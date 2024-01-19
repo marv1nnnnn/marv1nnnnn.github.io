@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on My New Hugo Site</title>
+    <title>Posts on Do Not Track</title>
     <link>https://marv1nnnnn.github.io/posts/</link>
-    <description>Recent content in Posts on My New Hugo Site</description>
+    <description>Recent content in Posts on Do Not Track</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Jan 2023 08:30:00 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 12 Jan 2024 11:23:15 +0800</lastBuildDate>
     <atom:link href="https://marv1nnnnn.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Post 3</title>
-      <link>https://marv1nnnnn.github.io/posts/post-3/</link>
-      <pubDate>Wed, 15 Mar 2023 11:00:00 -0700</pubDate>
-      <guid>https://marv1nnnnn.github.io/posts/post-3/</guid>
-      <description>Occaecat aliqua consequat laborum ut ex aute aliqua culpa quis irure esse magna dolore quis. Proident fugiat labore eu laboris officia Lorem enim. Ipsum occaecat cillum ut tempor id sint aliqua incididunt nisi incididunt reprehenderit. Voluptate ad minim sint est aute aliquip esse occaecat tempor officia qui sunt. Aute ex ipsum id ut in est velit est laborum incididunt. Aliqua qui id do esse sunt eiusmod id deserunt eu nostrud aute sit ipsum.</description>
+      <title>By the sea</title>
+      <link>https://marv1nnnnn.github.io/posts/20240112/</link>
+      <pubDate>Fri, 12 Jan 2024 11:23:15 +0800</pubDate>
+      <guid>https://marv1nnnnn.github.io/posts/20240112/</guid>
+      <description>这两天在看 Unity 2D 的入门材料，一般来说我更习惯读书来学习，但这块的资料好像并没有那么多—— 大部分书籍都是 2016 年左右。这方面我总是有些怪癖，只想通过最近一两年内出版的书来学习。可能是 AI 这个领域日新月异导致的不安全感，总觉得几年前出版的书，大部分内容今天都会失效。 但实际上 Unity 是一个很稳定的产品 (尽管刚刚裁员 1500) —— 游戏开发周期那么长，如果不向前兼容的话，学习成本太高。这也不由得让人去想，这真的就是最好的设计了么，最初可能只是少数人构思的几个原型，被越来越多的人使用，越做越大，大到没法改版，Hypernormalization. 人本质还是厌恶风险，厌恶改版。&#xA;最初我在看 B 站上的教学视频：https://www.bilibili.com/video/BV1Xj411r7Mm 自称自己是零难度，搜索排名第一的视频。但真的看起来却发现非常痛苦，麦克风收音很差，视频剪辑甚至会跳过关键步骤。而且每一步只是单纯的讲该怎么做，却不讲为什么做。直到看到一条弹幕说“真的讲的好差“，才彻底决定放弃这个教学视频。 后来我去 Youtube 上找视频，看到 [[Youtube Unity 2D tutorial]] 感叹于中英文长视频质量差异之大。但看到后面也让人有一点不适，这种不适很 personal. 主讲人是一个 ginger，很可爱，各种意义上。在视频讲解的间隙，镜头会从屏幕切换到他，他会讲两句俏皮话，配上合适的面部表情。&#xA;问题就在于他看起来很清楚的认识到自己的魅力所在，而且会应用这种魅力。我看过太多的技术人员分享的视频，拘谨，僵硬，心中有千万情绪缺只能用一种尴尬的生态展现。好在大部分时候听众也同样是技术，讲者和听众之间有种不言自明的默契。 不知道这是不是一种嫉妒？应该是吧。大概有这么几种人，不知道自己身上特质的人，知道自己身上特质但不会（想）去利用的人，知道自己身上特质并主动去利用的人。我可能是第二种，但没有欲望去成为第三种。 佩服这种做了很精致剪辑（一定反复反复录了很多遍，注意每一个细节），同时还展示自己的脆弱和尴尬的视频。这说明他一定已经很接纳自己了，能够真诚的把自己交付给这个世界。 这种人能有什么问题呢？后来我查到这个人叫 Mark Brown，做高质量游戏解读视频非常有名。我在网上搜他的评论，会有很多人抱怨他讲的东西很浅显但故作高深，但也有人说他其实不会不懂装懂，很坦诚自己没有那么专业。唯独没有人不喜欢他的视频风格，大家都很喜欢他的声音，停顿，节奏。 我想我不喜欢的原因还是，某种深处，我们可能会是一种人，内向，敏感，带着一点点小聪明。区别就在于，我还在用这些去构建自我防御，而他却能把这些转化成风格去生产。难道痛苦就只配在地下室一个人慢慢咀嚼么？在镜头前剪辑了三十遍的脆弱，会给人带来一丝坚强么？&#xA;写到这里慢慢有点写不下去了，这些议题缠绕在我身上太久，像阴魂一样。像三岛由纪夫所说，这些对生产力确实没有帮助，我想过去我就是陷入这些太久了，想要保持情绪的一种纯粹性而不加控制。实际上并不矛盾，就像大海，在海中，还是在海岸，海还会是海。我需要多站在海岸上一些。</description>
     </item>
     <item>
-      <title>Post 2</title>
-      <link>https://marv1nnnnn.github.io/posts/post-2/</link>
-      <pubDate>Wed, 15 Feb 2023 10:00:00 -0700</pubDate>
-      <guid>https://marv1nnnnn.github.io/posts/post-2/</guid>
-      <description>Anim eiusmod irure incididunt sint cupidatat. Incididunt irure irure irure nisi ipsum do ut quis fugiat consectetur proident cupidatat incididunt cillum. Dolore voluptate occaecat qui mollit laborum ullamco et. Ipsum laboris officia anim laboris culpa eiusmod ex magna ex cupidatat anim ipsum aute. Mollit aliquip occaecat qui sunt velit ut cupidatat reprehenderit enim sunt laborum. Velit veniam in officia nulla adipisicing ut duis officia.&#xA;Exercitation voluptate irure in irure tempor mollit Lorem nostrud ad officia.</description>
+      <title>Why I Start (Again?)</title>
+      <link>https://marv1nnnnn.github.io/posts/whyis/</link>
+      <pubDate>Mon, 08 Jan 2024 16:03:15 +0800</pubDate>
+      <guid>https://marv1nnnnn.github.io/posts/whyis/</guid>
+      <description>今年要 28 岁了，一般来说人也到了下坡的时间，日子像雪球一样滚着，没有什么值得额外记录的。心也会孟一层尘隔绝外部的光和热。过去二十多年我也从来没有刻意记录过什么，一直试图把自己放在一种漂浮的状态，无根无基，似乎这种状态才可以避免暴风雨时连根拔起的撕裂。&#xA;但去年确实是很特别的一年，27 岁，对于所有活在梦里的人可能都是一道坎。在豆瓣账号被永久封禁后，那种漂浮感愈发强烈，这种“无重力感”带来的不适慢慢超越了对撕裂的恐惧。过去会不敢面对自己的记录，因为一切都变化的太快，今年的我憎恨着昨天的我，明天的我又会憎恨今天的我。现在仿佛到了一个平原，各种人生的方向也都窥视过一二，自我依旧很令人讨厌，但不至于无法面对。也意识到其他过客无法真的带来什么，只有凝视自己，凝视所带来的未知，才是会扎根的。&#xA;我开始试着去培养一些可以终生的爱好，比如打网球，因为它会用到全身的肌肉以及大脑，比如做游戏，因为它需要文本、编程、图像、音乐所有这些技能。这个年龄开始做这些已经不是想要做出些什么，而是对过去二十多年从来没有真正投入过一件事情的一种亡羊补牢。&#xA;同样工作上今年也会是很关键性的一年，站在一个开创性的机会面前，也站在悬崖绝壁的面前。&#xA;我可能花了二十多年才接纳自己，可以直视自己，从旁观者去看自己的想法，并把这些记录下来。希望这次记录可以延续久一些，此刻虔诚的期望。</description>
     </item>
     <item>
-      <title>Post 1</title>
-      <link>https://marv1nnnnn.github.io/posts/post-1/</link>
-      <pubDate>Sun, 15 Jan 2023 09:00:00 -0700</pubDate>
-      <guid>https://marv1nnnnn.github.io/posts/post-1/</guid>
-      <description>Tempor proident minim aliquip reprehenderit dolor et ad anim Lorem duis sint eiusmod. Labore ut ea duis dolor. Incididunt consectetur proident qui occaecat incididunt do nisi Lorem. Tempor do laborum elit laboris excepteur eiusmod do. Eiusmod nisi excepteur ut amet pariatur adipisicing Lorem.&#xA;Occaecat nulla excepteur dolore excepteur duis eiusmod ullamco officia anim in voluptate ea occaecat officia. Cillum sint esse velit ea officia minim fugiat. Elit ea esse id aliquip pariatur cupidatat id duis minim incididunt ea ea.</description>
+      <title></title>
+      <link>https://marv1nnnnn.github.io/posts/test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://marv1nnnnn.github.io/posts/test/</guid>
+      <description>![[/posts/images/a.png]]</description>
     </item>
   </channel>
 </rss>
