@@ -29,6 +29,12 @@
     <guid>https://quartz.jzhao.xyz/20240112</guid>
     <description>这两天在看 Unity 2D 的入门材料，一般来说我更习惯读书来学习，但这块的资料好像并没有那么多—— 大部分书籍都是 2016 年左右。这方面我总是有些怪癖，只想通过最近一两年内出版的书来学习。可能是 AI 这个领域日新月异导致的不安全感，总觉得几年前出版的书，大部分内容今天都会失效。 但实际上 Unity 是一个很稳定的产品 (尽管刚刚裁员 1500) —— 游戏开发周期那么长，如果不向前兼容的话，学习成本太高。这也不由得让人去想，这真的就是最好的设计了么，最初可能只是少数人构思的几个原型，被越来越多的人使用，越做越大，大到没法改版，Hypernormalization.</description>
     <pubDate>Mon, 29 Jan 2024 03:42:09 GMT</pubDate>
+  </item><item>
+    <title>index</title>
+    <link>https://quartz.jzhao.xyz/</link>
+    <guid>https://quartz.jzhao.xyz/</guid>
+    <description>sss.</description>
+    <pubDate>Mon, 29 Jan 2024 03:28:55 GMT</pubDate>
   </item>
     </channel>
   </rss>
