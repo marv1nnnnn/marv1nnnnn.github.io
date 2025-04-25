@@ -1,0 +1,67 @@
+---
+import '../../styles/global.css';
+import { AstroSeo } from '@astrolib/seo';
+import { getImage } from 'astro:assets';
+import macBackground1 from '../../assets/images/mac-background1.jpg';
+import macBackground2 from '../../assets/images/mac-background2.jpg';
+import macBackground3 from '../../assets/images/mac-background3.jpg';
+
+const backgrounds = await Promise.all([
+  getImage({ src: macBackground1, width: 3500 }),
+  getImage({ src: macBackground2, width: 3500 }),
+  getImage({ src: macBackground3, width: 3500 }),
+]);
+---
+
+<!-- Core meta tags -->
+<meta charset='UTF-8' />
+<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+<meta
+  name='viewport'
+  content='width=device-width, initial-scale=1, maximum-scale=1'
+/>
+<meta name='author' content='Marvin Ma' />
+<!-- Replace with your name -->
+
+<!-- SEO Configuration - customize these values -->
+<AstroSeo
+  title={Astro.props.title || 'Marvin Ma - Engineer, Developer, 90% useless trivia, 10% deep weirdness'}
+  description={Astro.props.description ||
+    'Personal portfolio showcasing software engineering, indie game development, and digital art projects.'}
+  canonical={Astro.props.canonical || 'https://marv1nnnnn.github.io'}
+  openGraph={{
+    url: Astro.props.openGraph?.url || 'https://marv1nnnnn.github.io',
+    title: Astro.props.openGraph?.title || 'Marvin Ma - Engineer, Developer, 90% useless trivia, 10% deep weirdness',
+    description:
+      Astro.props.openGraph?.description ||
+      'Personal portfolio showcasing software engineering, indie game development, and digital art projects.',
+    images: [
+      // {
+      //   url: '', // og image here
+      // },
+    ],
+    site_name: Astro.props.openGraph?.site_name || 'Marvin Ma',
+  }}
+/>
+
+<!-- Favicon links removed as none provided -->
+
+<!-- Theme colors for browsers -->
+<meta name='msapplication-TileColor' content='YOUR_COLOR_HEX' />
+<meta name='theme-color' content='YOUR_COLOR_HEX' />
+
+<!-- Auto-generated sitemap -->
+<link rel='sitemap' href='/sitemap-index.xml' />
+
+<!-- Preload background images for performance -->
+{
+  backgrounds.map((bg) => (
+    <link
+      rel='preload'
+      href={bg.src}
+      as='image'
+      type='image/webp'
+      fetchpriority='high'
+    />
+  ))
+}

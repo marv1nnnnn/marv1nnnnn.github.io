@@ -1,0 +1,21 @@
+---
+import BaseHead from '../components/global/BaseHead.astro';
+---
+
+<html
+  lang='en'
+  class='scroll-smooth selection:bg-gray-900 selection:text-white overflow-x-hidden'
+>
+  <head>
+    <BaseHead
+      title={Astro.props.title}
+      description={Astro.props.description}
+      canonical={Astro.props.canonical}
+      openGraph={Astro.props.openGraph}
+    />
+  </head>
+
+  <body class='overflow-x-hidden bg-gray-900'>
+    <slot />
+  </body>
+</html>

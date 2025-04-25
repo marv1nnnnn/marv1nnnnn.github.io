@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://YOUR_WEBSITE_URL/sitemap-index.xml
+
+# Avoid API routes
+Disallow: /api/

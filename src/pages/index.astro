@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LandingPage from '../components/LandingPage.astro';
+---
+
+<!-- 
+  Customize these values for your portfolio:
+  - title: Your name and role
+  - description: Brief description of your expertise
+  - canonical: Your website URL
+  - openGraph: Social media sharing metadata
+-->
+<Layout
+  title='Marvin Ma - Engineer, Developer, 90% useless trivia, 10% deep weirdness'
+  description='Personal portfolio showcasing software engineering, indie game development, and digital art projects.'
+  canonical='https://marv1nnnnn.github.io'
+  openGraph={{
+    url: 'https://marv1nnnnn.github.io',
+    title: 'Marvin Ma - Engineer, Developer, 90% useless trivia, 10% deep weirdness',
+    description:
+      'Personal portfolio showcasing software engineering, indie game development, and digital art projects.',
+    site_name: 'Marvin Ma',
+  }}
+>
+  <LandingPage />
+</Layout>
