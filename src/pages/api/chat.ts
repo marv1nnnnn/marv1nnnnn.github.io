@@ -1,13 +1,19 @@
 import type { APIRoute } from 'astro';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-});
-
 export const POST: APIRoute = async ({ request }) => {
+  // Initialize OpenAI client inside the handler to avoid build-time errors
+  const openai = new OpenAI({
+    apiKey: import.meta.env.OPENAI_API_KEY,
+  });
+
   try {
     const body = await request.json();
+
+    // Check if API key is actually available at runtime before proceeding
+    if (!openai.apiKey) {
+      throw new Error('OpenAI API key is missing.');
+    }
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',

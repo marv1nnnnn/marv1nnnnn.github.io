@@ -377,6 +377,26 @@
           "Existing entries (**/.DS_STORE, .project_state.json, .roomodes) are preserved."
         ],
         "log": [".gitignore updated successfully with standard Node.js/Astro exclusions."]
+      },
+      "task-fix-astro-config-001": {
+        "description": "Correct astro.config.mjs for GitHub Pages deployment. Update 'site', change 'output' to 'static', remove 'vercel' adapter, and set 'base' to '/'.",
+        "assignedTo": "apex-implementer",
+        "status": "Done",
+        "dependsOn": ["task-fix-deploy-workflow-001"],
+        "inputs": ["astro.config.mjs"],
+        "outputs": ["astro.config.mjs"],
+        "acceptanceCriteria": [
+          "site is updated to 'https://marv1nnnnn.github.io'.",
+          "output is set to 'static'.",
+          "vercel adapter is removed from integrations.",
+          "base is set to '/'.",
+          "npm run build completes successfully after changes."
+        ],
+        "log": [
+          "Updated astro.config.mjs: set site='https://marv1nnnnn.github.io', base='/', output='static', removed vercel adapter.",
+          "Fixed build error by moving OpenAI client initialization inside the POST handler in src/pages/api/chat.ts.",
+          "Build successful after changes."
+        ]
       }
   },
   "journal": [
@@ -427,6 +447,14 @@
     {
       "timestamp": "2025-04-25T18:08:20+08:00",
       "entry": "Deployment workflow fixed. All phases complete."
+    },
+    {
+      "timestamp": "2025-04-25T18:34:00+08:00",
+      "entry": "Deployment successful but resulted in 404. Diagnosed issue: incorrect astro.config.mjs settings (output, adapter, site, base) for GitHub Pages. Creating task task-fix-astro-config-001 to correct configuration."
+    },
+    {
+      "timestamp": "2025-04-25T18:37:14+08:00",
+      "entry": "Task task-fix-astro-config-001 completed by apex-implementer. astro.config.mjs corrected for GitHub Pages static deployment. Build successful."
     }
   ]
 }

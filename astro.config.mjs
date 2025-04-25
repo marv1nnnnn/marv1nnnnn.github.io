@@ -2,12 +2,12 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
-import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   // Replace with your website URL (required for sitemap generation)
-  site: 'https://example.com',
+  site: 'https://marv1nnnnn.github.io',
+  base: '/', // Set the base path for GitHub Pages deployment
 
   // URL configuration
   trailingSlash: 'never', // Removes trailing slashes from URLs
@@ -30,8 +30,7 @@ export default defineConfig({
   ],
 
   // Deployment configuration
-  output: 'server', // Server-side rendering - required for OpenAI API usage
-  adapter: vercel(), // Deploy to Vercel - optional
+  output: 'static', // Output static files for GitHub Pages
   devToolbar: {
     enabled: false,
   },
