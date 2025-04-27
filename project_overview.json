@@ -1,0 +1,113 @@
+{
+  "projectName": "marv1nnnnn.github.io",
+  "overallStatus": "Needs Review",
+  "highLevelPlan": [
+    "Analyze and fix the 400 Bad Request error and image preload warnings.",
+    "Describe a user interface for displaying blog content that renders markdown, combining terminal and modern text editor aesthetics.",
+    "Implement the blog content display UI as a modal component.",
+    "Debug errors related to remark-prism.js and global object in client-side code."
+  ],
+  "tasks": {
+    "task-001-debug-blog-error": {
+      "type": "debug",
+      "status": "Needs Review",
+      "assignedTo": null,
+      "dependsOn": [],
+      "description_summary": "Analyzed and fixed backend path issue for 400 Bad Request; frontend parameter still null."
+    },
+    "task-002-debug-filename-param": {
+      "type": "debug",
+      "status": "Done",
+      "assignedTo": null,
+      "dependsOn": ["task-001-debug-blog-error"],
+      "description_summary": "Debug why fileName parameter is null in MacToolbar.tsx."
+    },
+    "task-003-debug-blog-content-400": {
+      "type": "debug",
+      "status": "Done",
+      "assignedTo": null,
+      "dependsOn": ["task-002-debug-filename-param"],
+      "description_summary": "Debug the 400 Bad Request error from /api/blog-content when fileName is provided."
+    },
+    "task-004-debug-blog-content-api-error": {
+      "type": "debug",
+      "status": "Done",
+      "assignedTo": "debug",
+      "dependsOn": [],
+      "description_summary": "Initial debugging complete. Issue likely related to Astro configuration or network environment, not backend code logic for query parameters."
+    },
+    "task-005-investigate-astro-config": {
+      "type": "debug",
+      "status": "Done",
+      "assignedTo": "debug",
+      "dependsOn": ["task-004-debug-blog-content-api-error"],
+      "description_summary": "Investigation complete. Issue likely an Astro bug with query parameter handling in development server. Suggested workarounds or monitoring Astro repo."
+    },
+    "task-006-implement-dynamic-route": {
+      "type": "code",
+      "status": "Done",
+      "assignedTo": "apex-implementer",
+      "dependsOn": ["task-005-investigate-astro-config"],
+      "description_summary": "Implemented dynamic route segment workaround for /api/blog-content and updated tests."
+    },
+    "task-007-describe-blog-ui": {
+      "type": "design",
+      "status": "Done",
+      "assignedTo": null,
+      "dependsOn": [],
+      "description_summary": "Describe a user interface for displaying blog content that renders markdown, combining terminal and modern text editor aesthetics."
+    },
+    "task-008-implement-blog-ui-component": {
+      "type": "feature",
+      "status": "Done",
+      "assignedTo": "apex-implementer",
+      "dependsOn": ["task-007-describe-blog-ui"],
+      "description_summary": "Implement the blog content display UI as a modal component that appears when a blog title is clicked."
+    },
+    "task-009-debug-blog-ui-errors": {
+      "type": "debug",
+      "status": "Done",
+      "assignedTo": "debug",
+      "dependsOn": ["task-008-implement-blog-ui-component"],
+      "description_summary": "Debug errors related to remark-prism.js and global object when displaying blog content in the modal component."
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "4/27/2025, 8:47:00 AM",
+      "note": "Task task-003-debug-blog-content-400 marked as Done. Testing was skipped as requested by the user."
+    },
+    {
+      "timestamp": "4/27/2025, 9:08:51 AM",
+      "note": "Task task-006-implement-dynamic-route marked as Done. Testing was skipped as requested by the user."
+    },
+    {
+      "timestamp": "4/27/2025, 9:29:42 AM",
+      "note": "Task task-007-describe-blog-ui marked as Done. UI specification created and subtasks defined."
+    },
+    {
+      "timestamp": "4/27/2025, 9:35:41 AM",
+      "note": "Task task-008-implement-blog-ui-component was started but canceled by the user."
+    },
+    {
+      "timestamp": "4/27/2025, 9:37:10 AM",
+      "note": "Task task-008-implement-blog-ui-component marked as Done. Tests were skipped as requested by the user."
+    },
+    {
+      "timestamp": "4/27/2025, 9:38:16 AM",
+      "note": "User reported errors after task-008 completion. Task-008 status updated to Blocked-Debug. Created task-009 to address the errors."
+    },
+     {
+      "timestamp": "4/27/2025, 9:49:40 AM",
+      "note": "Task task-009-debug-blog-ui-errors marked as Implemented. Markdown processing moved to server-side."
+    },
+    {
+      "timestamp": "4/27/2025, 9:50:08 AM",
+      "note": "User reported that errors persist after task-009 completion. Task-009 status updated to Blocked-Debug."
+    },
+    {
+      "timestamp": "4/27/2025, 9:52:38 AM",
+      "note": "Task task-009-debug-blog-ui-errors marked as Done. Errors resolved by removing client-side script block."
+    }
+  ]
+}

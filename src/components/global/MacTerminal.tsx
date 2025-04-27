@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FaRegFolderClosed } from 'react-icons/fa6';
 
 type Message = {
@@ -30,6 +30,7 @@ export default function MacTerminal() {
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isMouseNearTop, setIsMouseNearTop] = useState(false); // State to track if mouse is near the top bar
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -136,29 +137,131 @@ If a question is asked, respond with: "The AI chat feature is currently disabled
       input: '',
     }));
 
-    // AI Chat logic disabled as per task instructions (skipAIChat: true)
-    // Immediately show the "disabled" message instead of calling API
-    setChatHistory((prev) => ({
-      ...prev,
-      messages: [
-        ...prev.messages,
-        {
-          role: 'assistant',
-          content:
-            'The AI chat feature is currently disabled. Please check out my GitHub profile or other links for more information.',
+    setIsTyping(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      ],
-    }));
+        body: JSON.stringify({ messages: [...chatHistory.messages, { role: 'user', content: userInput }] }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      setChatHistory((prev) => ({
+        ...prev,
+        messages: [
+          ...prev.messages,
+          { role: 'assistant', content: data.message },
+        ],
+      }));
+    } catch (error) {
+      console.error('Error fetching chat response:', error);
+      setChatHistory((prev) => ({
+        ...prev,
+        messages: [
+          ...prev.messages,
+          {
+            role: 'assistant',
+            content: `Error: Unable to get response. ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      }));
+    } finally {
+      setIsTyping(false);
+    }
   };
 
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  // Center the terminal initially
+  useEffect(() => {
+    const centerTerminal = () => {
+      if (terminalRef.current) {
+        const terminalWidth = terminalRef.current.offsetWidth;
+        const terminalHeight = terminalRef.current.offsetHeight;
+        const centerX = (window.innerWidth - terminalWidth) / 2;
+        const centerY = (window.innerHeight - terminalHeight) / 2;
+        setPosition({ x: centerX, y: centerY });
+      }
+    };
+
+    centerTerminal();
+    window.addEventListener('resize', centerTerminal);
+
+    return () => window.removeEventListener('resize', centerTerminal);
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (terminalRef.current) {
+      setIsDragging(true);
+      setOffset({
+        x: e.clientX - terminalRef.current.getBoundingClientRect().left,
+        y: e.clientY - terminalRef.current.getBoundingClientRect().top,
+      });
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+    setPosition({
+      x: e.clientX - offset.x,
+      y: e.clientY - offset.y,
+    });
+  }, [isDragging, offset]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
+
+
   return (
-    <div className='bg-black/75 w-[600px] h-[400px] rounded-lg overflow-hidden shadow-lg mx-4 sm:mx-0'>
-      <div className='bg-gray-800 h-6 flex items-center space-x-2 px-4'>
+    <div
+      ref={terminalRef}
+      data-testid="mac-terminal" // Add data-testid here
+      className='bg-black/75 w-[600px] h-[400px] rounded-lg overflow-hidden shadow-lg fixed'
+      style={{ left: `${position.x}px`, top: `${position.y}px`, cursor: isDragging ? 'grabbing' : 'grab' }}
+      onMouseMove={(e) => { // Add mouse move listener to the main terminal div
+        if (terminalRef.current) {
+          const terminalRect = terminalRef.current.getBoundingClientRect();
+          const mouseY = e.clientY - terminalRect.top;
+          // Define a threshold for "near the top bar" (e.g., the height of the top bar, which is h-6 ~ 24px)
+          const topBarHeight = 24;
+          setIsMouseNearTop(mouseY <= topBarHeight);
+        }
+      }}
+      onMouseLeave={() => setIsMouseNearTop(false)} // Hide icon when mouse leaves terminal
+    >
+      <div
+        className='bg-gray-800 h-6 flex items-center space-x-2 px-4 cursor-grab'
+        onMouseDown={handleMouseDown}
+      >
         <div className='w-3 h-3 rounded-full bg-red-500'></div>
         <div className='w-3 h-3 rounded-full bg-yellow-500'></div>
         <div className='w-3 h-3 rounded-full bg-green-500'></div>
         <span className='text-sm text-gray-300 flex-grow text-center font-semibold flex items-center justify-center gap-2'>
-          <FaRegFolderClosed size={14} className='text-gray-300' />
+          <span data-testid="drag-icon" className={`flex items-center gap-2 transition-opacity duration-200 ${isMouseNearTop ? 'opacity-100' : 'opacity-0'}`}> {/* Conditionally apply opacity to icon */}
+            <FaRegFolderClosed size={14} className='text-gray-300' />
+          </span>
           marv1nnnnn.github.io ⸺ zsh
         </span>
       </div>

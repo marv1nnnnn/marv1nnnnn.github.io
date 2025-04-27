@@ -18,3 +18,5 @@ dist/
 
 # Logs
 *.log
+.state
+.docs
