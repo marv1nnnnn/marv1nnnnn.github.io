@@ -13,6 +13,12 @@ interface AppLayoutProps {
 export default function Desktop({ initialBg, backgroundMap }: AppLayoutProps) {
   const [currentBg, setCurrentBg] = useState<string>(initialBg);
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    }
+    return 'dark';
+  });
 
   useEffect(() => {
     const lastBg = localStorage.getItem('lastBackground');
@@ -45,6 +51,14 @@ export default function Desktop({ initialBg, backgroundMap }: AppLayoutProps) {
     loadBackgroundImage();
   }, [currentBg, backgroundMap]);
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', content: '' });
@@ -68,7 +82,7 @@ export default function Desktop({ initialBg, backgroundMap }: AppLayoutProps) {
       />
 
       <div className='relative z-10'>
-        <MacToolbar onBlogFileSelect={openModal} /> {/* Pass openModal to MacToolbar */}
+        <MacToolbar onBlogFileSelect={openModal} toggleTheme={toggleTheme} currentTheme={theme} /> {/* Pass openModal and theme toggle to MacToolbar */}
       </div>
 
       <div className='relative z-0 flex items-center justify-center h-[calc(100vh-10rem)] md:h-[calc(100vh-1.5rem)] pt-6'>

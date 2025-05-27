@@ -1,5 +1,52 @@
 @import 'tailwindcss';
 
+/* Define macOS-inspired color palette using CSS variables */
+:root {
+  /* Light Mode Colors */
+  --mac-bg-light: #ffffff;
+  --mac-text-light: #1c1c1e; /* Dark Gray */
+  --mac-secondary-text-light: #636366; /* Medium Gray */
+  --mac-border-light: #e5e5ea; /* Light Gray */
+  --mac-accent-blue-light: #007aff; /* Apple Blue */
+  --mac-code-bg-light: #f5f5f7; /* Light Gray for code */
+  --mac-code-text-light: #3a3a3c; /* Darker Gray for code text */
+  --mac-blockquote-bg-light: #f2f2f7; /* Very light gray */
+  --mac-blockquote-border-light: #d1d1d6; /* Light gray border */
+  --mac-link-light: #007aff;
+
+  /* Dark Mode Colors */
+  --mac-bg-dark: #1c1c1e; /* Dark Gray */
+  --mac-text-dark: #f2f2f7; /* Light Gray */
+  --mac-secondary-text-dark: #8e8e93; /* Medium Gray */
+  --mac-border-dark: #3a3a3c; /* Darker Gray */
+  --mac-accent-blue-dark: #0a84ff; /* Slightly brighter blue for dark mode */
+  --mac-code-bg-dark: #2c2c2e; /* Darker Gray for code */
+  --mac-code-text-dark: #f2f2f7; /* Light Gray for code text */
+  --mac-blockquote-bg-dark: #2c2c2e; /* Darker gray */
+  --mac-blockquote-border-dark: #48484a; /* Dark gray border */
+  --mac-link-dark: #0a84ff;
+}
+
+/* Default to Dark Mode (or apply based on system preference/toggle) */
+html {
+  color-scheme: dark; /* Hint to browser for scrollbars, etc. */
+}
+
+body {
+  background-color: var(--mac-bg-dark);
+  color: var(--mac-text-dark);
+}
+
+/* Light Mode Overrides */
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='light'] body {
+  background-color: var(--mac-bg-light);
+  color: var(--mac-text-light);
+}
+
 @layer base {
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
@@ -7,9 +54,252 @@
       'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6; /* Slightly increased line height for readability */
   }
 
   .font-mono {
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
   }
+}
+
+/* Ensure iframes within blog content have a transparent background */
+.blog-content-modal-markdown iframe {
+  background-color: transparent !important;
+}
+
+/* Modal Container & Overlay */
+.blog-content-modal-overlay {
+  backdrop-filter: blur(5px); /* Subtle blur for the overlay */
+}
+
+.blog-content-modal-container {
+  /* Use CSS variables for background and border */
+  background-color: rgba(var(--mac-bg-dark-rgb, 28, 28, 30), 0.9); /* Fallback for RGB */
+  border: 1px solid var(--mac-border-dark);
+  @apply rounded-xl shadow-2xl; /* Stronger shadow */
+  backdrop-filter: blur(15px); /* Frosted glass effect for the modal itself */
+}
+
+html[data-theme='light'] .blog-content-modal-container {
+  background-color: rgba(var(--mac-bg-light-rgb, 255, 255, 255), 0.9);
+  border: 1px solid var(--mac-border-light);
+}
+
+/* Blog Content Modal Markdown Styling */
+.blog-content-modal-markdown {
+  color: var(--mac-text-dark); /* Use variable for text color */
+  @apply leading-relaxed text-lg mx-auto; /* Lighter text, slightly larger, centered */
+  /* Removed fixed padding, now handled by BlogContentModal.tsx */
+  font-family: sans-serif; /* Modern font */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown {
+  color: var(--mac-text-light);
+}
+
+.blog-content-modal-markdown h1,
+.blog-content-modal-markdown h2,
+.blog-content-modal-markdown h3,
+.blog-content-modal-markdown h4,
+.blog-content-modal-markdown h5,
+.blog-content-modal-markdown h6 {
+  color: var(--mac-text-dark); /* Headings use primary text color */
+  @apply font-semibold mt-10 mb-4; /* Slightly less bold, more refined spacing */
+  letter-spacing: -0.02em; /* Tighter letter spacing for headings */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown h1,
+html[data-theme='light'] .blog-content-modal-markdown h2,
+html[data-theme='light'] .blog-content-modal-markdown h3,
+html[data-theme='light'] .blog-content-modal-markdown h4,
+html[data-theme='light'] .blog-content-modal-markdown h5,
+html[data-theme='light'] .blog-content-modal-markdown h6 {
+  color: var(--mac-text-light);
+}
+
+.blog-content-modal-markdown h1 { @apply text-4xl; } /* Larger H1 */
+.blog-content-modal-markdown h2 { @apply text-3xl; } /* Larger H2 */
+.blog-content-modal-markdown h3 { @apply text-2xl; } /* Larger H3 */
+.blog-content-modal-markdown h4 { @apply text-xl; } /* Larger H4 */
+
+.blog-content-modal-markdown p {
+  @apply mb-5; /* Increased paragraph spacing */
+}
+
+.blog-content-modal-markdown a {
+  color: var(--mac-link-dark); /* Use variable for link color */
+  @apply hover:opacity-80 transition-opacity duration-200; /* Modern link styling with transition */
+  text-decoration: none; /* Remove default underline */
+  border-bottom: 1px solid currentColor; /* Add subtle underline that matches text color */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown a {
+  color: var(--mac-link-light);
+}
+
+.blog-content-modal-markdown ul,
+.blog-content-modal-markdown ol {
+  @apply mb-5 pl-6; /* Increased list spacing and padding */
+}
+
+.blog-content-modal-markdown ul {
+  @apply list-disc;
+}
+
+.blog-content-modal-markdown ol {
+  @apply list-decimal;
+}
+
+.blog-content-modal-markdown li {
+  @apply mb-2.5; /* Increased list item spacing */
+}
+
+.blog-content-modal-markdown blockquote {
+  border-left: 4px solid var(--mac-accent-blue-dark); /* macOS blue border */
+  background-color: var(--mac-blockquote-bg-dark); /* Subtle background */
+  color: var(--mac-secondary-text-dark); /* Secondary text color */
+  @apply pl-5 py-3 italic mb-6 rounded-r-md; /* Modern blockquote with blue border and subtle background */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown blockquote {
+  border-left: 4px solid var(--mac-accent-blue-light);
+  background-color: var(--mac-blockquote-bg-light);
+  color: var(--mac-secondary-text-light);
+}
+
+.blog-content-modal-markdown pre {
+  background-color: var(--mac-code-bg-dark); /* Code block background */
+  color: var(--mac-code-text-dark); /* Code block text color */
+  @apply p-6 rounded-lg overflow-x-auto mb-6; /* More padding */
+  border: 1px solid var(--mac-border-dark); /* Subtle border */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Subtle inner shadow */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown pre {
+  background-color: var(--mac-code-bg-light);
+  color: var(--mac-code-text-light);
+  border: 1px solid var(--mac-border-light);
+}
+
+.blog-content-modal-markdown code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace; /* Prefer Menlo for macOS feel */
+  background-color: var(--mac-code-bg-dark); /* Inline code background */
+  color: var(--mac-code-text-dark); /* Inline code text color */
+  @apply text-sm px-1.5 py-0.5 rounded-md; /* Inline code with better padding, rounded corners */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown code {
+  background-color: var(--mac-code-bg-light);
+  color: var(--mac-code-text-light);
+}
+
+.blog-content-modal-markdown pre code {
+  @apply bg-transparent p-0; /* Reset for code inside pre */
+}
+
+.blog-content-modal-markdown table {
+  @apply w-full border-collapse mb-6; /* Table styling with more margin */
+}
+.blog-content-modal-markdown th,
+.blog-content-modal-markdown td {
+  border: 1px solid var(--mac-border-dark); /* Table cell border */
+  @apply px-5 py-3 text-left; /* Table cell styling with more padding */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown th,
+html[data-theme='light'] .blog-content-modal-markdown td {
+  border: 1px solid var(--mac-border-light);
+}
+
+.blog-content-modal-markdown th {
+  background-color: var(--mac-code-bg-dark); /* Table header background */
+  color: var(--mac-text-dark); /* Table header text */
+  @apply font-semibold; /* Slightly less bold */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown th {
+  background-color: var(--mac-code-bg-light);
+  color: var(--mac-text-light);
+}
+
+.blog-content-modal-markdown img {
+  @apply max-w-full h-auto rounded-lg my-6 shadow-lg; /* Image styling with larger rounded corners and shadow */
+}
+
+/* Custom Scrollbar for Webkit browsers */
+.blog-content-modal-markdown::-webkit-scrollbar {
+  width: 8px; /* Thinner scrollbar */
+}
+
+.blog-content-modal-markdown::-webkit-scrollbar-track {
+  background: var(--mac-code-bg-dark); /* Darker track */
+  border-radius: 10px;
+}
+
+html[data-theme='light'] .blog-content-modal-markdown::-webkit-scrollbar-track {
+  background: var(--mac-code-bg-light);
+}
+
+.blog-content-modal-markdown::-webkit-scrollbar-thumb {
+  background: var(--mac-secondary-text-dark); /* Slightly lighter thumb */
+  border-radius: 10px;
+  border: 2px solid var(--mac-code-bg-dark); /* Border to make thumb appear thinner */
+}
+
+html[data-theme='light'] .blog-content-modal-markdown::-webkit-scrollbar-thumb {
+  background: var(--mac-secondary-text-light);
+  border: 2px solid var(--mac-code-bg-light);
+}
+
+.blog-content-modal-markdown::-webkit-scrollbar-thumb:hover {
+  background: #888; /* More distinct hover */
+}
+
+/* Text Selection */
+.blog-content-modal-markdown::selection {
+  background-color: var(--mac-accent-blue-dark); /* macOS blue selection color */
+  color: #ffffff;
+}
+
+html[data-theme='light'] .blog-content-modal-markdown::selection {
+  background-color: var(--mac-accent-blue-light);
+}
+
+/* Shiki specific styling for code blocks */
+.blog-content-modal-markdown pre.shiki {
+  padding: 1.5rem; /* Adjust padding for Shiki output */
+  line-height: 1.5; /* Ensure good line height for code */
+  font-size: 0.9rem; /* Slightly smaller font for code */
+}
+
+.blog-content-modal-markdown pre.shiki code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background-color: transparent; /* Shiki handles its own background */
+  padding: 0;
+}
+
+/* Ensure the RGB values are available for modal container transparency */
+:root {
+  --mac-bg-dark-rgb: 28, 28, 30;
+  --mac-bg-light-rgb: 255, 255, 255;
+}
+
+/* Resize Handle for Blog Content Modal */
+.resize-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  background: transparent; /* Make it invisible */
+  z-index: 10; /* Ensure it's above content */
+}
+
+/* Enable text selection for the modal content */
+.blog-content-modal-markdown {
+  user-select: text; /* Allow text selection */
+  -webkit-user-select: text; /* For Webkit browsers */
+  -moz-user-select: text; /* For Firefox */
+  -ms-user-select: text; /* For Internet Explorer/Edge */
 }

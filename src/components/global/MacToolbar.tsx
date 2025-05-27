@@ -9,9 +9,11 @@ import {
 import { VscVscode } from 'react-icons/vsc';
 export interface MacToolbarProps {
   onBlogFileSelect: (title: string, content: string) => void;
+  toggleTheme: () => void;
+  currentTheme: 'light' | 'dark';
 }
 
-export default function MacToolbar({ onBlogFileSelect }: MacToolbarProps) {
+export default function MacToolbar({ onBlogFileSelect, toggleTheme, currentTheme }: MacToolbarProps) {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
 
@@ -114,7 +116,10 @@ export default function MacToolbar({ onBlogFileSelect }: MacToolbarProps) {
           <div className='relative'>
             <span
               className='cursor-default hover:bg-white/20 px-2 rounded'
-              onClick={() => setIsFileMenuOpen(!isFileMenuOpen)}
+              onClick={() => {
+                console.log('MacToolbar - File menu clicked, isFileMenuOpen:', !isFileMenuOpen);
+                setIsFileMenuOpen(!isFileMenuOpen);
+              }}
             >
               File
             </span>
@@ -124,7 +129,8 @@ export default function MacToolbar({ onBlogFileSelect }: MacToolbarProps) {
                   <div
                     key={file}
                     className='px-4 py-1 hover:bg-blue-500 cursor-default'
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent event from bubbling up and closing the menu prematurely
                       console.log('Clicked file:', file); // Log the file being clicked
                       handleBlogFileClick(file);
                     }}
@@ -142,6 +148,21 @@ export default function MacToolbar({ onBlogFileSelect }: MacToolbarProps) {
           <span className='cursor-default'>Help</span>
         </div>
         <div className='flex items-center space-x-4'>
+          <button
+            onClick={toggleTheme}
+            className='flex items-center justify-center w-5 h-5 rounded-full hover:bg-white/20 transition-colors duration-200'
+            title={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} Mode`}
+          >
+            {currentTheme === 'light' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 4a1 1 0 011 1v1a1 1 0 11-2 0V7a1 1 0 011-1zm-4 0a1 1 0 011 1v1a1 1 0 11-2 0V7a1 1 0 011-1zm-4 0a1 1 0 011 1v1a1 1 0 11-2 0V7a1 1 0 011-1zm-3 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm0 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm3 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm4 0a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm3-4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm0-4a1 1 0 011 1v1a1 1 0 11-2 0V7a1 1 0 011-1zM7 10a3 3 0 116 0 3 3 0 01-6 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
           <VscVscode
             size={16}
             className='cursor-default hover:opacity-80 transition-opacity'

@@ -3,9 +3,7 @@ import { dirname } from 'path';
 import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
-import { remark } from 'remark';
-import html from 'remark-html';
-import remarkPrism from 'remark-prism';
+import { renderMarkdown } from '@utils/markdownRenderer'; // Import our custom markdown renderer
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -61,17 +59,10 @@ export const GET: APIRoute = async ({ params }) => {
 
     const markdownContent = await fs.readFile(filePath, 'utf-8');
 
-    // Process markdown to HTML with remark-prism
-    const processedContent = await remark()
-      .use(html, { sanitize: false }) // Use remark-html to convert to HTML
-      .use(remarkPrism) // Use remark-prism for syntax highlighting
-      .process(markdownContent);
+    // Use our custom renderMarkdown function to get HTML and headings
+    const { html, headings } = await renderMarkdown(markdownContent);
 
-    const content = processedContent.toString();
-
-    console.log('Generated HTML content:', content);
-
-    return new Response(JSON.stringify({ content }), {
+    return new Response(JSON.stringify({ content: html, headings }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json'
