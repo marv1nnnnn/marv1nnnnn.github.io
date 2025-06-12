@@ -17,7 +17,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        '@config': '/src/config',
+        '@config': new URL('./src/config', import.meta.url).pathname,
       },
     },
   },
