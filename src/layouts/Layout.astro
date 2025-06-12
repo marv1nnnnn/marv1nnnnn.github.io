@@ -1,0 +1,25 @@
+---
+import BaseHead from '../components/global/BaseHead.astro';
+import Analytics from '@vercel/analytics/astro'
+import  SpeedInsights  from "@vercel/speed-insights/astro"
+---
+
+<html
+  lang='en'
+  class='scroll-smooth selection:bg-gray-900 selection:text-white overflow-x-hidden'
+>
+  <head>
+    <BaseHead
+      title={Astro.props.title}
+      description={Astro.props.description}
+      canonical={Astro.props.canonical}
+      openGraph={Astro.props.openGraph}
+    />
+    <Analytics />
+    <SpeedInsights />
+  </head>
+
+  <body class='overflow-x-hidden bg-gray-900'>
+    <slot />
+  </body>
+</html>
