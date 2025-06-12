@@ -1,0 +1,78 @@
+---
+import '../../styles/global.css';
+import { AstroSeo } from '@astrolib/seo';
+import { getImage } from 'astro:assets';
+import macBackground1 from '../../assets/images/mac-background1.jpg';
+import macBackground2 from '../../assets/images/mac-background3.jpg';
+import macBackground3 from '../../assets/images/mac-background3.jpg';
+import { userConfig } from '../../config/userConfig';
+
+const backgrounds = await Promise.all([
+  getImage({ src: macBackground1, width: 3500 }),
+  getImage({ src: macBackground2, width: 3500 }),
+  getImage({ src: macBackground3, width: 3500 }),
+]);
+---
+
+<!-- Core meta tags -->
+<meta charset='UTF-8' />
+<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+<meta
+  name='viewport'
+  content='width=device-width, initial-scale=1, maximum-scale=1'
+/>
+<meta name='author' content={userConfig.name} />
+
+<!-- SEO Configuration -->
+<AstroSeo
+  title={Astro.props.title || userConfig.seo.title}
+  description={Astro.props.description || userConfig.seo.description}
+  canonical={Astro.props.canonical || userConfig.website}
+  openGraph={{
+    url: Astro.props.openGraph?.url || userConfig.website,
+    title: Astro.props.openGraph?.title || userConfig.seo.title,
+    description: Astro.props.openGraph?.description || userConfig.seo.description,
+    images: [
+      {
+        url: '',
+        // og image here
+      },
+    ],
+    site_name: Astro.props.openGraph?.site_name || userConfig.name,
+  }}
+/>
+
+<!-- Add your favicon files in public/images/ -->
+<link rel='apple-touch-icon' sizes='180x180' href='https://avatars.githubusercontent.com/u/97130221?s=400&u=aaa4eb0bf9d07b901f0b15df8540fefea2fca729&v=4' />
+<link
+  rel='icon'
+  type='image/png'
+  sizes='32x32'
+  href='https://avatars.githubusercontent.com/u/97130221?s=400&u=aaa4eb0bf9d07b901f0b15df8540fefea2fca729&v=4'
+/>
+<link
+  rel='icon'
+  type='image/png'
+  sizes='16x16'
+  href='https://avatars.githubusercontent.com/u/97130221?s=400&u=aaa4eb0bf9d07b901f0b15df8540fefea2fca729&v=4'
+/>
+
+<!-- Theme colors for browsers -->
+<meta name='msapplication-TileColor' content={userConfig.theme.secondaryColor} />
+<meta name='theme-color' content={userConfig.theme.secondaryColor} />
+
+<!-- Auto-generated sitemap -->
+<link rel='sitemap' href='/sitemap-index.xml' />
+
+<!-- Preload background images for performance -->
+{
+  backgrounds.map((bg) => (
+    <link
+      rel='preload'
+      href={bg.src}
+      as='image'
+      type='image/webp'
+      fetchpriority='high'
+    />
+  ))
+}
