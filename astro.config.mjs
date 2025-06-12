@@ -15,6 +15,11 @@ export default defineConfig({
   // Vite configuration
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@config': '/src/config',
+      },
+    },
   },
 
   // Required integrations
