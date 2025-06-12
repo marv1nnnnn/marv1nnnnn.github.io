@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
+
 export default defineConfig({
   // Replace with your website URL (required for sitemap generation)
   site: 'https://example.com',
