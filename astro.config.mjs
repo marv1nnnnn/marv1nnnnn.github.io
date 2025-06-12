@@ -4,6 +4,11 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   // Replace with your website URL (required for sitemap generation)
@@ -17,7 +22,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        '@config': new URL('./src/config', import.meta.url).pathname,
+        '@config': path.resolve(__dirname, './src/config'),
       },
     },
   },
