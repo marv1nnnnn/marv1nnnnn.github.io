@@ -40,3 +40,5 @@ export const GET: APIRoute = async ({ params }) => {
     });
   }
 };
+
+export const prerender = false;
