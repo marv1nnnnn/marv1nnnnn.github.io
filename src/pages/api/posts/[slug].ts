@@ -41,4 +41,12 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const prerender = false;
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const blogDirectory = new URL('../../../content/blog/', import.meta.url);
+  const files = await fs.readdir(blogDirectory);
+  return files
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => ({ params: { slug: file.replace(/\.md$/, '') } }));
+}

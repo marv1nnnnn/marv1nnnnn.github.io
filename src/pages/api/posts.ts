@@ -1,44 +1,32 @@
-import type { APIRoute } from 'astro';
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ request }) => {
+export const prerender = true;
+
+export const GET: APIRoute = async () => {
   const blogDirectory = path.join(process.cwd(), 'src', 'content', 'blog');
-  let posts: any[] = [];
+  const files = await fs.readdir(blogDirectory);
 
-  try {
-    const files = await fs.readdir(blogDirectory);
-
-    for (const file of files) {
-      if (file.endsWith('.md')) {
-        const filePath = path.join(blogDirectory, file);
-        const fileContent = await fs.readFile(filePath, 'utf-8');
+  const posts = await Promise.all(
+    files
+      .filter((file) => file.endsWith('.md'))
+      .map(async (filename) => {
+        const slug = filename.replace(/\.md$/, '');
+        const fileContent = await fs.readFile(path.join(blogDirectory, filename), 'utf-8');
         const { data } = matter(fileContent);
-
-        posts.push({
-          slug: file.replace('.md', ''),
+        return {
+          slug,
           ...data,
-        });
-      }
-    }
+        };
+      })
+  );
 
-    // Sort posts by date in descending order
-    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    return new Response(JSON.stringify(posts), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    return new Response(JSON.stringify({ message: 'Error fetching blog posts' }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
+  return new Response(JSON.stringify(posts), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
