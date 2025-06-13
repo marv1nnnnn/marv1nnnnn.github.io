@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import adapter from '@astrojs/adapter-static';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
@@ -31,13 +30,6 @@ export default defineConfig({
 
   // Deployment configuration for GitHub Pages
   output: 'static', // Static site generation for GitHub Pages
-  adapter: adapter({
-    pages: 'dist',
-    assets: 'dist',
-    routes: {
-      // Include all routes
-    },
-  }),
   devToolbar: {
     enabled: false,
   },
