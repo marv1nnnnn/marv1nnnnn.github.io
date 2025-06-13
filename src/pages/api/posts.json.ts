@@ -8,25 +8,16 @@ export const prerender = true;
 export const GET: APIRoute = async () => {
   const blogDirectory = path.join(process.cwd(), 'src', 'content', 'blog');
   const files = await fs.readdir(blogDirectory);
-
   const posts = await Promise.all(
     files
-      .filter((file) => file.endsWith('.md'))
+      .filter((f) => f.endsWith('.md'))
       .map(async (filename) => {
         const slug = filename.replace(/\.md$/, '');
-        const fileContent = await fs.readFile(path.join(blogDirectory, filename), 'utf-8');
-        const { data } = matter(fileContent);
-        return {
-          slug,
-          ...data,
-        };
+        const { data } = matter(await fs.readFile(path.join(blogDirectory, filename), 'utf-8'));
+        return { slug, ...data };
       })
   );
-
   return new Response(JSON.stringify(posts), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
-};
+}; 
