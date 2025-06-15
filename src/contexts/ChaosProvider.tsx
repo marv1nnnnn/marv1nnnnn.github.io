@@ -271,24 +271,7 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         <div className="screen-distortion" />
       )}
       
-      {/* Performance indicator for debugging */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{
-          position: 'fixed',
-          top: 10,
-          right: 10,
-          background: 'rgba(0,0,0,0.8)',
-          color: '#00ff00',
-          padding: '5px',
-          fontSize: '10px',
-          fontFamily: 'monospace',
-          zIndex: 99999
-        }}>
-          Performance: {systemState.performanceMode} | 
-          Chaos: {Math.round(systemState.chaosLevel * 100)}% |
-          Mobile: {systemState.isMobile ? 'Yes' : 'No'}
-        </div>
-      )}
+
     </ChaosContext.Provider>
   )
 }

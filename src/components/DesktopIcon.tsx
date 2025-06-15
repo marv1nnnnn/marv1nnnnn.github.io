@@ -46,64 +46,73 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onDoubleClick })
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: flex-start;
           width: 80px;
-          padding: 8px;
-          margin: 4px;
+          height: 90px;
+          padding: 4px;
           cursor: pointer;
-          border-radius: 4px;
-          transition: all 0.2s ease;
+          transition: all 0.15s ease;
           user-select: none;
+          position: relative;
         }
 
         .desktop-icon:hover {
-          background: rgba(255, 255, 255, 0.1);
           transform: scale(1.05);
         }
 
         .desktop-icon.selected {
-          background: rgba(0, 100, 200, 0.4);
-          border: 1px dashed rgba(255, 255, 255, 0.6);
+          background: rgba(0, 0, 139, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          border-radius: 2px;
         }
 
         .icon-image {
-          font-size: 32px;
-          margin-bottom: 4px;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-          animation: iconFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes iconFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-2px); }
-        }
-
-        .icon-label {
-          font-size: 11px;
-          color: white;
-          text-align: center;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-          font-family: 'Comic Sans MS', cursive, sans-serif;
-          line-height: 1.2;
-          max-width: 100%;
-          word-wrap: break-word;
-          background: rgba(0, 0, 0, 0.3);
-          padding: 2px 4px;
-          border-radius: 3px;
-        }
-
-        .desktop-icon:hover .icon-image {
-          animation: iconBounce 0.6s ease-in-out infinite;
-        }
-
-        @keyframes iconBounce {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          25% { transform: translateY(-3px) scale(1.1); }
-          50% { transform: translateY(-1px) scale(1.05); }
-          75% { transform: translateY(-2px) scale(1.08); }
+          font-size: 36px;
+          margin-bottom: 2px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          background: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(0, 0, 0, 0.3);
+          border-radius: 4px;
+          box-shadow: 
+            inset 1px 1px 0 rgba(255, 255, 255, 0.8),
+            inset -1px -1px 0 rgba(0, 0, 0, 0.2),
+            2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .desktop-icon:active .icon-image {
-          transform: scale(0.95);
+          box-shadow: 
+            inset -1px -1px 0 rgba(255, 255, 255, 0.8),
+            inset 1px 1px 0 rgba(0, 0, 0, 0.2),
+            1px 1px 2px rgba(0, 0, 0, 0.3);
+          transform: translate(1px, 1px);
+        }
+
+        .icon-label {
+          font-size: 10px;
+          color: black;
+          text-align: center;
+          font-family: 'Geneva', 'Helvetica', Arial, sans-serif;
+          font-weight: normal;
+          line-height: 1.1;
+          max-width: 80px;
+          word-wrap: break-word;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 1px 3px;
+          border-radius: 2px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          margin-top: 2px;
+        }
+
+        .desktop-icon.selected .icon-label {
+          background: rgba(0, 0, 139, 0.9);
+          color: white;
+          border-color: rgba(255, 255, 255, 0.5);
         }
       `}</style>
     </div>

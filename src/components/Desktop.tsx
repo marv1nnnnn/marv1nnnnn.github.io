@@ -181,11 +181,51 @@ const gamePrograms = [
   }
 ]
 
+// Miscellaneous programs (utilities and effects)
+const miscPrograms = [
+  {
+    id: 'blog-reader',
+    label: 'BlogReader.exe',
+    icon: '📖',
+    component: <BlogReader />,
+    title: 'Terminal Blog Reader'
+  },
+  {
+    id: 'hit-counter',
+    label: 'Counter.exe',
+    icon: '🔢',
+    component: <HitCounter />,
+    title: 'Retro Hit Counter'
+  },
+  {
+    id: 'visitor-greeter',
+    label: 'Welcome.exe',
+    icon: '👋',
+    component: <VisitorGreeter />,
+    title: 'Visitor Greeter'
+  },
+  {
+    id: 'cursor-trail',
+    label: 'CursorFX.exe',
+    icon: '✨',
+    component: <CursorTrail />,
+    title: 'Cursor Trail Effects'
+  },
+  {
+    id: 'chaos-monitor',
+    label: 'Monitor.exe',
+    icon: '⚠️',
+    component: <ChaosMonitor />,
+    title: 'System Chaos Monitor'
+  }
+]
+
 // Combined desktop icons
 const desktopIcons = [
   ...essentialPrograms,
   ...chaosPrograms,
-  ...gamePrograms
+  ...gamePrograms,
+  ...miscPrograms
   // AI personalities are now integrated into Terminal.exe
 ]
 
@@ -313,6 +353,50 @@ const Desktop: React.FC = () => {
       )}
 
       <style jsx>{`
+        .desktop {
+          width: 100vw;
+          height: 100vh;
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(135deg, #4a90e2, #7b68ee, #50c9c3);
+        }
+
+        .desktop-mode {
+          background: linear-gradient(135deg, #4a90e2, #7b68ee, #50c9c3);
+        }
+
+        .desktop-icons {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          padding: 20px;
+          display: grid;
+          grid-template-columns: repeat(8, 1fr);
+          grid-template-rows: repeat(6, 1fr);
+          gap: 10px;
+          z-index: 5;
+        }
+
+        /* Specific positioning for Mac System 7 authentic scattered layout */
+        .desktop-icons > :nth-child(1) { grid-column: 1; grid-row: 1; } /* Terminal */
+        .desktop-icons > :nth-child(2) { grid-column: 2; grid-row: 2; } /* Calculator */
+        .desktop-icons > :nth-child(3) { grid-column: 1; grid-row: 3; } /* Notepad */
+        .desktop-icons > :nth-child(4) { grid-column: 3; grid-row: 1; } /* Music */
+        .desktop-icons > :nth-child(5) { grid-column: 4; grid-row: 2; } /* Chaos Control */
+        .desktop-icons > :nth-child(6) { grid-column: 6; grid-row: 1; } /* BSOD */
+        .desktop-icons > :nth-child(7) { grid-column: 5; grid-row: 3; } /* Lava Lamp */
+        .desktop-icons > :nth-child(8) { grid-column: 7; grid-row: 2; } /* Weather */
+        .desktop-icons > :nth-child(9) { grid-column: 8; grid-row: 1; } /* Browser */
+        .desktop-icons > :nth-child(10) { grid-column: 2; grid-row: 4; } /* Snake */
+        .desktop-icons > :nth-child(11) { grid-column: 4; grid-row: 4; } /* Tetris */
+        .desktop-icons > :nth-child(12) { grid-column: 1; grid-row: 5; } /* Blog Reader */
+        .desktop-icons > :nth-child(13) { grid-column: 3; grid-row: 5; } /* Counter */
+        .desktop-icons > :nth-child(14) { grid-column: 5; grid-row: 1; } /* Welcome */
+        .desktop-icons > :nth-child(15) { grid-column: 6; grid-row: 3; } /* Cursor FX */
+        .desktop-icons > :nth-child(16) { grid-column: 7; grid-row: 4; } /* Monitor */
+
         .welcome-message {
           position: absolute;
           top: 50%;

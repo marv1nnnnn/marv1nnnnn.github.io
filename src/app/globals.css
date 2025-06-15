@@ -171,10 +171,13 @@ body::before {
   position: absolute;
   top: 20px;
   left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  grid-template-rows: repeat(auto-fill, 100px);
+  gap: 15px;
   z-index: 1;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .desktop-icon {
