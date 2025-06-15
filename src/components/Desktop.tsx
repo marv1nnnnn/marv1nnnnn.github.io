@@ -283,15 +283,6 @@ const Desktop: React.FC = () => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
-          case '1':
-            setChaosLevel(0.3)
-            break
-          case '2':
-            setChaosLevel(1.0)
-            break
-          case '3':
-            setChaosLevel(2.0)
-            break
           case 'e':
             triggerSystemWideEffect('full-chaos')
             e.preventDefault()
@@ -340,7 +331,7 @@ const Desktop: React.FC = () => {
             <div>Performance: {systemState.performanceMode}</div>
             {!systemState.isMobile && (
               <div className="keyboard-hints">
-                Press Ctrl+1/2/3 for chaos levels, Ctrl+E for full chaos!
+                Press Ctrl+E for full chaos! Use Chaos.exe for chaos level control.
               </div>
             )}
           </div>

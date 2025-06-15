@@ -13,6 +13,9 @@ export interface WindowConfig {
   isActive: boolean
   isMinimized: boolean
   isMaximized: boolean
+  // Store original position/size for restore functionality
+  originalPosition?: { x: number; y: number }
+  originalSize?: { width: number; height: number }
   icon?: string
   resizable?: boolean
   draggable?: boolean
@@ -98,14 +101,32 @@ export const WindowManagerProvider: React.FC<{ children: ReactNode }> = ({ child
   }, [])
 
   const maximizeWindow = useCallback((id: string) => {
-    setWindows(prev => prev.map(w => 
-      w.id === id ? { 
-        ...w, 
-        isMaximized: !w.isMaximized,
-        position: w.isMaximized ? w.position : { x: 0, y: 0 },
-        size: w.isMaximized ? w.size : { width: window.innerWidth, height: window.innerHeight - 30 }
-      } : w
-    ))
+    setWindows(prev => prev.map(w => {
+      if (w.id !== id) return w
+      
+      if (w.isMaximized) {
+        // Restore window to original position/size
+        return {
+          ...w,
+          isMaximized: false,
+          position: w.originalPosition || w.position,
+          size: w.originalSize || w.size,
+          // Clear stored original values after restore
+          originalPosition: undefined,
+          originalSize: undefined
+        }
+      } else {
+        // Maximize window and store original position/size
+        return {
+          ...w,
+          isMaximized: true,
+          originalPosition: w.position,
+          originalSize: w.size,
+          position: { x: 0, y: 0 },
+          size: { width: window.innerWidth, height: window.innerHeight - 30 }
+        }
+      }
+    }))
   }, [])
 
   const updateWindow = useCallback((id: string, updates: Partial<WindowConfig>) => {

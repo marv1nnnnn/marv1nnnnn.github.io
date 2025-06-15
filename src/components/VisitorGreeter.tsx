@@ -1,6 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useChaos } from '@/contexts/ChaosProvider'
+import AITerminal from '@/components/AITerminal'
+import MusicPlayer from '@/components/MusicPlayer'
+import BlogReader from '@/components/BlogReader'
 
 const GREETING_MESSAGES = [
   "🌟 Welcome to my digital chaos! 🌟",
@@ -32,6 +36,7 @@ const WELCOME_TIPS = [
 ]
 
 const VisitorGreeter: React.FC = () => {
+  const { createWindow, triggerSystemWideEffect } = useChaos()
   const [currentMessage, setCurrentMessage] = useState('')
   const [visitorName, setVisitorName] = useState('')
   const [currentTip, setCurrentTip] = useState('')
@@ -89,6 +94,40 @@ const VisitorGreeter: React.FC = () => {
     if (userAgent.includes('Safari')) return '🧭 Safari Adventurer'
     if (userAgent.includes('Edge')) return '⚡ Edge Rider'
     return '🔍 Mystery Browser User'
+  }
+
+  // Window creation handlers for action buttons
+  const handleOpenBlog = () => {
+    triggerSystemWideEffect('rainbow-cascade')
+    createWindow({
+      title: 'Terminal Blog Reader v2.0',
+      component: <BlogReader />,
+      size: { width: 700, height: 600 },
+      icon: '📖',
+      position: { x: 100, y: 100 }
+    })
+  }
+
+  const handleOpenAIChat = () => {
+    triggerSystemWideEffect('rainbow-cascade')
+    createWindow({
+      title: 'Terminal AI - HACKER_AI',
+      component: <AITerminal personalityId="HACKER_AI" />,
+      size: { width: 600, height: 500 },
+      icon: '🤖',
+      position: { x: 150, y: 150 }
+    })
+  }
+
+  const handleOpenMusic = () => {
+    triggerSystemWideEffect('rainbow-cascade')
+    createWindow({
+      title: 'Winamp Clone v5.66',
+      component: <MusicPlayer />,
+      size: { width: 300, height: 400 },
+      icon: '🎵',
+      position: { x: 200, y: 200 }
+    })
   }
 
   return (
@@ -154,19 +193,19 @@ const VisitorGreeter: React.FC = () => {
             <div className="action-buttons">
               <button 
                 className="action-btn primary"
-                onClick={() => window.dispatchEvent(new CustomEvent('openProgram', { detail: 'blog-reader' }))}
+                onClick={handleOpenBlog}
               >
                 📖 READ BLOG
               </button>
               <button 
                 className="action-btn secondary"
-                onClick={() => window.dispatchEvent(new CustomEvent('openProgram', { detail: 'ai_HACKER_AI' }))}
+                onClick={handleOpenAIChat}
               >
                 🤖 CHAT WITH AI
               </button>
               <button 
                 className="action-btn tertiary"
-                onClick={() => window.dispatchEvent(new CustomEvent('openProgram', { detail: 'music-player' }))}
+                onClick={handleOpenMusic}
               >
                 🎵 PLAY MUSIC
               </button>
