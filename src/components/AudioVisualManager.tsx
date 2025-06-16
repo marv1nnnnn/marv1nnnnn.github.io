@@ -45,22 +45,9 @@ export const AudioVisualProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const midEnergy = visualizerData.slice(8, 32).reduce((sum, val) => sum + val, 0) / 24
       const highEnergy = visualizerData.slice(32).reduce((sum, val) => sum + val, 0) / (visualizerData.length - 32)
 
-      // Trigger effects based on audio intensity
-      if (bassEnergy > 0.7) {
-        visual.triggerScreenFlash('#ff0080', 150)
-      }
-
-      if (midEnergy > 0.6) {
-        visual.triggerCursorExplosion()
-      }
-
-      if (highEnergy > 0.8) {
-        visual.triggerGlitchEffect()
-      }
-
       // Random chaos events based on overall energy
       const totalEnergy = (bassEnergy + midEnergy + highEnergy) / 3
-      if (totalEnergy > 0.5 && Math.random() < 0.1 * chaosLevel) {
+      if (totalEnergy > 0.6 && Math.random() < 0.05 * chaosLevel) {
         const randomEffect = Math.floor(Math.random() * 4)
         switch (randomEffect) {
           case 0:
@@ -88,13 +75,10 @@ export const AudioVisualProvider: React.FC<{ children: React.ReactNode }> = ({ c
       switch (eventType) {
         case 'play':
           visual.triggerCursorExplosion()
-          visual.triggerScreenFlash('#00ff00', 200)
           break
         case 'pause':
-          visual.triggerScreenFlash('#ffff00', 150)
           break
         case 'stop':
-          visual.triggerScreenFlash('#ff0040', 200)
           break
         case 'track-change':
           visual.triggerMatrixRain(2000)
@@ -112,7 +96,6 @@ export const AudioVisualProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const triggerAudioVisualSync = useCallback(() => {
     audio.soundEffects.notification()
     visual.triggerCursorExplosion()
-    visual.triggerScreenFlash('#00ffff', 300)
     visual.triggerGlitchEffect()
     
     setTimeout(() => {
@@ -238,9 +221,6 @@ export const ChaosControlPanel: React.FC = () => {
             </button>
             <button onClick={() => visual.triggerGlitchEffect()}>
               📺 Glitch
-            </button>
-            <button onClick={() => visual.triggerScreenFlash('#ff00ff', 500)}>
-              ⚡ Flash
             </button>
             <button onClick={() => audio.soundEffects.click()}>
               🔊 Click Sound

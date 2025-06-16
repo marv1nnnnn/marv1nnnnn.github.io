@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@react-three/postprocessing": "^2.19.1",
+    "@tweenjs/tween.js": "^25.0.0",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.0.0",
     "framer-motion": "^12.18.1",
@@ -19,6 +23,7 @@
     "react-draggable": "^4.4.6",
     "react-rnd": "^10.4.1",
     "react-spring": "^10.0.1",
+    "three": "^0.166.0",
     "tone": "^15.1.22",
     "use-sound": "^5.0.0",
     "uuid": "^9.0.1",
@@ -30,6 +35,7 @@
     "@types/node": "20.8.0",
     "@types/react": "18.2.25",
     "@types/react-dom": "18.2.11",
+    "@types/three": "^0.169.0",
     "@types/uuid": "^9.0.6",
     "eslint": "8.51.0",
     "eslint-config-next": "14.0.0",

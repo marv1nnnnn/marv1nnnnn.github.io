@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "slug": "welcome-to-chaos",
+    "title": "Welcome to the Chaos",
+    "author": "WebMaster Supreme",
+    "date": "2025-06-15",
+    "tags": ["welcome", "chaos", "early-web", "nostalgia"],
+    "filename": "welcome-to-chaos.md"
+  },
+  {
+    "id": "2",
+    "slug": "art-of-digital-chaos",
+    "title": "The Art of Digital Chaos",
+    "author": "Chaos Architect",
+    "date": "2025-06-14",
+    "tags": ["design", "aesthetics", "philosophy", "web-history"],
+    "filename": "art-of-digital-chaos.md"
+  },
+  {
+    "id": "3",
+    "slug": "ai-personalities-explained",
+    "title": "AI Personalities Explained",
+    "author": "AI Whisperer",
+    "date": "2025-06-13",
+    "tags": ["ai", "personalities", "technology", "interaction"],
+    "filename": "ai-personalities-explained.md"
+  }
+] 

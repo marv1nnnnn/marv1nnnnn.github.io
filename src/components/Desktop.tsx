@@ -17,8 +17,11 @@ import SnakeGame from './SnakeGame'
 import TetrisGame from './TetrisGame'
 import DigitalLavaLamp from './DigitalLavaLamp'
 import WeatherWidget from './WeatherWidget'
+import BrainDashboard from './brain/BrainDashboard'
 import { useChaos } from '@/contexts/ChaosProvider'
 import { getAllPersonalities } from '@/config/personalities'
+import { useWindowManager } from '@/hooks/useWindowManager'
+import { getProgram } from '@/config/programRegistry'
 
 // Sample program components for demonstration
 const SampleTerminal = () => <MultiPersonalityTerminal />
@@ -105,6 +108,13 @@ const essentialPrograms = [
     icon: '🎪',
     component: <ChaosControlPanel />,
     title: 'Chaos Control Panel'
+  },
+  {
+    id: 'brain-dashboard',
+    label: 'Brain.exe',
+    icon: '🧠',
+    component: null, // Will be handled specially
+    title: 'Brain Module Dashboard'
   }
 ]
 
@@ -230,16 +240,18 @@ const desktopIcons = [
 ]
 
 const Desktop: React.FC = () => {
-  const { 
-    windows, 
-    createWindow, 
-    systemState, 
-    setChaosLevel, 
+  const {
+    windows,
+    createWindow,
+    systemState,
+    setChaosLevel,
     triggerSystemWideEffect,
-    startupState 
+    startupState
   } = useChaos()
   
   const [showWelcome, setShowWelcome] = useState(true)
+  const [show3DBrain, setShow3DBrain] = useState(false)
+  const { createWindow: createWindowDirect } = useWindowManager()
 
   // Hide welcome message after startup or when windows exist
   useEffect(() => {
@@ -253,18 +265,42 @@ const Desktop: React.FC = () => {
     // Play interaction sound and trigger effects
     triggerSystemWideEffect('rainbow-cascade')
     
+    // Special handling for Brain Dashboard
+    if (iconConfig.id === 'brain-dashboard') {
+      createWindow({
+        title: iconConfig.title,
+        component: (
+          <BrainDashboard
+            onModuleLaunch={handleProgramLaunch}
+            showInstructions={true}
+            enableAutoRotation={true}
+            className="w-full h-full"
+          />
+        ),
+        size: {
+          width: typeof window !== 'undefined' ? Math.min(800, window.innerWidth * 0.9) : 800,
+          height: typeof window !== 'undefined' ? Math.min(600, window.innerHeight * 0.8) : 600
+        },
+        icon: iconConfig.icon,
+        position: systemState.isMobile
+          ? { x: 10, y: 50 }
+          : undefined
+      })
+      return
+    }
+    
     // Responsive sizing based on device
     const isAITerminal = iconConfig.id.startsWith('ai_')
     const baseSizeMultiplier = systemState.isMobile ? 0.9 : 1
     
     const windowSize = isAITerminal
-      ? { 
-          width: typeof window !== 'undefined' ? Math.min(600 * baseSizeMultiplier, window.innerWidth * 0.9) : 600, 
-          height: typeof window !== 'undefined' ? Math.min(500 * baseSizeMultiplier, window.innerHeight * 0.7) : 500 
+      ? {
+          width: typeof window !== 'undefined' ? Math.min(600 * baseSizeMultiplier, window.innerWidth * 0.9) : 600,
+          height: typeof window !== 'undefined' ? Math.min(500 * baseSizeMultiplier, window.innerHeight * 0.7) : 500
         }
-      : { 
-          width: typeof window !== 'undefined' ? Math.min(400 * baseSizeMultiplier, window.innerWidth * 0.8) : 400, 
-          height: typeof window !== 'undefined' ? Math.min(300 * baseSizeMultiplier, window.innerHeight * 0.6) : 300 
+      : {
+          width: typeof window !== 'undefined' ? Math.min(400 * baseSizeMultiplier, window.innerWidth * 0.8) : 400,
+          height: typeof window !== 'undefined' ? Math.min(300 * baseSizeMultiplier, window.innerHeight * 0.6) : 300
         }
 
     createWindow({
@@ -272,9 +308,30 @@ const Desktop: React.FC = () => {
       component: iconConfig.component,
       size: windowSize,
       icon: iconConfig.icon,
-      position: systemState.isMobile 
+      position: systemState.isMobile
         ? { x: 10, y: 50 + windows.length * 20 } // Stack on mobile
         : undefined // Random positioning on desktop
+    })
+  }
+
+  // Enhanced program launch handler for 3D brain
+  const handleProgramLaunch = (moduleId: string, regionId?: string) => {
+    const program = getProgram(moduleId)
+    if (!program) {
+      console.error(`Program not found: ${moduleId}`)
+      return
+    }
+
+    // Audio-visual feedback for program launch
+    triggerSystemWideEffect('rainbow-cascade')
+
+    // Create window from 3D brain experience
+    createWindowDirect({
+      title: program.title,
+      component: React.createElement(program.component),
+      size: program.size,
+      icon: program.icon,
+      position: program.position || undefined
     })
   }
 
@@ -287,6 +344,10 @@ const Desktop: React.FC = () => {
             triggerSystemWideEffect('full-chaos')
             e.preventDefault()
             break
+          case 'b':
+            setShow3DBrain(!show3DBrain)
+            e.preventDefault()
+            break
         }
       }
     }
@@ -294,54 +355,76 @@ const Desktop: React.FC = () => {
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [setChaosLevel, triggerSystemWideEffect])
-
-  return (
-    <div className={`desktop ${systemState.isMobile ? 'mobile' : 'desktop-mode'}`}>
-      {/* Desktop Icons */}
-      <div className={`desktop-icons ${systemState.isMobile ? 'mobile-layout' : ''}`}>
-        {desktopIcons.map((icon) => (
-          <DesktopIcon
-            key={icon.id}
-            icon={icon.icon}
-            label={icon.label}
-            onDoubleClick={() => handleIconDoubleClick(icon)}
-          />
-        ))}
-      </div>
-
-      {/* Render all windows */}
-      {windows.map((window) => (
-        <Window key={window.id} window={window} />
-      ))}
-
-      {/* Welcome message */}
-      {showWelcome && windows.length === 0 && (
-        <div className={`welcome-message ${systemState.isMobile ? 'mobile' : ''}`}>
-          <div className="rainbow-text-enhanced blink-enhanced text-glow">
-            ✨ WELCOME TO CHAOS OS ✨
-          </div>
-          <div className="subtitle">
-            {systemState.isMobile ? 'Tap' : 'Double-click'} icons to launch programs!
-          </div>
-          <div className="personality-preview">
-            AI Personalities: {getAllPersonalities().map(p => p.icon).join(' ')}
-          </div>
-          <div className="chaos-controls">
-            <div>Chaos Level: {Math.round(systemState.chaosLevel * 100)}%</div>
-            <div>Performance: {systemState.performanceMode}</div>
-            {!systemState.isMobile && (
-              <div className="keyboard-hints">
-                Press Ctrl+E for full chaos! Use Chaos.exe for chaos level control.
-              </div>
-            )}
-          </div>
+return (
+  <div className={`desktop ${systemState.isMobile ? 'mobile' : 'desktop-mode'}`}>
+    {/* 3D Brain Experience */}
+    {show3DBrain ? (
+      <BrainDashboard
+        onModuleLaunch={handleProgramLaunch}
+        showInstructions={true}
+        enableAutoRotation={true}
+        className="fixed inset-0 z-50"
+      />
+    ) : (
+      <>
+        {/* Desktop Icons */}
+        <div className={`desktop-icons ${systemState.isMobile ? 'mobile-layout' : ''}`}>
+          {desktopIcons.map((icon) => (
+            <DesktopIcon
+              key={icon.id}
+              icon={icon.icon}
+              label={icon.label}
+              onDoubleClick={() => handleIconDoubleClick(icon)}
+            />
+          ))}
         </div>
-      )}
 
-      {/* Mobile touch feedback overlay */}
-      {systemState.isMobile && (
-        <div className="mobile-touch-feedback" />
-      )}
+        {/* Render all windows */}
+        {windows.map((window) => (
+          <Window key={window.id} window={window} />
+        ))}
+
+        {/* Welcome message */}
+        {showWelcome && windows.length === 0 && (
+          <div className={`welcome-message ${systemState.isMobile ? 'mobile' : ''}`}>
+            <div className="rainbow-text-enhanced blink-enhanced text-glow">
+              ✨ WELCOME TO CHAOS OS ✨
+            </div>
+            <div className="subtitle">
+              {systemState.isMobile ? 'Tap' : 'Double-click'} icons to launch programs!
+            </div>
+            <div className="personality-preview">
+              AI Personalities: {getAllPersonalities().map(p => p.icon).join(' ')}
+            </div>
+            <div className="chaos-controls">
+              <div>Chaos Level: {Math.round(systemState.chaosLevel * 100)}%</div>
+              <div>Performance: {systemState.performanceMode}</div>
+              {!systemState.isMobile && (
+                <div className="keyboard-hints">
+                  Press Ctrl+E for full chaos! Press Ctrl+B to enter 3D brain mode!
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile touch feedback overlay */}
+        {systemState.isMobile && (
+          <div className="mobile-touch-feedback" />
+        )}
+      </>
+    )}
+
+    {/* 3D Brain Toggle Button - Enhanced persistent floating interface */}
+    <div className="brain-toggle-dock">
+      <button
+        className="brain-toggle-button"
+        onClick={() => setShow3DBrain(!show3DBrain)}
+        title={show3DBrain ? "Exit 3D Brain" : "Enter 3D Brain"}
+      >
+        {show3DBrain ? '🔙' : '🧠'}
+      </button>
+    </div>
 
       <style jsx>{`
         .desktop {
@@ -479,6 +562,90 @@ const Desktop: React.FC = () => {
           bottom: 0;
           pointer-events: none;
           z-index: 1;
+        }
+
+        /* Enhanced 3D Brain Toggle Button */
+        .brain-toggle-dock {
+          position: fixed;
+          bottom: 100px;
+          right: 100px;
+          width: 70px;
+          height: 70px;
+          z-index: 1000;
+          animation: floating 4s ease-in-out infinite;
+          filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
+        }
+
+        .brain-toggle-button {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #ff0080, #00ffff);
+          border: 3px solid #ffffff;
+          border-radius: 50%;
+          color: white;
+          font-size: 28px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.8));
+          animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+
+        .brain-toggle-button:hover {
+          transform: scale(1.1);
+          filter: drop-shadow(0 0 25px rgba(255, 0, 128, 1));
+          background: linear-gradient(135deg, #00ffff, #ff0080);
+        }
+
+        .brain-toggle-button:active {
+          transform: scale(0.95);
+        }
+
+        @keyframes floating {
+          0%, 100% {
+            transform: translateY(0px) scale(1);
+          }
+          25% {
+            transform: translateY(-8px) scale(1.02);
+          }
+          50% {
+            transform: translateY(-4px) scale(1.01);
+          }
+          75% {
+            transform: translateY(-12px) scale(1.03);
+          }
+        }
+
+        @keyframes pulseGlow {
+          0% {
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+          }
+          100% {
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.8), 0 0 40px rgba(0, 255, 255, 0.6);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .brain-toggle-dock {
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+          }
+          
+          .brain-toggle-button {
+            font-size: 24px;
+            border-width: 2px;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .brain-toggle-dock,
+          .brain-toggle-button {
+            animation: none;
+          }
         }
       `}</style>
     </div>

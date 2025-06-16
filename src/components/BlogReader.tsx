@@ -14,34 +14,7 @@ const BlogReader: React.FC = () => {
     renderMarkdown
   } = useContentManager()
 
-  const [displayedContent, setDisplayedContent] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-
-  // Typewriter effect for content
-  useEffect(() => {
-    if (!activePost || !activePost.content) return
-
-    setIsTyping(true)
-    setDisplayedContent('')
-    
-    const content = activePost.content
-    let currentIndex = 0
-    
-    const typeInterval = setInterval(() => {
-      if (currentIndex < content.length) {
-        setDisplayedContent(content.slice(0, currentIndex + 1))
-        currentIndex++
-      } else {
-        setIsTyping(false)
-        clearInterval(typeInterval)
-      }
-    }, 20) // Typing speed
-
-    return () => {
-      clearInterval(typeInterval)
-      setIsTyping(false)
-    }
-  }, [activePost])
+  // No streaming effect - display full content immediately
 
   if (!activePost) {
     return (
@@ -74,7 +47,7 @@ const BlogReader: React.FC = () => {
       <div className="blog-header">
         <div className="blog-title">📖 BLOG READER v2.0 - Terminal Mode</div>
         <div className="blog-status">
-          {isLoading ? '● LOADING...' : isTyping ? '● TYPING...' : '● READY'}
+          {isLoading ? '● LOADING...' : '● READY'}
         </div>
       </div>
 
@@ -83,7 +56,7 @@ const BlogReader: React.FC = () => {
         <button 
           className="nav-btn" 
           onClick={navigatePrevious}
-          disabled={isLoading || isTyping}
+          disabled={isLoading}
         >
           ◀ PREV
         </button>
@@ -95,7 +68,7 @@ const BlogReader: React.FC = () => {
         <button 
           className="nav-btn" 
           onClick={navigateNext}
-          disabled={isLoading || isTyping}
+          disabled={isLoading}
         >
           NEXT ▶
         </button>
@@ -133,10 +106,9 @@ const BlogReader: React.FC = () => {
               <div 
                 className="markdown-content"
                 dangerouslySetInnerHTML={{ 
-                  __html: renderMarkdown(displayedContent) 
+                  __html: renderMarkdown(activePost.content) 
                 }}
               />
-              {isTyping && <span className="typing-cursor">█</span>}
             </div>
           </div>
         )}
@@ -151,7 +123,7 @@ const BlogReader: React.FC = () => {
               key={post.id}
               className={`post-link ${activePost.id === post.id ? 'active' : ''}`}
               onClick={() => loadPost(post.id)}
-              disabled={isLoading || isTyping}
+              disabled={isLoading}
             >
               [{index + 1}] {post.title}
             </button>

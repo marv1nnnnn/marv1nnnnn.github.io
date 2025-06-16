@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Howl, Howler } from 'howler'
 import * as Tone from 'tone'
 
@@ -40,21 +40,31 @@ export const useAudioManager = () => {
   const animationFrameRef = useRef<number | null>(null)
   const positionIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Sample playlist - in real app this would be loaded dynamically
-  const defaultPlaylist: Track[] = [
-    {
-      id: '1',
-      title: 'Dial-up Nostalgia',
-      artist: 'Web 2.0 Collective',
-      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Free sample sound
-    },
-    {
-      id: '2', 
-      title: 'Y2K Dreams',
-      artist: 'Millennium Bug',
-      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+  // Empty playlist - will be loaded from file
+  const [defaultPlaylist, setDefaultPlaylist] = useState<Track[]>([])
+
+  // Load playlist from file
+  const loadPlaylist = useCallback(async () => {
+    try {
+      const response = await fetch('/music/playlist.json')
+      const playlistData = await response.json()
+      
+      // Convert to Track objects with proper URLs
+      const tracks: Track[] = playlistData.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        artist: item.artist,
+        url: `/music/${item.filename}`, // Assuming music files are in public/music/
+        duration: item.duration
+      }))
+      
+      setDefaultPlaylist(tracks)
+      setState(prev => ({ ...prev, playlist: tracks }))
+    } catch (error) {
+      console.error('Failed to load playlist:', error)
+      // Keep empty playlist on error
     }
-  ]
+  }, [])
 
   // Initialize Web Audio API for visualization
   const initializeAudioContext = useCallback(async () => {
@@ -66,11 +76,14 @@ export const useAudioManager = () => {
       analyser.fftSize = 256
       analyserRef.current = analyser
 
-      setState(prev => ({ ...prev, isLoaded: true, playlist: defaultPlaylist }))
+      setState(prev => ({ ...prev, isLoaded: true }))
+      
+      // Load playlist after audio context is ready
+      await loadPlaylist()
     } catch (error) {
       console.error('Failed to initialize audio context:', error)
     }
-  }, [])
+  }, [loadPlaylist])
 
   // Update visualizer data
   const updateVisualizerData = useCallback(() => {
@@ -262,10 +275,24 @@ export const useAudioManager = () => {
     }
   }, [])
 
-  // Initialize on mount
+  // Initialize AudioContext after first user gesture to satisfy browser policies
   useEffect(() => {
-    initializeAudioContext()
-  }, [initializeAudioContext])
+    if (state.isLoaded) return
+
+    const resume = () => {
+      initializeAudioContext()
+      window.removeEventListener('pointerdown', resume)
+      window.removeEventListener('keydown', resume)
+    }
+
+    window.addEventListener('pointerdown', resume, { once: true })
+    window.addEventListener('keydown', resume, { once: true })
+
+    return () => {
+      window.removeEventListener('pointerdown', resume)
+      window.removeEventListener('keydown', resume)
+    }
+  }, [initializeAudioContext, state.isLoaded])
 
   return {
     ...state,

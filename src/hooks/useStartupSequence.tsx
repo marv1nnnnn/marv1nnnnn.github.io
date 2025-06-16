@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, ReactNode, ComponentType, createElement } from 'react'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import { useAudioManager } from '@/hooks/useAudioManager'
 import AITerminal from '@/components/AITerminal'
@@ -11,21 +11,22 @@ import VisitorGreeter from '@/components/VisitorGreeter'
 import CursorTrail from '@/components/CursorTrail'
 import ChaosMonitor from '@/components/ChaosMonitor'
 
-interface AutoLaunchProgram {
+interface AutoLaunchProgram<P = any> {
   id: string
   title: string
-  component: React.ReactNode
+  component: ComponentType<P>
+  props?: P
   icon: string
   size: { width: number; height: number }
   delay: number
   position: { x: number; y: number }
 }
 
-const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
+const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram<any>[] = [
   {
     id: 'visitor-greeter',
     title: 'Visitor Greeter v3.1',
-    component: <VisitorGreeter />,
+    component: VisitorGreeter,
     icon: '👋',
     size: { width: 400, height: 300 },
     delay: 500,
@@ -34,7 +35,8 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'terminal-ai',
     title: 'Terminal AI - HACKER_AI',
-    component: <AITerminal personalityId="HACKER_AI" />,
+    component: AITerminal,
+    props: { personalityId: 'HACKER_AI' },
     icon: '💻',
     size: { width: 600, height: 500 },
     delay: 1000,
@@ -43,7 +45,7 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'blog-reader',
     title: 'Blog Reader v2.0',
-    component: <BlogReader />,
+    component: BlogReader,
     icon: '📖',
     size: { width: 700, height: 600 },
     delay: 1500,
@@ -52,7 +54,7 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'music-player',
     title: 'Winamp Clone v5.66',
-    component: <MusicPlayer />,
+    component: MusicPlayer,
     icon: '🎵',
     size: { width: 300, height: 400 },
     delay: 2000,
@@ -61,7 +63,7 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'hit-counter',
     title: 'Hit Counter v1.0',
-    component: <HitCounter />,
+    component: HitCounter,
     icon: '🔢',
     size: { width: 250, height: 150 },
     delay: 2500,
@@ -70,7 +72,7 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'cursor-trail',
     title: 'Cursor Trail FX',
-    component: <CursorTrail />,
+    component: CursorTrail,
     icon: '✨',
     size: { width: 200, height: 100 },
     delay: 3000,
@@ -79,7 +81,7 @@ const AUTO_LAUNCH_PROGRAMS: AutoLaunchProgram[] = [
   {
     id: 'chaos-monitor',
     title: 'System Chaos Monitor',
-    component: <ChaosMonitor />,
+    component: ChaosMonitor,
     icon: '⚠️',
     size: { width: 450, height: 350 },
     delay: 3500,
@@ -114,7 +116,7 @@ const useStartupSequence = () => {
             // Create window
             createWindow({
               title: program.title,
-              component: program.component,
+              component: createElement(program.component, program.props ?? {} as any),
               size: program.size,
               position: program.position,
               icon: program.icon

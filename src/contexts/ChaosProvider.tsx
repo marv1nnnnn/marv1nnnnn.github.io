@@ -166,7 +166,6 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         break
         
       case 'system-shock':
-        visual.triggerScreenFlash('#ff0040', 300)
         visual.triggerWindowShake()
         audio.soundEffects.error()
         break
@@ -180,7 +179,6 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       case 'full-chaos':
         visual.triggerMatrixRain(5000)
         visual.triggerGlitchEffect()
-        visual.triggerScreenFlash('#00ffff', 500)
         setTimeout(() => visual.triggerCursorExplosion(), 200)
         setTimeout(() => visual.triggerWindowShake(), 400)
         audio.soundEffects.notification()

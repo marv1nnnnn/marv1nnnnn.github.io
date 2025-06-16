@@ -362,6 +362,293 @@
   }
 }
 
+/* 3D Brain Y2K Enhancement Effects */
+
+/* Neural pulse animations for brain tissue */
+@keyframes neuralPulse {
+  0%, 100% {
+    filter: brightness(1) hue-rotate(0deg);
+    transform: scale(1);
+  }
+  25% {
+    filter: brightness(1.3) hue-rotate(90deg);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: brightness(1.6) hue-rotate(180deg);
+    transform: scale(1.05);
+  }
+  75% {
+    filter: brightness(1.3) hue-rotate(270deg);
+    transform: scale(1.02);
+  }
+}
+
+/* Chaotic gradient for brain regions */
+@keyframes chaosGradient {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  20% {
+    background-position: 25% 25%;
+    filter: hue-rotate(72deg) saturate(1.3);
+  }
+  40% {
+    background-position: 75% 75%;
+    filter: hue-rotate(144deg) saturate(1.6);
+  }
+  60% {
+    background-position: 100% 25%;
+    filter: hue-rotate(216deg) saturate(1.3);
+  }
+  80% {
+    background-position: 50% 100%;
+    filter: hue-rotate(288deg) saturate(1.1);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(360deg) saturate(1);
+  }
+}
+
+/* Y2K holographic sweep for program windows */
+@keyframes holographicSweep {
+  0% {
+    background-position: -200% center;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 200% center;
+    opacity: 0;
+  }
+}
+
+/* Neural spark trails */
+@keyframes neuralSpark {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.8) rotate(270deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Brain region activation effect */
+@keyframes regionActivation {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 0, 128, 0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 0, 128, 0.8);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 0, 128, 0);
+    transform: scale(1);
+  }
+}
+
+/* Y2K scan effect for the entire brain */
+@keyframes brainScan {
+  0% {
+    background: linear-gradient(0deg,
+      transparent 0%,
+      rgba(0, 255, 255, 0.1) 45%,
+      rgba(0, 255, 255, 0.3) 50%,
+      rgba(0, 255, 255, 0.1) 55%,
+      transparent 100%);
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Chaotic energy field around brain */
+@keyframes chaosField {
+  0%, 100% {
+    filter: hue-rotate(0deg) blur(0px);
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    filter: hue-rotate(90deg) blur(1px);
+    transform: scale(1.02) rotate(2deg);
+  }
+  50% {
+    filter: hue-rotate(180deg) blur(0px);
+    transform: scale(0.98) rotate(-1deg);
+  }
+  75% {
+    filter: hue-rotate(270deg) blur(1px);
+    transform: scale(1.01) rotate(1deg);
+  }
+}
+
+/* Enhanced neon pulse for UI elements */
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor;
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      0 0 40px currentColor;
+    filter: brightness(1.5);
+  }
+}
+
+/* 3D Brain specific utility classes */
+.brain-neural-pulse {
+  animation: neuralPulse 2s ease-in-out infinite;
+}
+
+.brain-chaos-gradient {
+  background: linear-gradient(45deg,
+    #ff0080, #00ffff, #ffff00, #80ff00, #ff8000, #ff0080);
+  background-size: 300% 300%;
+  animation: chaosGradient 4s ease-in-out infinite;
+}
+
+.brain-holographic-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.brain-holographic-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent);
+  animation: holographicSweep 3s ease-in-out infinite;
+}
+
+.brain-neural-spark {
+  animation: neuralSpark 1.5s ease-out infinite;
+}
+
+.brain-region-activation {
+  animation: regionActivation 2s ease-in-out infinite;
+}
+
+.brain-scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: brainScan 4s linear infinite;
+  pointer-events: none;
+}
+
+.brain-chaos-field {
+  animation: chaosField 6s ease-in-out infinite;
+}
+
+.brain-neon-pulse {
+  animation: neonPulse 3s ease-in-out infinite;
+}
+
+/* Y2K distortion effects for brain environment */
+.y2k-brain-distortion {
+  position: relative;
+}
+
+.y2k-brain-distortion::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 255, 255, 0.02) 1px,
+    rgba(0, 255, 255, 0.02) 2px
+  );
+  animation: scan-lines 0.05s linear infinite;
+  pointer-events: none;
+}
+
+/* Brain program window emergence */
+@keyframes programEmergence {
+  0% {
+    transform: scale(0) translateY(50px) rotateY(-180deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  50% {
+    transform: scale(1.1) translateY(10px) rotateY(-90deg);
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+  100% {
+    transform: scale(1) translateY(0) rotateY(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.brain-program-emergence {
+  animation: programEmergence 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Enhanced visual feedback for brain interactions */
+.brain-interaction-ripple {
+  position: relative;
+  overflow: visible;
+}
+
+.brain-interaction-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 255, 0.6);
+  transform: translate(-50%, -50%);
+  animation: ripple-expand 0.6s ease-out;
+}
+
+@keyframes ripple-expand {
+  to {
+    width: 200px;
+    height: 200px;
+    border-width: 1px;
+    opacity: 0;
+  }
+}
+
 /* Error/glitch text */
 .error-text {
   color: #ff0040;
