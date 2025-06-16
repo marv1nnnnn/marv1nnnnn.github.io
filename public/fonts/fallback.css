@@ -1,0 +1,19 @@
+/* Fallback font definitions for 3D brain components */
+@font-face {
+  font-family: 'ComicNeue-Regular';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: swap;
+  fallback: monospace;
+}
+
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: swap;
+  fallback: monospace;
+}
+
+/* Ensure monospace is used as fallback for all text in 3D components */
+.brain-text {
+  font-family: monospace, 'Courier New', courier;
+}

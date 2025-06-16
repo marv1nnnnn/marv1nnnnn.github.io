@@ -1,0 +1,30 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chaosGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#00ff00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffff00;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with chaotic gradient -->
+  <rect width="32" height="32" fill="url(#chaosGradient)" />
+  
+  <!-- Retro computer terminal shape -->
+  <rect x="4" y="6" width="24" height="18" fill="#000000" stroke="#ffffff" stroke-width="1"/>
+  <rect x="6" y="8" width="20" height="12" fill="#001100"/>
+  
+  <!-- Terminal cursor/text simulation -->
+  <rect x="8" y="10" width="2" height="2" fill="#00ff00"/>
+  <rect x="11" y="10" width="6" height="1" fill="#00ff00"/>
+  <rect x="8" y="13" width="8" height="1" fill="#00ff00"/>
+  <rect x="8" y="16" width="4" height="1" fill="#00ff00"/>
+  
+  <!-- Chaos sparkles -->
+  <circle cx="26" cy="8" r="1" fill="#ffff00"/>
+  <circle cx="28" cy="12" r="1" fill="#ff00ff"/>
+  <circle cx="6" cy="26" r="1" fill="#00ffff"/>
+  <circle cx="24" cy="28" r="1" fill="#ff0000"/>
+</svg> 

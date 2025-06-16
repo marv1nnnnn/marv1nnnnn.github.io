@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "title": "Dial-up Nostalgia",
+    "artist": "Web 2.0 Collective",
+    "filename": "dial-up-nostalgia.mp3",
+    "duration": 240
+  },
+  {
+    "id": "2",
+    "title": "Y2K Dreams",
+    "artist": "Millennium Bug",
+    "filename": "y2k-dreams.mp3",
+    "duration": 180
+  },
+  {
+    "id": "3",
+    "title": "GeoCities Anthem",
+    "artist": "Retro Web Warriors",
+    "filename": "geocities-anthem.mp3",
+    "duration": 210
+  },
+  {
+    "id": "4",
+    "title": "Matrix Rain",
+    "artist": "Code Runners",
+    "filename": "matrix-rain.mp3",
+    "duration": 195
+  }
+] 

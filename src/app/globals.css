@@ -1,0 +1,628 @@
+/* Chaotic Early-Web OS Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  overflow: hidden;
+  user-select: none;
+}
+
+body {
+  background: linear-gradient(45deg, #ff0080, #00ffff, #ffff00, #ff0080);
+  background-size: 400% 400%;
+  animation: chaosGradient 10s ease infinite;
+  position: relative;
+}
+
+/* Animated background gradient */
+@keyframes chaosGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Star field overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+    radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: starfield 20s linear infinite;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+@keyframes starfield {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100px);
+  }
+}
+
+/* Desktop container */
+.desktop {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Window styling */
+.window {
+  position: absolute;
+  background: linear-gradient(135deg, #c0c0c0, #808080);
+  border: 2px outset #c0c0c0;
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.5),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.8);
+  min-width: 200px;
+  min-height: 150px;
+  cursor: move;
+  animation: windowSpawn 0.3s ease-out;
+}
+
+.window:hover {
+  filter: brightness(1.1);
+}
+
+@keyframes windowSpawn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Window title bar */
+.window-title-bar {
+  background: linear-gradient(90deg, #000080, #4040ff);
+  color: white;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000040;
+  cursor: move;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.window-title-bar.inactive {
+  background: linear-gradient(90deg, #808080, #a0a0a0);
+  color: #c0c0c0;
+}
+
+/* Window controls */
+.window-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.window-control-btn {
+  width: 16px;
+  height: 14px;
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  font-size: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+
+.window-control-btn:hover {
+  background: #e0e0e0;
+}
+
+.window-control-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.close-btn {
+  background: #ff4040;
+  color: white;
+}
+
+.close-btn:hover {
+  background: #ff6060;
+}
+
+/* Window content */
+.window-content {
+  padding: 8px;
+  background: #c0c0c0;
+  height: calc(100% - 22px);
+  overflow: auto;
+}
+
+/* Desktop icons */
+.desktop-icons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  grid-template-rows: repeat(auto-fill, 100px);
+  gap: 15px;
+  z-index: 1;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.desktop-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.desktop-icon.selected {
+  background: rgba(0, 0, 255, 0.3);
+}
+
+.desktop-icon-image {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  border: 1px solid #000;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.desktop-icon-label {
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  text-shadow: 
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  font-weight: bold;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #c0c0c0;
+  border: 1px inset #c0c0c0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #808080, #a0a0a0);
+  border: 1px outset #808080;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #606060, #808080);
+}
+
+::-webkit-scrollbar-button {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  height: 16px;
+}
+
+/* Blinking text effect */
+.blink {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Glitch text effect */
+.glitch {
+  animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-2px); }
+  20% { transform: translateX(2px); }
+  30% { transform: translateX(-1px); }
+  40% { transform: translateX(1px); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  90% { transform: translateX(-2px); }
+}
+
+/* Rainbow text */
+.rainbow-text {
+  background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s ease infinite;
+}
+
+@keyframes rainbow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Terminal styling */
+.terminal {
+  background: #000;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  padding: 10px;
+  border-radius: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.terminal-prompt::before {
+  content: 'C:\\>';
+  color: #00ff00;
+  margin-right: 4px;
+}
+
+/* Button styling */
+.retro-button {
+  background: linear-gradient(135deg, #e0e0e0, #a0a0a0);
+  border: 2px outset #c0c0c0;
+  color: #000;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.retro-button:hover {
+  background: linear-gradient(135deg, #f0f0f0, #b0b0b0);
+}
+
+.retro-button:active {
+  border: 2px inset #c0c0c0;
+  background: linear-gradient(135deg, #a0a0a0, #e0e0e0);
+}
+
+/* Loading screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  color: #00ff00;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Courier New', monospace;
+  z-index: 9999;
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+  body {
+    /* Reduce background animation intensity on mobile */
+    animation-duration: 15s;
+  }
+  
+  body::before {
+    /* Reduce star field intensity */
+    opacity: 0.3;
+    animation-duration: 30s;
+  }
+  
+  .window {
+    width: 95vw !important;
+    height: 70vh !important;
+    top: 10vh !important;
+    left: 2.5vw !important;
+    /* Disable dragging on mobile */
+    position: fixed !important;
+    /* Remove resize handle */
+    resize: none !important;
+  }
+  
+  .window-title-bar {
+    /* Make title bar touch-friendly */
+    padding: 8px 12px;
+    font-size: 14px;
+    /* Prevent dragging on mobile */
+    cursor: default;
+  }
+  
+  .window-control-btn {
+    /* Larger touch targets */
+    width: 24px;
+    height: 22px;
+    font-size: 12px;
+  }
+  
+  .desktop-icons {
+    /* Mobile icon layout */
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  
+  .desktop-icon {
+    width: auto;
+    padding: 8px 4px;
+    /* Touch-friendly sizing */
+    min-height: 80px;
+  }
+  
+  .desktop-icon-image {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+  
+  .desktop-icon-label {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+  
+  /* Mobile-specific terminal adjustments */
+  .terminal {
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .terminal-prompt::before {
+    content: '>';
+  }
+  
+  /* Mobile button adjustments */
+  .retro-button {
+    padding: 8px 16px;
+    font-size: 12px;
+    /* Touch-friendly sizing */
+    min-height: 44px;
+  }
+  
+  /* Disable some effects on mobile for performance */
+  .blink {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .glitch {
+    animation: none;
+  }
+  
+  /* Mobile scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .window {
+    max-width: 90vw;
+    max-height: 80vh;
+  }
+  
+  .desktop-icons {
+    gap: 15px;
+  }
+  
+  .desktop-icon {
+    width: 72px;
+  }
+  
+  .desktop-icon-image {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  
+  .desktop-icon-label {
+    font-size: 11px;
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  body::before {
+    animation: none;
+  }
+  
+  .rainbow-text {
+    background: #ff0080;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .window {
+    border: 3px solid #ffffff;
+    background: #000000;
+    color: #ffffff;
+  }
+  
+  .window-title-bar {
+    background: #ffffff;
+    color: #000000;
+  }
+  
+  .desktop-icon-label {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+  }
+}
+
+/* Loading and performance states */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #000000, #1a1a2e, #16213e, #000000);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: loadingPulse 2s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.loading-text {
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #00ff00;
+}
+
+.loading-bar {
+  width: 300px;
+  height: 20px;
+  border: 2px solid #00ff00;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #001100;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #00aa00);
+  animation: loadingProgress 3s ease-in-out infinite;
+}
+
+@keyframes loadingProgress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+/* Touch-specific styles */
+@media (hover: none) {
+  .desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+  
+  .retro-button:hover {
+    background: linear-gradient(135deg, #f0f0f0, #b0b0b0);
+    transform: scale(1.05);
+  }
+  
+  .window:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .desktop-icons {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    max-height: 80px;
+  }
+  
+  .desktop-icon {
+    min-height: 60px;
+    padding: 4px 2px;
+  }
+  
+  .desktop-icon-image {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+  
+  .desktop-icon-label {
+    font-size: 8px;
+  }
+  
+  .window {
+    height: 80vh !important;
+    top: 5vh !important;
+  }
+}
