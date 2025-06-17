@@ -90,18 +90,45 @@ export default function ModuleGrid({
   
   // Generate module data from brain mapping configuration
   const moduleData = useMemo(() => {
-    if (!selectedRegion || !BRAIN_REGION_MAPPING[selectedRegion]) {
+    console.log('🧠 ModuleGrid: Generating module data for region:', selectedRegion)
+    
+    if (!selectedRegion) {
+      console.log('🧠 ModuleGrid: No selected region, returning empty array')
       return []
     }
 
-    const regionConfig = BRAIN_REGION_MAPPING[selectedRegion]
-    const category = REGION_TO_CATEGORY[selectedRegion] || 'ui'
+    // Try exact match first, then fallback to similar regions
+    let regionConfig = BRAIN_REGION_MAPPING[selectedRegion]
+    console.log('🧠 ModuleGrid: Found region config:', regionConfig)
     
-    return regionConfig.programs.map(programId => 
-      createModuleData(programId, category, {
+    // Fallback logic for temporal lobe variants
+    if (!regionConfig && selectedRegion.includes('temporal')) {
+      regionConfig = BRAIN_REGION_MAPPING['temporal-lobe-left']
+      console.log('🧠 ModuleGrid: Using temporal fallback config:', regionConfig)
+    }
+    
+    if (!regionConfig) {
+      console.warn(`🧠 ModuleGrid: Brain region '${selectedRegion}' not found in mapping`)
+      return []
+    }
+
+    const category = REGION_TO_CATEGORY[selectedRegion] || 'ui'
+    console.log('🧠 ModuleGrid: Using category:', category)
+    console.log('🧠 ModuleGrid: Programs to create:', regionConfig.programs)
+    
+    const modules = regionConfig.programs.map(programId => {
+      console.log('🧠 ModuleGrid: Creating module for program:', programId)
+      const moduleData = createModuleData(programId, category, {
         isActive: false // Could track active programs here
       })
-    )
+      console.log('🧠 ModuleGrid: Created module data:', moduleData)
+      return moduleData
+    })
+    
+    console.log('🧠 ModuleGrid: Final module data array:', modules)
+    console.log('🧠 ModuleGrid: Module count:', modules.length)
+    
+    return modules
   }, [selectedRegion])
 
   const regionInfo = selectedRegion && REGION_INFO[selectedRegion] ? REGION_INFO[selectedRegion] : null
@@ -120,167 +147,77 @@ export default function ModuleGrid({
   }, [onClose])
 
   // Don't render if no region selected
-  if (!selectedRegion || moduleData.length === 0) {
+  console.log('🧠 ModuleGrid: Render check - selectedRegion:', selectedRegion, 'moduleData.length:', moduleData.length)
+  
+  if (!selectedRegion) {
+    console.log('🧠 ModuleGrid: Not rendering - no selected region')
     return null
   }
+  
+  if (moduleData.length === 0) {
+    console.log('🧠 ModuleGrid: Not rendering - no module data')
+    return null
+  }
+  
+  console.log('🧠 ModuleGrid: Rendering with', moduleData.length, 'modules')
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={selectedRegion}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className={`module-grid-container ${className}`}
+    <div 
+      className="fixed inset-0 z-[9999] bg-blue-500/80 flex items-center justify-center"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 99999,
+        backgroundColor: 'rgba(0, 0, 255, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'auto'
+      }}
+    >
+      <div 
+        className="bg-white p-8 rounded-lg max-w-4xl w-full mx-4"
+        style={{
+          backgroundColor: 'white',
+          padding: '32px',
+          borderRadius: '8px',
+          maxWidth: '56rem',
+          width: '100%',
+          margin: '0 16px',
+          pointerEvents: 'auto'
+        }}
       >
-        {/* Backdrop overlay */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+        <h2 className="text-2xl font-bold text-black mb-4">
+          Brain Region: {selectedRegion}
+        </h2>
+        <p className="text-black mb-4">
+          Found {moduleData.length} modules
+        </p>
+        <button 
           onClick={handleClose}
-        />
-
-        {/* Main grid container */}
-        <div className="fixed inset-4 z-50 flex flex-col">
-          {/* Header section */}
-          {showHeader && regionInfo && (
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
-              className="bg-black/80 backdrop-blur-md rounded-t-2xl p-6 border border-white/10"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Close
+        </button>
+        
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {moduleData.map((module, index) => (
+            <div 
+              key={module.id}
+              className="bg-gray-100 p-4 rounded cursor-pointer hover:bg-gray-200"
+              onClick={() => handleModuleLaunch(module.id)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  {/* Region color indicator */}
-                  <div 
-                    className="w-4 h-4 rounded-full shadow-lg"
-                    style={{ 
-                      backgroundColor: regionInfo.color,
-                      boxShadow: `0 0 20px ${regionInfo.color}60`
-                    }}
-                  />
-                  
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {regionInfo.title}
-                    </h2>
-                    <p className="text-sm text-gray-400">
-                      {regionInfo.subtitle}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Close button */}
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleClose}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors duration-200"
-                >
-                  <svg 
-                    className="w-6 h-6 text-white" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M6 18L18 6M6 6l12 12" 
-                    />
-                  </svg>
-                </motion.button>
-              </div>
-
-              {/* Region description */}
-              <p className="text-gray-300 mt-3 leading-relaxed">
-                {regionInfo.description}
-              </p>
-
-              {/* Module count */}
-              <div className="mt-4 flex items-center space-x-2">
-                <span className="text-sm text-gray-400">
-                  {moduleData.length} modules available
-                </span>
-                <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
-              </div>
-            </motion.div>
-          )}
-
-          {/* Grid container */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className={`
-              flex-1 
-              bg-black/80 backdrop-blur-md 
-              ${showHeader ? 'rounded-b-2xl' : 'rounded-2xl'}
-              p-6 
-              border border-white/10 
-              ${showHeader ? 'border-t-0' : ''}
-              overflow-y-auto
-            `}
-          >
-            {/* Responsive grid */}
-            <div className={`
-              grid gap-6 h-full
-              grid-cols-1 
-              sm:grid-cols-2 
-              lg:grid-cols-3 
-              xl:grid-cols-4 
-              2xl:grid-cols-5
-              auto-rows-max
-              content-start
-            `}>
-              {moduleData.map((module, index) => (
-                <ModuleCard
-                  key={module.id}
-                  module={module}
-                  index={index}
-                  onLaunch={handleModuleLaunch}
-                />
-              ))}
+              <div className="text-2xl mb-2">{module.icon}</div>
+              <h3 className="font-bold text-black">{module.title}</h3>
+              <p className="text-sm text-gray-600">{module.description}</p>
             </div>
-
-            {/* Empty state (shouldn't happen with current data but good fallback) */}
-            {moduleData.length === 0 && (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🧠</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    No modules found
-                  </h3>
-                  <p className="text-gray-400">
-                    This brain region doesn't have any modules configured yet.
-                  </p>
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Footer with navigation hints */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-            className="mt-4 flex justify-center"
-          >
-            <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
-              <p className="text-sm text-gray-300 text-center">
-                <span className="font-medium">Click</span> a module to launch • 
-                <span className="font-medium"> ESC</span> or click outside to close
-              </p>
-            </div>
-          </motion.div>
+          ))}
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   )
 }
 

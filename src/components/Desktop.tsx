@@ -21,7 +21,7 @@ import BrainDashboard from './brain/BrainDashboard'
 import { useChaos } from '@/contexts/ChaosProvider'
 import { getAllPersonalities } from '@/config/personalities'
 import { useWindowManager } from '@/hooks/useWindowManager'
-import { getProgram } from '@/config/programRegistry'
+import { getProgram, PROGRAM_REGISTRY } from '@/config/programRegistry'
 
 // Sample program components for demonstration
 const SampleTerminal = () => <MultiPersonalityTerminal />
@@ -316,23 +316,30 @@ const Desktop: React.FC = () => {
 
   // Enhanced program launch handler for 3D brain
   const handleProgramLaunch = (moduleId: string, regionId?: string) => {
+    console.log('🧠 Brain launching program:', moduleId, 'from region:', regionId)
+    
     const program = getProgram(moduleId)
     if (!program) {
-      console.error(`Program not found: ${moduleId}`)
+      console.error(`❌ Program not found in registry: ${moduleId}`)
+      console.log('📋 Available programs:', Object.keys(PROGRAM_REGISTRY))
       return
     }
+
+    console.log('✅ Program found:', program.title)
 
     // Audio-visual feedback for program launch
     triggerSystemWideEffect('rainbow-cascade')
 
     // Create window from 3D brain experience
-    createWindowDirect({
+    createWindow({
       title: program.title,
       component: React.createElement(program.component),
       size: program.size,
       icon: program.icon,
       position: program.position || undefined
     })
+    
+    console.log('🚀 Window created for:', program.title)
   }
 
   // Keyboard shortcuts

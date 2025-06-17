@@ -128,9 +128,11 @@ export function useBrainCamera(options: BrainCameraOptions = {}) {
   const getCameraStateForRegion = useCallback((regionId: string): CameraState => {
     const regionToStateMap: Record<string, CameraState> = {
       'frontal-cortex': 'frontal-zoom',
+      'temporal-lobe': 'temporal-zoom',
       'temporal-lobe-left': 'temporal-zoom',
       'temporal-lobe-right': 'temporal-zoom',
       'motor-cortex': 'parietal-zoom',
+      'parietal-lobe': 'parietal-zoom',
       'occipital-lobe': 'occipital-zoom',
       'brainstem': 'overview' // Stay in overview for brainstem
     }

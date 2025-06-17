@@ -4,6 +4,11 @@ import { getAllPersonalities } from '@/config/personalities'
 // Dynamic imports for existing components
 const AITerminal = React.lazy(() => import('@/components/AITerminal'))
 const MusicPlayer = React.lazy(() => import('@/components/MusicPlayer'))
+const BlogReader = React.lazy(() => import('@/components/BlogReader'))
+const HitCounter = React.lazy(() => import('@/components/HitCounter'))
+const VisitorGreeter = React.lazy(() => import('@/components/VisitorGreeter'))
+const CursorTrail = React.lazy(() => import('@/components/CursorTrail'))
+const ChaosMonitor = React.lazy(() => import('@/components/ChaosMonitor'))
 
 // Interactive Programs and Games (newly created)
 const SnakeGame = React.lazy(() => import('@/components/SnakeGame'))
@@ -142,6 +147,56 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
     component: () => React.createElement('div', { style: { padding: '20px' } }, 'Browser Coming Soon...'),
     icon: '🌐',
     size: { width: 800, height: 600 },
+    autoLaunch: false
+  },
+  
+  // Additional programs from desktop
+  'blog-reader': {
+    id: 'blog-reader',
+    title: 'Blog Reader',
+    component: BlogReader,
+    icon: '📖',
+    size: { width: 700, height: 500 },
+    autoLaunch: false
+  },
+  'hit-counter': {
+    id: 'hit-counter',
+    title: 'Hit Counter',
+    component: HitCounter,
+    icon: '👁️',
+    size: { width: 300, height: 200 },
+    autoLaunch: false
+  },
+  'visitor-greeter': {
+    id: 'visitor-greeter',
+    title: 'Visitor Greeter',
+    component: VisitorGreeter,
+    icon: '👋',
+    size: { width: 400, height: 300 },
+    autoLaunch: false
+  },
+  'cursor-trail': {
+    id: 'cursor-trail',
+    title: 'Cursor Trail FX',
+    component: CursorTrail,
+    icon: '✨',
+    size: { width: 350, height: 250 },
+    autoLaunch: false
+  },
+  'chaos-monitor': {
+    id: 'chaos-monitor',
+    title: 'Chaos Monitor',
+    component: ChaosMonitor,
+    icon: '📊',
+    size: { width: 600, height: 400 },
+    autoLaunch: false
+  },
+  'chaos-control': {
+    id: 'chaos-control',
+    title: 'Chaos Control Panel',
+    component: () => React.createElement('div', { style: { padding: '20px' } }, 'Chaos Control Coming Soon...'),
+    icon: '⚡',
+    size: { width: 500, height: 400 },
     autoLaunch: false
   }
 }

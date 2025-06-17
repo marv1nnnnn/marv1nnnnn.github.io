@@ -34,11 +34,11 @@ interface RaycastingOptions {
   enableHover?: boolean
 }
 
-// Brain region color to ID mapping based on the Brain.tsx vertex colors
+// Brain region color to ID mapping - MUST match Brain.tsx exactly
 const COLOR_TO_REGION: Record<string, string> = {
   '#0099ff': 'frontal-cortex',    // Blue - frontal lobe
-  '#9966ff': 'temporal-lobe',     // Purple - temporal lobe
-  '#00cc66': 'motor-cortex',      // Green - parietal/motor cortex
+  '#9966ff': 'temporal-lobe-left', // Purple - temporal lobe left
+  '#00cc66': 'motor-cortex',      // Green - motor cortex  
   '#ff6600': 'occipital-lobe',    // Orange - occipital lobe
   '#ff3366': 'brainstem',         // Pink - brainstem
 }
@@ -128,30 +128,27 @@ export function useBrainRaycasting(options: RaycastingOptions = {}) {
     raycaster.current.params.Points = { threshold: 0.1 }
     raycaster.current.params.Line = { threshold: 0.1 }
     
-    // DEBUG: Log scene structure
-    console.log('Scene children count:', scene.children.length)
-    scene.children.forEach((child, i) => {
-      const mesh = child as Mesh
-      console.log(`Scene child ${i}:`, {
-        type: child.type,
-        name: child.name,
-        hasGeometry: !!mesh.geometry,
-        hasColorAttribute: !!mesh.geometry?.attributes?.color,
-        visible: child.visible,
-        raycast: !!mesh.raycast,
-        boundingBox: mesh.geometry ? 'has-geometry' : 'no-geometry',
-        matrixWorldNeedsUpdate: child.matrixWorldNeedsUpdate
-      })
-      
-      // Ensure the object's world matrix is up to date for raycasting
-      if (child.matrixWorldNeedsUpdate) {
-        child.updateMatrixWorld(true)
-      }
+    // Find only the brain mesh specifically
+    const brainMeshes = scene.children.filter(child => 
+      child.type === 'Mesh' && 
+      (child.name === 'brainMesh' || (child as Mesh).geometry?.attributes?.color)
+    )
+    
+    console.log('Brain meshes found:', brainMeshes.length)
+    
+    if (brainMeshes.length === 0) {
+      console.log('No brain mesh found in scene')
+      return null
+    }
+    
+    // Update world matrices for all brain meshes
+    brainMeshes.forEach(mesh => {
+      mesh.updateMatrixWorld(true)
     })
     
-    // Find intersections with brain mesh - use more targeted approach
-    const intersects = raycaster.current.intersectObjects(scene.children, true)
-    console.log('Total intersects found:', intersects.length)
+    // Find intersections with brain mesh only
+    const intersects = raycaster.current.intersectObjects(brainMeshes, false)
+    console.log('Brain intersects found:', intersects.length)
     
     // DEBUG: Log all intersections found
     intersects.forEach((intersect, i) => {
