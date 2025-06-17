@@ -3,12 +3,15 @@ import { getAllPersonalities } from '@/config/personalities'
 
 // Dynamic imports for existing components
 const AITerminal = React.lazy(() => import('@/components/AITerminal'))
+const HackerAITerminal = React.lazy(() => import('@/components/AITerminalWrapper').then(module => ({ default: module.HackerAITerminal })))
 const MusicPlayer = React.lazy(() => import('@/components/MusicPlayer'))
 const BlogReader = React.lazy(() => import('@/components/BlogReader'))
 const HitCounter = React.lazy(() => import('@/components/HitCounter'))
 const VisitorGreeter = React.lazy(() => import('@/components/VisitorGreeter'))
 const CursorTrail = React.lazy(() => import('@/components/CursorTrail'))
 const ChaosMonitor = React.lazy(() => import('@/components/ChaosMonitor'))
+const Notepad = React.lazy(() => import('@/components/Notepad'))
+const Browser = React.lazy(() => import('@/components/Browser'))
 
 // Interactive Programs and Games (newly created)
 const SnakeGame = React.lazy(() => import('@/components/SnakeGame'))
@@ -34,7 +37,7 @@ export const AUTO_LAUNCH_PROGRAMS: ProgramConfig[] = [
   {
     id: 'terminal-ai',
     title: 'Terminal AI - HACKER_AI',
-    component: () => React.createElement(AITerminal, { personalityId: 'HACKER_AI' }),
+    component: React.lazy(() => import('@/components/AITerminalWrapper').then(module => ({ default: module.HackerAITerminal }))),
     icon: '💻',
     size: { width: 600, height: 500 },
     autoLaunch: true,
@@ -51,12 +54,14 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
     return acc
   }, {} as { [key: string]: ProgramConfig }),
 
-  // AI Personalities (not auto-launch)
+  // AI Personalities (not auto-launch) - using direct components with fallback handling
   ...getAllPersonalities().reduce((acc, personality) => {
     acc[`ai_${personality.id}`] = {
       id: `ai_${personality.id}`,
       title: `AI Terminal - ${personality.name}`,
-      component: () => React.createElement(AITerminal, { personalityId: personality.id }),
+      component: React.lazy(() => import('@/components/AITerminal').then(module => ({
+        default: () => React.createElement(module.default, { personalityId: personality.id })
+      }))),
       icon: personality.icon,
       size: { width: 600, height: 500 },
       autoLaunch: false
@@ -128,7 +133,7 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
   'calculator': {
     id: 'calculator',
     title: 'Calculator.exe',
-    component: () => React.createElement('div', { style: { padding: '20px' } }, 'Standard Calculator Coming Soon...'),
+    component: BrokenCalculator,
     icon: '🔢',
     size: { width: 300, height: 400 },
     autoLaunch: false
@@ -136,7 +141,7 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
   'notepad': {
     id: 'notepad',
     title: 'Notepad.exe',
-    component: () => React.createElement('div', { style: { padding: '20px' } }, 'Notepad Coming Soon...'),
+    component: Notepad,
     icon: '📝',
     size: { width: 500, height: 400 },
     autoLaunch: false
@@ -144,7 +149,7 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
   'browser': {
     id: 'browser',
     title: 'Chaos Browser',
-    component: () => React.createElement('div', { style: { padding: '20px' } }, 'Browser Coming Soon...'),
+    component: Browser,
     icon: '🌐',
     size: { width: 800, height: 600 },
     autoLaunch: false
@@ -194,7 +199,7 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
   'chaos-control': {
     id: 'chaos-control',
     title: 'Chaos Control Panel',
-    component: () => React.createElement('div', { style: { padding: '20px' } }, 'Chaos Control Coming Soon...'),
+    component: React.lazy(() => import('@/components/ChaosControlPanel').then(module => ({ default: module.ChaosControlPanel }))),
     icon: '⚡',
     size: { width: 500, height: 400 },
     autoLaunch: false

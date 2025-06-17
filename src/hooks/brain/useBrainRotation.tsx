@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Vector2, Euler, Object3D } from 'three'
 
@@ -153,6 +153,24 @@ export function useBrainRotation(options: BrainRotationOptions = {}) {
   
   // Get current dragging state
   const getDraggingState = useCallback(() => isDragging.current, [])
+  
+  // Automatically attach/detach based on enabled state
+  useEffect(() => {
+    if (enabled) {
+      attachEventListeners()
+    } else {
+      detachEventListeners()
+      // Reset any active drag state when disabled
+      isDragging.current = false
+      hasMovedEnough.current = false
+      mouseDownTime.current = 0
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      detachEventListeners()
+    }
+  }, [enabled, attachEventListeners, detachEventListeners])
   
   return {
     attachEventListeners,

@@ -19,7 +19,26 @@ const SnakeGame: React.FC = () => {
   const [score, setScore] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [glitchMode, setGlitchMode] = useState(false)
-  const { triggerSystemWideEffect, audio, systemState } = useChaos()
+  
+  // Safely access chaos context with fallbacks
+  let chaosContext
+  try {
+    chaosContext = useChaos()
+  } catch (error) {
+    console.warn('SnakeGame: ChaosProvider not available, using fallbacks')
+    chaosContext = {
+      triggerSystemWideEffect: () => {},
+      audio: { 
+        soundEffects: { 
+          error: () => {}, 
+          success: () => {} 
+        } 
+      },
+      systemState: { chaosLevel: 0.5 }
+    }
+  }
+  
+  const { triggerSystemWideEffect, audio, systemState } = chaosContext
 
   // Generate random food position
   const generateFood = useCallback((): Position => {

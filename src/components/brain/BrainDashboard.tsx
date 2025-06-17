@@ -1,11 +1,14 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Brain from './Brain'
 import BrainLighting from './BrainLighting'
 import BrainProgramIcons from './BrainProgramIcons'
-import { BrainRegionHit } from '../../hooks/brain/useBrainRaycasting'
+import Brain3DWindow, { Brain3DWindow as Brain3DWindowType, generateWindowPosition } from './Brain3DWindow'
+import { BrainRegionHit } from '../../hooks/brain/useBrainRaycastingNew'
+import { getProgram, PROGRAM_REGISTRY } from '../../config/programRegistry'
+import { v4 as uuidv4 } from 'uuid'
 
 /**
  * @interface BrainDashboardProps
@@ -49,10 +52,16 @@ export default function BrainDashboard({
   const [launchedPrograms, setLaunchedPrograms] = useState<Set<string>>(new Set())
   const [lastLaunchedProgram, setLastLaunchedProgram] = useState<string | null>(null)
   
+  // 3D Window Management
+  const [brain3DWindows, setBrain3DWindows] = useState<Brain3DWindowType[]>([])
+  const [activeWindowId, setActiveWindowId] = useState<string | null>(null)
+  const [nextZIndex, setNextZIndex] = useState(100)
+  const [isDraggingModule, setIsDraggingModule] = useState(false)
+  const [brainCameraControls, setBrainCameraControls] = useState<any>(null)
+  
 
   // Handle brain region selection
   const handleRegionClick = useCallback((region: BrainRegionHit) => {
-    console.log('🧠 Brain region clicked:', region.regionId)
     setSelectedRegion(region.regionId)
   }, [])
 
@@ -61,28 +70,166 @@ export default function BrainDashboard({
     setHoveredRegion(region?.regionId || null)
   }, [])
 
+  // 3D Window Management Functions
+  const create3DWindow = useCallback((programId: string, regionId: string, dragBias?: { x: number; y: number }) => {
+    const program = getProgram(programId)
+    if (!program) {
+      return
+    }
+
+    // Count existing windows from this region for positioning
+    const regionWindowCount = brain3DWindows.filter(w => w.regionId === regionId).length
+    const windowPosition = generateWindowPosition(regionId, regionWindowCount, dragBias)
+    
+    const newWindow: Brain3DWindowType = {
+      id: uuidv4(),
+      title: program.title,
+      component: React.createElement(program.component),
+      position: windowPosition,
+      size: program.size,
+      icon: program.icon,
+      isMinimized: false,
+      regionId
+    }
+
+    setBrain3DWindows(prev => [...prev, newWindow])
+    setActiveWindowId(newWindow.id)
+    setNextZIndex(prev => prev + 1)
+  }, [brain3DWindows])
+
+  const close3DWindow = useCallback((windowId: string) => {
+    setBrain3DWindows(prev => prev.filter(w => w.id !== windowId))
+    if (activeWindowId === windowId) {
+      setActiveWindowId(null)
+    }
+  }, [activeWindowId])
+
+  const minimize3DWindow = useCallback((windowId: string) => {
+    setBrain3DWindows(prev => 
+      prev.map(w => 
+        w.id === windowId ? { ...w, isMinimized: !w.isMinimized } : w
+      )
+    )
+  }, [])
+
+  const focus3DWindow = useCallback((windowId: string) => {
+    setActiveWindowId(windowId)
+    setNextZIndex(prev => prev + 1)
+  }, [])
+
+  const update3DWindowPosition = useCallback((windowId: string, position: [number, number, number]) => {
+    setBrain3DWindows(prev => 
+      prev.map(w => 
+        w.id === windowId ? { ...w, position } : w
+      )
+    )
+  }, [])
+
+  // Handle module drag state changes
+  const handleModuleDragStart = useCallback(() => {
+    setIsDraggingModule(true)
+  }, [])
+
+  const handleModuleDragEnd = useCallback(() => {
+    setIsDraggingModule(false)
+  }, [])
+
+  // Handle drag-to-desktop from program icons
+  const handleDragToDesktop = useCallback((programId: string, dragInfo: { offset: { x: number; y: number }; velocity: { x: number; y: number } }) => {
+    if (!selectedRegion) {
+      return
+    }
+    
+    // Convert 2D drag offset to 3D positioning bias
+    const dragMagnitude = Math.sqrt(dragInfo.offset.x ** 2 + dragInfo.offset.y ** 2)
+    const dragBias = dragMagnitude > 0 ? {
+      x: dragInfo.offset.x,
+      y: dragInfo.offset.y
+    } : undefined
+    
+    create3DWindow(programId, selectedRegion, dragBias)
+  }, [selectedRegion, create3DWindow])
+
   // Handle program launch from 3D icons
   const handleModuleLaunch = useCallback((programId: string) => {
-    console.log('🚀 Launching program:', programId, 'from region:', selectedRegion)
+    if (!selectedRegion) {
+      return
+    }
     
     // Add to launched programs set for visual feedback
-    setLaunchedPrograms(prev => new Set([...prev, programId]))
+    setLaunchedPrograms(prev => new Set(Array.from(prev).concat(programId)))
     setLastLaunchedProgram(programId)
     
     // Clear the launch notification after 3 seconds
-    setTimeout(() => setLastLaunchedProgram(null), 3000)
+    setTimeout(() => {
+      setLastLaunchedProgram(null)
+    }, 3000)
     
-    if (selectedRegion && onModuleLaunch) {
+    // Create 3D window
+    create3DWindow(programId, selectedRegion)
+    
+    // Also call original callback if provided for compatibility
+    if (onModuleLaunch) {
       onModuleLaunch(programId, selectedRegion)
     }
-    // Keep the panel open after launch for better UX
-    // Users can manually close if they want to explore other regions
-  }, [selectedRegion, onModuleLaunch])
+  }, [selectedRegion, create3DWindow, onModuleLaunch])
 
   // Close program icons
   const handleCloseGrid = useCallback(() => {
     setSelectedRegion(null)
   }, [])
+
+  // Get brain camera controls reference
+  const handleBrainRef = useCallback((brainMesh: any) => {
+    if (brainMesh && brainMesh.userData?.brainCamera) {
+      setBrainCameraControls(brainMesh.userData.brainCamera)
+    }
+  }, [])
+
+  // Keyboard shortcuts and mouse wheel zoom
+  useEffect(() => {
+    if (!brainCameraControls) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl/Cmd key combinations
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case '=':
+          case '+':
+            event.preventDefault()
+            brainCameraControls.zoomIn()
+            break
+          case '-':
+            event.preventDefault()
+            brainCameraControls.zoomOut()
+            break
+          case '0':
+            event.preventDefault()
+            brainCameraControls.resetZoom()
+            break
+        }
+      }
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      // Only zoom when Ctrl/Cmd is held
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        if (event.deltaY < 0) {
+          brainCameraControls.zoomIn()
+        } else {
+          brainCameraControls.zoomOut()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('wheel', handleWheel)
+    }
+  }, [brainCameraControls])
 
   return (
     <>
@@ -91,7 +238,7 @@ export default function BrainDashboard({
       <Canvas
         dpr={[1, 2]}
         performance={{ min: 0.8 }}
-        camera={{ position: [0, 5, 15], fov: 60 }}
+        camera={{ position: [0, 8, 25], fov: 60 }}
         gl={{ 
           antialias: true, 
           alpha: true,
@@ -109,10 +256,12 @@ export default function BrainDashboard({
           
           {/* Clean brain component */}
           <Brain
+            ref={handleBrainRef}
             isActive={true}
             enableCameraControl={true}
             enableRaycasting={true}
-            autoRotateInOverview={enableAutoRotation}
+            enableManualRotation={!isDraggingModule}
+            autoRotateInOverview={enableAutoRotation && !isDraggingModule}
             onRegionClick={handleRegionClick}
             onRegionHover={handleRegionHover}
           />
@@ -120,13 +269,27 @@ export default function BrainDashboard({
           {/* 3D Floating Program Icons */}
           <BrainProgramIcons
             selectedRegion={selectedRegion}
-            onProgramLaunch={(programId: string) => {
-              console.log('🔗 BrainDashboard received launch request for:', programId);
-              handleModuleLaunch(programId);
-            }}
+            onProgramLaunch={handleModuleLaunch}
             onClose={handleCloseGrid}
             launchedPrograms={launchedPrograms}
+            onDragToDesktop={handleDragToDesktop}
+            onModuleDragStart={handleModuleDragStart}
+            onModuleDragEnd={handleModuleDragEnd}
           />
+          
+          {/* 3D Floating Windows */}
+          {brain3DWindows.map((window) => (
+            <Brain3DWindow
+              key={window.id}
+              window={window}
+              onClose={close3DWindow}
+              onMinimize={minimize3DWindow}
+              onFocus={focus3DWindow}
+              onUpdatePosition={update3DWindowPosition}
+              isActive={activeWindowId === window.id}
+              zIndex={activeWindowId === window.id ? nextZIndex : 100}
+            />
+          ))}
           
         </Suspense>
       </Canvas>
@@ -160,6 +323,10 @@ export default function BrainDashboard({
             <div className="flex items-start">
               <div className="w-2 h-2 rounded-full bg-green-400 mt-2 mr-3 flex-shrink-0" />
               <span><strong className="text-white">Drag</strong> to rotate brain view</span>
+            </div>
+            <div className="flex items-start">
+              <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0" />
+              <span><strong className="text-white">Zoom</strong> with Ctrl +/- or controls</span>
             </div>
           </div>
         </motion.div>
@@ -230,6 +397,58 @@ export default function BrainDashboard({
         </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Camera zoom controls */}
+      {brainCameraControls && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="absolute bottom-6 left-6 bg-gradient-to-br from-black/80 via-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl p-4 border border-white/10"
+          style={{
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          }}
+        >
+          <div className="flex items-center mb-3">
+            <div className="w-2 h-2 rounded-full bg-blue-400 mr-3 animate-pulse shadow-lg shadow-blue-400/50" />
+            <h4 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              Camera Zoom
+            </h4>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={brainCameraControls.zoomIn}
+              className="flex items-center justify-center py-2 px-3 rounded-lg bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-500/90 hover:to-cyan-500/90 border border-blue-400/40 text-white text-sm font-medium transition-all duration-200"
+            >
+              🔍+ Zoom In
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={brainCameraControls.zoomOut}
+              className="flex items-center justify-center py-2 px-3 rounded-lg bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-500/90 hover:to-pink-500/90 border border-purple-400/40 text-white text-sm font-medium transition-all duration-200"
+            >
+              🔍- Zoom Out
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={brainCameraControls.resetZoom}
+              className="flex items-center justify-center py-2 px-3 rounded-lg bg-gradient-to-r from-gray-600/80 to-gray-700/80 hover:from-gray-500/90 hover:to-gray-600/90 border border-gray-400/40 text-white text-sm font-medium transition-all duration-200"
+            >
+              ↺ Reset
+            </motion.button>
+            <div className="text-center text-xs text-gray-400 mt-2 space-y-1">
+              <div>Zoom: {brainCameraControls.zoomLevel?.toFixed(1)}x</div>
+              <div className="text-xs text-gray-500">
+                Ctrl + Wheel/+/-/0
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Enhanced brain region color legend */}
       <motion.div 

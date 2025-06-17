@@ -76,7 +76,7 @@ const brainFragmentShader = `
  * @param {BrainProps} props - The component props.
  * @returns {React.ReactElement} A Three.js mesh element representing the brain.
  */
-export default function Brain({
+const Brain = React.forwardRef<Mesh, BrainProps>(({
   position = [0, 0, 0],
   scale = 1,
   isActive = true,
@@ -86,7 +86,7 @@ export default function Brain({
   onRegionClick,
   onRegionHover,
   autoRotateInOverview = true
-}: BrainProps) {
+}, ref) => {
   const meshRef = useRef<Mesh>(null)
   const materialRef = useRef<ShaderMaterial>(null)
 
@@ -96,6 +96,21 @@ export default function Brain({
     autoRotationSpeed: 0.05,
     transitionDuration: 2000
   })
+
+  // Expose camera controls via mesh userData for parent components
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.userData.brainCamera = brainCamera
+    }
+    // Also set the ref if provided
+    if (ref) {
+      if (typeof ref === 'function') {
+        ref(meshRef.current)
+      } else {
+        ref.current = meshRef.current
+      }
+    }
+  }, [brainCamera, ref])
 
   // Initialize raycasting system
   const brainRaycasting = useBrainRaycasting({
@@ -316,13 +331,13 @@ export default function Brain({
     getCurrentCameraState: brainCamera.getCameraInfo,
     
     // Raycasting controls
-    raycastAtPosition: brainRaycasting.raycastAtPosition,
+    raycastAtPosition: brainRaycasting.castRay,
     getCurrentHoveredRegion: brainRaycasting.getCurrentHoveredRegion,
     clearHover: brainRaycasting.clearHover,
     
     // Combined functionality
     clickRegionAt: (x: number, y: number) => {
-      const hit = brainRaycasting.raycastAtPosition(x, y)
+      const hit = brainRaycasting.castRay(x, y)
       if (hit && enableCameraControl) {
         brainCamera.focusOnRegion(hit.regionId)
       }
@@ -354,7 +369,11 @@ export default function Brain({
       />
     </mesh>
   )
-}
+})
+
+Brain.displayName = 'Brain'
+
+export default Brain
 
 /**
  * @interface BrainControls

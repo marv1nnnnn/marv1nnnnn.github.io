@@ -20,27 +20,27 @@ interface CameraPosition {
 // Define camera states based on brain anatomy and technical specification
 const CAMERA_STATES: Record<CameraState, CameraPosition> = {
   overview: {
-    position: new Vector3(0, 5, 15),
+    position: new Vector3(0, 8, 25), // Moved farther for better viewport
     target: new Vector3(0, 0, 0),
     fov: 60
   },
   'frontal-zoom': {
-    position: new Vector3(0, 3, 8),
+    position: new Vector3(0, 6, 16),
     target: new Vector3(0, 2.5, 4), // Focus on frontal cortex
     fov: 45
   },
   'temporal-zoom': {
-    position: new Vector3(-6, 2, 3),
+    position: new Vector3(-12, 4, 6),
     target: new Vector3(-4.5, 0.5, 0), // Focus on temporal lobe
     fov: 50
   },
   'parietal-zoom': {
-    position: new Vector3(0, 8, 2),
+    position: new Vector3(0, 16, 4),
     target: new Vector3(0, 4.5, 0), // Focus on motor cortex/parietal
     fov: 45
   },
   'occipital-zoom': {
-    position: new Vector3(0, 2, -8),
+    position: new Vector3(0, 4, -16),
     target: new Vector3(0, 1, -4.5), // Focus on occipital lobe
     fov: 50
   }
@@ -79,6 +79,7 @@ export function useBrainCamera(options: BrainCameraOptions = {}) {
 
   const [currentState, setCurrentState] = useState<CameraState>('overview')
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [zoomLevel, setZoomLevel] = useState(1.0) // 1.0 = normal, < 1.0 = zoom in, > 1.0 = zoom out
   const { camera } = useThree()
   
   // Track current target for camera to look at
@@ -161,22 +162,40 @@ export function useBrainCamera(options: BrainCameraOptions = {}) {
     })
   }, [springApi])
 
+  // Zoom controls
+  const zoomIn = useCallback(() => {
+    setZoomLevel(prev => Math.max(0.3, prev - 0.2)) // Min zoom: 0.3 (very close)
+  }, [])
+
+  const zoomOut = useCallback(() => {
+    setZoomLevel(prev => Math.min(3.0, prev + 0.2)) // Max zoom: 3.0 (far away)
+  }, [])
+
+  const resetZoom = useCallback(() => {
+    setZoomLevel(1.0)
+  }, [])
+
   // Get current camera information
   const getCameraInfo = useCallback(() => ({
     state: currentState,
     isTransitioning,
     position: new Vector3(...position.get()),
     target: new Vector3(...target.get()),
-    fov: fov.get()
-  }), [currentState, isTransitioning, position, target, fov])
+    fov: fov.get(),
+    zoomLevel
+  }), [currentState, isTransitioning, position, target, fov, zoomLevel])
 
   // Auto-rotation logic for overview state
   useFrame((state, delta) => {
     if (!camera) return
 
     // Update camera position and target from spring animation
-    const currentPosition = new Vector3(...position.get())
+    const basePosition = new Vector3(...position.get())
     const currentTargetPos = new Vector3(...target.get())
+    
+    // Apply zoom by scaling the distance from target to camera
+    const directionToCamera = basePosition.clone().sub(currentTargetPos)
+    const zoomedPosition = currentTargetPos.clone().add(directionToCamera.multiplyScalar(zoomLevel))
     
     // Apply auto-rotation when in overview and not transitioning
     if (enableAutoRotation && currentState === 'overview' && !isTransitioning) {
@@ -186,21 +205,21 @@ export function useBrainCamera(options: BrainCameraOptions = {}) {
       if (timeSinceStateChange > 3000) {
         autoRotationAngle.current += autoRotationSpeed * delta
         
-        // Rotate around the brain
-        const radius = currentPosition.length()
+        // Rotate around the brain with zoom applied
+        const radius = zoomedPosition.length()
         const rotatedPosition = new Vector3(
           Math.cos(autoRotationAngle.current) * radius,
-          currentPosition.y,
+          zoomedPosition.y,
           Math.sin(autoRotationAngle.current) * radius
         )
         
         camera.position.copy(rotatedPosition)
       } else {
-        camera.position.copy(currentPosition)
+        camera.position.copy(zoomedPosition)
       }
     } else {
-      camera.position.copy(currentPosition)
-      autoRotationAngle.current = Math.atan2(currentPosition.z, currentPosition.x)
+      camera.position.copy(zoomedPosition)
+      autoRotationAngle.current = Math.atan2(zoomedPosition.z, zoomedPosition.x)
     }
 
     // Update camera target and FOV
@@ -227,12 +246,18 @@ export function useBrainCamera(options: BrainCameraOptions = {}) {
     // Current state
     currentState,
     isTransitioning,
+    zoomLevel,
     
     // Control methods
     transitionToState,
     focusOnRegion,
     returnToOverview,
     setCameraPosition,
+    
+    // Zoom controls
+    zoomIn,
+    zoomOut,
+    resetZoom,
     
     // Utilities
     getCameraInfo,

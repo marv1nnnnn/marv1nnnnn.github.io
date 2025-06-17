@@ -16,6 +16,9 @@ interface ModuleCardProps {
   module: ModuleCardData
   index: number
   onLaunch?: (moduleId: string) => void
+  onDragStart?: (moduleId: string) => void
+  onDragEnd?: (moduleId: string, dragInfo: { offset: { x: number; y: number }; velocity: { x: number; y: number } }) => void
+  onDrag?: (moduleId: string, info: { offset: { x: number; y: number }; point: { x: number; y: number } }) => void
 }
 
 // Icon mapping for different module types
@@ -114,25 +117,27 @@ const CATEGORY_THEMES = {
   }
 }
 
-export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps) {
+export default function ModuleCard({ module, index, onLaunch, onDragStart, onDragEnd, onDrag }: ModuleCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isLaunching, setIsLaunching] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const theme = CATEGORY_THEMES[module.category]
   const icon = MODULE_ICONS[module.id] || '📱'
   const description = MODULE_DESCRIPTIONS[module.id] || 'Application module'
 
   const handleClick = () => {
-    console.log('🎯 ModuleCard clicked:', module.id, module.title)
+    // Don't trigger click if we're currently dragging
+    if (isDragging) return
+    
     setIsLaunching(true)
     
     // Reset launching state after animation
-    setTimeout(() => setIsLaunching(false), 1000)
+    setTimeout(() => {
+      setIsLaunching(false)
+    }, 1000)
     
     if (onLaunch) {
-      console.log('🚀 Calling onLaunch for:', module.id)
       onLaunch(module.id)
-    } else {
-      console.warn('⚠️ No onLaunch callback provided')
     }
     
     if (module.onClick) {
@@ -140,10 +145,38 @@ export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps)
     }
   }
 
+  // Drag handlers
+  const handleDragStart = () => {
+    setIsDragging(true)
+    if (onDragStart) {
+      onDragStart(module.id)
+    }
+  }
+
+  const handleDragEnd = (event: any, info: any) => {
+    setIsDragging(false)
+    if (onDragEnd) {
+      onDragEnd(module.id, { offset: info.offset, velocity: info.velocity })
+    }
+  }
+
+  const handleDrag = (event: any, info: any) => {
+    if (onDrag) {
+      onDrag(module.id, { offset: info.offset, point: info.point })
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 15, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+        boxShadow: isDragging 
+          ? `0 20px 40px -12px ${theme.primary}40, 0 0 30px ${theme.primary}30`
+          : undefined
+      }}
       exit={{ opacity: 0, y: -15, scale: 0.95 }}
       transition={{ 
         duration: 0.4, 
@@ -153,33 +186,58 @@ export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps)
         damping: 30
       }}
       whileHover={{ 
-        scale: 1.03,
-        y: -4,
+        scale: isDragging ? 1.05 : 1.03,
+        y: isDragging ? 0 : -4,
         transition: { duration: 0.25, ease: "easeOut" }
       }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: isDragging ? 1.05 : 0.97 }}
+      whileDrag={{
+        scale: 1.15,
+        rotate: [0, -3, 3, -2, 2, 0],
+        opacity: 1,
+        zIndex: 1000,
+        boxShadow: "0 25px 50px -12px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.3)",
+        transition: { duration: 0.2 }
+      }}
+      drag
+      dragMomentum={false}
+      dragElastic={0.1}
+      dragConstraints={{
+        top: -200,
+        left: -200,
+        right: 200,
+        bottom: 200
+      }}
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDrag={handleDrag}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
       className={`
-        relative group cursor-pointer
+        relative group ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
         bg-gradient-to-br ${theme.gradient}
         backdrop-blur-xl
         border ${theme.border}
-        rounded-2xl p-6
+        rounded-2xl p-5
         ${theme.glow} ${theme.hoverGlow}
         transition-all duration-300 ease-out
         ${module.isActive ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-black/20' : ''}
+        ${isDragging ? 'shadow-2xl shadow-cyan-400/70 ring-2 ring-cyan-400/80 border-cyan-400/60' : ''}
         hover:border-opacity-60
         overflow-hidden
-        min-h-[160px]
+        min-h-[120px] w-full
+        select-none
       `}
     >
       {/* Animated background particles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           animate={{
-            background: isLaunching
+            background: isDragging
+              ? `radial-gradient(circle at 50% 50%, ${theme.primary}35 0%, transparent 80%)`
+              : isLaunching
               ? `radial-gradient(circle at 50% 50%, ${theme.primary}25 0%, transparent 70%)`
               : isHovered 
               ? `radial-gradient(circle at 50% 50%, ${theme.primary}15 0%, transparent 60%)`
@@ -197,22 +255,23 @@ export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps)
       </div>
 
       {/* Card content */}
-      <div className="relative z-10 flex flex-col h-full">
-        {/* Header with icon and status */}
-        <div className="flex items-start justify-between mb-3">
+      <div className="relative z-10 flex items-center h-full space-x-4">
+        {/* Icon section */}
+        <div className="flex-shrink-0 flex items-center justify-center relative">
           <motion.div
             animate={{ 
-              rotate: isLaunching ? [0, 360] : isHovered ? [0, -3, 3, 0] : 0,
-              scale: isLaunching ? [1, 1.3, 1] : isHovered ? 1.15 : 1
+              rotate: isDragging ? [0, 360] : isLaunching ? [0, 360] : isHovered ? [0, -3, 3, 0] : 0,
+              scale: isDragging ? [1, 1.4, 1.2] : isLaunching ? [1, 1.3, 1] : isHovered ? 1.15 : 1
             }}
             transition={{ 
-              duration: isLaunching ? 0.8 : 0.6, 
-              ease: isLaunching ? "easeInOut" : "easeInOut"
+              duration: isDragging ? 1.2 : isLaunching ? 0.8 : 0.6, 
+              ease: isDragging ? "easeInOut" : isLaunching ? "easeInOut" : "easeInOut",
+              repeat: isDragging ? Infinity : 0
             }}
             className="text-3xl"
             style={{ 
-              filter: `drop-shadow(0 0 ${isLaunching ? '20px' : '12px'} ${theme.primary}${isLaunching ? '80' : '50'})`,
-              textShadow: `0 0 ${isLaunching ? '30px' : '20px'} ${theme.primary}${isLaunching ? '60' : '40'}`
+              filter: `drop-shadow(0 0 ${isDragging ? '25px' : isLaunching ? '20px' : '12px'} ${theme.primary}${isDragging ? '90' : isLaunching ? '80' : '50'})`,
+              textShadow: `0 0 ${isDragging ? '35px' : isLaunching ? '30px' : '20px'} ${theme.primary}${isDragging ? '70' : isLaunching ? '60' : '40'}`
             }}
           >
             {icon}
@@ -223,7 +282,7 @@ export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps)
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 shadow-lg shadow-green-500/50"
+              className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 shadow-lg shadow-green-500/50"
             >
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
@@ -234,68 +293,75 @@ export default function ModuleCard({ module, index, onLaunch }: ModuleCardProps)
           )}
         </div>
 
-        {/* Module title with gradient */}
-        <motion.h3 
-          className="text-lg font-bold text-white mb-3 leading-tight"
-          animate={{
-            backgroundImage: isHovered 
-              ? `linear-gradient(135deg, ${theme.primary}, ${theme.secondary}, ${theme.accent})`
-              : 'none'
-          }}
-          style={{
-            backgroundClip: isHovered ? 'text' : 'unset',
-            WebkitBackgroundClip: isHovered ? 'text' : 'unset',
-            color: isHovered ? 'transparent' : 'white'
-          }}
-        >
-          {module.title || module.id.split('-').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1)
-          ).join(' ')}
-        </motion.h3>
+        {/* Content section */}
+        <div className="flex-1 flex flex-col justify-center min-w-0">
+          {/* Module title with gradient */}
+          <motion.h3 
+            className="text-base font-bold text-white mb-1 leading-tight"
+            animate={{
+              backgroundImage: isHovered 
+                ? `linear-gradient(135deg, ${theme.primary}, ${theme.secondary}, ${theme.accent})`
+                : 'none'
+            }}
+            style={{
+              backgroundClip: isHovered ? 'text' : 'unset',
+              WebkitBackgroundClip: isHovered ? 'text' : 'unset',
+              color: isHovered ? 'transparent' : 'white'
+            }}
+          >
+            {module.title || module.id.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ')}
+          </motion.h3>
 
-        {/* Module description */}
-        <p className="text-sm text-gray-300 leading-relaxed flex-1 mb-4 min-h-[3rem]">
-          {description}
-        </p>
+          {/* Module description */}
+          <p className="text-xs text-gray-300 leading-relaxed mb-2">
+            {description}
+          </p>
+        </div>
 
         {/* Launch indicator */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ 
-            opacity: (isHovered || isLaunching || module.isActive) ? 1 : 0,
-            scale: (isHovered || isLaunching || module.isActive) ? 1 : 0.8
-          }}
-          transition={{ duration: 0.25 }}
-          className="flex items-center justify-center py-2 px-3 rounded-xl bg-gradient-to-r"
-          style={{
-            backgroundImage: module.isActive 
-              ? `linear-gradient(90deg, ${theme.primary}40, ${theme.secondary}40)`
-              : `linear-gradient(90deg, ${theme.primary}20, ${theme.secondary}20)`
-          }}
-        >
-          <motion.span 
-            className="text-xs font-semibold bg-gradient-to-r bg-clip-text text-transparent"
-            style={{
-              backgroundImage: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`
-            }}
-          >
-            {isLaunching ? 'Launching...' : module.isActive ? 'Running' : 'Launch Module'}
-          </motion.span>
+        <div className="flex-shrink-0">
           <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ 
-              x: isLaunching ? [0, 5, 0] : isHovered ? [0, 3, 0] : 0,
-              rotate: isLaunching ? 360 : 0
+              opacity: (isHovered || isLaunching || isDragging || module.isActive) ? 1 : 0,
+              scale: (isHovered || isLaunching || isDragging || module.isActive) ? 1 : 0.8
             }}
-            transition={{ 
-              duration: isLaunching ? 0.5 : 1, 
-              repeat: isLaunching ? Infinity : Infinity 
+            transition={{ duration: 0.25 }}
+            className="flex items-center justify-center py-1 px-3 rounded-xl bg-gradient-to-r"
+            style={{
+              backgroundImage: isDragging
+                ? `linear-gradient(90deg, ${theme.primary}60, ${theme.secondary}60)`
+                : module.isActive 
+                ? `linear-gradient(90deg, ${theme.primary}40, ${theme.secondary}40)`
+                : `linear-gradient(90deg, ${theme.primary}20, ${theme.secondary}20)`
             }}
-            className="ml-2 text-xs"
-            style={{ color: theme.primary }}
           >
-            {module.isActive ? '●' : '→'}
+            <motion.span 
+              className="text-xs font-semibold bg-gradient-to-r bg-clip-text text-transparent whitespace-nowrap"
+              style={{
+                backgroundImage: `linear-gradient(90deg, ${theme.primary}, ${theme.secondary})`
+              }}
+            >
+              {isDragging ? 'Dragging...' : isLaunching ? 'Launching...' : module.isActive ? 'Running' : 'Launch'}
+            </motion.span>
+            <motion.div
+              animate={{ 
+                x: isDragging ? [0, 8, 0] : isLaunching ? [0, 5, 0] : isHovered ? [0, 3, 0] : 0,
+                rotate: isDragging ? [0, 360] : isLaunching ? 360 : 0
+              }}
+              transition={{ 
+                duration: isDragging ? 0.8 : isLaunching ? 0.5 : 1, 
+                repeat: isDragging ? Infinity : isLaunching ? Infinity : Infinity 
+              }}
+              className="ml-2 text-xs"
+              style={{ color: theme.primary }}
+            >
+              {isDragging ? '✋' : module.isActive ? '●' : '→'}
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Hover border effect */}

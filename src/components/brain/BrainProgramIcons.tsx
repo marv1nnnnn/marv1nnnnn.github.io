@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { Html } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BRAIN_REGION_MAPPING } from '../../config/brainMapping'
@@ -10,6 +10,9 @@ interface BrainProgramIconsProps {
   onProgramLaunch: (programId: string) => void
   onClose: () => void
   launchedPrograms?: Set<string>
+  onDragToDesktop?: (programId: string, dragInfo: { offset: { x: number; y: number }; velocity: { x: number; y: number } }) => void
+  onModuleDragStart?: () => void
+  onModuleDragEnd?: () => void
 }
 
 // Region to category mapping
@@ -46,8 +49,14 @@ export default function BrainProgramIcons({
   selectedRegion,
   onProgramLaunch,
   onClose,
-  launchedPrograms = new Set()
+  launchedPrograms = new Set(),
+  onDragToDesktop,
+  onModuleDragStart,
+  onModuleDragEnd
 }: BrainProgramIconsProps) {
+  
+  const [draggedModule, setDraggedModule] = useState<string | null>(null)
+  const [isDragActive, setIsDragActive] = useState(false)
   
   // Generate module data for the selected region
   const moduleData = useMemo(() => {
@@ -71,6 +80,32 @@ export default function BrainProgramIcons({
     }).filter(Boolean)
   }, [selectedRegion, launchedPrograms])
   
+  // Drag handlers
+  const handleDragStart = useCallback((moduleId: string) => {
+    setDraggedModule(moduleId)
+    setIsDragActive(true)
+    onModuleDragStart?.()
+  }, [onModuleDragStart])
+
+  const handleDragEnd = useCallback((moduleId: string, dragInfo: { offset: { x: number; y: number }; velocity: { x: number; y: number } }) => {
+    setDraggedModule(null)
+    setIsDragActive(false)
+    onModuleDragEnd?.()
+    
+    // Check if dragged outside the panel (simple threshold for now)
+    const dragDistance = Math.sqrt(dragInfo.offset.x ** 2 + dragInfo.offset.y ** 2)
+    const dragVelocity = Math.sqrt(dragInfo.velocity.x ** 2 + dragInfo.velocity.y ** 2)
+    
+    // If dragged far enough or with enough velocity, create 3D window
+    if ((dragDistance > 100 || dragVelocity > 500) && onDragToDesktop) {
+      onDragToDesktop(moduleId, dragInfo)
+    }
+  }, [onDragToDesktop, onModuleDragEnd])
+
+  const handleDrag = useCallback((moduleId: string, info: { offset: { x: number; y: number }; point: { x: number; y: number } }) => {
+    // Optional: add real-time feedback during drag
+  }, [])
+
   if (!selectedRegion || moduleData.length === 0) {
     return null
   }
@@ -81,9 +116,14 @@ export default function BrainProgramIcons({
   // Position the panel in a stable location (right side of screen)
   return (
     <Html
-      position={[10, 0, 0]} // Fixed position to the right of the brain
+      position={[5.5, 0, 0]} // Reduced position for better screen fit
       transform={false}
-      center
+      center={false}
+      style={{
+        width: '450px',
+        minWidth: '400px',
+        maxWidth: '500px'
+      }}
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -97,18 +137,22 @@ export default function BrainProgramIcons({
             stiffness: 300,
             damping: 30
           }}
-          className="
-            fixed right-4 top-1/2 transform -translate-y-1/2
+          className={`
+            relative
             bg-gradient-to-br from-black/95 via-gray-900/95 to-black/95
             backdrop-blur-2xl
-            border border-white/20
-            rounded-3xl p-8 
-            w-[520px] max-h-[85vh]
+            border ${isDragActive ? 'border-cyan-400/60' : 'border-white/20'}
+            rounded-3xl p-6 
             shadow-2xl shadow-black/50
-            z-50
             overflow-hidden
-          "
+            transition-all duration-300
+            ${isDragActive ? 'ring-2 ring-cyan-400/30' : ''}
+          `}
           style={{
+            width: '450px',
+            minWidth: '400px',
+            maxWidth: '500px',
+            maxHeight: '85vh',
             boxShadow: `
               0 25px 50px -12px rgba(0, 0, 0, 0.8),
               0 0 0 1px rgba(255, 255, 255, 0.1),
@@ -180,15 +224,23 @@ export default function BrainProgramIcons({
           </div>
           
           {/* Module Grid */}
-          <div className="relative z-10 grid grid-cols-2 gap-6 max-h-[55vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <div 
+            className="relative z-10 grid grid-cols-2 gap-4 max-h-[55vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
+            style={{ width: '100%' }}
+          >
             {moduleData.map((module, index) => {
-              console.log('🎨 Rendering ModuleCard:', module.id, 'onLaunch:', typeof onProgramLaunch);
+              if (!module) {
+                return null;
+              }
               return (
                 <ModuleCard
                   key={module.id}
                   module={module}
                   index={index}
                   onLaunch={onProgramLaunch}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDrag={handleDrag}
                 />
               );
             })}
@@ -207,9 +259,41 @@ export default function BrainProgramIcons({
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-1 h-1 rounded-full bg-cyan-400 mr-2"
               />
-              Click any module to launch application
+              {isDragActive ? 'Drag outside to create 3D window' : 'Click to launch • Drag to move to 3D space'}
             </div>
           </motion.div>
+
+          {/* Drag zone indicator */}
+          <AnimatePresence>
+            {isDragActive && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute inset-0 pointer-events-none"
+              >
+                <div className="absolute inset-2 border-2 border-dashed border-cyan-400/50 rounded-2xl">
+                  <div className="flex items-center justify-center h-full">
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        opacity: [0.5, 0.8, 0.5]
+                      }}
+                      transition={{ 
+                        duration: 1.5, 
+                        repeat: Infinity 
+                      }}
+                      className="text-cyan-400/70 text-center"
+                    >
+                      <div className="text-2xl mb-2">↗️</div>
+                      <div className="text-xs font-medium">Drag outside panel</div>
+                      <div className="text-xs">to create 3D window</div>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </AnimatePresence>
     </Html>

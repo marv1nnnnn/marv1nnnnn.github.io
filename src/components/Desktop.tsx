@@ -327,19 +327,23 @@ const Desktop: React.FC = () => {
 
     console.log('✅ Program found:', program.title)
 
-    // Audio-visual feedback for program launch
-    triggerSystemWideEffect('rainbow-cascade')
+    // This is now handled by the BrainDashboard's own handleModuleLaunch
+    // We only create 2D windows if the call comes from outside the 3D brain
+    if (!regionId) {
+      // Audio-visual feedback for program launch
+      triggerSystemWideEffect('rainbow-cascade')
 
-    // Create window from 3D brain experience
-    createWindow({
-      title: program.title,
-      component: React.createElement(program.component),
-      size: program.size,
-      icon: program.icon,
-      position: program.position || undefined
-    })
-    
-    console.log('🚀 Window created for:', program.title)
+      // Create traditional 2D window
+      createWindow({
+        title: program.title,
+        component: React.createElement(program.component),
+        size: program.size,
+        icon: program.icon,
+        position: program.position || undefined
+      })
+      
+      console.log('🚀 2D Window created for:', program.title)
+    }
   }
 
   // Keyboard shortcuts

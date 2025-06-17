@@ -4,107 +4,237 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Chaotic Early-Web OS** is a Next.js 14 application that creates a nostalgic desktop environment celebrating early web aesthetics. It features an interactive desktop with draggable windows, multiple AI personalities, mini-games, and a sophisticated 3D brain visualization system built with Three.js and React Three Fiber.
+This is "Chaotic Early-Web OS" - a Next.js 14 application that recreates a nostalgic desktop environment celebrating early web aesthetics. It features draggable windows, retro games, AI chat personalities, a 3D brain visualization, and chaotic visual effects reminiscent of 90s/Y2K web design.
 
 ## Development Commands
 
 ```bash
-# Start development server
+# Development server
 npm run dev
-# or
-pnpm dev
 
-# Build for production
+# Production build
 npm run build
-# or
-pnpm build
 
 # Start production server
 npm start
 
-# Run linting
+# Linting
 npm run lint
 ```
 
-## Code Architecture
+## Key Dependencies
+
+**3D Graphics and Visualization:**
+- `@react-three/fiber` - React renderer for Three.js
+- `@react-three/drei` - Useful helpers for React Three Fiber
+- `@react-three/postprocessing` - Post-processing effects
+- `three` - Core 3D library for brain visualization
+
+**Animation and Effects:**
+- `framer-motion` - Advanced animations and transitions
+- `@tweenjs/tween.js` - Smooth value interpolation
+
+**Audio Processing:**
+- `howler` - Audio library for sound effects
+- `tone` - Audio synthesis and effects
+- `use-sound` - React hook for audio
+- `web-audio-beat-detector` - Audio analysis for reactive effects
+
+**UI and Interaction:**
+- `react-draggable` - Draggable window functionality
+- `react-rnd` - Resizable and draggable components
+- `react-spring` - Spring-physics based animations
+- `canvas-confetti` - Particle effects
+
+## Architecture Overview
 
 ### Core Application Structure
 
-The app follows Next.js 14 App Router conventions with these key architectural patterns:
+The app uses a multi-provider architecture where all functionality flows through nested React contexts:
 
-- **Provider Chain**: The main page wraps components in multiple context providers in this order:
-  - `AIChatProvider` → `WindowManagerProvider` → `ChaosProvider` → `AudioVisualProvider` → `Desktop`
+1. **AIChatProvider** - Manages AI personality chat system
+2. **WindowManagerProvider** - Handles draggable window system
+3. **ChaosProvider** - Central orchestrator for all system state, effects, and audio
+4. **AudioVisualProvider** - Audio processing and visual effects
 
-- **Component-Based Desktop**: The main `Desktop` component manages the desktop environment, windows, and application launcher
+### Key Architectural Components
 
-- **Modular Program System**: Applications are registered in `src/config/programRegistry.ts` with lazy loading for performance
+**Desktop Environment (`src/components/Desktop.tsx`)**
+- Main desktop interface with draggable icons in a grid layout
+- Integrates 3D brain visualization toggle
+- Handles program launching and window creation
+- Responsive design with mobile/desktop modes
 
-### 3D Brain Visualization System
+**Window Management (`src/hooks/useWindowManager.tsx`)**
+- Complete window lifecycle management (create, focus, minimize, maximize, close)
+- Z-index management and positioning
+- State persistence and responsive sizing
 
-Located in `src/components/brain/`, this is a sophisticated Three.js implementation:
+**Chaos System (`src/contexts/ChaosProvider.tsx`)**
+- Central state management for system chaos level, performance, and effects
+- Audio-reactive visual effects
+- Real-time performance monitoring and adaptive quality
+- Mobile device detection and responsive behavior
 
-- **Brain.tsx**: Core 3D model with procedural geometry, vertex coloring, custom shaders, and raycasting
-- **BrainDashboard.tsx**: Main UI container orchestrating the 3D scene and 2D overlays  
-- **useBrainCamera.tsx**: State-based camera control with smooth transitions and auto-rotation
-- **useBrainRaycasting.tsx**: Mouse-to-3D interaction using raycasting for region detection
+**Program Registry (`src/config/programRegistry.ts`)**
+- Centralized registry of all launchable programs
+- Auto-launch program configuration
+- Dynamic component loading with React.lazy()
+- Program size, positioning, and icon management
 
-Data flow: User interaction → Raycasting → Region identification → Camera transitions → UI updates
+### 3D Brain Visualization
 
-### Configuration Systems
+The 3D brain system is a sophisticated Three.js implementation located in `src/components/brain/`:
 
-- **Program Registry** (`src/config/programRegistry.ts`): Defines all launchable applications with lazy loading, window sizing, and auto-launch behavior
-- **AI Personalities** (`src/config/personalities.ts`): Configures different AI terminal personalities
-- **Brain Mapping** (`src/config/brainMapping.ts`): Maps 3D brain regions to available modules/applications
+**Core Components:**
+- `Brain.tsx` - Procedurally generated brain mesh with vertex coloring for region identification
+- `BrainDashboard.tsx` - Main UI orchestrator with scene setup and overlays  
+- `ModuleGrid.tsx` - Program launcher interface when brain regions are clicked
 
-### Content Management
+**Interaction System:**
+- `useBrainCamera.tsx` - State-based camera control with smooth transitions
+- `useBrainRaycasting.tsx` - Mouse-to-3D interaction using color-based region detection
+- Brain regions map to specific programs via `src/config/brainMapping.ts`
 
-- **Blog System**: Static markdown files in `public/blog/` with metadata in `blog-metadata.json`
-- **Music Playlist**: JSON configuration in `public/music/playlist.json`
+**Data Flow:**
+1. User clicks on 3D brain mesh
+2. Raycasting detects vertex color at intersection point
+3. Color maps to brain region ID via `src/utils/colorUtils.ts`
+4. Camera transitions to focus on region
+5. ModuleGrid displays available programs for that region
 
-## Key Dependencies
+### AI Personalities System
 
-- **React Three Fiber**: 3D rendering and Three.js integration
-- **Framer Motion**: Animations and transitions
-- **React Spring**: Physics-based animations for camera movement
-- **Tone.js**: Audio synthesis and effects
-- **Howler.js**: Audio playback management
-- **React Draggable/RND**: Window dragging and resizing
+**Configuration (`src/config/personalities.ts`)**
+- Multiple AI personalities with distinct styles and prompts
+- Each personality has unique visual theming and behavioral traits
+- Integrated into Terminal.exe program
 
-## Development Standards
+**Implementation:**
+- Personalities are dynamically loaded as separate terminal instances
+- Each has custom styling, icons, and interaction patterns
+- Managed through the AI chat context system
 
-### Component Patterns
-- Use lazy loading for program components to improve initial load performance
-- Implement proper cleanup in useEffect hooks, especially for audio/3D resources
-- Follow the established provider pattern for state management
+## File Structure Guidelines
 
-### File Organization
-- Components: `/src/components/` (with subdirectories for complex systems like `brain/`)
-- Hooks: `/src/hooks/` (with subdirectories like `brain/` for specialized hooks)
-- Configuration: `/src/config/`
-- Context Providers: `/src/contexts/`
-- Services: `/src/services/`
+**Component Organization:**
+- Main components in `src/components/`
+- Brain-specific components in `src/components/brain/`
+- Hooks in `src/hooks/` with brain-specific hooks in `src/hooks/brain/`
+- Configuration files in `src/config/`
+- Utilities in `src/utils/`
 
-### TypeScript Usage
-- Define proper interfaces for component props and configuration objects
-- Use proper typing for Three.js objects and React Three Fiber components
-- Maintain type safety for the program registry and configuration systems
+**Blog System:**
+- Blog posts as Markdown files in `public/blog/`
+- Metadata managed in `public/blog/blog-metadata.json`
+- BlogReader component handles rendering
 
-## Adding New Programs
+**Standards Application:**
+- This project follows Mouse Protocol conventions in `.cursor/rules/`
+- Always apply relevant standards from the rules directory
+- Focus on maintaining the chaotic/retro aesthetic while ensuring code quality
 
-To add a new desktop application:
+## Key Technical Patterns
 
-1. Create component in `/src/components/`
-2. Add lazy import in `programRegistry.ts`
-3. Define program configuration with proper sizing and metadata
-4. Test window management integration
+**Component Lazy Loading:**
+All programs use React.lazy() for code splitting and performance
 
-## Mouse Protocol Integration
+**State Management Pattern:**
+Context providers handle domain-specific state, with ChaosProvider as the central coordinator
 
-This project uses a sophisticated Mouse Protocol system (see `.cursorrules` and `.cursor/rules/core_protocol.mouse.mdc`) that requires:
+**Effects and Animation:**
+Heavy use of CSS animations, Framer Motion, and Three.js for the retro aesthetic
 
-- All file modifications must be tracked as formal Mouse Tasks
-- Detailed logging of all changes and state transitions
-- Sequential TaskID generation following the `MOUSE#TASK_DDDD` pattern
-- Proper task lifecycle management with states: Pending → Ready → Planning/InProgress → Review → Done
+**Responsive Design:**
+Mobile-first approach with adaptive layouts and touch-friendly interfaces
 
-When working on this project, follow the Mouse Protocol guidelines for task creation, execution logging, and file operation tracking.
+**Performance Optimization:**
+Real-time FPS monitoring with automatic quality adjustment based on device capabilities
+
+## Integration Patterns
+
+### Adding New Programs
+1. **Create Component**: Build your program component in `src/components/`
+2. **Register Program**: Add entry to `PROGRAM_REGISTRY` in `src/config/programRegistry.ts`
+3. **Set Properties**: Define size, icon, auto-launch behavior, and integration points
+4. **Lazy Loading**: Use `React.lazy()` for code splitting
+
+### Connecting to Chaos System
+```typescript
+// Access chaos context in components
+const { 
+  systemState, 
+  triggerSystemWideEffect, 
+  setChaosLevel 
+} = useChaos()
+
+// Trigger effects on user interaction
+const handleUserAction = () => {
+  triggerSystemWideEffect('rainbow-cascade')
+  // Your action logic
+}
+```
+
+### Audio-Reactive Components
+```typescript
+// Listen to audio data for reactive effects
+useEffect(() => {
+  if (audio.isPlaying) {
+    const { visualizerData } = audio
+    // React to audio energy levels
+    const energy = visualizerData.slice(0, 8).reduce((sum, val) => sum + val, 0) / 8
+    if (energy > 0.6) {
+      // Trigger visual effects
+    }
+  }
+}, [audio.visualizerData])
+```
+
+### Window Integration
+```typescript
+// Create windows through ChaosProvider
+const { createWindow } = useChaos()
+
+createWindow({
+  title: 'My Program',
+  component: <MyComponent />,
+  size: { width: 400, height: 300 },
+  icon: '🎮'
+})
+```
+
+## Testing and Debugging
+
+### 3D Brain System Testing
+- **Region Detection**: Click various brain regions and verify correct program mapping
+- **Camera Transitions**: Test smooth transitions between brain regions
+- **Performance**: Monitor FPS with brain rendering active
+- **Mobile Interaction**: Test touch interactions on mobile devices
+
+### Audio System Testing
+- **Effect Triggers**: Verify audio-reactive effects respond to music
+- **Volume Controls**: Test chaos level impact on audio volume
+- **Performance Impact**: Monitor CPU usage with audio analysis active
+
+### Common Debugging Scenarios
+- **Brain Raycasting Issues**: Check console for color detection logs in `colorUtils.ts`
+- **Window Z-Index Problems**: Verify `useWindowManager` z-index incrementing
+- **Performance Drops**: Check ChaosProvider performance mode adjustments
+- **Mobile Layout Issues**: Test responsive behavior on various screen sizes
+
+### Development Environment
+- **Browser DevTools**: Use React DevTools for component state inspection
+- **Three.js Inspector**: Browser extension for 3D scene debugging
+- **Audio Context**: Check browser audio permissions and autoplay policies
+- **Performance Monitoring**: Use browser Performance tab for FPS analysis
+
+## Development Notes
+
+- The project embraces intentional "chaos" and glitch effects as core features
+- Maintain the nostalgic early-web aesthetic when adding new features
+- All programs should integrate with the window management system
+- Consider mobile experience for all new components
+- Use the established program registry pattern for new applications
+- **Performance Critical**: 3D rendering and audio processing are performance-sensitive
+- **Audio Permissions**: Some features require user interaction to enable audio
+- **Mobile Considerations**: Touch events and reduced visual effects for performance
