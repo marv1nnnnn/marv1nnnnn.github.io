@@ -17,7 +17,20 @@ import SnakeGame from './SnakeGame'
 import TetrisGame from './TetrisGame'
 import DigitalLavaLamp from './DigitalLavaLamp'
 import WeatherWidget from './WeatherWidget'
-import BrainDashboard from './brain/BrainDashboard'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for BrainDashboard to prevent SSR issues
+const BrainDashboard = dynamic(() => import('./brain/BrainDashboard'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full bg-black text-cyan-400">
+      <div className="text-center">
+        <div className="text-2xl mb-2">🧠</div>
+        <div>Loading Brain Interface...</div>
+      </div>
+    </div>
+  )
+})
 import { useChaos } from '@/contexts/ChaosProvider'
 import { getAllPersonalities } from '@/config/personalities'
 import { useWindowManager } from '@/hooks/useWindowManager'
