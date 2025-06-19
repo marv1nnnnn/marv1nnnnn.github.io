@@ -4,15 +4,44 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import ProgramErrorBoundary from './ProgramErrorBoundary'
+import { ChaosProvider, useChaos } from '@/contexts/ChaosProvider'
+import { AIChatProvider } from '@/contexts/AIChatContext'
+import { WindowManagerProvider } from '@/hooks/useWindowManager'
+import { AudioVisualProvider } from '@/components/AudioVisualManager'
+
+/**
+ * Context wrapper for programs launched from the brain interface.
+ * This ensures that React contexts are available within the Html portal
+ * created by @react-three/drei, which doesn't automatically inherit context.
+ */
+interface ProgramContextWrapperProps {
+  children: React.ReactNode
+}
+
+const ProgramContextWrapper: React.FC<ProgramContextWrapperProps> = ({ children }) => {
+  return (
+    <AIChatProvider>
+      <WindowManagerProvider>
+        <ChaosProvider>
+          <AudioVisualProvider>
+            {children}
+          </AudioVisualProvider>
+        </ChaosProvider>
+      </WindowManagerProvider>
+    </AIChatProvider>
+  )
+}
 
 export interface Brain3DWindow {
   id: string
+  programId: string
   title: string
   component: React.ReactNode
   position: [number, number, number]
   size: { width: number; height: number }
   icon?: string
   isMinimized?: boolean
+  isFullscreen?: boolean
   regionId?: string
 }
 
@@ -20,6 +49,7 @@ interface Brain3DWindowProps {
   window: Brain3DWindow
   onClose: (id: string) => void
   onMinimize: (id: string) => void
+  onMaximize?: (id: string) => void
   onFocus: (id: string) => void
   onUpdatePosition?: (id: string, position: [number, number, number]) => void
   isActive: boolean
@@ -30,6 +60,7 @@ export default function Brain3DWindow({
   window,
   onClose,
   onMinimize,
+  onMaximize,
   onFocus,
   onUpdatePosition,
   isActive,
@@ -44,17 +75,42 @@ export default function Brain3DWindow({
   const [currentPosition, setCurrentPosition] = useState<[number, number, number]>(window.position)
   const [htmlPosition, setHtmlPosition] = useState<[number, number, number]>([0, 0, 0.15])
   
-  const { camera, raycaster, pointer, gl } = useThree()
+  const { camera, raycaster, pointer, gl, size } = useThree()
+  
+  // Calculate viewport-aware bounds to prevent windows going off-screen
+  const getViewportBounds = () => {
+    const aspect = size.width / size.height
+    const fov = (camera as THREE.PerspectiveCamera).fov
+    const distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0))
+    
+    // Calculate visible area at the brain's position (z=0)
+    const vFOV = (fov * Math.PI) / 180
+    const visibleHeight = 2 * Math.tan(vFOV / 2) * distance
+    const visibleWidth = visibleHeight * aspect
+    
+    // Conservative bounds to keep windows fully visible
+    const margin = 2 // Extra margin to ensure windows stay on screen
+    return {
+      minX: -visibleWidth / 2 + margin,
+      maxX: visibleWidth / 2 - margin,
+      minY: -visibleHeight / 2 + margin,
+      maxY: visibleHeight / 2 - margin - 1, // Extra margin at top to prevent going above screen
+      minZ: -8,
+      maxZ: 8
+    }
+  }
 
   // Update position when window.position changes
   useEffect(() => {
     setCurrentPosition(window.position)
+    // Active windows get moved forward in Z space for better layering
+    const zOffset = isActive ? 0.3 : 0.15
     setHtmlPosition([
       window.position[0],
       window.position[1],
-      window.position[2] + 0.15
+      window.position[2] + zOffset
     ])
-  }, [window.position])
+  }, [window.position, isActive])
 
   // Gentle floating animation for the window
   useFrame((state) => {
@@ -77,11 +133,12 @@ export default function Brain3DWindow({
         )
       }
       
-      // Update HTML position to follow the mesh
+      // Update HTML position to follow the mesh with active window layering
+      const zOffset = isActive ? 0.3 : 0.15
       setHtmlPosition([
         pos[0],
         pos[1] + floatOffset,
-        pos[2] + 0.15
+        pos[2] + zOffset
       ])
     }
   })
@@ -106,11 +163,12 @@ export default function Brain3DWindow({
         startPosition[2]
       ]
       
-      // Apply boundary constraints (matching generateWindowPosition)
+      // Apply viewport-aware boundary constraints
+      const bounds = getViewportBounds()
       const constrainedPosition: [number, number, number] = [
-        Math.max(-10, Math.min(10, newPosition[0])),
-        Math.max(-4, Math.min(8, newPosition[1])),
-        Math.max(-8, Math.min(8, newPosition[2]))
+        Math.max(bounds.minX, Math.min(bounds.maxX, newPosition[0])),
+        Math.max(bounds.minY, Math.min(bounds.maxY, newPosition[1])),
+        Math.max(bounds.minZ, Math.min(bounds.maxZ, newPosition[2]))
       ]
       
       setCurrentPosition(constrainedPosition)
@@ -145,11 +203,11 @@ export default function Brain3DWindow({
       >
         <boxGeometry args={[window.size.width / 100, window.size.height / 100, 0.2]} />
         <meshStandardMaterial
-          color={hovered || isActive ? '#4a90e2' : '#2a2a2a'}
+          color={isActive ? '#5ba3f5' : hovered ? '#4a90e2' : '#2a2a2a'}
           transparent
-          opacity={0.1}
-          emissive={hovered || isActive ? '#1a4a6e' : '#000000'}
-          emissiveIntensity={0.2}
+          opacity={isActive ? 0.15 : 0.1}
+          emissive={isActive ? '#2a5a8e' : hovered ? '#1a4a6e' : '#000000'}
+          emissiveIntensity={isActive ? 0.4 : 0.2}
         />
       </mesh>
 
@@ -159,9 +217,9 @@ export default function Brain3DWindow({
         <meshStandardMaterial
           color={isActive ? '#00ccff' : '#4a90e2'}
           transparent
-          opacity={0.3}
+          opacity={isActive ? 0.4 : 0.3}
           emissive={isActive ? '#0088cc' : '#1a4a6e'}
-          emissiveIntensity={0.5}
+          emissiveIntensity={isActive ? 0.8 : 0.5}
         />
       </mesh>
 
@@ -187,14 +245,16 @@ export default function Brain3DWindow({
               className={`
                 relative bg-gradient-to-br from-black/95 via-gray-900/95 to-black/95
                 backdrop-blur-xl
-                border border-white/20
-                rounded-2xl overflow-hidden
-                shadow-2xl shadow-black/50
-                ${isActive ? 'ring-2 ring-cyan-400/50' : ''}
+                border rounded-2xl overflow-hidden
+                shadow-2xl transition-all duration-300
+                ${isActive 
+                  ? 'border-cyan-400/60 ring-2 ring-cyan-400/50 shadow-cyan-500/20 shadow-2xl' 
+                  : 'border-white/20 shadow-black/50'
+                }
               `}
               style={{
-                width: window.size.width,
-                height: window.size.height,
+                width: window.isFullscreen ? size.width * 0.9 : window.size.width,
+                height: window.isFullscreen ? size.height * 0.9 : window.size.height,
                 visibility: 'visible',
                 display: 'block'
               }}
@@ -238,9 +298,26 @@ export default function Brain3DWindow({
                       onMinimize(window.id)
                     }}
                     className="w-5 h-5 rounded-full bg-yellow-500 hover:bg-yellow-400 flex items-center justify-center text-black text-xs font-bold transition-colors"
+                    title="Minimize"
                   >
                     −
                   </motion.button>
+                  
+                  {/* Maximize/Fullscreen Button */}
+                  {onMaximize && (
+                    <motion.button
+                      whileHover={{ scale: 1.1, backgroundColor: '#10b981' }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onMaximize(window.id)
+                      }}
+                      className="w-5 h-5 rounded-full bg-green-500 hover:bg-green-400 flex items-center justify-center text-white text-xs font-bold transition-colors"
+                      title={window.isFullscreen ? "Restore" : "Fullscreen"}
+                    >
+                      {window.isFullscreen ? '⤢' : '⤡'}
+                    </motion.button>
+                  )}
                   
                   {/* Close Button */}
                   <motion.button
@@ -251,6 +328,7 @@ export default function Brain3DWindow({
                       onClose(window.id)
                     }}
                     className="w-5 h-5 rounded-full bg-red-500 hover:bg-red-400 flex items-center justify-center text-white text-xs font-bold transition-colors"
+                    title="Close"
                   >
                     ×
                   </motion.button>
@@ -260,14 +338,16 @@ export default function Brain3DWindow({
               {/* Window Content */}
               <motion.div
                 className="h-full overflow-hidden"
-                style={{ height: window.size.height - 48 }} // Subtract title bar height
+                style={{ height: (window.isFullscreen ? size.height * 0.9 : window.size.height) - 48 }} // Subtract title bar height
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
                 <div className="w-full h-full overflow-auto">
                   <ProgramErrorBoundary programId={window.id}>
-                    {window.component}
+                    <ProgramContextWrapper>
+                      {window.component}
+                    </ProgramContextWrapper>
                   </ProgramErrorBoundary>
                 </div>
               </motion.div>
@@ -354,11 +434,11 @@ export function generateWindowPosition(
     basePosition[2] + offsetZ
   ]
 
-  // Expanded constraints for far camera - ensure viewport visibility
+  // Use more conservative bounds for initial positioning
   const constrainedPosition: [number, number, number] = [
-    Math.max(-10, Math.min(10, rawPosition[0])),  // X bounds - much wider
-    Math.max(-4, Math.min(8, rawPosition[1])),    // Y bounds - taller range
-    Math.max(-8, Math.min(8, rawPosition[2]))     // Z bounds - deeper range
+    Math.max(-8, Math.min(8, rawPosition[0])),    // X bounds - reasonable range
+    Math.max(-3, Math.min(4, rawPosition[1])),    // Y bounds - prevent going above screen
+    Math.max(-6, Math.min(6, rawPosition[2]))     // Z bounds - moderate depth
   ]
 
   return constrainedPosition

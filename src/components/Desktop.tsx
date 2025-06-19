@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Window from './Window'
 import DesktopIcon from './DesktopIcon'
 import MultiPersonalityTerminal from './MultiPersonalityTerminal'
@@ -246,12 +246,24 @@ const Desktop: React.FC = () => {
     systemState,
     setChaosLevel,
     triggerSystemWideEffect,
-    startupState
+    startupState,
+    registerProgramLaunch,
+    registerProgramClose,
+    isProgramRunning
   } = useChaos()
   
   const [showWelcome, setShowWelcome] = useState(true)
   const [show3DBrain, setShow3DBrain] = useState(false)
   const { createWindow: createWindowDirect } = useWindowManager()
+
+  // Wrapper to register program launches
+  const createWindowWithRegistration = useCallback((config: any, programId?: string) => {
+    const windowId = createWindow(config)
+    if (programId && windowId) {
+      registerProgramLaunch(programId, 'desktop-window', windowId)
+    }
+    return windowId
+  }, [createWindow, registerProgramLaunch])
 
   // Hide welcome message after startup or when windows exist
   useEffect(() => {
@@ -267,7 +279,7 @@ const Desktop: React.FC = () => {
     
     // Special handling for Brain Dashboard
     if (iconConfig.id === 'brain-dashboard') {
-      createWindow({
+      createWindowWithRegistration({
         title: iconConfig.title,
         component: (
           <BrainDashboard
@@ -285,7 +297,7 @@ const Desktop: React.FC = () => {
         position: systemState.isMobile
           ? { x: 10, y: 50 }
           : undefined
-      })
+      }, iconConfig.id)
       return
     }
     
@@ -303,7 +315,7 @@ const Desktop: React.FC = () => {
           height: typeof window !== 'undefined' ? Math.min(300 * baseSizeMultiplier, window.innerHeight * 0.6) : 300
         }
 
-    createWindow({
+    createWindowWithRegistration({
       title: iconConfig.title,
       component: iconConfig.component,
       size: windowSize,
@@ -311,7 +323,7 @@ const Desktop: React.FC = () => {
       position: systemState.isMobile
         ? { x: 10, y: 50 + windows.length * 20 } // Stack on mobile
         : undefined // Random positioning on desktop
-    })
+    }, iconConfig.id)
   }
 
   // Enhanced program launch handler for 3D brain
@@ -334,13 +346,13 @@ const Desktop: React.FC = () => {
       triggerSystemWideEffect('rainbow-cascade')
 
       // Create traditional 2D window
-      createWindow({
+      createWindowWithRegistration({
         title: program.title,
         component: React.createElement(program.component),
         size: program.size,
         icon: program.icon,
         position: program.position || undefined
-      })
+      }, program.id)
       
       console.log('🚀 2D Window created for:', program.title)
     }

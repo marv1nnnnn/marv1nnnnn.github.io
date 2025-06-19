@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,8 @@ import BrainProgramIcons from './BrainProgramIcons'
 import Brain3DWindow, { Brain3DWindow as Brain3DWindowType, generateWindowPosition } from './Brain3DWindow'
 import { BrainRegionHit } from '../../hooks/brain/useBrainRaycastingNew'
 import { getProgram, PROGRAM_REGISTRY } from '../../config/programRegistry'
+import { BRAIN_REGION_MAPPING } from '../../config/brainMapping'
+import { useChaos } from '../../contexts/ChaosProvider'
 import { v4 as uuidv4 } from 'uuid'
 
 /**
@@ -47,10 +49,33 @@ export default function BrainDashboard({
   showInstructions = true,
   enableAutoRotation = true
 }: BrainDashboardProps) {
+  const { 
+    isProgramRunning, 
+    registerProgramLaunch, 
+    registerProgramClose, 
+    getRunningPrograms, 
+    systemState 
+  } = useChaos()
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null)
-  const [launchedPrograms, setLaunchedPrograms] = useState<Set<string>>(new Set())
   const [lastLaunchedProgram, setLastLaunchedProgram] = useState<string | null>(null)
+  
+  // Get launched programs from centralized status
+  const launchedPrograms = new Set(getRunningPrograms())
+  
+  // Performance-based settings
+  const performanceSettings = useMemo(() => {
+    const { performanceMode, isMobile } = systemState
+    
+    return {
+      enableShadows: performanceMode === 'high' && !isMobile,
+      antialias: performanceMode !== 'low',
+      pixelRatio: isMobile ? Math.min(window.devicePixelRatio, 2) : window.devicePixelRatio,
+      enableAutoRotation: enableAutoRotation && performanceMode !== 'low',
+      animationIntensity: performanceMode === 'high' ? 1 : performanceMode === 'medium' ? 0.7 : 0.3,
+      maxWindows: isMobile ? 3 : performanceMode === 'low' ? 5 : 10
+    }
+  }, [systemState, enableAutoRotation])
   
   // 3D Window Management
   const [brain3DWindows, setBrain3DWindows] = useState<Brain3DWindowType[]>([])
@@ -77,12 +102,19 @@ export default function BrainDashboard({
       return
     }
 
+    // Enforce window limits for performance
+    if (brain3DWindows.length >= performanceSettings.maxWindows) {
+      console.warn(`⚠️ Window limit reached (${performanceSettings.maxWindows}). Cannot create more 3D windows.`)
+      return
+    }
+
     // Count existing windows from this region for positioning
     const regionWindowCount = brain3DWindows.filter(w => w.regionId === regionId).length
     const windowPosition = generateWindowPosition(regionId, regionWindowCount, dragBias)
     
     const newWindow: Brain3DWindowType = {
       id: uuidv4(),
+      programId: programId,
       title: program.title,
       component: React.createElement(program.component),
       position: windowPosition,
@@ -92,22 +124,40 @@ export default function BrainDashboard({
       regionId
     }
 
+    // Register the program launch with centralized system
+    registerProgramLaunch(programId, '3d-window', newWindow.id, regionId)
+
     setBrain3DWindows(prev => [...prev, newWindow])
     setActiveWindowId(newWindow.id)
     setNextZIndex(prev => prev + 1)
-  }, [brain3DWindows])
+  }, [brain3DWindows, registerProgramLaunch, performanceSettings.maxWindows])
 
   const close3DWindow = useCallback((windowId: string) => {
+    // Find the window being closed to unregister the program
+    const windowToClose = brain3DWindows.find(w => w.id === windowId)
+    if (windowToClose) {
+      // Use the stored program ID for accurate tracking
+      registerProgramClose(windowToClose.programId, windowId)
+    }
+    
     setBrain3DWindows(prev => prev.filter(w => w.id !== windowId))
     if (activeWindowId === windowId) {
       setActiveWindowId(null)
     }
-  }, [activeWindowId])
+  }, [activeWindowId, brain3DWindows, registerProgramClose])
 
   const minimize3DWindow = useCallback((windowId: string) => {
     setBrain3DWindows(prev => 
       prev.map(w => 
         w.id === windowId ? { ...w, isMinimized: !w.isMinimized } : w
+      )
+    )
+  }, [])
+
+  const maximize3DWindow = useCallback((windowId: string) => {
+    setBrain3DWindows(prev => 
+      prev.map(w => 
+        w.id === windowId ? { ...w, isFullscreen: !w.isFullscreen } : w
       )
     )
   }, [])
@@ -156,8 +206,7 @@ export default function BrainDashboard({
       return
     }
     
-    // Add to launched programs set for visual feedback
-    setLaunchedPrograms(prev => new Set(Array.from(prev).concat(programId)))
+    // Set launch notification
     setLastLaunchedProgram(programId)
     
     // Clear the launch notification after 3 seconds
@@ -234,16 +283,22 @@ export default function BrainDashboard({
   return (
     <>
     <div className={`brain-dashboard relative w-full h-screen bg-gradient-to-b from-gray-900 to-black ${className}`}>
-      {/* 3D Brain Canvas */}
+      {/* 3D Brain Canvas with adaptive performance */}
       <Canvas
-        dpr={[1, 2]}
-        performance={{ min: 0.8 }}
+        dpr={[1, performanceSettings.pixelRatio]}
+        performance={{ 
+          min: systemState.performanceMode === 'low' ? 0.3 : systemState.performanceMode === 'medium' ? 0.6 : 0.8,
+          max: systemState.performanceMode === 'low' ? 0.6 : 1.0
+        }}
         camera={{ position: [0, 8, 25], fov: 60 }}
         gl={{ 
-          antialias: true, 
+          antialias: performanceSettings.antialias, 
           alpha: true,
-          powerPreference: "high-performance"
+          powerPreference: systemState.isMobile ? "default" : "high-performance",
+          stencil: false,
+          depth: true
         }}
+        shadows={performanceSettings.enableShadows}
         style={{
           width: '100%',
           height: '100vh',
@@ -254,14 +309,14 @@ export default function BrainDashboard({
           {/* Enhanced lighting system for maximum brain visibility */}
           <BrainLighting intensity={1.2} />
           
-          {/* Clean brain component */}
+          {/* Brain component with performance optimizations */}
           <Brain
             ref={handleBrainRef}
             isActive={true}
             enableCameraControl={true}
-            enableRaycasting={true}
+            enableRaycasting={!systemState.isMobile || systemState.performanceMode !== 'low'}
             enableManualRotation={!isDraggingModule}
-            autoRotateInOverview={enableAutoRotation && !isDraggingModule}
+            autoRotateInOverview={performanceSettings.enableAutoRotation && !isDraggingModule}
             onRegionClick={handleRegionClick}
             onRegionHover={handleRegionHover}
           />
@@ -284,6 +339,7 @@ export default function BrainDashboard({
               window={window}
               onClose={close3DWindow}
               onMinimize={minimize3DWindow}
+              onMaximize={maximize3DWindow}
               onFocus={focus3DWindow}
               onUpdatePosition={update3DWindowPosition}
               isActive={activeWindowId === window.id}
@@ -294,7 +350,7 @@ export default function BrainDashboard({
         </Suspense>
       </Canvas>
 
-      {/* Enhanced Instructions overlay */}
+      {/* Enhanced Instructions overlay with visual hints */}
       {showInstructions && !selectedRegion && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -306,61 +362,174 @@ export default function BrainDashboard({
           }}
         >
           <div className="flex items-center mb-4">
-            <div className="w-3 h-3 rounded-full bg-cyan-400 mr-3 animate-pulse shadow-lg shadow-cyan-400/50" />
+            <motion.div 
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="w-3 h-3 rounded-full bg-cyan-400 mr-3 shadow-lg shadow-cyan-400/50" 
+            />
             <h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
               Neural Interface
             </h3>
           </div>
+          
           <div className="space-y-3 text-sm text-gray-300">
-            <div className="flex items-start">
-              <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0" />
-              <span><strong className="text-white">Click</strong> brain regions to access modules</span>
-            </div>
-            <div className="flex items-start">
-              <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 mr-3 flex-shrink-0" />
-              <span><strong className="text-white">Launch</strong> programs directly from panel</span>
-            </div>
-            <div className="flex items-start">
-              <div className="w-2 h-2 rounded-full bg-green-400 mt-2 mr-3 flex-shrink-0" />
-              <span><strong className="text-white">Drag</strong> to rotate brain view</span>
-            </div>
-            <div className="flex items-start">
-              <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0" />
+            <motion.div 
+              className="flex items-start"
+              whileHover={{ x: 4, transition: { duration: 0.2 } }}
+            >
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0" 
+              />
+              <span><strong className="text-white">Click</strong> colored brain regions to explore modules</span>
+            </motion.div>
+            
+            <motion.div 
+              className="flex items-start"
+              whileHover={{ x: 4, transition: { duration: 0.2 } }}
+            >
+              <motion.div 
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 2.2, repeat: Infinity, delay: 0.2 }}
+                className="w-2 h-2 rounded-full bg-purple-400 mt-2 mr-3 flex-shrink-0" 
+              />
+              <span><strong className="text-white">Launch</strong> or <strong className="text-cyan-300">drag</strong> programs to 3D space</span>
+            </motion.div>
+            
+            <motion.div 
+              className="flex items-start"
+              whileHover={{ x: 4, transition: { duration: 0.2 } }}
+            >
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, delay: 0.4 }}
+                className="w-2 h-2 rounded-full bg-green-400 mt-2 mr-3 flex-shrink-0" 
+              />
+              <span><strong className="text-white">Drag</strong> to manually rotate brain</span>
+            </motion.div>
+            
+            <motion.div 
+              className="flex items-start"
+              whileHover={{ x: 4, transition: { duration: 0.2 } }}
+            >
+              <motion.div 
+                animate={{ scale: [1, 1.4, 1] }}
+                transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
+                className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0" 
+              />
               <span><strong className="text-white">Zoom</strong> with Ctrl +/- or controls</span>
-            </div>
+            </motion.div>
           </div>
+          
+          {/* Interactive hint */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="mt-4 p-3 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-400/30"
+          >
+            <div className="flex items-center text-xs text-cyan-200">
+              <motion.span
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="mr-2"
+              >
+                💡
+              </motion.span>
+              <span>Try clicking the <strong className="text-cyan-300">blue frontal region</strong> first!</span>
+            </div>
+          </motion.div>
         </motion.div>
       )}
 
-      {/* Enhanced region info display */}
-      {hoveredRegion && !selectedRegion && (
-        <motion.div
-          initial={{ opacity: 0, x: 20, scale: 0.95 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: 20, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
-          className="absolute top-6 right-6 bg-gradient-to-br from-black/80 via-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl p-5 text-white border border-white/10 min-w-[280px]"
-          style={{
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-          }}
-        >
-          <div className="flex items-center mb-3">
-            <div className="w-2 h-2 rounded-full bg-yellow-400 mr-3 animate-pulse shadow-lg shadow-yellow-400/50" />
-            <h4 className="text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent capitalize">
-              {hoveredRegion.replace('-', ' ')}
-            </h4>
-          </div>
-          <p className="text-sm text-gray-300 leading-relaxed mb-3">
-            {getRegionDescription(hoveredRegion)}
-          </p>
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Neural Region</span>
-            <span className="bg-gray-800/50 px-2 py-1 rounded-lg">
-              Click to explore
-            </span>
-          </div>
-        </motion.div>
-      )}
+      {/* Enhanced region info display with program preview */}
+      <AnimatePresence>
+        {hoveredRegion && !selectedRegion && (
+          <motion.div
+            initial={{ opacity: 0, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="absolute top-6 right-6 bg-gradient-to-br from-black/80 via-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl p-5 text-white border border-white/10 min-w-[320px] max-w-[400px]"
+            style={{
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            }}
+          >
+            <div className="flex items-center mb-3">
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-3 h-3 rounded-full bg-yellow-400 mr-3 shadow-lg shadow-yellow-400/50" 
+              />
+              <h4 className="text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent capitalize">
+                {hoveredRegion.replace('-', ' ')}
+              </h4>
+            </div>
+            
+            <p className="text-sm text-gray-300 leading-relaxed mb-4">
+              {getRegionDescription(hoveredRegion)}
+            </p>
+            
+            {/* Available programs preview */}
+            {(() => {
+              const regionConfig = BRAIN_REGION_MAPPING[hoveredRegion]
+              if (!regionConfig) return null
+              
+              return (
+                <div className="mb-4">
+                  <div className="flex items-center mb-2">
+                    <span className="text-xs text-gray-400 font-medium">Available Programs:</span>
+                    <div className="ml-2 text-xs bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded-lg">
+                      {regionConfig.programs.length} modules
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {regionConfig.programs.slice(0, 4).map((programId) => {
+                      const program = getProgram(programId)
+                      return program ? (
+                        <motion.div
+                          key={programId}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.1 }}
+                          className="flex items-center text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-lg border border-gray-700/50"
+                        >
+                          <span className="mr-1">{program.icon}</span>
+                          <span className="truncate max-w-[80px]">{program.title.split('.')[0]}</span>
+                        </motion.div>
+                      ) : null
+                    })}
+                    {regionConfig.programs.length > 4 && (
+                      <div className="flex items-center text-xs text-gray-500 px-2 py-1">
+                        +{regionConfig.programs.length - 4} more
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
+            
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="flex items-center">
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-2 h-2 rounded-full bg-green-400 mr-2"
+                />
+                Neural Region Active
+              </span>
+              <motion.span 
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="bg-gradient-to-r from-yellow-600/30 to-orange-600/30 text-yellow-300 px-3 py-1 rounded-lg border border-yellow-500/30"
+              >
+                Click to explore
+              </motion.span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Launch Success Notification */}
       <AnimatePresence>
@@ -398,7 +567,7 @@ export default function BrainDashboard({
         )}
       </AnimatePresence>
 
-      {/* Camera zoom controls */}
+      {/* Performance Status & Camera Controls */}
       {brainCameraControls && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -409,6 +578,42 @@ export default function BrainDashboard({
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
           }}
         >
+          {/* Performance Status */}
+          <div className="mb-4 pb-3 border-b border-gray-700/50">
+            <div className="flex items-center mb-2">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className={`w-2 h-2 rounded-full mr-2 ${
+                  systemState.performanceMode === 'high' ? 'bg-green-400' :
+                  systemState.performanceMode === 'medium' ? 'bg-yellow-400' : 'bg-orange-400'
+                }`}
+              />
+              <span className="text-xs text-gray-400 font-medium">Performance</span>
+            </div>
+            <div className="text-xs space-y-1">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Mode:</span>
+                <span className={`font-medium ${
+                  systemState.performanceMode === 'high' ? 'text-green-300' :
+                  systemState.performanceMode === 'medium' ? 'text-yellow-300' : 'text-orange-300'
+                }`}>
+                  {systemState.performanceMode.toUpperCase()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">3D Windows:</span>
+                <span className={`font-medium ${
+                  brain3DWindows.length >= performanceSettings.maxWindows * 0.8 ? 'text-orange-300' : 'text-cyan-300'
+                }`}>
+                  {brain3DWindows.length}/{performanceSettings.maxWindows}
+                </span>
+              </div>
+              {systemState.isMobile && (
+                <div className="text-xs text-blue-300 mt-1">📱 Mobile Optimized</div>
+              )}
+            </div>
+          </div>
           <div className="flex items-center mb-3">
             <div className="w-2 h-2 rounded-full bg-blue-400 mr-3 animate-pulse shadow-lg shadow-blue-400/50" />
             <h4 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -450,7 +655,7 @@ export default function BrainDashboard({
         </motion.div>
       )}
 
-      {/* Enhanced brain region color legend */}
+      {/* Enhanced brain region color legend with navigation */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -461,7 +666,11 @@ export default function BrainDashboard({
         }}
       >
         <div className="flex items-center mb-4">
-          <div className="w-2 h-2 rounded-full bg-cyan-400 mr-3 animate-pulse shadow-lg shadow-cyan-400/50" />
+          <motion.div 
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            className="w-2 h-2 rounded-full bg-cyan-400 mr-3 shadow-lg shadow-cyan-400/50" 
+          />
           <h4 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
             Region Map
           </h4>
@@ -469,40 +678,104 @@ export default function BrainDashboard({
         <div className="space-y-3 text-sm">
           <motion.div 
             whileHover={{ scale: 1.02, x: 4 }}
+            onClick={() => brainCameraControls?.focusOnRegion('frontal-cortex')}
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg mr-3 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-200"></div>
-            <span className="text-gray-300 group-hover:text-white transition-colors">Frontal <span className="text-gray-500">(UI)</span></span>
+            <motion.div 
+              className="w-4 h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg mr-3 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              animate={hoveredRegion === 'frontal-cortex' ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
+            <span className="text-gray-300 group-hover:text-white transition-colors">
+              Frontal <span className="text-gray-500">(UI Tools)</span>
+              {hoveredRegion === 'frontal-cortex' && <span className="text-cyan-300 ml-2">← Currently viewing</span>}
+            </span>
           </motion.div>
+          
           <motion.div 
             whileHover={{ scale: 1.02, x: 4 }}
+            onClick={() => brainCameraControls?.focusOnRegion('temporal-lobe-left')}
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all duration-200"></div>
-            <span className="text-gray-300 group-hover:text-white transition-colors">Temporal <span className="text-gray-500">(Media)</span></span>
+            <motion.div 
+              className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              animate={hoveredRegion?.includes('temporal') ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
+            <span className="text-gray-300 group-hover:text-white transition-colors">
+              Temporal <span className="text-gray-500">(Media)</span>
+              {hoveredRegion?.includes('temporal') && <span className="text-purple-300 ml-2">← Currently viewing</span>}
+            </span>
           </motion.div>
+          
           <motion.div 
             whileHover={{ scale: 1.02, x: 4 }}
+            onClick={() => brainCameraControls?.focusOnRegion('motor-cortex')}
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg mr-3 shadow-lg shadow-green-500/30 group-hover:shadow-green-500/50 transition-all duration-200"></div>
-            <span className="text-gray-300 group-hover:text-white transition-colors">Motor <span className="text-gray-500">(Games)</span></span>
+            <motion.div 
+              className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg mr-3 shadow-lg shadow-green-500/30 group-hover:shadow-green-500/50 transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              animate={hoveredRegion === 'motor-cortex' ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
+            <span className="text-gray-300 group-hover:text-white transition-colors">
+              Motor <span className="text-gray-500">(Games)</span>
+              {hoveredRegion === 'motor-cortex' && <span className="text-green-300 ml-2">← Currently viewing</span>}
+            </span>
           </motion.div>
+          
           <motion.div 
             whileHover={{ scale: 1.02, x: 4 }}
+            onClick={() => brainCameraControls?.focusOnRegion('occipital-lobe')}
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg mr-3 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 transition-all duration-200"></div>
-            <span className="text-gray-300 group-hover:text-white transition-colors">Occipital <span className="text-gray-500">(AI)</span></span>
+            <motion.div 
+              className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg mr-3 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              animate={hoveredRegion === 'occipital-lobe' ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
+            <span className="text-gray-300 group-hover:text-white transition-colors">
+              Occipital <span className="text-gray-500">(Visual AI)</span>
+              {hoveredRegion === 'occipital-lobe' && <span className="text-orange-300 ml-2">← Currently viewing</span>}
+            </span>
           </motion.div>
+          
           <motion.div 
             whileHover={{ scale: 1.02, x: 4 }}
+            onClick={() => brainCameraControls?.focusOnRegion('brainstem')}
             className="flex items-center cursor-pointer group"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg mr-3 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-all duration-200"></div>
-            <span className="text-gray-300 group-hover:text-white transition-colors">Brainstem <span className="text-gray-500">(Core)</span></span>
+            <motion.div 
+              className="w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg mr-3 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              animate={hoveredRegion === 'brainstem' ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
+            <span className="text-gray-300 group-hover:text-white transition-colors">
+              Brainstem <span className="text-gray-500">(Core)</span>
+              {hoveredRegion === 'brainstem' && <span className="text-red-300 ml-2">← Currently viewing</span>}
+            </span>
           </motion.div>
         </div>
+        
+        {/* Usage hint */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
+          className="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-500 text-center"
+        >
+          <motion.span
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            Click regions to navigate
+          </motion.span>
+        </motion.div>
       </motion.div>
 
 
@@ -518,15 +791,15 @@ export default function BrainDashboard({
  */
 function getRegionDescription(regionId: string): string {
   const descriptions: Record<string, string> = {
-    'frontal-cortex': 'User interface and interaction modules',
+    'frontal-cortex': 'Logic & AI consciousness center - calculators, terminals, and multi-personality AI interfaces await your exploration',
     'temporal-lobe': 'Media processing and audio modules',
-    'temporal-lobe-left': 'Media processing and audio modules', 
-    'temporal-lobe-right': 'Media processing and audio modules',
+    'temporal-lobe-left': 'Audio & memory processing hub - music players, blog archives, and visitor analytics live here', 
+    'temporal-lobe-right': 'Social interaction nexus - visitor greetings and user communication modules',
     'parietal-lobe': 'System monitoring and spatial awareness',
-    'motor-cortex': 'Interactive games and motor control',
-    'occipital-lobe': 'AI processing and personality modules',
-    'brainstem': 'Core system functions and vital processes'
+    'motor-cortex': 'Interactive entertainment zone - classic games and motor control challenges',
+    'occipital-lobe': 'Visual processing wonderland - digital art, browser interfaces, and aesthetic modules',
+    'brainstem': 'Core system nucleus - vital system functions, chaos controls, and emergency protocols'
   }
   
-  return descriptions[regionId] || 'Brain region containing various modules'
+  return descriptions[regionId] || 'Mysterious brain region containing unknown digital modules waiting to be discovered'
 }

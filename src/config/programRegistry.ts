@@ -4,6 +4,7 @@ import { getAllPersonalities } from '@/config/personalities'
 // Dynamic imports for existing components
 const AITerminal = React.lazy(() => import('@/components/AITerminal'))
 const HackerAITerminal = React.lazy(() => import('@/components/AITerminalWrapper').then(module => ({ default: module.HackerAITerminal })))
+const MultiPersonalityTerminal = React.lazy(() => import('@/components/MultiPersonalityTerminal'))
 const MusicPlayer = React.lazy(() => import('@/components/MusicPlayer'))
 const BlogReader = React.lazy(() => import('@/components/BlogReader'))
 const HitCounter = React.lazy(() => import('@/components/HitCounter'))
@@ -144,6 +145,14 @@ export const PROGRAM_REGISTRY: { [key: string]: ProgramConfig } = {
     component: Notepad,
     icon: '📝',
     size: { width: 500, height: 400 },
+    autoLaunch: false
+  },
+  'multi-personality-terminal': {
+    id: 'multi-personality-terminal',
+    title: 'Multi-Personality AI Terminal',
+    component: MultiPersonalityTerminal,
+    icon: '🎭',
+    size: { width: 700, height: 600 },
     autoLaunch: false
   },
   'browser': {
