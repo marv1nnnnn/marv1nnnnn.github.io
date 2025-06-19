@@ -70,7 +70,7 @@ export default function BrainDashboard({
     return {
       enableShadows: performanceMode === 'high' && !isMobile,
       antialias: performanceMode !== 'low',
-      pixelRatio: isMobile ? Math.min(window.devicePixelRatio, 2) : window.devicePixelRatio,
+      pixelRatio: isMobile ? Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2) : (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
       enableAutoRotation: enableAutoRotation && performanceMode !== 'low',
       animationIntensity: performanceMode === 'high' ? 1 : performanceMode === 'medium' ? 0.7 : 0.3,
       maxWindows: isMobile ? 3 : performanceMode === 'low' ? 5 : 10

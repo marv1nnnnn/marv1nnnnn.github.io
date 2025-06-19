@@ -1,4 +1,10 @@
-import { Vector3 } from 'three'
+// Dynamic import to prevent SSR issues
+const getVector3 = () => {
+  if (typeof window !== 'undefined') {
+    return require('three').Vector3
+  }
+  return null
+}
 
 export interface BrainRegionConfig {
   position: [number, number, number]
