@@ -152,3 +152,7 @@ export const getRandomPersonality = (): PersonalityConfig => {
 export const getAllPersonalities = (): PersonalityConfig[] => {
   return Object.values(PERSONALITY_CONFIG)
 }
+
+export const getPersonality = (id: string): PersonalityConfig | undefined => {
+  return PERSONALITY_CONFIG[id]
+}

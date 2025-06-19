@@ -14,7 +14,7 @@ export const BRAIN_REGION_MAPPING: Record<string, BrainRegionConfig> = {
     position: [0, 2.5, 4],
     color: '#00ffff',
     shape: 'geometric',
-    programs: ['broken-calculator', 'terminal', 'chaos-monitor', 'notepad', 'ai-terminal'],
+    programs: ['broken-calculator', 'terminal-ai', 'multi-personality-terminal', 'chaos-monitor', 'notepad'],
     size: 3.0,
     activationRadius: 5
   },

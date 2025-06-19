@@ -7,6 +7,21 @@ import { useVisualEffects, CursorTrail } from '@/hooks/useVisualEffects'
 import { useAIChatContext } from '@/contexts/AIChatContext'
 import useStartupSequence from '@/hooks/useStartupSequence'
 
+interface ProgramStatus {
+  programId: string
+  title: string
+  isRunning: boolean
+  instances: Array<{
+    id: string
+    type: 'desktop-window' | '3d-window'
+    windowId?: string
+    regionId?: string
+    launchedAt: number
+  }>
+  totalLaunches: number
+  lastLaunched: number
+}
+
 interface ChaosContextType {
   // Window Management
   windows: ReturnType<typeof useWindowManager>['windows']
@@ -31,6 +46,14 @@ interface ChaosContextType {
     chaosLevel: number
     effectsEnabled: boolean
   }
+  
+  // Program Status Management
+  programStatus: Record<string, ProgramStatus>
+  registerProgramLaunch: (programId: string, instanceType: 'desktop-window' | '3d-window', instanceId: string, regionId?: string) => void
+  registerProgramClose: (programId: string, instanceId: string) => void
+  isProgramRunning: (programId: string) => boolean
+  getProgramInstances: (programId: string) => ProgramStatus['instances']
+  getRunningPrograms: () => string[]
   
   // Global Controls
   setChaosLevel: (level: number) => void
@@ -60,6 +83,9 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     chaosLevel: 1.0,
     effectsEnabled: true
   })
+
+  // Program status management
+  const [programStatus, setProgramStatus] = useState<Record<string, ProgramStatus>>({})
 
   // Detect mobile devices
   useEffect(() => {
@@ -155,6 +181,75 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [systemState.effectsEnabled, systemState.chaosLevel, visual])
 
+  // Program status management functions
+  const registerProgramLaunch = useCallback((programId: string, instanceType: 'desktop-window' | '3d-window', instanceId: string, regionId?: string) => {
+    const now = Date.now()
+    setProgramStatus(prev => {
+      const existing = prev[programId] || {
+        programId,
+        title: programId,
+        isRunning: false,
+        instances: [],
+        totalLaunches: 0,
+        lastLaunched: 0
+      }
+      
+      return {
+        ...prev,
+        [programId]: {
+          ...existing,
+          isRunning: true,
+          instances: [
+            ...existing.instances.filter(inst => inst.id !== instanceId), // Remove if exists
+            {
+              id: instanceId,
+              type: instanceType,
+              windowId: instanceType === 'desktop-window' ? instanceId : undefined,
+              regionId,
+              launchedAt: now
+            }
+          ],
+          totalLaunches: existing.totalLaunches + 1,
+          lastLaunched: now
+        }
+      }
+    })
+    
+    console.log(`📊 Program registered: ${programId} (${instanceType}) - Instance: ${instanceId}`)
+  }, [])
+
+  const registerProgramClose = useCallback((programId: string, instanceId: string) => {
+    setProgramStatus(prev => {
+      const existing = prev[programId]
+      if (!existing) return prev
+      
+      const remainingInstances = existing.instances.filter(inst => inst.id !== instanceId)
+      
+      return {
+        ...prev,
+        [programId]: {
+          ...existing,
+          instances: remainingInstances,
+          isRunning: remainingInstances.length > 0
+        }
+      }
+    })
+    
+    console.log(`📊 Program closed: ${programId} - Instance: ${instanceId}`)
+  }, [])
+
+  const isProgramRunning = useCallback((programId: string) => {
+    return programStatus[programId]?.isRunning || false
+  }, [programStatus])
+
+  const getProgramInstances = useCallback((programId: string) => {
+    return programStatus[programId]?.instances || []
+  }, [programStatus])
+
+  const getRunningPrograms = useCallback(() => {
+    return Object.keys(programStatus).filter(programId => programStatus[programId].isRunning)
+  }, [programStatus])
+
   // System-wide effect trigger
   const triggerSystemWideEffect = useCallback((effectType: string) => {
     switch (effectType) {
@@ -243,6 +338,14 @@ export const ChaosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     // System State
     systemState,
+    
+    // Program Status Management
+    programStatus,
+    registerProgramLaunch,
+    registerProgramClose,
+    isProgramRunning,
+    getProgramInstances,
+    getRunningPrograms,
     
     // Global Controls
     setChaosLevel,

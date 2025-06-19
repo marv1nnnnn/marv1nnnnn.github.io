@@ -1,12 +1,23 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useChaos } from '@/contexts/ChaosProvider'
+
+// Safe chaos context hook
+function useChaosContextSafely() {
+  try {
+    const { useChaos } = require('@/contexts/ChaosProvider')
+    return useChaos()
+  } catch (error) {
+    console.warn('⚠️ [BROKEN-CALC] ChaosProvider not available, using fallback mode')
+    return null
+  }
+}
 
 const BrokenCalculator: React.FC = () => {
   const [display, setDisplay] = useState('0')
   const [isGlitching, setIsGlitching] = useState(false)
-  const { triggerSystemWideEffect, audio } = useChaos()
+  
+  const chaosContext = useChaosContextSafely()
 
   const glitchyNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '?', '!', '#', '@']
 
@@ -14,8 +25,13 @@ const BrokenCalculator: React.FC = () => {
     // Random chance to glitch
     if (Math.random() < 0.3) {
       setIsGlitching(true)
-      audio.soundEffects.error()
-      triggerSystemWideEffect('system-shock')
+      // Only trigger effects if chaos context is available
+      if (chaosContext?.audio?.soundEffects?.error) {
+        chaosContext.audio.soundEffects.error()
+      }
+      if (chaosContext?.triggerSystemWideEffect) {
+        chaosContext.triggerSystemWideEffect('system-shock')
+      }
       
       // Show random glitchy numbers
       const glitchInterval = setInterval(() => {
@@ -46,7 +62,9 @@ const BrokenCalculator: React.FC = () => {
       }, 1000)
     } else {
       // Normal operation (sometimes)
-      audio.soundEffects.click()
+      if (chaosContext?.audio?.soundEffects?.click) {
+        chaosContext.audio.soundEffects.click()
+      }
       
       if (value === 'C') {
         setDisplay('0')

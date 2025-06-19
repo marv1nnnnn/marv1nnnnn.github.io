@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Window from './Window'
 import DesktopIcon from './DesktopIcon'
 import MultiPersonalityTerminal from './MultiPersonalityTerminal'
@@ -21,7 +21,7 @@ import BrainDashboard from './brain/BrainDashboard'
 import { useChaos } from '@/contexts/ChaosProvider'
 import { getAllPersonalities } from '@/config/personalities'
 import { useWindowManager } from '@/hooks/useWindowManager'
-import { getProgram } from '@/config/programRegistry'
+import { getProgram, PROGRAM_REGISTRY } from '@/config/programRegistry'
 
 // Sample program components for demonstration
 const SampleTerminal = () => <MultiPersonalityTerminal />
@@ -246,12 +246,24 @@ const Desktop: React.FC = () => {
     systemState,
     setChaosLevel,
     triggerSystemWideEffect,
-    startupState
+    startupState,
+    registerProgramLaunch,
+    registerProgramClose,
+    isProgramRunning
   } = useChaos()
   
   const [showWelcome, setShowWelcome] = useState(true)
   const [show3DBrain, setShow3DBrain] = useState(false)
   const { createWindow: createWindowDirect } = useWindowManager()
+
+  // Wrapper to register program launches
+  const createWindowWithRegistration = useCallback((config: any, programId?: string) => {
+    const windowId = createWindow(config)
+    if (programId && windowId) {
+      registerProgramLaunch(programId, 'desktop-window', windowId)
+    }
+    return windowId
+  }, [createWindow, registerProgramLaunch])
 
   // Hide welcome message after startup or when windows exist
   useEffect(() => {
@@ -267,7 +279,7 @@ const Desktop: React.FC = () => {
     
     // Special handling for Brain Dashboard
     if (iconConfig.id === 'brain-dashboard') {
-      createWindow({
+      createWindowWithRegistration({
         title: iconConfig.title,
         component: (
           <BrainDashboard
@@ -285,7 +297,7 @@ const Desktop: React.FC = () => {
         position: systemState.isMobile
           ? { x: 10, y: 50 }
           : undefined
-      })
+      }, iconConfig.id)
       return
     }
     
@@ -303,7 +315,7 @@ const Desktop: React.FC = () => {
           height: typeof window !== 'undefined' ? Math.min(300 * baseSizeMultiplier, window.innerHeight * 0.6) : 300
         }
 
-    createWindow({
+    createWindowWithRegistration({
       title: iconConfig.title,
       component: iconConfig.component,
       size: windowSize,
@@ -311,28 +323,39 @@ const Desktop: React.FC = () => {
       position: systemState.isMobile
         ? { x: 10, y: 50 + windows.length * 20 } // Stack on mobile
         : undefined // Random positioning on desktop
-    })
+    }, iconConfig.id)
   }
 
   // Enhanced program launch handler for 3D brain
   const handleProgramLaunch = (moduleId: string, regionId?: string) => {
+    console.log('🧠 Brain launching program:', moduleId, 'from region:', regionId)
+    
     const program = getProgram(moduleId)
     if (!program) {
-      console.error(`Program not found: ${moduleId}`)
+      console.error(`❌ Program not found in registry: ${moduleId}`)
+      console.log('📋 Available programs:', Object.keys(PROGRAM_REGISTRY))
       return
     }
 
-    // Audio-visual feedback for program launch
-    triggerSystemWideEffect('rainbow-cascade')
+    console.log('✅ Program found:', program.title)
 
-    // Create window from 3D brain experience
-    createWindowDirect({
-      title: program.title,
-      component: React.createElement(program.component),
-      size: program.size,
-      icon: program.icon,
-      position: program.position || undefined
-    })
+    // This is now handled by the BrainDashboard's own handleModuleLaunch
+    // We only create 2D windows if the call comes from outside the 3D brain
+    if (!regionId) {
+      // Audio-visual feedback for program launch
+      triggerSystemWideEffect('rainbow-cascade')
+
+      // Create traditional 2D window
+      createWindowWithRegistration({
+        title: program.title,
+        component: React.createElement(program.component),
+        size: program.size,
+        icon: program.icon,
+        position: program.position || undefined
+      }, program.id)
+      
+      console.log('🚀 2D Window created for:', program.title)
+    }
   }
 
   // Keyboard shortcuts

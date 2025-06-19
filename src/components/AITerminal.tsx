@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useAIChatContext } from '@/contexts/AIChatContext'
 import { ChatMessage } from '@/hooks/useAIChat'
-import { PersonalityConfig } from '@/config/personalities'
+import { PersonalityConfig, getPersonality } from '@/config/personalities'
 
 interface AITerminalProps {
   personalityId: string
@@ -12,13 +12,20 @@ interface AITerminalProps {
 const AITerminal: React.FC<AITerminalProps> = ({ personalityId }) => {
   const [input, setInput] = useState('')
   const [showCursor, setShowCursor] = useState(true)
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   
-  const { conversations, sendMessage, getPersonality } = useAIChatContext()
+  // Try to use AI context, but handle gracefully if not available
+  let aiContext: ReturnType<typeof useAIChatContext> | null = null
+  try {
+    aiContext = useAIChatContext()
+  } catch (error) {
+    console.warn('⚠️ [AI-TERMINAL] AIChatContext not available, using fallback mode:', error)
+  }
   
-  const personality = getPersonality(personalityId)
-  const conversation = conversations[personalityId] || { messages: [], isLoading: false }
+  const personality = aiContext?.getPersonality(personalityId) || getPersonality(personalityId)
+  const conversation = aiContext?.conversations[personalityId] || { messages: localMessages, isLoading: false }
 
   // Blinking cursor effect
   useEffect(() => {
@@ -46,14 +53,36 @@ const AITerminal: React.FC<AITerminalProps> = ({ personalityId }) => {
     }
 
     const message = input.trim()
-    console.log('Sending message:', { message, personalityId })
+    console.log('Sending message:', { message, personalityId, hasAIContext: !!aiContext })
     setInput('')
     
-    try {
-      await sendMessage(message, personalityId)
-      console.log('Message sent successfully')
-    } catch (error) {
-      console.error('Error sending message:', error)
+    if (aiContext?.sendMessage) {
+      try {
+        await aiContext.sendMessage(message, personalityId)
+        console.log('Message sent successfully via AI context')
+      } catch (error) {
+        console.error('Error sending message via AI context:', error)
+      }
+    } else {
+      // Fallback: Add message to local state if AI context not available
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        content: message,
+        isUser: true,
+        timestamp: Date.now(),
+        personalityId
+      }
+      
+      const fallbackResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: `[OFFLINE MODE] ${personality?.name || 'AI'}: I'm currently running in offline mode. AI chat features are not available in the 3D brain environment.`,
+        isUser: false,
+        timestamp: Date.now() + 1,
+        personalityId
+      }
+      
+      setLocalMessages(prev => [...prev, userMessage, fallbackResponse])
+      console.log('Added messages to local state (fallback mode)')
     }
   }
 

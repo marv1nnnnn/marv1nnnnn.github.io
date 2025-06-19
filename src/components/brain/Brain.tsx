@@ -2,7 +2,8 @@ import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Mesh, BufferGeometry, BufferAttribute, Vector3, Color, ShaderMaterial, DoubleSide } from 'three'
 import { useBrainCamera } from '../../hooks/brain/useBrainCamera'
-import { useBrainRaycasting, BrainRegionHit } from '../../hooks/brain/useBrainRaycasting'
+import { useBrainRaycastingNew as useBrainRaycasting, BrainRegionHit } from '../../hooks/brain/useBrainRaycastingNew'
+import { useBrainRotation } from '../../hooks/brain/useBrainRotation'
 /**
  * @interface BrainProps
  * @description Defines the props for the Brain component.
@@ -21,18 +22,19 @@ interface BrainProps {
   isActive?: boolean
   enableCameraControl?: boolean
   enableRaycasting?: boolean
+  enableManualRotation?: boolean
   onRegionClick?: (region: BrainRegionHit) => void
   onRegionHover?: (region: BrainRegionHit | null) => void
   autoRotateInOverview?: boolean
 }
 
-// Anatomical region color mapping as per technical specification
+// Anatomical region color mapping - EXACT match with raycasting system
 const BRAIN_COLORS = {
-  frontal: new Color('#0099ff'),    // Blue - UI modules (frontal lobe)
-  temporal: new Color('#9966ff'),   // Purple - Media modules (temporal lobe) 
-  parietal: new Color('#00cc66'),   // Green - System modules (parietal lobe)
-  occipital: new Color('#ff6600'),  // Orange - AI/Personality modules (occipital lobe)
-  brainstem: new Color('#ff3366'),  // Pink - Core systems (brainstem/cerebellum)
+  frontal: new Color(0, 0.6, 1),      // #0099ff - Blue - UI modules (frontal lobe)
+  temporal: new Color(0.6, 0.4, 1),   // #9966ff - Purple - Media modules (temporal lobe) 
+  parietal: new Color(0, 0.8, 0.4),   // #00cc66 - Green - System modules (parietal lobe)
+  occipital: new Color(1, 0.4, 0),    // #ff6600 - Orange - AI/Personality modules (occipital lobe)
+  brainstem: new Color(1, 0.2, 0.4),  // #ff3366 - Pink - Core systems (brainstem/cerebellum)
 }
 
 // Simplified working shader for brain visibility
@@ -49,7 +51,15 @@ const brainFragmentShader = `
   varying vec3 vColor;
   
   void main() {
-    gl_FragColor = vec4(vColor, 1.0);
+    // Enhance the colors and add some glow
+    vec3 color = vColor * 1.2;
+    float alpha = 0.8;
+    
+    // Add a subtle glow effect
+    float glow = length(vColor) * 0.3;
+    color += glow;
+    
+    gl_FragColor = vec4(color, alpha);
   }
 `
 
@@ -66,31 +76,54 @@ const brainFragmentShader = `
  * @param {BrainProps} props - The component props.
  * @returns {React.ReactElement} A Three.js mesh element representing the brain.
  */
-export default function Brain({
+const Brain = React.forwardRef<Mesh, BrainProps>(({
   position = [0, 0, 0],
   scale = 1,
   isActive = true,
   enableCameraControl = true,
   enableRaycasting = true,
+  enableManualRotation = true,
   onRegionClick,
   onRegionHover,
   autoRotateInOverview = true
-}: BrainProps) {
+}, ref) => {
   const meshRef = useRef<Mesh>(null)
   const materialRef = useRef<ShaderMaterial>(null)
 
-  // Initialize camera control system
+  // Initialize camera control system (disable auto-rotation when manual rotation is enabled)
   const brainCamera = useBrainCamera({
-    enableAutoRotation: autoRotateInOverview,
+    enableAutoRotation: autoRotateInOverview && !enableManualRotation,
     autoRotationSpeed: 0.05,
     transitionDuration: 2000
   })
+
+  // Expose camera controls via mesh userData for parent components
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.userData.brainCamera = brainCamera
+    }
+    // Also set the ref if provided
+    if (ref) {
+      if (typeof ref === 'function') {
+        ref(meshRef.current)
+      } else {
+        ref.current = meshRef.current
+      }
+    }
+  }, [brainCamera, ref])
 
   // Initialize raycasting system
   const brainRaycasting = useBrainRaycasting({
     onRegionClick: onRegionClick,
     onRegionHover: onRegionHover,
     enableHover: !!onRegionHover
+  })
+
+  // Initialize manual rotation system
+  const brainRotation = useBrainRotation({
+    enabled: enableManualRotation,
+    rotationSpeed: 0.01,
+    targetRef: meshRef
   })
 
   // Procedurally generate brain geometry with vertex coloring
@@ -237,33 +270,37 @@ export default function Brain({
     return geometry
   }, [])
 
-  // Simple rotation animation
-  useFrame((state) => {
+  // Update world matrix for raycasting (rotation is now handled by useBrainRotation)
+  useFrame(() => {
     if (!meshRef.current) return
-    
-    const time = state.clock.getElapsedTime()
-    
-    // Simple gentle rotation
-    meshRef.current.rotation.y = time * 0.1
-    meshRef.current.rotation.x = Math.sin(time * 0.15) * 0.02
     
     // CRITICAL: Ensure world matrix is updated for raycasting
     meshRef.current.updateMatrixWorld(true)
   })
 
-  // Set up event listeners for raycasting when component mounts
+  // Set up event listeners for raycasting and rotation when component mounts
   useEffect(() => {
-    if (!enableRaycasting) return
-
-    console.log('Brain: Setting up event listeners for raycasting')
-    const cleanup = brainRaycasting.attachEventListeners()
+    const cleanupFunctions: (() => void)[] = []
+    
+    if (enableRaycasting) {
+      console.log('Brain: Setting up event listeners for raycasting')
+      const raycastCleanup = brainRaycasting.attachEventListeners()
+      if (raycastCleanup) cleanupFunctions.push(raycastCleanup)
+    }
+    
+    if (enableManualRotation) {
+      console.log('Brain: Setting up event listeners for manual rotation')
+      const rotationCleanup = brainRotation.attachEventListeners()
+      if (rotationCleanup) cleanupFunctions.push(rotationCleanup)
+    }
     
     return () => {
       console.log('Brain: Cleaning up event listeners')
-      cleanup?.()
+      cleanupFunctions.forEach(cleanup => cleanup())
       brainRaycasting.detachEventListeners()
+      brainRotation.detachEventListeners()
     }
-  }, [enableRaycasting, onRegionClick, onRegionHover, brainRaycasting])
+  }, [enableRaycasting, enableManualRotation, onRegionClick, onRegionHover, brainRaycasting, brainRotation])
 
   // Log mesh information for debugging
   useEffect(() => {
@@ -294,13 +331,13 @@ export default function Brain({
     getCurrentCameraState: brainCamera.getCameraInfo,
     
     // Raycasting controls
-    raycastAtPosition: brainRaycasting.raycastAtPosition,
+    raycastAtPosition: brainRaycasting.castRay,
     getCurrentHoveredRegion: brainRaycasting.getCurrentHoveredRegion,
     clearHover: brainRaycasting.clearHover,
     
     // Combined functionality
     clickRegionAt: (x: number, y: number) => {
-      const hit = brainRaycasting.raycastAtPosition(x, y)
+      const hit = brainRaycasting.castRay(x, y)
       if (hit && enableCameraControl) {
         brainCamera.focusOnRegion(hit.regionId)
       }
@@ -317,20 +354,26 @@ export default function Brain({
       userData={{ brainControls }} // Expose controls via userData for parent access
       castShadow={false}
       receiveShadow={false}
-      raycast={undefined} // Use default Three.js raycast method
+      name="brainMesh" // Add name for debugging
     >
       <shaderMaterial
         ref={materialRef}
         attach="material"
         vertexShader={brainVertexShader}
         fragmentShader={brainFragmentShader}
-        transparent
-        vertexColors
+        transparent={true}
+        vertexColors={true}
         side={DoubleSide} // DoubleSide to ensure faces are visible from both sides
+        depthWrite={true} // Enable depth writing for proper raycasting
+        blending={1} // NormalBlending instead of AdditiveBlending
       />
     </mesh>
   )
-}
+})
+
+Brain.displayName = 'Brain'
+
+export default Brain
 
 /**
  * @interface BrainControls
