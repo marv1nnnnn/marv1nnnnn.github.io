@@ -4,237 +4,139 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "Chaotic Early-Web OS" - a Next.js 14 application that recreates a nostalgic desktop environment celebrating early web aesthetics. It features draggable windows, retro games, AI chat personalities, a 3D brain visualization, and chaotic visual effects reminiscent of 90s/Y2K web design.
+The Transmitter-Receiver OS is a Suda51-inspired personal website that functions as a surreal, interactive desktop operating system. Built with Next.js 14, TypeScript, and React Three Fiber, it recreates the aesthetic and narrative themes of the "Kill the Past" universe through a fragmented, unreliable interface.
 
 ## Development Commands
 
+**Build and Development:**
 ```bash
-# Development server
-npm run dev
-
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Linting
-npm run lint
+npm run dev          # Start development server
+npm run build        # Production build with static export
+npm run start        # Start production server
+npm run lint         # Run ESLint
 ```
 
-## Key Dependencies
-
-**3D Graphics and Visualization:**
-- `@react-three/fiber` - React renderer for Three.js
-- `@react-three/drei` - Useful helpers for React Three Fiber
-- `@react-three/postprocessing` - Post-processing effects
-- `three` - Core 3D library for brain visualization
-
-**Animation and Effects:**
-- `framer-motion` - Advanced animations and transitions
-- `@tweenjs/tween.js` - Smooth value interpolation
-
-**Audio Processing:**
-- `howler` - Audio library for sound effects
-- `tone` - Audio synthesis and effects
-- `use-sound` - React hook for audio
-- `web-audio-beat-detector` - Audio analysis for reactive effects
-
-**UI and Interaction:**
-- `react-draggable` - Draggable window functionality
-- `react-rnd` - Resizable and draggable components
-- `react-spring` - Spring-physics based animations
-- `canvas-confetti` - Particle effects
+**Package Management:**
+```bash
+pnpm add <package>   # Use pnpm for adding dependencies (not npm)
+```
 
 ## Architecture Overview
 
-### Core Application Structure
+### Core Design Philosophy
+The OS simulates a digital consciousness interface with intentional glitches, unreliable data, and cryptic system messages. Everything is themed around conspiracy, fractured identity, and unstable information transmission.
 
-The app uses a multi-provider architecture where all functionality flows through nested React contexts:
+### Application Structure
+**Main OS Components:**
+- `BootSequence.tsx` - Cryptic startup sequence with procedural errors
+- `Desktop.tsx` - Main environment with cursor trails and random glitches  
+- `WindowManager.tsx` - Handles draggable windows using react-rnd
+- `AudioContext.tsx` - Web Audio API system for procedural sound generation
 
-1. **AIChatProvider** - Manages AI personality chat system
-2. **WindowManagerProvider** - Handles draggable window system
-3. **ChaosProvider** - Central orchestrator for all system state, effects, and audio
-4. **AudioVisualProvider** - Audio processing and visual effects
+**Core Applications (Windows):**
+- **Case File Reader** (`CaseFileReader.tsx`) - Blog system with "Film Window" interface, typewriter effects, keyword glitching
+- **Heaven's Smile Gallery** (`HeavensSmileGallery.tsx`) - 3D portfolio using Three.js, targeting system mechanics
+- **Catherine's Suitcase** (`CatherinesSuitcase.tsx`) - 3D music player with rotatable PS2-era model
+- **Lost & Found Games** (`LostFoundGames.tsx`) - Mini-game launcher with "Soul Shells" currency
+- **Transmitted Consciousness** (`TransmittedConsciousness.tsx`) - AI chat interface using xAI Grok API
 
-### Key Architectural Components
+### Technical Stack Integration
 
-**Desktop Environment (`src/components/Desktop.tsx`)**
-- Main desktop interface with draggable icons in a grid layout
-- Integrates 3D brain visualization toggle
-- Handles program launching and window creation
-- Responsive design with mobile/desktop modes
+**3D Graphics (React Three Fiber):**
+- Projects use `@react-three/fiber` with `@react-three/drei` helpers
+- Custom 3D models for Catherine's Suitcase music player
+- Targeting system mechanics in Heaven's Smile Gallery
+- All 3D components require `'use client'` directive
 
-**Window Management (`src/hooks/useWindowManager.tsx`)**
-- Complete window lifecycle management (create, focus, minimize, maximize, close)
-- Z-index management and positioning
-- State persistence and responsive sizing
+**Animation Systems:**
+- **GSAP** for sharp, impactful UI transitions and glitch effects
+- Window entrance animations, progress bars, target spawning
+- Desktop icon staggered entrance animations
+- Glitch shake effects with random transforms
 
-**Chaos System (`src/contexts/ChaosProvider.tsx`)**
-- Central state management for system chaos level, performance, and effects
-- Audio-reactive visual effects
-- Real-time performance monitoring and adaptive quality
-- Mobile device detection and responsive behavior
+**Audio Architecture:**
+- **AudioContext** provides Web Audio API-based procedural sound generation
+- 10+ system sounds: boot, click, hover, error, windowOpen/Close, typing, glitch, targetHit, gameStart/Over, success
+- No external audio files - all sounds generated programmatically
+- Use `useAudio()` hook and `playSound(soundId)` throughout components
 
-**Program Registry (`src/config/programRegistry.ts`)**
-- Centralized registry of all launchable programs
-- Auto-launch program configuration
-- Dynamic component loading with React.lazy()
-- Program size, positioning, and icon management
+**AI Integration:**
+- xAI Grok API integration in `/api/chat/route.ts`
+- Fallback responses when API unavailable
+- Cryptic personality with unreliable narrator characteristics
+- Environment variable: `XAI_API_KEY` in `.env.local`
 
-### 3D Brain Visualization
+### TypeScript Architecture
 
-The 3D brain system is a sophisticated Three.js implementation located in `src/components/brain/`:
+**Comprehensive type system in `src/types/index.ts`:**
+- `WindowState` - Window management with position, focus, z-index
+- `ProjectTarget` - 3D portfolio projects with positions, shapes, colors
+- `TruthSearchKeyword`, `TargetingTarget` - Game-specific mechanics  
+- `SystemState` - Global OS state including glitch levels, connection status
+- `BootPhase` - Boot sequence configuration with error chances
 
-**Core Components:**
-- `Brain.tsx` - Procedurally generated brain mesh with vertex coloring for region identification
-- `BrainDashboard.tsx` - Main UI orchestrator with scene setup and overlays  
-- `ModuleGrid.tsx` - Program launcher interface when brain regions are clicked
+**Key Patterns:**
+- All components use strict TypeScript with comprehensive interfaces
+- Window components receive `windowId: string` prop
+- Applications are registered through icon mappings in Desktop.tsx
+- State management uses React hooks with TypeScript generics
 
-**Interaction System:**
-- `useBrainCamera.tsx` - State-based camera control with smooth transitions
-- `useBrainRaycasting.tsx` - Mouse-to-3D interaction using color-based region detection
-- Brain regions map to specific programs via `src/config/brainMapping.ts`
+### Configuration & Build
 
-**Data Flow:**
-1. User clicks on 3D brain mesh
-2. Raycasting detects vertex color at intersection point
-3. Color maps to brain region ID via `src/utils/colorUtils.ts`
-4. Camera transitions to focus on region
-5. ModuleGrid displays available programs for that region
+**Static Export Configuration:**
+- `next.config.js` configured for static export (`output: 'export'`)
+- Images unoptimized for static hosting
+- ESM externals set to 'loose' for Three.js compatibility
 
-### AI Personalities System
+**Critical Dependencies:**
+- `react-rnd` for draggable/resizable windows
+- `gsap` for animations (already installed)
+- `@react-three/fiber` + `@react-three/drei` for 3D scenes
+- `@ai-sdk/xai` + `ai` for AI chat functionality
 
-**Configuration (`src/config/personalities.ts`)**
-- Multiple AI personalities with distinct styles and prompts
-- Each personality has unique visual theming and behavioral traits
-- Integrated into Terminal.exe program
+### Development Patterns
 
-**Implementation:**
-- Personalities are dynamically loaded as separate terminal instances
-- Each has custom styling, icons, and interaction patterns
-- Managed through the AI chat context system
+**Component Architecture:**
+- Main applications are windows that receive window management props
+- Each app maintains its own state and handles window lifecycle
+- Games track scores and use "Soul Shells" currency system
+- All interactive elements play system sounds via AudioContext
 
-## File Structure Guidelines
+**Styling Approach:**
+- CSS-in-JS using styled-jsx for component-specific styles
+- Global Suda51 color palette in `globals.css` with CSS variables
+- CRT effects, film grain, scanlines throughout interface
+- Button hover effects with `translate(-1px, -1px)` for depth
 
-**Component Organization:**
-- Main components in `src/components/`
-- Brain-specific components in `src/components/brain/`
-- Hooks in `src/hooks/` with brain-specific hooks in `src/hooks/brain/`
-- Configuration files in `src/config/`
-- Utilities in `src/utils/`
+**Animation Guidelines:**
+- Use GSAP for entrance animations, glitches, and state transitions
+- Entrance animations: `opacity: 0 → 1`, `scale: 0.8 → 1`, `y: 20 → 0`
+- Glitch effects: Random `x/y` translation with `rotationZ`, brief duration
+- Stagger animations for multiple elements (desktop icons, UI elements)
 
-**Blog System:**
-- Blog posts as Markdown files in `public/blog/`
-- Metadata managed in `public/blog/blog-metadata.json`
-- BlogReader component handles rendering
+**Audio Integration:**
+- Wrap new components with `useAudio()` hook
+- Call `playSound()` on user interactions: clicks, hovers, game events
+- Use specific sound IDs: 'click', 'hover', 'windowOpen', 'targetHit', etc.
+- Audio provides immediate feedback for all user actions
 
-**Standards Application:**
-- This project follows Mouse Protocol conventions in `.cursor/rules/`
-- Always apply relevant standards from the rules directory
-- Focus on maintaining the chaotic/retro aesthetic while ensuring code quality
+### AI Personality Configuration
 
-## Key Technical Patterns
+The Transmitted Consciousness uses a cryptic, unreliable personality:
+- Responds with philosophical questions rather than direct answers
+- References non-existent "case files" and conspiracy elements  
+- Switches tones unexpectedly while maintaining technical knowledge
+- Glitches responses occasionally with redacted text and system messages
 
-**Component Lazy Loading:**
-All programs use React.lazy() for code splitting and performance
+### Testing & Deployment
 
-**State Management Pattern:**
-Context providers handle domain-specific state, with ChaosProvider as the central coordinator
+**Build Requirements:**
+- TypeScript compilation must pass without errors
+- Static export generates all pages successfully  
+- Three.js components require client-side rendering
+- Audio context requires user interaction to initialize
 
-**Effects and Animation:**
-Heavy use of CSS animations, Framer Motion, and Three.js for the retro aesthetic
-
-**Responsive Design:**
-Mobile-first approach with adaptive layouts and touch-friendly interfaces
-
-**Performance Optimization:**
-Real-time FPS monitoring with automatic quality adjustment based on device capabilities
-
-## Integration Patterns
-
-### Adding New Programs
-1. **Create Component**: Build your program component in `src/components/`
-2. **Register Program**: Add entry to `PROGRAM_REGISTRY` in `src/config/programRegistry.ts`
-3. **Set Properties**: Define size, icon, auto-launch behavior, and integration points
-4. **Lazy Loading**: Use `React.lazy()` for code splitting
-
-### Connecting to Chaos System
-```typescript
-// Access chaos context in components
-const { 
-  systemState, 
-  triggerSystemWideEffect, 
-  setChaosLevel 
-} = useChaos()
-
-// Trigger effects on user interaction
-const handleUserAction = () => {
-  triggerSystemWideEffect('rainbow-cascade')
-  // Your action logic
-}
-```
-
-### Audio-Reactive Components
-```typescript
-// Listen to audio data for reactive effects
-useEffect(() => {
-  if (audio.isPlaying) {
-    const { visualizerData } = audio
-    // React to audio energy levels
-    const energy = visualizerData.slice(0, 8).reduce((sum, val) => sum + val, 0) / 8
-    if (energy > 0.6) {
-      // Trigger visual effects
-    }
-  }
-}, [audio.visualizerData])
-```
-
-### Window Integration
-```typescript
-// Create windows through ChaosProvider
-const { createWindow } = useChaos()
-
-createWindow({
-  title: 'My Program',
-  component: <MyComponent />,
-  size: { width: 400, height: 300 },
-  icon: '🎮'
-})
-```
-
-## Testing and Debugging
-
-### 3D Brain System Testing
-- **Region Detection**: Click various brain regions and verify correct program mapping
-- **Camera Transitions**: Test smooth transitions between brain regions
-- **Performance**: Monitor FPS with brain rendering active
-- **Mobile Interaction**: Test touch interactions on mobile devices
-
-### Audio System Testing
-- **Effect Triggers**: Verify audio-reactive effects respond to music
-- **Volume Controls**: Test chaos level impact on audio volume
-- **Performance Impact**: Monitor CPU usage with audio analysis active
-
-### Common Debugging Scenarios
-- **Brain Raycasting Issues**: Check console for color detection logs in `colorUtils.ts`
-- **Window Z-Index Problems**: Verify `useWindowManager` z-index incrementing
-- **Performance Drops**: Check ChaosProvider performance mode adjustments
-- **Mobile Layout Issues**: Test responsive behavior on various screen sizes
-
-### Development Environment
-- **Browser DevTools**: Use React DevTools for component state inspection
-- **Three.js Inspector**: Browser extension for 3D scene debugging
-- **Audio Context**: Check browser audio permissions and autoplay policies
-- **Performance Monitoring**: Use browser Performance tab for FPS analysis
-
-## Development Notes
-
-- The project embraces intentional "chaos" and glitch effects as core features
-- Maintain the nostalgic early-web aesthetic when adding new features
-- All programs should integrate with the window management system
-- Consider mobile experience for all new components
-- Use the established program registry pattern for new applications
-- **Performance Critical**: 3D rendering and audio processing are performance-sensitive
-- **Audio Permissions**: Some features require user interaction to enable audio
-- **Mobile Considerations**: Touch events and reduced visual effects for performance
+**Environment Setup:**
+- Copy `.env.example` to `.env.local` for xAI API key
+- No external audio assets needed (procedural generation)
+- Static export ready for GitHub Pages or similar hosting
