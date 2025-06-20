@@ -6,7 +6,17 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(npm run lint)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm run:*)",
+      "Bash(npm install:*)",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__onboarding",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__list_dir",
+      "mcp__serena__write_memory",
+      "mcp__serena__find_symbol",
+      "WebFetch(domain:docs.x.ai)"
     ],
     "deny": []
   }

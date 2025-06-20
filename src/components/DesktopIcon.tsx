@@ -1,122 +1,131 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { DesktopIcon as DesktopIconType } from '@/types'
+import { useAudio } from '@/contexts/AudioContext'
 
 interface DesktopIconProps {
-  icon: string
-  label: string
+  icon: DesktopIconType
   onDoubleClick: () => void
 }
 
-const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onDoubleClick }) => {
+export default function DesktopIcon({ icon, onDoubleClick }: DesktopIconProps) {
+  const { playSound } = useAudio()
   const [isSelected, setIsSelected] = useState(false)
-  const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [clickCount, setClickCount] = useState(0)
+  const [lastClickTime, setLastClickTime] = useState(0)
 
   const handleClick = () => {
-    if (clickTimeout) {
+    const now = Date.now()
+    const timeDiff = now - lastClickTime
+
+    if (timeDiff < 300) {
       // Double click detected
-      clearTimeout(clickTimeout)
-      setClickTimeout(null)
+      setClickCount(0)
       onDoubleClick()
     } else {
-      // Single click - select icon
+      // Single click
+      playSound('click')
+      setClickCount(1)
       setIsSelected(true)
-      const timeout = setTimeout(() => {
-        setIsSelected(false)
-        setClickTimeout(null)
+      setLastClickTime(now)
+
+      // Reset selection after delay if no double click
+      setTimeout(() => {
+        if (clickCount === 1) {
+          setIsSelected(false)
+          setClickCount(0)
+        }
       }, 300)
-      setClickTimeout(timeout)
     }
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
   }
 
   return (
     <div
       className={`desktop-icon ${isSelected ? 'selected' : ''}`}
+      style={{
+        left: icon.position.x,
+        top: icon.position.y,
+      }}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseEnter={() => playSound('hover')}
     >
       <div className="icon-image">
-        {icon}
+        {icon.icon}
       </div>
       <div className="icon-label">
-        {label}
+        {icon.name}
       </div>
 
       <style jsx>{`
         .desktop-icon {
+          position: absolute;
+          width: 80px;
+          height: 80px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: flex-start;
-          width: 80px;
-          height: 90px;
-          padding: 4px;
-          cursor: pointer;
-          transition: all 0.15s ease;
+          cursor: crosshair;
           user-select: none;
-          position: relative;
+          padding: var(--space-xs);
+          border-radius: 2px;
+          transition: all 0.1s ease;
         }
 
         .desktop-icon:hover {
+          background: rgba(255, 255, 255, 0.1);
           transform: scale(1.05);
         }
 
         .desktop-icon.selected {
-          background: rgba(0, 0, 139, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          border-radius: 2px;
+          background: var(--color-info);
+          color: var(--color-void);
+        }
+
+        .desktop-icon.selected:hover {
+          background: var(--color-info);
         }
 
         .icon-image {
-          font-size: 36px;
-          margin-bottom: 2px;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 48px;
-          height: 48px;
-          background: rgba(255, 255, 255, 0.9);
-          border: 1px solid rgba(0, 0, 0, 0.3);
-          border-radius: 4px;
-          box-shadow: 
-            inset 1px 1px 0 rgba(255, 255, 255, 0.8),
-            inset -1px -1px 0 rgba(0, 0, 0, 0.2),
-            2px 2px 4px rgba(0, 0, 0, 0.3);
+          font-size: 32px;
+          margin-bottom: var(--space-xs);
+          filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+          transition: filter 0.1s ease;
         }
 
-        .desktop-icon:active .icon-image {
-          box-shadow: 
-            inset -1px -1px 0 rgba(255, 255, 255, 0.8),
-            inset 1px 1px 0 rgba(0, 0, 0, 0.2),
-            1px 1px 2px rgba(0, 0, 0, 0.3);
-          transform: translate(1px, 1px);
+        .desktop-icon:hover .icon-image {
+          filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 1));
         }
 
         .icon-label {
-          font-size: 10px;
-          color: black;
+          font-family: var(--font-system);
+          font-size: var(--font-size-xs);
           text-align: center;
-          font-family: 'Geneva', 'Helvetica', Arial, sans-serif;
-          font-weight: normal;
-          line-height: 1.1;
-          max-width: 80px;
+          line-height: 1.2;
+          text-shadow: 
+            1px 1px 0px var(--color-void),
+            -1px -1px 0px var(--color-void),
+            1px -1px 0px var(--color-void),
+            -1px 1px 0px var(--color-void);
           word-wrap: break-word;
-          background: rgba(255, 255, 255, 0.95);
-          padding: 1px 3px;
-          border-radius: 2px;
-          border: 1px solid rgba(0, 0, 0, 0.2);
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-          margin-top: 2px;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
         }
 
         .desktop-icon.selected .icon-label {
-          background: rgba(0, 0, 139, 0.9);
-          color: white;
-          border-color: rgba(255, 255, 255, 0.5);
+          color: var(--color-void);
+          text-shadow: none;
         }
       `}</style>
     </div>
   )
 }
-
-export default DesktopIcon
