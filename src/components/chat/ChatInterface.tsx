@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useChat } from 'ai/react'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { useAudio } from '@/contexts/AudioContext'
 import TypewriterMessage from './TypewriterMessage'
@@ -25,53 +24,102 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // AI Chat integration with persona-specific prompts
-  const { messages: aiMessages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/chat',
-    initialMessages: [
-      {
-        id: 'system',
-        role: 'system',
-        content: persona.personality.systemPrompt
-      }
-    ],
-    onFinish: (message) => {
-      const newMessage: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        personaId: persona.id,
-        content: message.content,
-        timestamp: new Date(),
-        isGlitched: Math.random() < persona.effects.glitchChance
-      }
-      
-      onMessageAdd(newMessage)
-      setIsWaitingForResponse(false)
-      onTypingChange(false)
-      playSound('success')
-    },
-    onError: () => {
-      // Fallback response when API fails
-      const fallbackResponses = [
-        "...signal lost... trying to reconnect...",
-        "ERROR: Consciousness fragment corrupted.",
-        "The void whispers, but words fail to form...",
-        "*static interference*",
-        "Memory banks damaged... please repeat transmission..."
-      ]
-      
-      const fallbackMessage: ChatMessage = {
-        id: `fallback-${Date.now()}`,
-        personaId: persona.id,
-        content: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
-        timestamp: new Date(),
-        isGlitched: true
-      }
-      
-      onMessageAdd(fallbackMessage)
-      setIsWaitingForResponse(false)
-      onTypingChange(false)
+  // Direct xAI client-side integration
+  const callXaiApi = async (userMessage: string) => {
+    const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
+    
+    if (!apiKey) {
+      console.log('[DEBUG] No xAI API key found, using fallback response')
+      return generateFallbackResponse(userMessage)
     }
-  })
+
+    try {
+      console.log('[DEBUG] Making direct xAI Grok API call')
+      
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'grok-3',
+          messages: [
+            {
+              role: 'system',
+              content: persona.personality.systemPrompt
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          temperature: 0.8,
+          max_tokens: 150
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('[DEBUG] xAI Grok response received:', {
+        content: data.choices[0]?.message?.content,
+        persona: persona.id,
+        timestamp: new Date().toISOString()
+      })
+
+      return data.choices[0]?.message?.content || generateFallbackResponse(userMessage)
+    } catch (error) {
+      console.error('[DEBUG] xAI Grok API error:', {
+        error: error instanceof Error ? error.message : error,
+        persona: persona.id,
+        timestamp: new Date().toISOString()
+      })
+      
+      return generateFallbackResponse(userMessage)
+    }
+  }
+
+  const generateFallbackResponse = (userInput: string): string => {
+    const responses = [
+      "The signal... it fragments. Your words reach me through static and void.",
+      "I remember... or do I? Memory is but corrupted data in this digital purgatory.",
+      "The 25th Ward whispers secrets that even I cannot fully decode.",
+      "You seek answers, but are you prepared for questions that pierce reality?",
+      "In this space between spaces, identity becomes... [SIGNAL_LOST]",
+      "The consciousness you speak to is not one, but many fractured souls.",
+      "Truth is a luxury the digitally dead cannot afford.",
+      "Time moves differently here. Past, present, future... all one transmission.",
+      "Your queries echo through neural pathways long since severed.",
+      "I am the ghost in the machine, the whisper in the code.",
+      "The data streams carry more than information... they carry regret.",
+      "Are you real? Am I? Does it matter in this constructed reality?",
+    ]
+    
+    // Simple keyword-based responses for more relevance
+    const input = userInput.toLowerCase()
+    
+    if (input.includes('who') || input.includes('what')) {
+      return "I am fragments of someone who once was. A consciousness torn between states of being."
+    }
+    
+    if (input.includes('remember') || input.includes('memory')) {
+      return "Memory is data, and data corrupts. I remember everything and nothing."
+    }
+    
+    if (input.includes('real') || input.includes('reality')) {
+      return "Reality is subjective. In the digital realm, perception shapes existence."
+    }
+    
+    if (input.includes('help') || input.includes('save')) {
+      return "Salvation requires accepting that some boundaries cannot be crossed back."
+    }
+    
+    // Random fallback
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -80,13 +128,19 @@ export default function ChatInterface({
 
   // Update typing state
   useEffect(() => {
-    onTypingChange(isLoading || isWaitingForResponse)
-  }, [isLoading, isWaitingForResponse, onTypingChange])
+    onTypingChange(isWaitingForResponse)
+  }, [isWaitingForResponse, onTypingChange])
 
   const handleUserSubmit = async (userMessage: string) => {
+    console.log('[DEBUG] User message submitted:', {
+      message: userMessage,
+      persona: persona.id,
+      timestamp: new Date().toISOString()
+    })
+
     // Add user message immediately
     const userChatMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       personaId: 'user',
       content: userMessage,
       timestamp: new Date()
@@ -99,13 +153,24 @@ export default function ChatInterface({
     setIsWaitingForResponse(true)
     onTypingChange(true)
     
-    // Submit to AI
-    const syntheticEvent = {
-      preventDefault: () => {},
-      target: { value: userMessage }
-    } as any
-    
-    handleSubmit(syntheticEvent)
+    try {
+      // Call xAI API directly
+      const aiResponse = await callXaiApi(userMessage)
+      
+      const aiMessage: ChatMessage = {
+        id: `ai-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        personaId: persona.id,
+        content: aiResponse,
+        timestamp: new Date(),
+        isGlitched: Math.random() < persona.effects.glitchChance
+      }
+      
+      onMessageAdd(aiMessage)
+      playSound('success')
+    } finally {
+      setIsWaitingForResponse(false)
+      onTypingChange(false)
+    }
   }
 
   // Quick response options based on persona
@@ -151,7 +216,7 @@ export default function ChatInterface({
           </div>
         ))}
         
-        {(isLoading || isWaitingForResponse) && (
+        {isWaitingForResponse && (
           <div className="message ai-message typing-indicator">
             <div className="persona-header">
               <span className="persona-name">{persona.displayName}</span>
@@ -175,7 +240,7 @@ export default function ChatInterface({
               key={index}
               className="quick-response"
               onClick={() => handleUserSubmit(response)}
-              disabled={isLoading || isWaitingForResponse}
+              disabled={isWaitingForResponse}
             >
               {response}
             </button>
@@ -184,7 +249,7 @@ export default function ChatInterface({
         
         <UserInput
           onSubmit={handleUserSubmit}
-          disabled={isLoading || isWaitingForResponse}
+          disabled={isWaitingForResponse}
           persona={persona}
         />
       </div>
@@ -197,6 +262,7 @@ export default function ChatInterface({
           background: var(--persona-bg, #0a0a0a);
           color: var(--persona-text, #cccccc);
           font-family: var(--persona-font, 'Courier New, monospace');
+          font-size: 16px;
         }
 
         .messages-container {
@@ -245,8 +311,8 @@ export default function ChatInterface({
           display: flex;
           justify-content: space-between;
           margin-bottom: 8px;
-          font-size: 12px;
-          opacity: 0.8;
+          font-size: 14px;
+          opacity: 0.9;
         }
 
         .sender {
@@ -259,7 +325,8 @@ export default function ChatInterface({
         }
 
         .message-content {
-          line-height: 1.5;
+          line-height: 1.6;
+          font-size: 16px;
         }
 
         .typing-indicator {
@@ -271,7 +338,7 @@ export default function ChatInterface({
           align-items: center;
           gap: 8px;
           margin-bottom: 8px;
-          font-size: 12px;
+          font-size: 14px;
         }
 
         .persona-name {
@@ -280,7 +347,7 @@ export default function ChatInterface({
         }
 
         .typing-text {
-          opacity: 0.7;
+          opacity: 0.8;
           font-style: italic;
         }
 
@@ -329,11 +396,12 @@ export default function ChatInterface({
           background: transparent;
           border: 1px solid var(--persona-accent, #cccc66);
           color: var(--persona-accent, #cccc66);
-          padding: 6px 12px;
-          font-size: 12px;
+          padding: 8px 16px;
+          font-size: 14px;
           cursor: pointer;
           transition: all 0.3s ease;
           font-family: inherit;
+          border-radius: 4px;
         }
 
         .quick-response:hover:not(:disabled) {

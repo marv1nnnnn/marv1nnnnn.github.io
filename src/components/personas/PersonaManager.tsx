@@ -25,7 +25,7 @@ export default function PersonaManager({ onPersonaChange, onMessageAdd, children
     
     // Add system message about persona switch
     const switchMessage: ChatMessage = {
-      id: `switch-${Date.now()}`,
+      id: `switch-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       personaId: newPersona.id,
       content: getPersonaSwitchMessage(newPersona),
       timestamp: new Date(),

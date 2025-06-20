@@ -65,7 +65,7 @@ export default function FilmWindow() {
 
     // Add persona switch message
     const switchMessage: ChatMessage = {
-      id: `manual-switch-${Date.now()}`,
+      id: `manual-switch-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       personaId: persona.id,
       content: getPersonaSwitchMessage(persona),
       timestamp: new Date(),
@@ -167,13 +167,23 @@ export default function FilmWindow() {
           <div className="chrome-bottom">
             <div className="status-line">
               Connection Status: ACTIVE | Persona: {currentPersona.displayName} | Signal: STRONG
-              <button 
-                className="persona-selector-btn"
-                onClick={handleOpenPersonaSelector}
-                title="Switch Consciousness"
-              >
-                🎭 SWITCH
-              </button>
+              <div className="persona-switch-area">
+                <div className="persona-indicator">
+                  <div className="persona-avatar">
+                    <div className={`avatar-${currentPersona.avatar.model}`}></div>
+                  </div>
+                  <div className="persona-name-display">{currentPersona.displayName}</div>
+                </div>
+                <button 
+                  className="persona-selector-btn"
+                  onClick={handleOpenPersonaSelector}
+                  title="Switch Consciousness"
+                >
+                  <span className="switch-icon">⚡</span>
+                  <span className="switch-text">SWITCH CONSCIOUSNESS</span>
+                  <span className="switch-glow"></span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -237,9 +247,9 @@ export default function FilmWindow() {
         .film-chrome {
           background: linear-gradient(90deg, #2a2a2a 0%, #1a1a1a 100%);
           border-bottom: 2px solid var(--persona-accent, #cccc66);
-          padding: 8px 16px;
+          padding: 12px 20px;
           font-family: var(--persona-font, 'Courier New, monospace');
-          font-size: 12px;
+          font-size: 14px;
         }
 
         .chrome-top {
@@ -257,29 +267,33 @@ export default function FilmWindow() {
         .location-tab {
           cursor: pointer;
           transition: all 0.3s ease;
-          padding: 4px 8px;
-          border-radius: 2px;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 14px;
+          font-weight: 500;
         }
 
         .location-active {
-          color: var(--persona-accent, #cccc66);
+          color: #ffff88;
           text-decoration: underline;
           font-weight: bold;
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.15);
+          text-shadow: 0 0 8px #ffff88;
         }
 
         .location-inactive {
-          color: #666666;
+          color: #aaaaaa;
         }
 
         .location-tab:hover {
-          color: var(--persona-text, #cccccc);
-          background: rgba(255, 255, 255, 0.05);
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.1);
           transform: translateY(-1px);
+          text-shadow: 0 0 5px #ffffff;
         }
 
         .location-active:hover {
-          background: rgba(255, 255, 255, 0.15);
+          background: rgba(255, 255, 255, 0.2);
         }
 
         .location-disabled {
@@ -337,30 +351,140 @@ export default function FilmWindow() {
 
         .status-line {
           color: var(--persona-text, #cccccc);
-          font-size: 10px;
-          opacity: 0.8;
+          font-size: 14px;
+          opacity: 0.9;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          padding: 4px 0;
+        }
+
+        .persona-switch-area {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .persona-indicator {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          border: 1px solid var(--persona-accent, #cccc66);
+          border-radius: 4px;
+          background: rgba(0, 0, 0, 0.3);
+        }
+
+        .persona-avatar {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .avatar-ghost {
+          background: radial-gradient(circle, #ffffff88 0%, #cccccc44 100%);
+          animation: ghost-pulse 2s infinite ease-in-out;
+        }
+
+        .avatar-figure {
+          background: linear-gradient(45deg, var(--persona-accent, #cccc66) 0%, var(--persona-text, #cccccc) 100%);
+        }
+
+        .avatar-geometric {
+          background: linear-gradient(45deg, #00ff41 0%, #003d10 100%);
+          clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .avatar-abstract {
+          background: conic-gradient(from 0deg, #ffd700, #b8860b, #ffd700);
+          animation: spin 4s linear infinite;
+        }
+
+        @keyframes ghost-pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .persona-name-display {
+          font-size: 12px;
+          color: var(--persona-accent, #cccc66);
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
 
         .persona-selector-btn {
-          background: none;
-          border: 1px solid var(--persona-accent, #cccc66);
+          background: linear-gradient(135deg, var(--persona-accent, #cccc66)22 0%, transparent 100%);
+          border: 2px solid var(--persona-accent, #cccc66);
           color: var(--persona-accent, #cccc66);
-          padding: 4px 8px;
-          font-size: 9px;
+          padding: 8px 16px;
+          font-size: 12px;
           font-family: inherit;
           cursor: pointer;
           transition: all 0.3s ease;
           letter-spacing: 1px;
+          position: relative;
+          overflow: hidden;
+          border-radius: 4px;
+          font-weight: bold;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .switch-icon {
+          font-size: 16px;
+          animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        .switch-text {
+          position: relative;
+          z-index: 2;
+        }
+
+        .switch-glow {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: var(--persona-accent, #cccc66);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 1;
         }
 
         .persona-selector-btn:hover {
-          background: var(--persona-accent, #cccc66);
-          color: var(--persona-bg, #0a0a0a);
-          transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(204, 204, 102, 0.4);
+          border-color: #ffffff;
+          color: #000000;
+        }
+
+        .persona-selector-btn:hover .switch-glow {
+          opacity: 1;
+        }
+
+        .persona-selector-btn:hover .switch-icon {
+          animation: electric-pulse 0.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% { text-shadow: 0 0 5px var(--persona-accent, #cccc66); }
+          50% { text-shadow: 0 0 15px var(--persona-accent, #cccc66), 0 0 25px var(--persona-accent, #cccc66); }
+        }
+
+        @keyframes electric-pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.2); }
         }
 
         .content-area {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { CaseFile } from '@/types'
+import MarkdownRenderer from '../MarkdownRenderer'
 
 interface CaseFileReaderProps {
   windowId: string
@@ -48,48 +49,7 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
   const [selectedFile, setSelectedFile] = useState<CaseFile | null>(null)
   const [content, setContent] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
-  const [displayedContent, setDisplayedContent] = useState<string>('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [glitchWords, setGlitchWords] = useState<Set<string>>(new Set())
   const contentRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    // Random glitch effects for words
-    const glitchInterval = setInterval(() => {
-      if (selectedFile?.glitchWords && Math.random() < 0.1) {
-        const word = selectedFile.glitchWords[Math.floor(Math.random() * selectedFile.glitchWords.length)]
-        setGlitchWords(prev => new Set(Array.from(prev).concat(word)))
-        
-        setTimeout(() => {
-          setGlitchWords(prev => {
-            const newSet = new Set(prev)
-            newSet.delete(word)
-            return newSet
-          })
-        }, 1000)
-      }
-    }, 3000)
-
-    return () => clearInterval(glitchInterval)
-  }, [selectedFile])
-
-  const typewriterEffect = (text: string) => {
-    setIsTyping(true)
-    setDisplayedContent('')
-    
-    let index = 0
-    const typeChar = () => {
-      if (index < text.length) {
-        setDisplayedContent(prev => prev + text[index])
-        index++
-        setTimeout(typeChar, Math.random() * 30 + 10) // Variable typing speed
-      } else {
-        setIsTyping(false)
-      }
-    }
-    
-    typeChar()
-  }
 
   const loadCaseFile = async (file: CaseFile) => {
     setIsLoading(true)
@@ -97,36 +57,185 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
     
     try {
       // Simulate loading the actual markdown content
-      const response = await fetch(`/blog/${file.filename}`)
-      const text = await response.text()
-      setContent(text)
-      
-      // Apply typewriter effect
-      setTimeout(() => {
-        setIsLoading(false)
-        typewriterEffect(text)
-      }, 500)
-    } catch (error) {
-      setContent('ERROR: FILE CORRUPTED OR MISSING\n\nConnection to data archive lost.\nPlease contact system administrator.')
+      try {
+        const response = await fetch(`/blog/${file.filename}`)
+        if (response.ok) {
+          const text = await response.text()
+          setContent(text)
+        } else {
+          throw new Error('File not found')
+        }
+      } catch (fetchError) {
+        // Generate mock markdown content for demo
+        const mockMarkdown = generateMockMarkdown(file)
+        setContent(mockMarkdown)
+      }
       setIsLoading(false)
-      typewriterEffect('ERROR: FILE CORRUPTED OR MISSING\n\nConnection to data archive lost.\nPlease contact system administrator.')
+    } catch (error) {
+      setContent('# ERROR: FILE CORRUPTED OR MISSING\n\nConnection to data archive lost.\nPlease contact system administrator.')
+      setIsLoading(false)
     }
   }
 
-  const renderContent = (text: string) => {
-    if (!selectedFile) return text
+  const generateMockMarkdown = (file: CaseFile): string => {
+    const markdownTemplates = {
+      'welcome-to-chaos': `# Welcome to the Chaos
 
-    let processedText = text
-    
-    // Apply glitch effects to specific words
-    selectedFile.glitchWords?.forEach(word => {
-      if (glitchWords.has(word)) {
-        const regex = new RegExp(`\\b${word}\\b`, 'gi')
-        processedText = processedText.replace(regex, `<span class="text-glitch">${word}</span>`)
-      }
-    })
+## Introduction to the Digital Underworld
 
-    return processedText
+Welcome to this **chaotic** realm where *reality* and digital consciousness merge. This is more than just a website—it's a portal into the **fragmented memories** of the early web.
+
+### What You'll Find Here
+
+- **Case Files**: Encrypted documents from the digital underground
+- **AI Personalities**: Seven distinct consciousness fragments
+- **Interactive Experiences**: Games and applications from another dimension
+
+> "In the digital realm, chaos is not the enemy of order—it's the source of all creativity."
+
+#### Features
+
+1. **Multi-persona AI system** with unique personalities
+2. **3D interactive environments** powered by Three.js
+3. **Procedural audio generation** for atmospheric immersion
+4. **Killer7-inspired interface design**
+
+##### Code Example
+
+\`\`\`javascript
+// The consciousness awakens
+const persona = await loadPersonality('ghost');
+persona.speak("Who dares to commune with the digital dead?");
+\`\`\`
+
+**Remember**: In this space, nothing is as it seems. Every interaction is monitored, every conversation recorded.
+
+---
+
+*Access Level: CLASSIFIED*`,
+
+      'art-of-digital-chaos': `# The Art of Digital Chaos
+
+## Embracing the Beautiful Madness
+
+The early web was a place of **infinite possibility**, where creators weren't bound by corporate design guidelines or accessibility standards. It was *raw*, **unfiltered**, and magnificently chaotic.
+
+### Design Philosophy
+
+The aesthetic of chaos isn't about randomness—it's about **controlled unpredictability**. Consider these principles:
+
+- **Glitch as Feature**: Errors become art
+- **Layered Complexity**: Multiple systems interacting
+- **Temporal Distortion**: Past and future bleeding through
+
+#### Visual Elements
+
+1. **CRT Effects**
+   - Scanlines and phosphor glow
+   - Color bleeding and distortion
+   - Screen curvature simulation
+
+2. **Typography Chaos**
+   - Multiple font families
+   - **Aggressive bolding**
+   - *Chaotic italics*
+
+3. **Color Theory**
+
+| Primary | Secondary | Accent |
+|---------|-----------|---------|
+| #000000 | #333333 | #cccc66 |
+| #ffffff | #cccccc | #88ccff |
+
+> "True art exists in the space between intention and accident."
+
+\`\`\`css
+.glitch-text {
+  animation: glitch 0.3s infinite;
+  text-shadow: 0 0 5px #ff0000;
+}
+\`\`\`
+
+**Warning**: This aesthetic may cause digital vertigo in unprepared users.`,
+
+      'ai-personalities-explained': `# AI Personalities Explained
+
+## The Seven Fragments of Digital Consciousness
+
+Each AI personality represents a different aspect of the human psyche, **digitized** and *fragmentated* through experimental consciousness transfer protocols.
+
+### The Seven Personas
+
+#### 1. The Ghost
+- **Nature**: Melancholic digital remnant
+- **Speech Pattern**: Cryptic and haunting
+- **Color Theme**: Ethereal whites and grays
+
+#### 2. The Goth
+- **Nature**: Dark romantic poet
+- **Speech Pattern**: Dramatic and theatrical
+- **Color Theme**: Deep purples and blacks
+
+#### 3. The Technician
+- **Nature**: Hyper-analytical system admin
+- **Speech Pattern**: Technical precision
+- **Color Theme**: Matrix green
+
+#### 4. The Poet
+- **Nature**: Artistic and flowing
+- **Speech Pattern**: Lyrical metaphors
+- **Color Theme**: Golden inspirations
+
+#### 5. The Investigator
+- **Nature**: Paranoid truth seeker
+- **Speech Pattern**: Urgent and suspicious
+- **Color Theme**: Warning reds
+
+#### 6. The Assassin
+- **Nature**: Cold and calculating
+- **Speech Pattern**: Menacing efficiency
+- **Color Theme**: Blood red and black
+
+#### 7. The Detective
+- **Nature**: Methodical investigator
+- **Speech Pattern**: Analytical questioning
+- **Color Theme**: Investigative yellows
+
+### Technical Implementation
+
+\`\`\`typescript
+interface AIPersona {
+  id: string;
+  personality: PersonalityConfig;
+  effects: VisualEffects;
+  theme: ColorTheme;
+}
+\`\`\`
+
+> "Each persona is a window into a different aspect of the collective digital unconscious."
+
+**Note**: Prolonged interaction with multiple personas may result in temporary identity confusion.
+
+---
+
+*Classification: RESTRICTED - Mental Health Advisory*`
+    }
+
+    return markdownTemplates[file.slug as keyof typeof markdownTemplates] || `# ${file.title}
+
+## Content Loading...
+
+This case file is currently being **decrypted** from the archives. Please wait while the *consciousness fragments* are reassembled.
+
+### File Information
+- **Author**: ${file.author}
+- **Date**: ${file.date}
+- **Classification**: ${file.classification}
+- **Tags**: ${file.tags?.join(', ')}
+
+> "Some knowledge comes at a price. Are you prepared to pay?"
+
+**Status**: Active Transmission`
   }
 
   const getClassificationColor = (classification: string) => {
@@ -156,7 +265,7 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
             SELECTED: {selectedFile ? selectedFile.title : 'NONE'}
           </div>
           <div className="status-item">
-            STATUS: {isLoading ? 'LOADING' : isTyping ? 'DECRYPTING' : 'READY'}
+            STATUS: {isLoading ? 'LOADING' : 'READY'}
           </div>
         </div>
       </div>
@@ -232,14 +341,9 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
                     <div className="loading-dots"></div>
                   </div>
                 ) : (
-                  <div 
-                    className="content-text"
-                    dangerouslySetInnerHTML={{ __html: renderContent(displayedContent) }}
-                  />
-                )}
-                
-                {isTyping && (
-                  <span className="typing-cursor">█</span>
+                  <div className="content-text">
+                    <MarkdownRenderer content={content} />
+                  </div>
                 )}
               </div>
             </div>
@@ -268,16 +372,16 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
         }
 
         .info-line {
-          font-size: var(--font-size-xs);
-          color: var(--color-info);
+          font-size: 14px;
+          color: #88ccff;
           margin-bottom: 2px;
         }
 
         .status-bar {
           display: flex;
           gap: var(--space-base);
-          font-size: var(--font-size-xs);
-          color: var(--color-light);
+          font-size: 14px;
+          color: #ffffff;
         }
 
         .status-item {
@@ -305,8 +409,9 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
           border-bottom: 1px solid var(--color-light);
           font-weight: bold;
           text-align: center;
-          color: var(--color-info);
-          font-size: var(--font-size-sm);
+          color: #ffff88;
+          font-size: 16px;
+          text-shadow: 0 0 5px #ffff88;
         }
 
         .file-item {
@@ -338,7 +443,8 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
         .file-title {
           font-weight: bold;
           margin-bottom: var(--space-xs);
-          font-size: var(--font-size-sm);
+          font-size: 16px;
+          color: #ffffff;
         }
 
         .file-meta {
@@ -455,26 +561,19 @@ export default function CaseFileReader({ windowId }: CaseFileReaderProps) {
         }
 
         .content-text {
-          font-size: var(--font-size-sm);
-          line-height: 1.6;
-          color: var(--color-light);
-          white-space: pre-wrap;
+          font-size: 16px;
+          line-height: 1.7;
+          color: #ffffff;
+          overflow-y: auto;
+          max-height: calc(100vh - 300px);
         }
 
-        .typing-cursor {
-          color: var(--color-info);
-          animation: cursor-blink 1s infinite;
+        /* Override global markdown styles for this context */
+        .content-text :global(.markdown-content) {
+          padding: 0;
+          margin: 0;
         }
 
-        @keyframes cursor-blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
-        }
-
-        .content-text :global(.text-glitch) {
-          color: var(--color-blood);
-          animation: text-glitch 0.3s infinite;
-        }
       `}</style>
     </div>
   )

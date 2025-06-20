@@ -13,7 +13,6 @@ interface TypewriterMessageProps {
 export default function TypewriterMessage({ message, persona, speed }: TypewriterMessageProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [isComplete, setIsComplete] = useState(false)
-  const [isGlitching, setIsGlitching] = useState(false)
   const { playSound } = useAudio()
 
   useEffect(() => {
@@ -29,14 +28,8 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
         currentIndex++
         
         // Play typing sound occasionally
-        if (Math.random() < 0.3) {
+        if (Math.random() < 0.2) {
           playSound('typing')
-        }
-        
-        // Random glitch effect during typing
-        if (message.isGlitched && Math.random() < 0.1) {
-          setIsGlitching(true)
-          setTimeout(() => setIsGlitching(false), 100)
         }
       } else {
         setIsComplete(true)
@@ -45,35 +38,9 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
     }, speed)
 
     return () => clearInterval(typeInterval)
-  }, [message.content, speed, message.isGlitched, playSound])
+  }, [message.content, speed, playSound])
 
-  const renderGlitchedText = (text: string) => {
-    if (!message.isGlitched && !isGlitching) return text
-    
-    return text.split('').map((char, index) => {
-      const shouldGlitch = isGlitching || (message.isGlitched && Math.random() < 0.1)
-      
-      if (shouldGlitch && char !== ' ') {
-        const glitchChars = ['█', '▓', '▒', '░', '¿', '§', '†', '‡', '¤', '◊']
-        const glitchChar = glitchChars[Math.floor(Math.random() * glitchChars.length)]
-        
-        return (
-          <span 
-            key={index}
-            className="glitch-char"
-            style={{
-              color: Math.random() < 0.5 ? '#ff0000' : '#00ff00',
-              textShadow: '0 0 5px currentColor'
-            }}
-          >
-            {glitchChar}
-          </span>
-        )
-      }
-      
-      return <span key={index}>{char}</span>
-    })
-  }
+  // Simple clean text display without glitch effects
 
   const getPersonaSpecificStyling = () => {
     switch (persona.personality.speakingStyle) {
@@ -86,18 +53,16 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
       case 'technical_precise':
         return {
           fontFamily: 'Courier New, monospace',
-          fontSize: '13px',
-          lineHeight: '1.4'
+          fontSize: '16px',
+          lineHeight: '1.6'
         }
       case 'lyrical_flowing':
         return {
           fontFamily: 'serif',
-          lineHeight: '1.7',
-          textAlign: 'center' as const
+          lineHeight: '1.7'
         }
       case 'urgent_suspicious':
         return {
-          textTransform: 'uppercase' as const,
           letterSpacing: '1px',
           fontWeight: 'bold'
         }
@@ -121,77 +86,62 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
       </div>
       
       <div 
-        className={`message-content ${isGlitching ? 'glitching' : ''}`}
+        className="message-content"
         style={getPersonaSpecificStyling()}
       >
-        {renderGlitchedText(displayedText)}
+        {displayedText}
         {!isComplete && <span className="cursor">|</span>}
       </div>
-      
-      {message.isGlitched && isComplete && (
-        <div className="glitch-warning">
-          [SIGNAL CORRUPTED - TRANSMISSION MAY BE INCOMPLETE]
-        </div>
-      )}
 
       <style jsx>{`
         .typewriter-message {
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.6);
           border: 1px solid var(--persona-accent, #cccc66);
-          border-radius: 4px;
-          padding: 12px;
+          border-radius: 6px;
+          padding: 16px;
           position: relative;
-          margin-bottom: 8px;
+          margin-bottom: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .message-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 8px;
-          font-size: 11px;
+          margin-bottom: 12px;
+          font-size: 14px;
           opacity: 0.9;
         }
 
         .persona-indicator {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 12px;
         }
 
         .persona-name {
-          color: var(--persona-accent, #cccc66);
+          color: #ffff88;
           font-weight: bold;
+          text-shadow: 0 0 5px #ffff88;
         }
 
         .persona-status {
-          color: var(--persona-text, #cccccc);
-          opacity: 0.7;
+          color: #ffffff;
+          opacity: 0.8;
           font-style: italic;
         }
 
         .timestamp {
-          color: var(--persona-text, #cccccc);
-          opacity: 0.6;
+          color: #ffffff;
+          opacity: 0.7;
         }
 
         .message-content {
-          color: var(--persona-text, #cccccc);
-          line-height: 1.6;
-          min-height: 20px;
+          color: #ffffff;
+          line-height: 1.7;
+          min-height: 24px;
           position: relative;
-        }
-
-        .message-content.glitching {
-          animation: content-glitch 0.1s ease-in-out;
-        }
-
-        @keyframes content-glitch {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-2px); }
-          50% { transform: translateX(2px); }
-          75% { transform: translateX(-1px); }
-          100% { transform: translateX(0); }
+          font-size: 16px;
         }
 
         .cursor {
@@ -205,27 +155,6 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
           51%, 100% { opacity: 0; }
         }
 
-        .glitch-char {
-          animation: glitch-flicker 0.15s ease-in-out;
-        }
-
-        @keyframes glitch-flicker {
-          0% { opacity: 1; }
-          50% { opacity: 0.3; }
-          100% { opacity: 1; }
-        }
-
-        .glitch-warning {
-          margin-top: 8px;
-          font-size: 10px;
-          color: #ff6666;
-          text-align: center;
-          opacity: 0.8;
-          font-style: italic;
-          border-top: 1px solid #ff6666;
-          padding-top: 4px;
-        }
-
         .typewriter-message::before {
           content: '';
           position: absolute;
@@ -235,8 +164,8 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
           bottom: -1px;
           background: linear-gradient(45deg, var(--persona-accent, #cccc66), transparent);
           z-index: -1;
-          opacity: 0.3;
-          border-radius: 4px;
+          opacity: 0.2;
+          border-radius: 6px;
         }
       `}</style>
     </div>

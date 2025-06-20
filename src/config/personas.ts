@@ -27,7 +27,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.3,
-      typewriterSpeed: 80,
+      typewriterSpeed: 30,
       audioTone: 'ethereal'
     }
   },
@@ -58,7 +58,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.1,
-      typewriterSpeed: 60,
+      typewriterSpeed: 25,
       audioTone: 'dark'
     }
   },
@@ -89,7 +89,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.05,
-      typewriterSpeed: 120,
+      typewriterSpeed: 20,
       audioTone: 'digital'
     }
   },
@@ -120,7 +120,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.2,
-      typewriterSpeed: 70,
+      typewriterSpeed: 25,
       audioTone: 'harmonic'
     }
   },
@@ -150,7 +150,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.4,
-      typewriterSpeed: 90,
+      typewriterSpeed: 35,
       audioTone: 'tense'
     }
   },
@@ -181,7 +181,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.25,
-      typewriterSpeed: 100,
+      typewriterSpeed: 30,
       audioTone: 'deadly'
     }
   },
@@ -211,7 +211,7 @@ export const AI_PERSONAS: AIPersona[] = [
     },
     effects: {
       glitchChance: 0.15,
-      typewriterSpeed: 85,
+      typewriterSpeed: 25,
       audioTone: 'investigative'
     }
   }
