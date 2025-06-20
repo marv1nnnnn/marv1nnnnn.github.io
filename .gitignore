@@ -16,10 +16,12 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.local
 
 # macOS-specific files
 .DS_Store
 
+out/
 # jetbrains setting folder
 .idea/
 
@@ -35,3 +37,23 @@ pnpm-debug.log*
 .rooroo/
 .next/
 .mouse/
+
+# Logs
+logs
+*.log
+dev-debug.log
+# Dependency directories
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

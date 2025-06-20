@@ -1,54 +1,129 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import { WindowManagerProvider } from '@/hooks/useWindowManager'
-import { AIChatProvider } from '@/contexts/AIChatContext'
-import { ChaosProvider } from '@/contexts/ChaosProvider'
-import { AudioVisualProvider } from '@/components/AudioVisualManager'
-
-// Dynamic import to prevent SSR issues with 3D components
-const Desktop = dynamic(() => import('@/components/Desktop'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center min-h-screen bg-black text-green-400 font-mono">
-      <div className="text-center">
-        <div className="text-4xl mb-4">🧠</div>
-        <div className="text-xl">Loading Chaotic Early-Web OS...</div>
-        <div className="text-sm mt-2 opacity-60">Initializing neural pathways...</div>
-      </div>
-    </div>
-  )
-})
+import ConsciousnessEmergence from '@/components/ConsciousnessEmergence'
+import FilmWindow from '@/components/FilmWindow'
+import PerformanceManager from '@/components/PerformanceManager'
+import { AudioProvider } from '@/contexts/AudioContext'
+import { PerformancePreset, preloadAllComponents } from '@/components/SceneLoader'
+import { DEFAULT_PERSONA } from '@/config/personas'
+import { AIPersona } from '@/types/personas'
 
 export default function Home() {
-  const [isClient, setIsClient] = useState(false)
+  const [isBooting, setIsBooting] = useState(true)
+  const [bootComplete, setBootComplete] = useState(false)
+  const [scenePreloading, setScenePreloading] = useState(false)
+  const [sceneReady, setSceneReady] = useState(false)
+  const [componentsPreloaded, setComponentsPreloaded] = useState(false)
+  const [preloadProgress, setPreloadProgress] = useState(0)
+  const [performancePreset, setPerformancePreset] = useState<PerformancePreset>('medium')
+  const [finalPersona, setFinalPersona] = useState<AIPersona>(DEFAULT_PERSONA)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
+    // Skip boot sequence in dev mode if needed
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined' && localStorage.getItem('skip-boot')) {
+      setIsBooting(false)
+      setBootComplete(true)
+      setSceneReady(true)
+      setComponentsPreloaded(true)
+      setPreloadProgress(100)
+      return
+    }
+
+    // Start scene preloading immediately (parallel with boot)
+    setScenePreloading(true)
+    
+    // Preload all 3D components during boot sequence with progress tracking
+    preloadAllComponents((progress, componentName) => {
+      setPreloadProgress(progress)
+      console.log(`[DEBUG] Preload progress: ${progress}% (${componentName})`)
+    }).then(() => {
+      console.log('[DEBUG] Component preloading completed during boot')
+      setComponentsPreloaded(true)
+      setPreloadProgress(100)
+    }).catch(error => {
+      console.warn('[DEBUG] Component preloading failed:', error)
+      setComponentsPreloaded(true) // Still allow progression
+      setPreloadProgress(100)
+    })
   }, [])
 
-  if (!isClient) {
+  const handleBootComplete = (bootPersona?: AIPersona) => {
+    if (bootPersona) {
+      setFinalPersona(bootPersona)
+    }
+    
+    setIsTransitioning(true)
+    
+    // Smooth transition with delay
+    setTimeout(() => {
+      setIsBooting(false)
+      setBootComplete(true)
+      
+      setTimeout(() => {
+        setIsTransitioning(false)
+      }, 1000) // Additional delay for smooth transition
+    }, 500) // Brief delay to show transition effect
+  }
+
+  const handleSceneReady = () => {
+    setSceneReady(true)
+  }
+
+  // Show boot sequence while booting
+  if (isBooting) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-green-400 font-mono">
-        <div className="text-center">
-          <div className="text-4xl mb-4">🧠</div>
-          <div className="text-xl">Loading Chaotic Early-Web OS...</div>
-          <div className="text-sm mt-2 opacity-60">Initializing neural pathways...</div>
-        </div>
-      </div>
+      <AudioProvider>
+        <ConsciousnessEmergence 
+          onEmergenceComplete={handleBootComplete}
+          isTransitioning={isTransitioning}
+          preloadProgress={preloadProgress}
+          componentsPreloaded={componentsPreloaded}
+        />
+        {/* Scene preloads hidden behind boot screen */}
+        {scenePreloading && (
+          <div style={{ position: 'absolute', top: '-100vh', left: '-100vw', width: '100px', height: '100px', overflow: 'hidden', pointerEvents: 'none' }}>
+            <FilmWindow 
+              isPreloading={true} 
+              onSceneReady={handleSceneReady}
+              performancePreset={performancePreset}
+              componentsPreloaded={componentsPreloaded}
+            />
+          </div>
+        )}
+      </AudioProvider>
     )
   }
 
+  // Show main scene after boot
   return (
-    <AIChatProvider>
-      <WindowManagerProvider>
-        <ChaosProvider>
-          <AudioVisualProvider>
-            <Desktop />
-          </AudioVisualProvider>
-        </ChaosProvider>
-      </WindowManagerProvider>
-    </AIChatProvider>
+    <AudioProvider>
+      <div className={`main-transition ${isTransitioning ? 'transitioning' : ''}`}>
+        <FilmWindow 
+          isPreloading={false}
+          onSceneReady={handleSceneReady}
+          performancePreset={performancePreset}
+          componentsPreloaded={componentsPreloaded}
+        />
+        <PerformanceManager 
+          onPresetChange={setPerformancePreset}
+          initialPreset={performancePreset}
+        />
+      </div>
+      
+      <style jsx>{`
+        .main-transition {
+          opacity: 1;
+          transform: scale(1);
+          transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+        
+        .main-transition.transitioning {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+      `}</style>
+    </AudioProvider>
   )
 }
