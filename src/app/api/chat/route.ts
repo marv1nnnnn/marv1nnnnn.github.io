@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     // Use xAI Grok if API key is available, otherwise fallback
     const model = process.env.XAI_API_KEY ? 
-      xai('grok-beta') : 
+      xai('grok-3') : 
       null
 
     if (!model) {

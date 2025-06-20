@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import BootSequence from '@/components/BootSequence'
-import Desktop from '@/components/Desktop'
+import FilmWindow from '@/components/FilmWindow'
+import { AudioProvider } from '@/contexts/AudioContext'
 
 export default function Home() {
   const [isBooting, setIsBooting] = useState(true)
@@ -22,8 +23,16 @@ export default function Home() {
   }
 
   if (isBooting) {
-    return <BootSequence onBootComplete={handleBootComplete} />
+    return (
+      <AudioProvider>
+        <BootSequence onBootComplete={handleBootComplete} />
+      </AudioProvider>
+    )
   }
 
-  return <Desktop />
+  return (
+    <AudioProvider>
+      <FilmWindow />
+    </AudioProvider>
+  )
 }

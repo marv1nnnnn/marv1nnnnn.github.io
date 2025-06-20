@@ -1,18 +1,24 @@
-/* The Transmitter-Receiver OS - Suda51 Inspired Design System */
+/* The Transmitter-Receiver OS - Film Window Interface Design System */
 
 :root {
-  /* Suda51 Color Palette */
+  /* Base Noir Palette */
   --color-void: #000000;
   --color-light: #ffffff;
-  --color-shadow: #333333;
+  --color-shadow: #1a1a1a;
   --color-grey-light: #cccccc;
   --color-grey-dark: #666666;
   
-  /* Symbolic Colors */
+  /* Flexible Persona Colors - Default */
   --color-blood: #cc0000;      /* killer7 crimson */
   --color-info: #0066cc;       /* The Silver Case cerulean */
-  --color-unease: #cccc66;     /* FSR unsettling yellow */
+  --color-unease: #cccc66;     /* Default yellow accent */
   --color-static: #999999;     /* Digital interference */
+  
+  /* Persona-specific Variables (dynamically updated) */
+  --persona-bg: #0a0a0a;
+  --persona-text: #cccccc;
+  --persona-accent: #cccc66;
+  --persona-font: 'Courier New', 'Lucida Console', monospace;
   
   /* Typography */
   --font-system: 'Courier New', 'Lucida Console', monospace;
@@ -44,16 +50,31 @@
 }
 
 body {
-  font-family: var(--font-system);
+  font-family: var(--persona-font, var(--font-system));
   font-size: var(--font-size-base);
   background: var(--color-void);
-  color: var(--color-light);
+  color: var(--persona-text, var(--color-light));
   overflow: hidden;
   user-select: none;
   cursor: crosshair;
+  margin: 0;
+  padding: 0;
 }
 
-/* CRT Screen Effect */
+/* Film Window Effect */
+.film-interface {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    var(--digital-noise),
+    linear-gradient(transparent 50%, rgba(255, 255, 255, 0.01) 50%);
+  background-size: 100px 100px, 100% 4px;
+  filter: var(--crt-flicker);
+  animation: crt-flicker 0.15s infinite linear alternate;
+}
+
+/* Backwards compatibility */
 .kamino-os {
   position: relative;
   width: 100vw;
