@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAudio } from '@/contexts/AudioContext'
 import { AIPersona, ChatMessage } from '@/types/personas'
+import { WindowState } from '@/types'
 import { AI_PERSONAS } from '@/config/personas'
 import PersonaManager from './personas/PersonaManager'
 import PersonaVisualizer from './personas/PersonaVisualizer'
 import PersonaSelector from './personas/PersonaSelector'
 import ChatInterface from './chat/ChatInterface'
-import ContentModal from './modals/ContentModal'
+import WindowManager from './WindowManager'
 import gsap from 'gsap'
 
 type ContentType = 'blogs' | 'music' | 'games' | null
@@ -20,6 +21,7 @@ export default function FilmWindow() {
   const [isTyping, setIsTyping] = useState(false)
   const [activeContent, setActiveContent] = useState<ContentType>(null)
   const [showPersonaSelector, setShowPersonaSelector] = useState(false)
+  const [windows, setWindows] = useState<WindowState[]>([])
   const filmWindowRef = useRef<HTMLDivElement>(null)
 
   // Initialize with welcome message
@@ -103,13 +105,51 @@ export default function FilmWindow() {
   }
 
   const handleMenuClick = (contentType: ContentType) => {
-    // Toggle if clicking the same tab
-    if (activeContent === contentType) {
-      setActiveContent(null)
-      playSound('windowClose')
-    } else {
-      setActiveContent(contentType)
+    if (!contentType) return
+    
+    // Map content types to application names
+    const applicationMap = {
+      'blogs': 'CaseFileReader',
+      'music': 'CatherinesSuitcase', 
+      'games': 'LostFoundGames'
+    }
+    
+    const appName = applicationMap[contentType]
+    const existingWindow = windows.find(w => w.component === appName)
+    
+    if (existingWindow) {
+      // Focus existing window
+      const maxZ = Math.max(...windows.map(w => w.zIndex), 0)
+      setWindows(prev => prev.map(window => ({
+        ...window,
+        isFocused: window.id === existingWindow.id,
+        zIndex: window.id === existingWindow.id ? maxZ + 1 : window.zIndex,
+        isMinimized: window.id === existingWindow.id ? false : window.isMinimized
+      })))
       playSound('click')
+    } else {
+      // Create new window
+      const newWindow: WindowState = {
+        id: `${appName}-${Date.now()}`,
+        title: getWindowTitle(contentType),
+        component: appName,
+        position: { x: 100, y: 100, width: 800, height: 600 },
+        isMinimized: false,
+        isMaximized: false,
+        isFocused: true,
+        zIndex: Math.max(...windows.map(w => w.zIndex), 0) + 1
+      }
+      setWindows(prev => [...prev, newWindow])
+      playSound('windowOpen')
+    }
+  }
+  
+  const getWindowTitle = (contentType: ContentType): string => {
+    switch (contentType) {
+      case 'blogs': return 'Case Files Archive'
+      case 'music': return "Catherine's Suitcase"
+      case 'games': return 'Lost Protocols Database'
+      default: return 'Unknown'
     }
   }
 
@@ -129,19 +169,19 @@ export default function FilmWindow() {
           <div className="chrome-top">
             <div className="location-tabs">
               <div 
-                className={`location-tab ${activeContent === 'blogs' ? 'location-active' : 'location-inactive'}`}
+                className={`location-tab ${windows.some(w => w.component === 'CaseFileReader' && w.isFocused) ? 'location-active' : 'location-inactive'}`}
                 onClick={() => handleMenuClick('blogs')}
               >
                 Case Files
               </div>
               <div 
-                className={`location-tab ${activeContent === 'music' ? 'location-active' : 'location-inactive'}`}
+                className={`location-tab ${windows.some(w => w.component === 'CatherinesSuitcase' && w.isFocused) ? 'location-active' : 'location-inactive'}`}
                 onClick={() => handleMenuClick('music')}
               >
                 Catherine's Suitcase
               </div>
               <div 
-                className={`location-tab ${activeContent === 'games' ? 'location-active' : 'location-inactive'}`}
+                className={`location-tab ${windows.some(w => w.component === 'LostFoundGames' && w.isFocused) ? 'location-active' : 'location-inactive'}`}
                 onClick={() => handleMenuClick('games')}
               >
                 Lost Protocols
@@ -215,14 +255,8 @@ export default function FilmWindow() {
         </div>
 
 
-        {/* Content Modal */}
-        {activeContent && (
-          <ContentModal 
-            contentType={activeContent}
-            onClose={handleCloseModal}
-            persona={currentPersona}
-          />
-        )}
+        {/* Window Manager */}
+        <WindowManager windows={windows} setWindows={setWindows} />
 
         {/* Persona Selector */}
         <PersonaSelector
