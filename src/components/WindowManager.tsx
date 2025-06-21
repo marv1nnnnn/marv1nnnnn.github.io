@@ -42,12 +42,28 @@ export default function WindowManager({ windows, setWindows }: WindowManagerProp
     playSound('click')
     setWindows(prev => prev.map(windowState => {
       if (windowState.id === windowId) {
-        return {
-          ...windowState,
-          isMaximized: !windowState.isMaximized,
-          position: !windowState.isMaximized 
-            ? { x: 0, y: 0, width: typeof window !== 'undefined' ? window.innerWidth : 1200, height: typeof window !== 'undefined' ? window.innerHeight - 40 : 760 }
-            : windowState.position,
+        if (!windowState.isMaximized) {
+          // Maximizing: store current position and set to fullscreen
+          return {
+            ...windowState,
+            isMaximized: true,
+            restoredPosition: windowState.position,
+            position: { 
+              x: 0, 
+              y: 0, 
+              width: typeof window !== 'undefined' ? window.innerWidth : 1200, 
+              height: typeof window !== 'undefined' ? window.innerHeight - 40 : 760 
+            },
+          }
+        } else {
+          // Restoring: use stored position or fallback to default
+          const restoredPos = windowState.restoredPosition || { x: 100, y: 100, width: 800, height: 600 }
+          return {
+            ...windowState,
+            isMaximized: false,
+            position: restoredPos,
+            restoredPosition: undefined
+          }
         }
       }
       return windowState

@@ -14,6 +14,7 @@ export interface WindowState {
   isMaximized: boolean
   isFocused: boolean
   position: WindowPosition
+  restoredPosition?: WindowPosition
   zIndex: number
   component: string
   props?: Record<string, any>
