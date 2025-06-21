@@ -7,7 +7,6 @@ import { WindowState } from '@/types'
 import { AI_PERSONAS } from '@/config/personas'
 import PersonaManager from './personas/PersonaManager'
 import PersonaVisualizer from './personas/PersonaVisualizer'
-import PersonaSelector from './personas/PersonaSelector'
 import ChatInterface from './chat/ChatInterface'
 import WindowManager from './WindowManager'
 import gsap from 'gsap'
@@ -236,6 +235,9 @@ export default function FilmWindow() {
               persona={currentPersona}
               isActive={true}
               isTyping={isTyping}
+              showMysticalSelector={showPersonaSelector}
+              onPersonaSelect={handlePersonaChange}
+              onCloseMysticalSelector={handleClosePersonaSelector}
             />
             <div className="persona-info">
               <div className="persona-name">{currentPersona.displayName}</div>
@@ -258,13 +260,6 @@ export default function FilmWindow() {
         {/* Window Manager */}
         <WindowManager windows={windows} setWindows={setWindows} />
 
-        {/* Persona Selector */}
-        <PersonaSelector
-          currentPersona={currentPersona}
-          onPersonaSelect={handlePersonaChange}
-          isVisible={showPersonaSelector}
-          onClose={handleClosePersonaSelector}
-        />
       </div>
 
       <style jsx>{`
