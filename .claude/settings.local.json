@@ -32,7 +32,9 @@
       "Bash(find:*)",
       "Bash(true)",
       "Bash(mkdir:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:latenode.com)",
+      "WebFetch(domain:apidog.com)"
     ],
     "deny": []
   }

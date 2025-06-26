@@ -1,4 +1,4 @@
-/* The Transmitter-Receiver OS - Film Window Interface Design System */
+/* marv1nnnnn OS - Personal Digital Interface Design System */
 
 :root {
   /* Base Noir Palette */
@@ -74,6 +74,19 @@ body {
   animation: crt-flicker 0.15s infinite linear alternate;
 }
 
+/* Personal system interface */
+.marv1nnnnn-os {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    var(--digital-noise),
+    linear-gradient(transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+  background-size: 100px 100px, 100% 4px;
+  filter: var(--crt-flicker);
+  animation: crt-flicker 0.15s infinite linear alternate;
+}
+
 /* Backwards compatibility */
 .kamino-os {
   position: relative;
@@ -95,6 +108,7 @@ body {
 }
 
 /* Scanlines */
+.marv1nnnnn-os::before,
 .kamino-os::before {
   content: '';
   position: absolute;
@@ -114,6 +128,7 @@ body {
 }
 
 /* Film Grain */
+.marv1nnnnn-os::after,
 .kamino-os::after {
   content: '';
   position: absolute;

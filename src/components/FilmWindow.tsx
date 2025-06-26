@@ -4,6 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useAudio } from '@/contexts/AudioContext'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { DEFAULT_PERSONA } from '@/config/personas'
+import { usePersistentMessages } from '@/hooks/usePersistentMessages'
 import PersonaManager from './personas/PersonaManager'
 import ChatInterface from './chat/ChatInterface'
 import DigitalOceanBackground from './DigitalOceanBackground'
@@ -113,7 +114,7 @@ export default function FilmWindow({
 }: FilmWindowProps) {
   const { playSound } = useAudio()
   const currentPersona = DEFAULT_PERSONA // Always use default persona
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const { messages, addMessage, clearMessages, isLoaded: messagesLoaded } = usePersistentMessages()
   const [isTyping, setIsTyping] = useState(false)
   const [glitchLevel, setGlitchLevel] = useState(0)
   const [isChatMinimized, setIsChatMinimized] = useState(true)
@@ -185,18 +186,22 @@ export default function FilmWindow({
     }
   }
 
-  // Initialize with welcome message and setup control panel props
+  // Initialize with welcome message only if no messages exist and messages are loaded
   useEffect(() => {
-    const welcomeMessage: ChatMessage = {
-      id: 'welcome-1',
-      personaId: currentPersona.id,
-      content: "Connection established... Multiple consciousnesses detected in the digital realm. Who dares to commune with the fragments of lost souls?",
-      timestamp: new Date(),
-      isGlitched: true
-    }
+    if (!messagesLoaded) return // Wait for messages to load from localStorage
     
-    setMessages([welcomeMessage])
-    playSound('boot')
+    if (messages.length === 0) {
+      const welcomeMessage: ChatMessage = {
+        id: 'welcome-1',
+        personaId: currentPersona.id,
+        content: "Welcome to marv1nnnnn's digital consciousness... My three personas are now active in this space. Feel free to explore and interact with different aspects of my digital identity.",
+        timestamp: new Date(),
+        isGlitched: true
+      }
+      
+      addMessage(welcomeMessage)
+      playSound('boot')
+    }
     
     // Update control panel window props now that component state is available
     setWindows(prev => prev.map(window =>
@@ -218,7 +223,7 @@ export default function FilmWindow({
         }
       } : window
     ))
-  }, [playSound, glitchLevel, cameraPosition, cameraRotation, sceneLighting, atmosphericIntensity, audioVolume, visualEffects])
+  }, [messagesLoaded, messages.length, addMessage, playSound, glitchLevel, cameraPosition, cameraRotation, sceneLighting, atmosphericIntensity, audioVolume, visualEffects])
 
   // Film window entrance animation
   useEffect(() => {
@@ -314,7 +319,7 @@ export default function FilmWindow({
   }
 
   const handleMessageAdd = (message: ChatMessage) => {
-    setMessages(prev => [...prev, message])
+    addMessage(message)
     
     // Subtle ocean ripple effect when messages are added
     if (message.personaId !== 'user') {
@@ -378,7 +383,7 @@ export default function FilmWindow({
       console.log('[DEBUG] Opening new control panel')
       const newWindow: WindowState = {
         id: 'control-panel-' + Date.now(),
-        title: 'System Control Panel',
+        title: 'marv1nnnnn Personal Control Panel',
         isMinimized: false,
         isMaximized: false,
         isFocused: true,
@@ -559,6 +564,7 @@ export default function FilmWindow({
               onMessageAdd={handleMessageAdd}
               onTypingChange={setIsTyping}
               onEmotionUpdate={handleEmotionUpdate}
+              onClearMessages={clearMessages}
               isMinimized={isChatMinimized}
               onToggleMinimize={handleToggleChatMinimize}
             />

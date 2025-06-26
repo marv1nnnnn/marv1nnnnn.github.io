@@ -3,8 +3,8 @@ import './globals.css'
 import { AudioProvider } from '@/contexts/AudioContext'
 
 export const metadata: Metadata = {
-  title: 'The Transmitter-Receiver OS',
-  description: 'A Suda51-inspired digital consciousness - Enter the 25th Ward',
+  title: 'marv1nnnnn OS - Digital Consciousness',
+  description: 'Enter marv1nnnnn\'s digital realm - An experimental fusion of AI, 3D art, and interactive design',
   icons: {
     icon: '/favicon.svg',
   },
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="kamino-os">
+      <body className="marv1nnnnn-os">
         <AudioProvider>
           {children}
         </AudioProvider>

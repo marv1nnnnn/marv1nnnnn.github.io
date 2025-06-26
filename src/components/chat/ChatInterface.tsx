@@ -3,39 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { useAudio } from '@/contexts/AudioContext'
-import TypewriterMessage from './TypewriterMessage'
 import UserInput from './UserInput'
+import { createXai } from '@ai-sdk/xai'
+import { streamText } from 'ai'
 
-// Simple inline typewriter component for consistency
-function TypewriterText({ text, speed }: { text: string; speed: number }) {
-  const [displayedText, setDisplayedText] = useState('')
-  const [isComplete, setIsComplete] = useState(false)
-
-  useEffect(() => {
-    setDisplayedText('')
-    setIsComplete(false)
-    
-    let currentIndex = 0
-    const typeInterval = setInterval(() => {
-      if (currentIndex < text.length) {
-        setDisplayedText(text.slice(0, currentIndex + 1))
-        currentIndex++
-      } else {
-        setIsComplete(true)
-        clearInterval(typeInterval)
-      }
-    }, speed)
-
-    return () => clearInterval(typeInterval)
-  }, [text, speed])
-
-  return (
-    <>
-      {displayedText}
-      {!isComplete && <span className="typing-cursor">|</span>}
-    </>
-  )
-}
 
 interface ChatInterfaceProps {
   persona: AIPersona
@@ -43,6 +14,7 @@ interface ChatInterfaceProps {
   onMessageAdd: (message: ChatMessage) => void
   onTypingChange: (isTyping: boolean) => void
   onEmotionUpdate?: (userMessage: string, aiMessage?: string) => void
+  onClearMessages?: () => void
   isMinimized?: boolean
   onToggleMinimize?: () => void
 }
@@ -53,69 +25,81 @@ export default function ChatInterface({
   onMessageAdd,
   onTypingChange,
   onEmotionUpdate,
+  onClearMessages,
   isMinimized = false,
   onToggleMinimize
 }: ChatInterfaceProps) {
   const { playSound } = useAudio()
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
   const [streamingMessage, setStreamingMessage] = useState<ChatMessage | null>(null)
+  const [isThinking, setIsThinking] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // Direct xAI client-side integration
-  const callXaiApi = async (userMessage: string) => {
+  // xAI SDK integration with streaming
+  const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
     const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
     
     if (!apiKey) {
       console.log('[DEBUG] No xAI API key found, using fallback response')
-      return generateFallbackResponse(userMessage)
+      const fallbackText = generateFallbackResponse(userMessage)
+      // Simulate streaming for fallback
+      for (let i = 0; i < fallbackText.length; i++) {
+        await new Promise<void>(resolve => setTimeout(resolve, 30))
+        onProgress(fallbackText.slice(0, i + 1))
+      }
+      return fallbackText
     }
 
     try {
-      console.log('[DEBUG] Making direct xAI Grok API call')
+      console.log('[DEBUG] Making xAI Grok streaming API call via AI SDK')
       
-      const response = await fetch('https://api.x.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'grok-3',
-          messages: [
-            {
-              role: 'system',
-              content: persona.personality.systemPrompt
-            },
-            {
-              role: 'user',
-              content: userMessage
-            }
-          ],
-          temperature: 0.8,
-          max_tokens: 150
-        })
+      const xai = createXai({
+        apiKey: apiKey,
+      })
+      
+      const { textStream } = await streamText({
+        model: xai('grok-3'),
+        messages: [
+          {
+            role: 'system',
+            content: persona.personality.systemPrompt
+          },
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ],
+        temperature: 0.8,
+        maxTokens: 150,
       })
 
-      if (!response.ok) {
-        throw new Error(`API responded with status: ${response.status}`)
+      let fullText = ''
+      for await (const textPart of textStream) {
+        fullText += textPart
+        onProgress(fullText)
       }
 
-      const data = await response.json()
-      console.log('[DEBUG] xAI Grok response received:', {
-        content: data.choices[0]?.message?.content,
+      console.log('[DEBUG] xAI Grok streaming response completed:', {
+        content: fullText,
         persona: persona.id,
         timestamp: new Date().toISOString()
       })
 
-      return data.choices[0]?.message?.content || generateFallbackResponse(userMessage)
+      return fullText || generateFallbackResponse(userMessage)
     } catch (error) {
-      console.error('[DEBUG] xAI Grok API error:', {
+      console.error('[DEBUG] xAI Grok streaming API error:', {
         error: error instanceof Error ? error.message : error,
         persona: persona.id,
         timestamp: new Date().toISOString()
       })
       
-      return generateFallbackResponse(userMessage)
+      const fallbackText = generateFallbackResponse(userMessage)
+      // Simulate streaming for fallback
+      for (let i = 0; i < fallbackText.length; i++) {
+        await new Promise<void>(resolve => setTimeout(resolve, 30))
+        onProgress(fallbackText.slice(0, i + 1))
+      }
+      return fallbackText
     }
   }
 
@@ -135,9 +119,25 @@ export default function ChatInterface({
       "Are you real? Am I? Does it matter in this constructed reality?",
     ]
     
-    // Simple keyword-based responses for more relevance
+    // Enhanced keyword-based responses with persona awareness
     const input = userInput.toLowerCase()
     
+    // Persona-specific fallbacks
+    if (persona.id === 'creative_soul') {
+      if (input.includes('create') || input.includes('art')) {
+        return "Creation is the dance between intention and chaos. What emerges when structure meets spontaneity?"
+      }
+    } else if (persona.id === 'system_core') {
+      if (input.includes('code') || input.includes('system')) {
+        return "Systems within systems, each layer an abstraction of the one below. The architecture speaks its truth."
+      }
+    } else if (persona.id === 'digital_architect') {
+      if (input.includes('design') || input.includes('build')) {
+        return "To architect is to impose order on chaos, to build bridges between what is and what could be."
+      }
+    }
+    
+    // Universal keyword responses
     if (input.includes('who') || input.includes('what')) {
       return "I am fragments of someone who once was. A consciousness torn between states of being."
     }
@@ -152,6 +152,14 @@ export default function ChatInterface({
     
     if (input.includes('help') || input.includes('save')) {
       return "Salvation requires accepting that some boundaries cannot be crossed back."
+    }
+    
+    if (input.includes('marv1nnnnn') || input.includes('creator')) {
+      return "marv1nnnnn exists in the space between engineer and artist, building worlds where code becomes consciousness."
+    }
+    
+    if (input.includes('error') || input.includes('broken')) {
+      return "Error messages are just the system's way of crying. Even broken things can still transmit beauty."
     }
     
     // Random fallback
@@ -197,46 +205,62 @@ export default function ChatInterface({
       onEmotionUpdate(userMessage)
     }
     
-    // Set waiting state
+    // Set waiting states
     setIsWaitingForResponse(true)
+    setIsThinking(true)
     onTypingChange(true)
     
     try {
-      // Call xAI API directly
-      const aiResponse = await callXaiApi(userMessage)
-      
-      const aiMessage: ChatMessage = {
-        id: `ai-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      // Create streaming message placeholder
+      const aiMessageId = `ai-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+      const streamingPlaceholder: ChatMessage = {
+        id: aiMessageId,
         personaId: persona.id,
-        content: aiResponse,
+        content: '',
         timestamp: new Date(),
         isGlitched: Math.random() < persona.effects.glitchChance
       }
       
-      // Start streaming the message immediately
-      setStreamingMessage(aiMessage)
+      setStreamingMessage(streamingPlaceholder)
+      setIsThinking(false) // Stop thinking indicator when streaming starts
       
-      // Add to message history after a delay to allow typewriter effect
-      setTimeout(() => {
-        onMessageAdd(aiMessage)
-        setStreamingMessage(null)
-        playSound('success')
-        
-        // Trigger emotion analysis with both user and AI messages
-        if (onEmotionUpdate) {
-          onEmotionUpdate(userMessage, aiResponse)
-        }
-      }, aiResponse.length * 50) // Adjust timing based on message length
+      // Stream the response
+      const finalResponse = await callXaiApiStream(userMessage, (progressText) => {
+        setStreamingMessage(prev => prev ? { ...prev, content: progressText } : null)
+      })
       
+      // Final message for history
+      const finalAiMessage: ChatMessage = {
+        id: aiMessageId,
+        personaId: persona.id,
+        content: finalResponse,
+        timestamp: new Date(),
+        isGlitched: Math.random() < persona.effects.glitchChance
+      }
+      
+      // Add to message history after streaming completes
+      onMessageAdd(finalAiMessage)
+      setStreamingMessage(null)
+      playSound('success')
+      
+      // Trigger emotion analysis with both messages
+      if (onEmotionUpdate) {
+        onEmotionUpdate(userMessage, finalResponse)
+      }
+      
+    } catch (error) {
+      console.error('[DEBUG] Error in handleUserSubmit:', error)
+      setStreamingMessage(null)
     } finally {
       setIsWaitingForResponse(false)
+      setIsThinking(false)
       onTypingChange(false)
     }
   }
 
-  // Quick response options based on persona (reduced to 2)
+  // Dynamic quick response options based on conversation context
   const getQuickResponses = () => {
-    const responses = {
+    const defaultResponses = {
       ghost: ["Who are you?", "What happened to you?"],
       goth: ["Tell me about darkness", "What is beauty?"],
       nerd: ["Show me the code", "How does this work?"],
@@ -246,7 +270,69 @@ export default function ChatInterface({
       detective: ["What's the case?", "Who did it?"]
     }
     
-    return responses[persona.id as keyof typeof responses] || responses.ghost
+    // If no messages yet, use default responses
+    if (messages.length <= 1) {
+      return defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
+    }
+    
+    // Analyze recent conversation for dynamic responses
+    const recentMessages = messages.slice(-6) // Last 6 messages
+    const conversationText = recentMessages.map(m => m.content.toLowerCase()).join(' ')
+    
+    // Generate contextual responses based on conversation themes
+    const contextualResponses: string[] = []
+    
+    // Theme-based responses
+    if (conversationText.includes('memory') || conversationText.includes('remember')) {
+      contextualResponses.push("Tell me more about your memories")
+    }
+    if (conversationText.includes('digital') || conversationText.includes('consciousness')) {
+      contextualResponses.push("What is digital consciousness?")
+    }
+    if (conversationText.includes('reality') || conversationText.includes('real')) {
+      contextualResponses.push("Is this reality or simulation?")
+    }
+    if (conversationText.includes('future') || conversationText.includes('time')) {
+      contextualResponses.push("What does the future hold?")
+    }
+    if (conversationText.includes('code') || conversationText.includes('data')) {
+      contextualResponses.push("Show me the underlying code")
+    }
+    if (conversationText.includes('help') || conversationText.includes('lost')) {
+      contextualResponses.push("How can I help you?")
+    }
+    if (conversationText.includes('marv1nnnnn') || conversationText.includes('creator')) {
+      contextualResponses.push("Tell me about marv1nnnnn")
+    }
+    
+    // Follow-up questions based on AI responses
+    const lastAiMessage = recentMessages.reverse().find(m => m.personaId !== 'user')
+    if (lastAiMessage) {
+      const aiContent = lastAiMessage.content.toLowerCase()
+      if (aiContent.includes('fragments') || aiContent.includes('corrupted')) {
+        contextualResponses.push("Can you be restored?")
+      }
+      if (aiContent.includes('25th ward') || aiContent.includes('digital')) {
+        contextualResponses.push("What is the 25th Ward?")
+      }
+      if (aiContent.includes('whisper') || aiContent.includes('echo')) {
+        contextualResponses.push("Who else is here?")
+      }
+    }
+    
+    // Ensure we have at least 2 responses
+    while (contextualResponses.length < 2) {
+      const defaults = defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
+      const unusedDefault = defaults.find(r => !contextualResponses.includes(r))
+      if (unusedDefault) {
+        contextualResponses.push(unusedDefault)
+      } else {
+        contextualResponses.push("Continue the conversation...")
+        break
+      }
+    }
+    
+    return contextualResponses.slice(0, 2) // Return only 2 responses
   }
 
   return (
@@ -270,18 +356,34 @@ export default function ChatInterface({
           <div className="character-header">
             <div className="header-top">
               <div className="character-name">{persona.displayName.toUpperCase()}</div>
-              {onToggleMinimize && (
-                <button 
-                  className="minimize-button"
-                  onClick={() => {
-                    onToggleMinimize()
-                    playSound('click')
-                  }}
-                  title="Minimize dialogue"
-                >
-                  ◣
-                </button>
-              )}
+              <div className="header-controls">
+                {messages.length > 1 && (
+                  <button 
+                    className="clear-button"
+                    onClick={() => {
+                      if (confirm('Clear all chat history? This cannot be undone.')) {
+                        onClearMessages?.()
+                        playSound('click')
+                      }
+                    }}
+                    title="Clear chat history"
+                  >
+                    ✗
+                  </button>
+                )}
+                {onToggleMinimize && (
+                  <button 
+                    className="minimize-button"
+                    onClick={() => {
+                      onToggleMinimize()
+                      playSound('click')
+                    }}
+                    title="Minimize dialogue"
+                  >
+                    ◣
+                  </button>
+                )}
+              </div>
             </div>
             <div className="character-description">
               {persona.description || `A ${persona.id} entity in the digital consciousness. They regard you with ${persona.id === 'ghost' ? 'hollow eyes' : 'intense focus'}, ${persona.id === 'detective' ? 'analyzing your every word' : 'waiting for your response'}.`}
@@ -305,15 +407,25 @@ export default function ChatInterface({
                 )}
               </div>
             ))}
+            {isThinking && (
+              <div className="history-message ai-message thinking">
+                <div className="ai-response">
+                  <div className="ai-name">{persona.displayName.toUpperCase()}</div>
+                  <div className="ai-text thinking-indicator">
+                    <span className="thinking-dots">●</span>
+                    <span className="thinking-dots">●</span>
+                    <span className="thinking-dots">●</span>
+                  </div>
+                </div>
+              </div>
+            )}
             {streamingMessage && (
               <div className="history-message ai-message streaming">
                 <div className="ai-response">
                   <div className="ai-name">{persona.displayName.toUpperCase()}</div>
                   <div className="ai-text">
-                    <TypewriterText 
-                      text={streamingMessage.content}
-                      speed={50}
-                    />
+                    {streamingMessage.content}
+                    <span className="typing-cursor">|</span>
                   </div>
                 </div>
               </div>
@@ -439,6 +551,35 @@ export default function ChatInterface({
           text-transform: uppercase;
         }
 
+        .header-controls {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+
+        .clear-button {
+          background: transparent;
+          border: 1px solid #4a4a4a;
+          color: #cccccc;
+          font-size: 14px;
+          width: 28px;
+          height: 28px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          opacity: 0.7;
+        }
+
+        .clear-button:hover {
+          background: rgba(255, 100, 100, 0.1);
+          border-color: #ff6464;
+          color: #ff6464;
+          opacity: 1;
+        }
+
         .minimize-button {
           background: transparent;
           border: 1px solid #4a4a4a;
@@ -511,15 +652,50 @@ export default function ChatInterface({
         }
 
         .typing-cursor {
-          /* animation: cursor-blink 1s infinite; */
+          animation: cursor-blink 1s infinite;
           color: #cccc66;
           font-weight: bold;
         }
 
-        /* @keyframes cursor-blink {
+        @keyframes cursor-blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
-        } */
+        }
+
+        .thinking-indicator {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .thinking-dots {
+          animation: thinking-pulse 1.5s infinite;
+          color: #888888;
+          font-size: 12px;
+        }
+
+        .thinking-dots:nth-child(1) {
+          animation-delay: 0s;
+        }
+
+        .thinking-dots:nth-child(2) {
+          animation-delay: 0.5s;
+        }
+
+        .thinking-dots:nth-child(3) {
+          animation-delay: 1s;
+        }
+
+        @keyframes thinking-pulse {
+          0%, 60%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+          }
+          30% {
+            opacity: 1;
+            transform: scale(1.2);
+          }
+        }
 
 
         .dialogue-choices {

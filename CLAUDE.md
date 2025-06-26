@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**"The Transmitter-Receiver OS"** is a Suda51-inspired interactive digital consciousness experience. It simulates a retro-futuristic operating system with AI personas, immersive 3D visualization, and a windowed application environment. The project is built as a Next.js static site deployed to GitHub Pages.
+**"marv1nnnnn OS"** is marv1nnnnn's personal website - an interactive digital consciousness experience that showcases the intersection of engineering and art. It features AI personas representing different aspects of marv1nnnnn's personality, immersive 3D visualizations, and a retro-futuristic windowed application environment. The project is built as a Next.js static site deployed to GitHub Pages.
 
 ## Essential Commands
 
@@ -48,10 +48,11 @@ FilmWindow (Main Container)
 
 ### AI Persona System
 
-Two distinct AI personalities with complete visual/behavioral themes:
+Three distinct AI personas representing different aspects of marv1nnnnn's personality:
 
-- **The Pallid Monolith** (`GHOST_PERSONA`) - Bone-white architectural horror with cyan corruption
-- **Geometric Acid Death Angel** (`ACID_ANGEL_PERSONA`) - Crystalline divine entity with acid green/magenta
+- **Creative Soul Mode** (`FLOATING_HEAD_PERSONA`) - Artistic, contemplative, aesthetically driven
+- **System Core Mode** (`GHOST_PERSONA`) - Analytical, structured, architecturally minded
+- **Digital Architect Mode** (`ACID_ANGEL_PERSONA`) - Engineering-artist fusion, technical precision with creative vision
 
 Each persona affects:
 - 3D model appearance and materials
@@ -80,8 +81,8 @@ Each persona affects:
 
 ### Window Management (`src/components/applications/`)
 - **`WindowManager.tsx`** - Handles dragging, resizing, focus management
-- **`CaseFileReader.tsx`** - Blog/markdown viewer with glitch effects
-- **`CatherinesSuitcase.tsx`** - Retro music player with vinyl aesthetics
+- **`CaseFileReader.tsx`** - marv1nnnnn's blog/markdown reader
+- **`CatherinesSuitcase.tsx`** - marv1nnnnn's personal music player with retro aesthetics
 - **`ControlPanel.tsx`** - 3D scene controls and system settings
 
 ### Audio System (`src/contexts/AudioContext.tsx`)
@@ -107,8 +108,8 @@ Each persona affects:
 ## Configuration & Content
 
 ### Static Content (`public/`)
-- **Blog posts** - Markdown files for case file reader
-- **Music playlist** - JSON configuration for Catherine's Suitcase
+- **Blog posts** - Markdown files for marv1nnnnn's blog reader
+- **Music playlist** - JSON configuration for marv1nnnnn's music player
 - **Audio assets** - System sounds and ambient tracks
 
 ### Performance Management
@@ -197,4 +198,4 @@ Each persona affects:
 3. Register click handlers in `FilmWindow.tsx`
 4. Define default window properties
 
-The project represents a sophisticated fusion of AI, 3D graphics, and interactive design - treat it as both a technical showcase and an artistic expression.
+The project represents marv1nnnnn's approach to web development - a sophisticated fusion of engineering excellence, AI integration, 3D graphics, and interactive design. Treat it as both a technical showcase and a personal artistic expression that demonstrates what's possible when engineering meets creativity.

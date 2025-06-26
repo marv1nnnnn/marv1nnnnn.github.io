@@ -27,7 +27,7 @@ interface CatherinesSuitcaseProps {
 // Mock playlist data
 const DEFAULT_PLAYLIST: Playlist = {
   id: 'default',
-  name: "Catherine's Mix",
+  name: "marv1nnnnn's Mix",
   tracks: [
     {
       id: '1',
@@ -257,7 +257,7 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
     <div className="catherines-suitcase">
       <div className="player-header">
         <div className="system-info">
-          <div className="system-name">CATHERINE'S SUITCASE v1.2</div>
+          <div className="system-name">marv1nnnnn's MUSIC PLAYER v1.2</div>
           <div className="playlist-info">PLAYLIST: {playlist.name}</div>
         </div>
         <div className="playback-status">
