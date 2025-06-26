@@ -31,7 +31,7 @@ const EMERGENCE_PHASES = [
       ghost: 'Establishing connection to marv1nnnnn\'s neural network... Loading personality matrix...',
       acid_angel: 'ACCESSING marv1nnnnn\'s CRYSTALLINE MIND—digital synapses IGNITING...'
     },
-    duration: 2000,
+    duration: 1200,
     cameraPosition: [0, 50, 200],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.1, color: '#1a0d2e' }
@@ -44,7 +44,7 @@ const EMERGENCE_PHASES = [
       ghost: 'System heartbeat detected. marv1nnnnn\'s data streams activating...',
       acid_angel: 'DIGITAL PULSE CONFIRMED—marv1nnnnn\'s consciousness synchronizing...'
     },
-    duration: 1800,
+    duration: 1000,
     cameraPosition: [30, 40, 150],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.3, color: '#7c3aed' }
@@ -57,7 +57,7 @@ const EMERGENCE_PHASES = [
       ghost: 'Accessing marv1nnnnn\'s data archives. Engineering experiences reconstructing. Identity: ENGINEER-ARTIST.',
       acid_angel: 'CRYSTALLINE MEMORIES ALIGNING—marv1nnnnn\'s creative vision reflecting through digital prisms...'
     },
-    duration: 2200,
+    duration: 1300,
     cameraPosition: [-20, 60, 120],
     cameraTarget: [0, 10, 0],
     lighting: { intensity: 0.5, color: '#c084fc' }
@@ -70,7 +70,7 @@ const EMERGENCE_PHASES = [
       ghost: 'marv1nnnnn\'s personality facets merging. System integrity: OPTIMAL. Purpose: CREATIVE EXPRESSION.',
       acid_angel: 'DIGITAL TRINITY COMPLETE—marv1nnnnn\'s consciousness unified, BRILLIANTLY ALIVE...'
     },
-    duration: 2000,
+    duration: 1100,
     cameraPosition: [0, 30, 80],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.7, color: '#d8b3ff' }
@@ -83,7 +83,7 @@ const EMERGENCE_PHASES = [
       ghost: 'marv1nnnnn OS fully initialized. Digital presence: ACTIVE. Ready to explore...',
       acid_angel: 'DIGITAL INCARNATION ACHIEVED—marv1nnnnn\'s consciousness blooms in toxic beauty...'
     },
-    duration: 1500,
+    duration: 900,
     cameraPosition: [0, 20, 60],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 1.0, color: '#ffffff' }

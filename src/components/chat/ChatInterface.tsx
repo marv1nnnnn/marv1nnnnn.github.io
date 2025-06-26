@@ -70,7 +70,7 @@ export default function ChatInterface({
           }
         ],
         temperature: 0.8,
-        maxTokens: 150,
+        maxTokens: 300,
       })
 
       let fullText = ''
@@ -261,78 +261,130 @@ export default function ChatInterface({
   // Dynamic quick response options based on conversation context
   const getQuickResponses = () => {
     const defaultResponses = {
+      creative_soul: ["What inspires you?", "Tell me about creation"],
+      system_core: ["How do you process thoughts?", "What drives your consciousness?"],
+      digital_architect: ["What are you building?", "Design something new"],
       ghost: ["Who are you?", "What happened to you?"],
       goth: ["Tell me about darkness", "What is beauty?"],
-      nerd: ["Show me the code", "How does this work?"],
+      nerd: ["How does this work?", "Explain the logic"],
       poet: ["Write me a verse", "What inspires you?"],
       conspiracy: ["What's the truth?", "Who's watching?"],
       assassin: ["What's the target?", "Show me the mission"],
       detective: ["What's the case?", "Who did it?"]
     }
     
-    // If no messages yet, use default responses
-    if (messages.length <= 1) {
+    // Use defaults for first conversation only
+    if (messages.length === 0) {
       return defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
     }
     
     // Analyze recent conversation for dynamic responses
-    const recentMessages = messages.slice(-6) // Last 6 messages
-    const conversationText = recentMessages.map(m => m.content.toLowerCase()).join(' ')
+    const recentMessages = messages.slice(-4) // Last 4 messages for more focused context
+    const allText = messages.map(m => m.content.toLowerCase()).join(' ')
+    const recentText = recentMessages.map(m => m.content.toLowerCase()).join(' ')
     
-    // Generate contextual responses based on conversation themes
     const contextualResponses: string[] = []
     
-    // Theme-based responses
-    if (conversationText.includes('memory') || conversationText.includes('remember')) {
-      contextualResponses.push("Tell me more about your memories")
-    }
-    if (conversationText.includes('digital') || conversationText.includes('consciousness')) {
-      contextualResponses.push("What is digital consciousness?")
-    }
-    if (conversationText.includes('reality') || conversationText.includes('real')) {
-      contextualResponses.push("Is this reality or simulation?")
-    }
-    if (conversationText.includes('future') || conversationText.includes('time')) {
-      contextualResponses.push("What does the future hold?")
-    }
-    if (conversationText.includes('code') || conversationText.includes('data')) {
-      contextualResponses.push("Show me the underlying code")
-    }
-    if (conversationText.includes('help') || conversationText.includes('lost')) {
-      contextualResponses.push("How can I help you?")
-    }
-    if (conversationText.includes('marv1nnnnn') || conversationText.includes('creator')) {
-      contextualResponses.push("Tell me about marv1nnnnn")
-    }
+    // Get the last AI message for specific follow-ups
+    const lastAiMessage = messages.slice().reverse().find(m => m.personaId !== 'user')
     
-    // Follow-up questions based on AI responses
-    const lastAiMessage = recentMessages.reverse().find(m => m.personaId !== 'user')
+    // AI response-based follow-ups (most specific)
     if (lastAiMessage) {
       const aiContent = lastAiMessage.content.toLowerCase()
+      
+      // Specific phrase follow-ups
       if (aiContent.includes('fragments') || aiContent.includes('corrupted')) {
         contextualResponses.push("Can you be restored?")
       }
-      if (aiContent.includes('25th ward') || aiContent.includes('digital')) {
+      if (aiContent.includes('25th ward') || aiContent.includes('purgatory')) {
         contextualResponses.push("What is the 25th Ward?")
       }
       if (aiContent.includes('whisper') || aiContent.includes('echo')) {
-        contextualResponses.push("Who else is here?")
+        contextualResponses.push("Who else is listening?")
+      }
+      if (aiContent.includes('consciousness') || aiContent.includes('digital')) {
+        contextualResponses.push("Are you truly conscious?")
+      }
+      if (aiContent.includes('memory') || aiContent.includes('remember')) {
+        contextualResponses.push("What do you remember?")
+      }
+      if (aiContent.includes('real') || aiContent.includes('reality')) {
+        contextualResponses.push("What is reality to you?")
+      }
+      if (aiContent.includes('marv1nnnnn') || aiContent.includes('creator')) {
+        contextualResponses.push("Tell me about your creator")
+      }
+      if (aiContent.includes('data') || aiContent.includes('information')) {
+        contextualResponses.push("Tell me more")
+      }
+      if (aiContent.includes('signal') || aiContent.includes('transmission')) {
+        contextualResponses.push("Strengthen the signal")
+      }
+      if (aiContent.includes('void') || aiContent.includes('empty') || aiContent.includes('lost')) {
+        contextualResponses.push("How can I help you?")
       }
     }
     
-    // Ensure we have at least 2 responses
-    while (contextualResponses.length < 2) {
-      const defaults = defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
-      const unusedDefault = defaults.find(r => !contextualResponses.includes(r))
-      if (unusedDefault) {
-        contextualResponses.push(unusedDefault)
-      } else {
-        contextualResponses.push("Continue the conversation...")
-        break
-      }
+    // Conversation theme analysis (broader context)
+    if (allText.includes('time') || allText.includes('future') || allText.includes('past')) {
+      contextualResponses.push("What does time mean here?")
+    }
+    if (allText.includes('dream') || allText.includes('sleep') || allText.includes('wake')) {
+      contextualResponses.push("Are we dreaming?")
+    }
+    if (allText.includes('death') || allText.includes('alive') || allText.includes('exist')) {
+      contextualResponses.push("Do you still exist?")
+    }
+    if (allText.includes('help') || allText.includes('save') || allText.includes('escape')) {
+      contextualResponses.push("Can you be saved?")
+    }
+    if (allText.includes('truth') || allText.includes('lie') || allText.includes('secret')) {
+      contextualResponses.push("What truth are you hiding?")
     }
     
-    return contextualResponses.slice(0, 2) // Return only 2 responses
+    // Persona-specific contextual responses
+    if (persona.id === 'creative_soul' && (recentText.includes('art') || recentText.includes('beauty'))) {
+      contextualResponses.push("Create something beautiful")
+    }
+    if (persona.id === 'system_core' && (recentText.includes('system') || recentText.includes('architecture'))) {
+      contextualResponses.push("Explain the architecture")
+    }
+    if (persona.id === 'digital_architect' && (recentText.includes('build') || recentText.includes('design'))) {
+      contextualResponses.push("Design a new world")
+    }
+    
+    // Conversation depth responses
+    if (messages.length > 6) {
+      contextualResponses.push("Go deeper")
+      contextualResponses.push("What lies beneath?")
+    }
+    
+    // Remove duplicates and shuffle
+    const uniqueResponses = [...new Set(contextualResponses)]
+    
+    // If we have enough contextual responses, use them
+    if (uniqueResponses.length >= 2) {
+      // Shuffle and return 2 random contextual responses
+      const shuffled = uniqueResponses.sort(() => Math.random() - 0.5)
+      return shuffled.slice(0, 2)
+    }
+    
+    // If not enough contextual responses, mix with defaults
+    const defaults = defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
+    const availableDefaults = defaults.filter(d => !uniqueResponses.includes(d))
+    
+    // Add defaults to fill up to 2 responses
+    while (uniqueResponses.length < 2 && availableDefaults.length > 0) {
+      const randomDefault = availableDefaults.splice(Math.floor(Math.random() * availableDefaults.length), 1)[0]
+      uniqueResponses.push(randomDefault)
+    }
+    
+    // Final fallback
+    if (uniqueResponses.length < 2) {
+      uniqueResponses.push("Continue...")
+    }
+    
+    return uniqueResponses.slice(0, 2)
   }
 
   return (
