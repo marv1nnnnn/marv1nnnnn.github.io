@@ -13,8 +13,8 @@ const CASE_FILES: CaseFile[] = [
   {
     id: '1',
     slug: 'welcome-to-chaos',
-    title: 'Welcome to the Chaos',
-    author: 'WebMaster Supreme',
+    title: 'Welcome to marv1nnnnn\'s Digital Space',
+    author: 'marv1nnnnn',
     date: '2025-06-15',
     tags: ['welcome', 'chaos', 'early-web', 'nostalgia'],
     filename: 'welcome-to-chaos.md',
@@ -24,8 +24,8 @@ const CASE_FILES: CaseFile[] = [
   {
     id: '2',
     slug: 'art-of-digital-chaos',
-    title: 'The Art of Digital Chaos',
-    author: 'Chaos Architect',
+    title: 'Engineering Meets Art: My Design Philosophy',
+    author: 'marv1nnnnn',
     date: '2025-06-14',
     tags: ['design', 'aesthetics', 'philosophy', 'web-history'],
     filename: 'art-of-digital-chaos.md',
@@ -35,8 +35,8 @@ const CASE_FILES: CaseFile[] = [
   {
     id: '3',
     slug: 'ai-personalities-explained',
-    title: 'AI Personalities Explained',
-    author: 'AI Whisperer',
+    title: 'My Digital Personas: Three Modes of Consciousness',
+    author: 'marv1nnnnn',
     date: '2025-06-13',
     tags: ['ai', 'personalities', 'technology', 'interaction'],
     filename: 'ai-personalities-explained.md',
@@ -252,7 +252,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
     <div className="case-file-reader">
       <div className="film-window-header">
         <div className="system-info">
-          <div className="info-line">KAMINO OS v2.5.1 - CASE FILE READER</div>
+          <div className="info-line">marv1nnnnn OS v1.0 - PERSONAL BLOG READER</div>
           <div className="info-line">ACCESS LEVEL: [USER_CLEARANCE_BETA]</div>
           <div className="info-line">SESSION: {new Date().toISOString().substr(0, 19)}</div>
         </div>
@@ -272,7 +272,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
 
       <div className="main-content">
         <div className="file-list">
-          <div className="list-header">CASE FILES ARCHIVE</div>
+          <div className="list-header">marv1nnnnn's BLOG ARCHIVE</div>
           
           {CASE_FILES.map(file => (
             <div
@@ -308,15 +308,15 @@ This case file is currently being **decrypted** from the archives. Please wait w
         <div className="content-area">
           {!selectedFile ? (
             <div className="welcome-screen">
-              <div className="welcome-title">THE FILM WINDOW</div>
-              <div className="welcome-subtitle">Case File Reading System</div>
+              <div className="welcome-title">marv1nnnnn OS</div>
+              <div className="welcome-subtitle">Personal Blog Reader</div>
               <div className="welcome-instructions">
-                Select a case file from the archive to begin decryption.
+                Select a blog post from the archive to begin reading.
                 <br />
                 <br />
-                WARNING: Some files may contain classified information
+                These are my thoughts, projects, and musings on the intersection
                 <br />
-                that could trigger automatic redaction protocols.
+                of engineering and digital art.
               </div>
             </div>
           ) : (
@@ -372,7 +372,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
         }
 
         .info-line {
-          font-size: 14px;
+          font-size: 12px;
           color: #88ccff;
           margin-bottom: 2px;
         }
@@ -380,7 +380,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
         .status-bar {
           display: flex;
           gap: var(--space-base);
-          font-size: 14px;
+          font-size: 12px;
           color: #ffffff;
         }
 
@@ -400,7 +400,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
           width: 300px;
           border-right: 2px solid var(--color-light);
           background: var(--color-shadow);
-          overflow-y: auto;
+          overflow-y: visible;
         }
 
         .list-header {
@@ -410,7 +410,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
           font-weight: bold;
           text-align: center;
           color: #ffff88;
-          font-size: 16px;
+          font-size: 14px;
           text-shadow: 0 0 5px #ffff88;
         }
 
@@ -443,7 +443,7 @@ This case file is currently being **decrypted** from the archives. Please wait w
         .file-title {
           font-weight: bold;
           margin-bottom: var(--space-xs);
-          font-size: 16px;
+          font-size: 14px;
           color: #ffffff;
         }
 
@@ -561,11 +561,9 @@ This case file is currently being **decrypted** from the archives. Please wait w
         }
 
         .content-text {
-          font-size: 16px;
-          line-height: 1.7;
+          font-size: 12px;
+          line-height: 1.4;
           color: #ffffff;
-          overflow-y: auto;
-          max-height: calc(100vh - 300px);
         }
 
         /* Override global markdown styles for this context */

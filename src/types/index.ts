@@ -1,4 +1,4 @@
-// Core OS Types for The Transmitter-Receiver OS
+// Core OS Types for marv1nnnnn's Personal Digital Interface
 
 export interface WindowPosition {
   x: number

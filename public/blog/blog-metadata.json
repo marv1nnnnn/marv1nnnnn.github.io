@@ -2,28 +2,28 @@
   {
     "id": "1",
     "slug": "welcome-to-chaos",
-    "title": "Welcome to the Chaos",
-    "author": "WebMaster Supreme",
+    "title": "Welcome to marv1nnnnn's Digital Space",
+    "author": "marv1nnnnn",
     "date": "2025-06-15",
-    "tags": ["welcome", "chaos", "early-web", "nostalgia"],
+    "tags": ["welcome", "personal", "engineering", "digital-art"],
     "filename": "welcome-to-chaos.md"
   },
   {
     "id": "2",
     "slug": "art-of-digital-chaos",
-    "title": "The Art of Digital Chaos",
-    "author": "Chaos Architect",
+    "title": "Engineering Meets Art: My Design Philosophy",
+    "author": "marv1nnnnn",
     "date": "2025-06-14",
-    "tags": ["design", "aesthetics", "philosophy", "web-history"],
+    "tags": ["engineering", "design", "philosophy", "creative-tech"],
     "filename": "art-of-digital-chaos.md"
   },
   {
     "id": "3",
     "slug": "ai-personalities-explained",
-    "title": "AI Personalities Explained",
-    "author": "AI Whisperer",
+    "title": "My Digital Personas: Three Modes of Consciousness",
+    "author": "marv1nnnnn",
     "date": "2025-06-13",
-    "tags": ["ai", "personalities", "technology", "interaction"],
+    "tags": ["ai", "personas", "consciousness", "personal-tech"],
     "filename": "ai-personalities-explained.md"
   }
 ] 

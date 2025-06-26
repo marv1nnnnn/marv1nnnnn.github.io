@@ -190,7 +190,7 @@ export default function ControlPanel({
     <div className="control-panel">
       <div className="film-window-header">
         <div className="system-info">
-          <div className="info-line">KAMINO OS v2.5.1 - SYSTEM CONTROL PANEL</div>
+          <div className="info-line">marv1nnnnn OS v1.0 - PERSONAL SYSTEM CONTROL</div>
           <div className="info-line">ACCESS LEVEL: [ADMINISTRATOR]</div>
           <div className="info-line">SESSION: {new Date().toISOString().substr(0, 19)}</div>
         </div>

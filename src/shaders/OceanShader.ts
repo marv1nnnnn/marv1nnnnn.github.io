@@ -1,4 +1,4 @@
-// Digital Ocean Shader for Transmitter-Receiver OS
+// Digital Ocean Shader for marv1nnnnn's Personal Interface
 // Simple, clean digital ocean with stable movement
 
 export const oceanVertexShader = `

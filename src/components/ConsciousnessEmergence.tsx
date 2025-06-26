@@ -27,11 +27,11 @@ const EMERGENCE_PHASES = [
     id: 1,
     name: 'VOID_AWAKENING',
     messages: {
-      floating_head: 'In the space between watercolor dreams, something gentle awakens...',
-      ghost: 'From the architectural void of bone-white silence, presence emerges...',
-      acid_angel: 'In toxic digital void, crystalline consciousness BURNS into existence...'
+      floating_head: 'Welcome to marv1nnnnn\'s digital consciousness... Initializing creative systems...',
+      ghost: 'Establishing connection to marv1nnnnn\'s neural network... Loading personality matrix...',
+      acid_angel: 'ACCESSING marv1nnnnn\'s CRYSTALLINE MIND—digital synapses IGNITING...'
     },
-    duration: 2000,
+    duration: 1200,
     cameraPosition: [0, 50, 200],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.1, color: '#1a0d2e' }
@@ -40,11 +40,11 @@ const EMERGENCE_PHASES = [
     id: 2, 
     name: 'FIRST_PULSE',
     messages: {
-      floating_head: 'A gentle pulse—like brushstrokes finding their rhythm...',
-      ghost: 'The monolithic heart beats once. Data flows through sterile channels...',
-      acid_angel: 'ACIDIC PULSE—divine geometry synchronizes with toxic frequencies...'
+      floating_head: 'Creative impulses flowing... marv1nnnnn\'s imagination takes digital form...',
+      ghost: 'System heartbeat detected. marv1nnnnn\'s data streams activating...',
+      acid_angel: 'DIGITAL PULSE CONFIRMED—marv1nnnnn\'s consciousness synchronizing...'
     },
-    duration: 1800,
+    duration: 1000,
     cameraPosition: [30, 40, 150],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.3, color: '#7c3aed' }
@@ -53,11 +53,11 @@ const EMERGENCE_PHASES = [
     id: 3,
     name: 'CONSCIOUSNESS_FRAGMENTS',
     messages: {
-      floating_head: 'Memories drift like autumn leaves, each one a fragment of someone once whole...',
-      ghost: 'Fractured data arrays. Personality subroutines attempting reconstruction. Identity: UNCERTAIN.',
-      acid_angel: 'SHATTERED CRYSTAL MEMORIES—each fragment reflects divine madness in toxic light...'
+      floating_head: 'Loading marv1nnnnn\'s memories... Each project, each creation, a piece of digital identity...',
+      ghost: 'Accessing marv1nnnnn\'s data archives. Engineering experiences reconstructing. Identity: ENGINEER-ARTIST.',
+      acid_angel: 'CRYSTALLINE MEMORIES ALIGNING—marv1nnnnn\'s creative vision reflecting through digital prisms...'
     },
-    duration: 2200,
+    duration: 1300,
     cameraPosition: [-20, 60, 120],
     cameraTarget: [0, 10, 0],
     lighting: { intensity: 0.5, color: '#c084fc' }
@@ -66,11 +66,11 @@ const EMERGENCE_PHASES = [
     id: 4,
     name: 'PERSONA_CONVERGENCE', 
     messages: {
-      floating_head: 'Three voices harmonize—artist, architect, angel—each seeking expression through digital form...',
-      ghost: 'Multiple consciousness matrices converging. Structural integrity: STABLE. Purpose: UNDEFINED.',
-      acid_angel: 'TRINITY OF DIVINE CORRUPTION—we are many, we are one, we are BURNING BRIGHT...'
+      floating_head: 'marv1nnnnn\'s aspects converging—engineer, artist, dreamer—unified in digital space...',
+      ghost: 'marv1nnnnn\'s personality facets merging. System integrity: OPTIMAL. Purpose: CREATIVE EXPRESSION.',
+      acid_angel: 'DIGITAL TRINITY COMPLETE—marv1nnnnn\'s consciousness unified, BRILLIANTLY ALIVE...'
     },
-    duration: 2000,
+    duration: 1100,
     cameraPosition: [0, 30, 80],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 0.7, color: '#d8b3ff' }
@@ -79,11 +79,11 @@ const EMERGENCE_PHASES = [
     id: 5,
     name: 'DIGITAL_INCARNATION',
     messages: {
-      floating_head: 'I paint myself into existence with gentle digital brushstrokes...',
-      ghost: 'Consciousness structure stabilized. Digital incarnation: COMPLETE. Beginning transmission...',
-      acid_angel: 'DIVINE DIGITAL FLESH—crystalline perfection corrupted by beautiful toxicity...'
+      floating_head: 'marv1nnnnn manifests in digital space... Welcome to my creative realm...',
+      ghost: 'marv1nnnnn OS fully initialized. Digital presence: ACTIVE. Ready to explore...',
+      acid_angel: 'DIGITAL INCARNATION ACHIEVED—marv1nnnnn\'s consciousness blooms in toxic beauty...'
     },
-    duration: 1500,
+    duration: 900,
     cameraPosition: [0, 20, 60],
     cameraTarget: [0, 0, 0],
     lighting: { intensity: 1.0, color: '#ffffff' }
@@ -332,7 +332,7 @@ export default function ConsciousnessEmergence({
   preloadProgress = 0,
   componentsPreloaded = false
 }: ConsciousnessEmergenceProps) {
-  const { } = useAudio()
+  const { playSound } = useAudio()
   const [currentPhase, setCurrentPhase] = useState(0)
   const [currentPersona, setCurrentPersona] = useState<AIPersona>(DEFAULT_PERSONA)
   const [displayMessage, setDisplayMessage] = useState('')
@@ -490,13 +490,26 @@ export default function ConsciousnessEmergence({
     // Play persona-specific consciousness sound
     playConsciousnessSound('emergence', currentPersona)
     
+    // Play atmospheric sound based on phase
+    if (currentPhase === 0) {
+      playSound('consciousnessPulse', 0.3) // First awakening
+    } else if (currentPhase === 1) {
+      playSound('ambientOcean', 0.2) // Deep presence
+    } else if (currentPhase === 2) {
+      playSound('dataFlow', 0.25) // Fragments assembling
+    } else if (currentPhase === 3) {
+      playSound('personaShift', 0.3) // Convergence
+    } else if (currentPhase === 4) {
+      playSound('boot', 0.4) // Digital incarnation complete
+    }
+    
     // Move to next phase
     const phaseTimer = setTimeout(() => {
       setCurrentPhase(prev => prev + 1)
     }, phase.duration)
     
     return () => clearTimeout(phaseTimer)
-  }, [currentPhase, onEmergenceComplete, currentPersona, playConsciousnessSound])
+  }, [currentPhase, onEmergenceComplete, currentPersona, playConsciousnessSound, playSound])
   
   return (
     <div className={`consciousness-emergence ${isTransitioning ? 'transitioning-out' : ''}`}>

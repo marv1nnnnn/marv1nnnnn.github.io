@@ -27,7 +27,7 @@ interface CatherinesSuitcaseProps {
 // Mock playlist data
 const DEFAULT_PLAYLIST: Playlist = {
   id: 'default',
-  name: "Catherine's Mix",
+  name: "marv1nnnnn's Mix",
   tracks: [
     {
       id: '1',
@@ -202,6 +202,29 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
   const [playlist, setPlaylist] = useState<Playlist>(DEFAULT_PLAYLIST)
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(0.7)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  // Load playlist from JSON file
+  useEffect(() => {
+    fetch('/music/playlist.json')
+      .then(response => response.json())
+      .then(tracks => {
+        const loadedPlaylist: Playlist = {
+          id: 'loaded',
+          name: "marv1nnnnn's Mix",
+          tracks: tracks,
+          currentTrack: 0,
+          isPlaying: false,
+          volume: 0.7,
+          isLooping: false,
+        }
+        setPlaylist(loadedPlaylist)
+      })
+      .catch(error => {
+        console.error('Failed to load playlist:', error)
+        // Keep using DEFAULT_PLAYLIST as fallback
+      })
+  }, [])
 
   const currentTrack = playlist.tracks[playlist.currentTrack || 0]
 
@@ -209,40 +232,105 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
     const nextTrack = ((playlist.currentTrack || 0) + 1) % playlist.tracks.length
     setPlaylist(prev => ({ ...prev, currentTrack: nextTrack }))
     setCurrentTime(0)
-  }, [playlist.currentTrack, playlist.tracks.length])
-
-  const handlePlay = () => {
-    setPlaylist(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
-  }
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (playlist.isPlaying) {
-      interval = setInterval(() => {
-        setCurrentTime(prev => {
-          const newTime = prev + 1
-          if (currentTrack && newTime >= currentTrack.duration) {
-            // Auto-advance to next track
-            handleNext()
-            return 0
-          }
-          return newTime
-        })
-      }, 1000)
+    if (audioRef.current && playlist.isPlaying) {
+      audioRef.current.currentTime = 0
     }
-    return () => clearInterval(interval)
-  }, [playlist.isPlaying, currentTrack, handleNext])
+  }, [playlist.currentTrack, playlist.tracks.length, playlist.isPlaying])
+
+  // Update audio source when track changes
+  useEffect(() => {
+    if (audioRef.current && currentTrack) {
+      audioRef.current.src = `/music/${currentTrack.filename}`
+      audioRef.current.load()
+    }
+  }, [playlist.currentTrack, currentTrack])
+
+  // Handle audio time updates
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(Math.floor(audio.currentTime))
+    }
+
+    const handleEnded = () => {
+      handleNext()
+    }
+
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('ended', handleEnded)
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('ended', handleEnded)
+    }
+  }, [handleNext])
+
+  // Update audio volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume
+    }
+  }, [volume])
 
   const handlePrevious = () => {
     const currentIndex = playlist.currentTrack || 0
     const prevTrack = currentIndex > 0 ? currentIndex - 1 : playlist.tracks.length - 1
     setPlaylist(prev => ({ ...prev, currentTrack: prevTrack }))
     setCurrentTime(0)
+    if (audioRef.current && playlist.isPlaying) {
+      audioRef.current.currentTime = 0
+    }
+  }
+
+  const handlePlay = () => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    if (playlist.isPlaying) {
+      audio.pause()
+    } else {
+      audio.play().catch(error => {
+        console.error('Failed to play audio:', error)
+      })
+    }
+    setPlaylist(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
   }
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume)
     setPlaylist(prev => ({ ...prev, volume: newVolume }))
+  }
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!currentTrack || !audioRef.current) return
+    
+    const progressBar = e.currentTarget
+    const rect = progressBar.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const progressWidth = rect.width
+    const clickProgress = clickX / progressWidth
+    
+    const newTime = clickProgress * currentTrack.duration
+    audioRef.current.currentTime = newTime
+    setCurrentTime(Math.floor(newTime))
+  }
+
+  const handleFastForward = () => {
+    if (!audioRef.current || !currentTrack) return
+    
+    const newTime = Math.min(audioRef.current.currentTime + 10, currentTrack.duration)
+    audioRef.current.currentTime = newTime
+    setCurrentTime(Math.floor(newTime))
+  }
+
+  const handleRewind = () => {
+    if (!audioRef.current) return
+    
+    const newTime = Math.max(audioRef.current.currentTime - 10, 0)
+    audioRef.current.currentTime = newTime
+    setCurrentTime(Math.floor(newTime))
   }
 
   const formatTime = (seconds: number) => {
@@ -255,9 +343,14 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
 
   return (
     <div className="catherines-suitcase">
+      <audio
+        ref={audioRef}
+        preload="metadata"
+        style={{ display: 'none' }}
+      />
       <div className="player-header">
         <div className="system-info">
-          <div className="system-name">CATHERINE'S SUITCASE v1.2</div>
+          <div className="system-name">marv1nnnnn's MUSIC PLAYER v1.2</div>
           <div className="playlist-info">PLAYLIST: {playlist.name}</div>
         </div>
         <div className="playback-status">
@@ -311,7 +404,7 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
           </div>
 
           <div className="progress-section">
-            <div className="progress-bar">
+            <div className="progress-bar" onClick={handleProgressClick}>
               <div className="progress-fill" style={{ width: `${progress}%` }} />
               <div className="progress-handle" style={{ left: `${progress}%` }} />
             </div>
@@ -326,11 +419,25 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
               ⏮
             </button>
             <button 
+              className="control-btn"
+              onClick={handleRewind}
+              title="Rewind 10s"
+            >
+              ⏪
+            </button>
+            <button 
               className="control-btn play-btn"
               onClick={handlePlay}
               title={playlist.isPlaying ? 'Pause' : 'Play'}
             >
               {playlist.isPlaying ? '⏸' : '▶'}
+            </button>
+            <button 
+              className="control-btn"
+              onClick={handleFastForward}
+              title="Fast Forward 10s"
+            >
+              ⏩
             </button>
             <button 
               className="control-btn"
@@ -364,7 +471,13 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
                 <div
                   key={track.id}
                   className={`track-item ${index === (playlist.currentTrack || 0) ? 'current' : ''}`}
-                  onClick={() => setPlaylist(prev => ({ ...prev, currentTrack: index }))}
+                  onClick={() => {
+                    setPlaylist(prev => ({ ...prev, currentTrack: index }))
+                    setCurrentTime(0)
+                    if (audioRef.current && playlist.isPlaying) {
+                      audioRef.current.currentTime = 0
+                    }
+                  }}
                 >
                   <div className="track-number">{(index + 1).toString().padStart(2, '0')}</div>
                   <div className="track-details">
@@ -487,6 +600,11 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
           border: 1px solid var(--color-light);
           position: relative;
           overflow: hidden;
+          cursor: pointer;
+        }
+
+        .progress-bar:hover {
+          border-color: var(--color-info);
         }
 
         .progress-fill {
