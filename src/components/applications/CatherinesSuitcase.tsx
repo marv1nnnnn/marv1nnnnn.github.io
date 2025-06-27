@@ -411,41 +411,50 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
           </div>
 
           <div className="player-controls">
-            <button 
-              className="control-btn"
-              onClick={handlePrevious}
-              title="Previous Track"
-            >
-              ⏮
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleRewind}
-              title="Rewind 10s"
-            >
-              ⏪
-            </button>
-            <button 
-              className="control-btn play-btn"
-              onClick={handlePlay}
-              title={playlist.isPlaying ? 'Pause' : 'Play'}
-            >
-              {playlist.isPlaying ? '⏸' : '▶'}
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleFastForward}
-              title="Fast Forward 10s"
-            >
-              ⏩
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleNext}
-              title="Next Track"
-            >
-              ⏭
-            </button>
+            <div className="track-controls">
+              <button 
+                className="control-btn track-btn"
+                onClick={handlePrevious}
+                title="Previous Track"
+              >
+                <span className="btn-icon">◀◀</span>
+                <span className="btn-label">PREV</span>
+              </button>
+              <button 
+                className="control-btn play-btn"
+                onClick={handlePlay}
+                title={playlist.isPlaying ? 'Pause' : 'Play'}
+              >
+                <span className="btn-icon">{playlist.isPlaying ? '⏸' : '▶'}</span>
+                <span className="btn-label">{playlist.isPlaying ? 'PAUSE' : 'PLAY'}</span>
+              </button>
+              <button 
+                className="control-btn track-btn"
+                onClick={handleNext}
+                title="Next Track"
+              >
+                <span className="btn-icon">▶▶</span>
+                <span className="btn-label">NEXT</span>
+              </button>
+            </div>
+            <div className="seek-controls">
+              <button 
+                className="control-btn seek-btn"
+                onClick={handleRewind}
+                title="Rewind 10s"
+              >
+                <span className="btn-icon">⏪</span>
+                <span className="btn-label">-10s</span>
+              </button>
+              <button 
+                className="control-btn seek-btn"
+                onClick={handleFastForward}
+                title="Fast Forward 10s"
+              >
+                <span className="btn-icon">⏩</span>
+                <span className="btn-label">+10s</span>
+              </button>
+            </div>
           </div>
 
           <div className="volume-section">
@@ -624,22 +633,65 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
 
         .player-controls {
           display: flex;
-          justify-content: center;
+          flex-direction: column;
+          gap: var(--space-lg);
+          align-items: center;
+        }
+
+        .track-controls {
+          display: flex;
           gap: var(--space-base);
+          justify-content: center;
+        }
+
+        .seek-controls {
+          display: flex;
+          gap: var(--space-base);
+          justify-content: center;
         }
 
         .control-btn {
-          width: 45px;
-          height: 45px;
           background: var(--color-void);
           border: 2px solid var(--color-light);
           color: var(--color-light);
-          font-size: var(--font-size-lg);
           cursor: crosshair;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           transition: all 0.1s ease;
+          padding: var(--space-sm) var(--space-base);
+          gap: var(--space-xs);
+        }
+
+        .btn-icon {
+          font-size: var(--font-size-lg);
+          line-height: 1;
+        }
+
+        .btn-label {
+          font-size: var(--font-size-xs);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .track-btn {
+          min-width: 70px;
+          height: 55px;
+        }
+
+        .seek-btn {
+          min-width: 60px;
+          height: 45px;
+          background: var(--color-shadow);
+          border-color: var(--color-grey-light);
+        }
+
+        .seek-btn:hover {
+          background: var(--color-grey-light);
+          color: var(--color-void);
+          transform: translate(-1px, -1px);
+          box-shadow: 2px 2px 0 var(--color-shadow);
         }
 
         .control-btn:hover {
@@ -652,6 +704,8 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
         .play-btn {
           background: var(--color-blood);
           border-color: var(--color-blood);
+          min-width: 80px;
+          height: 60px;
         }
 
         .play-btn:hover {

@@ -61,7 +61,7 @@ export default function ControlPanel({
   })
   
   // 3D Scene controls state
-  const [cameraPosition, setCameraPosition] = useState({ x:0, y:50, z:200 })
+  const [cameraPosition, setCameraPosition] = useState({ x:0, y:30, z:120 })
   const [cameraRotation, setCameraRotation] = useState({ x:0, y:0, z:0 })
   const [sceneLighting, setSceneLighting] = useState({ 
     intensity: 1.0, 
@@ -96,7 +96,7 @@ export default function ControlPanel({
 
   // Aurora controls state - optimized for performance
   const [auroraSettings, setAuroraSettings] = useState({
-    density: 0.6, // Reduced for better performance
+    density: 1.1, // Default to 110% as requested
     coverage: 0.7, // Reduced for better performance
     layerCount: 6 // Reduced from 12 for much better performance
   })
@@ -182,8 +182,7 @@ export default function ControlPanel({
     { id: 'effects', label: 'VISUAL FX', icon: '✨' },
     { id: '3d', label: '3D SCENE', icon: '🎮' },
     { id: 'persona', label: 'PERSONA 3D', icon: '👤' },
-    { id: 'audio', label: 'AUDIO SYS', icon: '🔊' },
-    { id: 'system', label: 'SYSTEM', icon: '⚙️' }
+    { id: 'audio', label: 'AUDIO SYS', icon: '🔊' }
   ]
 
   return (
@@ -660,7 +659,7 @@ export default function ControlPanel({
                 <div className="section-title">CAMERA PRESETS</div>
                 <div className="preset-buttons">
                   <button className="preset-button" onClick={() => {
-                    const defaultPos = {x:0, y:50, z:200}
+                    const defaultPos = {x:0, y:30, z:120}
                     const defaultRot = {x:0, y:0, z:0}
                     setCameraPosition(defaultPos)
                     setCameraRotation(defaultRot)
@@ -945,36 +944,6 @@ export default function ControlPanel({
             </div>
           )}
 
-          {selectedTab === 'system' && (
-            <div className="system-panel">
-              <div className="panel-title">SYSTEM DIAGNOSTICS</div>
-              
-              <div className="system-stats">
-                <div className="stat-item">
-                  <span className="stat-label">CPU USAGE:</span>
-                  <span className="stat-value">42%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">MEMORY:</span>
-                  <span className="stat-value">1.2GB</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">GPU:</span>
-                  <span className="stat-value">78%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">NETWORK:</span>
-                  <span className="stat-value">ONLINE</span>
-                </div>
-              </div>
-
-              <div className="system-actions">
-                <button className="action-button">SAVE CONFIG</button>
-                <button className="action-button">RESET DEFAULTS</button>
-                <button className="action-button danger">EMERGENCY STOP</button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

@@ -194,7 +194,13 @@ export default function FilmWindow({
       const welcomeMessage: ChatMessage = {
         id: 'welcome-1',
         personaId: currentPersona.id,
-        content: "Welcome to marv1nnnnn's digital consciousness... My three personas are now active in this space. Feel free to explore and interact with different aspects of my digital identity.",
+        content: `
+          Hello     |     Bonjour    |    Hola
+          こんにちは   |     你好      |    안녕하세요
+          Здравствуйте |   مرحبا      |    नमस्ते
+          Ciao      |    Olá       |    Hej
+          Xin chào  |    สวัสดี     |    გამარჯობა
+        `.trim().replace(/\n\s+/g, '\n'),
         timestamp: new Date(),
         isGlitched: true
       }
