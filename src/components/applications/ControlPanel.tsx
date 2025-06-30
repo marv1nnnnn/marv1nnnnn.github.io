@@ -61,7 +61,7 @@ export default function ControlPanel({
   })
   
   // 3D Scene controls state
-  const [cameraPosition, setCameraPosition] = useState({ x:0, y:50, z:200 })
+  const [cameraPosition, setCameraPosition] = useState({ x:0, y:30, z:120 })
   const [cameraRotation, setCameraRotation] = useState({ x:0, y:0, z:0 })
   const [sceneLighting, setSceneLighting] = useState({ 
     intensity: 1.0, 
@@ -96,7 +96,7 @@ export default function ControlPanel({
 
   // Aurora controls state - optimized for performance
   const [auroraSettings, setAuroraSettings] = useState({
-    density: 0.6, // Reduced for better performance
+    density: 1.1, // Default to 110% as requested
     coverage: 0.7, // Reduced for better performance
     layerCount: 6 // Reduced from 12 for much better performance
   })
@@ -178,12 +178,136 @@ export default function ControlPanel({
     playSound('hover')
   }
 
+  const handleExportApp = () => {
+    try {
+      // Create standalone HTML file with embedded CSS and JS
+      const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>marv1nnnnn OS - Exported</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: monospace; }
+        .export-container { padding: 20px; max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #88ccff; padding-bottom: 20px; }
+        .title { font-size: 24px; color: #88ccff; margin-bottom: 10px; }
+        .subtitle { color: #666; }
+        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #333; background: #111; }
+        .section-title { color: #ffff88; font-size: 18px; margin-bottom: 15px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .info-item { padding: 10px; background: #222; border-left: 3px solid #88ccff; }
+        .label { color: #88ccff; font-weight: bold; }
+        .value { color: #fff; margin-top: 5px; }
+        .export-note { text-align: center; padding: 20px; background: #333; margin-top: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="export-container">
+        <div class="header">
+            <div class="title">marv1nnnnn OS</div>
+            <div class="subtitle">Digital Consciousness Export</div>
+            <div class="subtitle">Exported: ${new Date().toLocaleString()}</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Current Configuration</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Persona</div>
+                    <div class="value">${currentPersona.displayName}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Glitch Level</div>
+                    <div class="value">${Math.round(glitchLevel * 100)}%</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Atmospheric Intensity</div>
+                    <div class="value">${Math.round(atmosphericIntensity * 100)}%</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Audio Volume</div>
+                    <div class="value">${Math.round(audioVolume * 100)}%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Visual Effects</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Ocean Waves</div>
+                    <div class="value">${visualEffects.oceanWaves ? 'ENABLED' : 'DISABLED'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Aurora</div>
+                    <div class="value">${visualEffects.aurora ? 'ENABLED' : 'DISABLED'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Particles</div>
+                    <div class="value">${visualEffects.particles ? 'ENABLED' : 'DISABLED'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Rain</div>
+                    <div class="value">${visualEffects.rain ? 'ENABLED' : 'DISABLED'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3D Scene Settings</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Camera Position</div>
+                    <div class="value">X: ${cameraPosition.x}, Y: ${cameraPosition.y}, Z: ${cameraPosition.z}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Persona Position</div>
+                    <div class="value">X: ${personaPosition.x}, Y: ${personaPosition.y}, Z: ${personaPosition.z}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Persona Scale</div>
+                    <div class="value">${personaScale}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Hover Effects</div>
+                    <div class="value">${personaHoverEffects.enabled ? 'ENABLED' : 'DISABLED'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-note">
+            <p>This is a static export of your marv1nnnnn OS configuration.</p>
+            <p>To restore these settings, import this file back into the system.</p>
+        </div>
+    </div>
+</body>
+</html>`
+
+      // Create and download the file
+      const blob = new Blob([htmlContent], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `marv1nnnnn-os-export-${new Date().toISOString().slice(0, 10)}.html`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      playSound('success')
+      console.log('App configuration exported successfully')
+    } catch (error) {
+      console.error('Export failed:', error)
+      playSound('error')
+    }
+  }
+
   const tabs = [
     { id: 'effects', label: 'VISUAL FX', icon: '✨' },
     { id: '3d', label: '3D SCENE', icon: '🎮' },
     { id: 'persona', label: 'PERSONA 3D', icon: '👤' },
-    { id: 'audio', label: 'AUDIO SYS', icon: '🔊' },
-    { id: 'system', label: 'SYSTEM', icon: '⚙️' }
+    { id: 'audio', label: 'AUDIO SYS', icon: '🔊' }
   ]
 
   return (
@@ -205,6 +329,9 @@ export default function ControlPanel({
           <div className="status-item">
             STATUS: ACTIVE
           </div>
+          <button className="export-button" onClick={handleExportApp} title="Export current configuration as standalone HTML file">
+            EXPORT
+          </button>
         </div>
       </div>
 
@@ -660,7 +787,7 @@ export default function ControlPanel({
                 <div className="section-title">CAMERA PRESETS</div>
                 <div className="preset-buttons">
                   <button className="preset-button" onClick={() => {
-                    const defaultPos = {x:0, y:50, z:200}
+                    const defaultPos = {x:0, y:30, z:120}
                     const defaultRot = {x:0, y:0, z:0}
                     setCameraPosition(defaultPos)
                     setCameraRotation(defaultRot)
@@ -945,36 +1072,6 @@ export default function ControlPanel({
             </div>
           )}
 
-          {selectedTab === 'system' && (
-            <div className="system-panel">
-              <div className="panel-title">SYSTEM DIAGNOSTICS</div>
-              
-              <div className="system-stats">
-                <div className="stat-item">
-                  <span className="stat-label">CPU USAGE:</span>
-                  <span className="stat-value">42%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">MEMORY:</span>
-                  <span className="stat-value">1.2GB</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">GPU:</span>
-                  <span className="stat-value">78%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">NETWORK:</span>
-                  <span className="stat-value">ONLINE</span>
-                </div>
-              </div>
-
-              <div className="system-actions">
-                <button className="action-button">SAVE CONFIG</button>
-                <button className="action-button">RESET DEFAULTS</button>
-                <button className="action-button danger">EMERGENCY STOP</button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1015,6 +1112,24 @@ export default function ControlPanel({
           padding: 2px var(--space-xs);
           border: 1px solid var(--color-grey-dark);
           background: var(--color-void);
+        }
+
+        .export-button {
+          padding: 4px 12px;
+          background: var(--color-shadow);
+          border: 2px solid #00ff00;
+          color: #00ff00;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: bold;
+          transition: all 0.2s ease;
+        }
+
+        .export-button:hover {
+          background: #00ff00;
+          color: var(--color-void);
+          box-shadow: 0 0 10px #00ff00;
         }
 
         .main-content {

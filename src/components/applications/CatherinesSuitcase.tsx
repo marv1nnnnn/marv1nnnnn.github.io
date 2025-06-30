@@ -24,45 +24,6 @@ interface CatherinesSuitcaseProps {
   windowId: string
 }
 
-// Mock playlist data
-const DEFAULT_PLAYLIST: Playlist = {
-  id: 'default',
-  name: "marv1nnnnn's Mix",
-  tracks: [
-    {
-      id: '1',
-      title: 'Dial-up Nostalgia',
-      artist: 'Web 2.0 Collective',
-      filename: 'dial-up-nostalgia.mp3',
-      duration: 240,
-    },
-    {
-      id: '2',
-      title: 'Y2K Dreams',
-      artist: 'Millennium Bug',
-      filename: 'y2k-dreams.mp3',
-      duration: 180,
-    },
-    {
-      id: '3',
-      title: 'GeoCities Anthem',
-      artist: 'Retro Web Warriors',
-      filename: 'geocities-anthem.mp3',
-      duration: 210,
-    },
-    {
-      id: '4',
-      title: 'Matrix Rain',
-      artist: 'Code Runners',
-      filename: 'matrix-rain.mp3',
-      duration: 195,
-    },
-  ],
-  currentTrack: 0,
-  isPlaying: false,
-  volume: 0.7,
-  isLooping: false,
-}
 
 function SuitcaseModel({ isPlaying, volume }: { isPlaying: boolean; volume: number }) {
   const suitcaseRef = useRef<THREE.Group>(null!)
@@ -199,15 +160,22 @@ function SuitcaseModel({ isPlaying, volume }: { isPlaying: boolean; volume: numb
 }
 
 export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
-  const [playlist, setPlaylist] = useState<Playlist>(DEFAULT_PLAYLIST)
+  const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(0.7)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   // Load playlist from JSON file
   useEffect(() => {
     fetch('/music/playlist.json')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to load playlist: ${response.status}`)
+        }
+        return response.json()
+      })
       .then(tracks => {
         const loadedPlaylist: Playlist = {
           id: 'loaded',
@@ -219,23 +187,26 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
           isLooping: false,
         }
         setPlaylist(loadedPlaylist)
+        setIsLoading(false)
       })
       .catch(error => {
         console.error('Failed to load playlist:', error)
-        // Keep using DEFAULT_PLAYLIST as fallback
+        setLoadError(error.message)
+        setIsLoading(false)
       })
   }, [])
 
-  const currentTrack = playlist.tracks[playlist.currentTrack || 0]
+  const currentTrack = playlist?.tracks[playlist.currentTrack || 0]
 
   const handleNext = useCallback(() => {
+    if (!playlist) return
     const nextTrack = ((playlist.currentTrack || 0) + 1) % playlist.tracks.length
-    setPlaylist(prev => ({ ...prev, currentTrack: nextTrack }))
+    setPlaylist(prev => prev ? { ...prev, currentTrack: nextTrack } : null)
     setCurrentTime(0)
     if (audioRef.current && playlist.isPlaying) {
       audioRef.current.currentTime = 0
     }
-  }, [playlist.currentTrack, playlist.tracks.length, playlist.isPlaying])
+  }, [playlist?.currentTrack, playlist?.tracks.length, playlist?.isPlaying])
 
   // Update audio source when track changes
   useEffect(() => {
@@ -275,9 +246,10 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
   }, [volume])
 
   const handlePrevious = () => {
+    if (!playlist) return
     const currentIndex = playlist.currentTrack || 0
     const prevTrack = currentIndex > 0 ? currentIndex - 1 : playlist.tracks.length - 1
-    setPlaylist(prev => ({ ...prev, currentTrack: prevTrack }))
+    setPlaylist(prev => prev ? { ...prev, currentTrack: prevTrack } : null)
     setCurrentTime(0)
     if (audioRef.current && playlist.isPlaying) {
       audioRef.current.currentTime = 0
@@ -286,7 +258,7 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
 
   const handlePlay = () => {
     const audio = audioRef.current
-    if (!audio) return
+    if (!audio || !playlist) return
 
     if (playlist.isPlaying) {
       audio.pause()
@@ -295,12 +267,12 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
         console.error('Failed to play audio:', error)
       })
     }
-    setPlaylist(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
+    setPlaylist(prev => prev ? { ...prev, isPlaying: !prev.isPlaying } : null)
   }
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume)
-    setPlaylist(prev => ({ ...prev, volume: newVolume }))
+    setPlaylist(prev => prev ? { ...prev, volume: newVolume } : null)
   }
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -340,6 +312,63 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
   }
 
   const progress = currentTrack ? (currentTime / currentTrack.duration) * 100 : 0
+
+  if (isLoading) {
+    return (
+      <div className="catherines-suitcase loading">
+        <div className="loading-message">Loading playlist...</div>
+        <style jsx>{`
+          .catherines-suitcase.loading {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-void);
+            color: var(--color-light);
+            font-family: var(--font-system);
+          }
+          .loading-message {
+            font-size: var(--font-size-base);
+            color: var(--color-info);
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  if (loadError || !playlist) {
+    return (
+      <div className="catherines-suitcase error">
+        <div className="error-message">
+          <div className="error-title">Failed to load playlist</div>
+          <div className="error-details">{loadError || 'Unknown error'}</div>
+        </div>
+        <style jsx>{`
+          .catherines-suitcase.error {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-void);
+            color: var(--color-light);
+            font-family: var(--font-system);
+          }
+          .error-message {
+            text-align: center;
+          }
+          .error-title {
+            font-size: var(--font-size-lg);
+            color: var(--color-blood);
+            margin-bottom: var(--space-base);
+          }
+          .error-details {
+            font-size: var(--font-size-sm);
+            color: var(--color-grey-light);
+          }
+        `}</style>
+      </div>
+    )
+  }
 
   return (
     <div className="catherines-suitcase">
@@ -411,41 +440,50 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
           </div>
 
           <div className="player-controls">
-            <button 
-              className="control-btn"
-              onClick={handlePrevious}
-              title="Previous Track"
-            >
-              ⏮
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleRewind}
-              title="Rewind 10s"
-            >
-              ⏪
-            </button>
-            <button 
-              className="control-btn play-btn"
-              onClick={handlePlay}
-              title={playlist.isPlaying ? 'Pause' : 'Play'}
-            >
-              {playlist.isPlaying ? '⏸' : '▶'}
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleFastForward}
-              title="Fast Forward 10s"
-            >
-              ⏩
-            </button>
-            <button 
-              className="control-btn"
-              onClick={handleNext}
-              title="Next Track"
-            >
-              ⏭
-            </button>
+            <div className="track-controls">
+              <button 
+                className="control-btn track-btn"
+                onClick={handlePrevious}
+                title="Previous Track"
+              >
+                <span className="btn-icon">◀◀</span>
+                <span className="btn-label">PREV</span>
+              </button>
+              <button 
+                className="control-btn play-btn"
+                onClick={handlePlay}
+                title={playlist.isPlaying ? 'Pause' : 'Play'}
+              >
+                <span className="btn-icon">{playlist.isPlaying ? '⏸' : '▶'}</span>
+                <span className="btn-label">{playlist.isPlaying ? 'PAUSE' : 'PLAY'}</span>
+              </button>
+              <button 
+                className="control-btn track-btn"
+                onClick={handleNext}
+                title="Next Track"
+              >
+                <span className="btn-icon">▶▶</span>
+                <span className="btn-label">NEXT</span>
+              </button>
+            </div>
+            <div className="seek-controls">
+              <button 
+                className="control-btn seek-btn"
+                onClick={handleRewind}
+                title="Rewind 10s"
+              >
+                <span className="btn-icon">⏪</span>
+                <span className="btn-label">-10s</span>
+              </button>
+              <button 
+                className="control-btn seek-btn"
+                onClick={handleFastForward}
+                title="Fast Forward 10s"
+              >
+                <span className="btn-icon">⏩</span>
+                <span className="btn-label">+10s</span>
+              </button>
+            </div>
           </div>
 
           <div className="volume-section">
@@ -472,7 +510,7 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
                   key={track.id}
                   className={`track-item ${index === (playlist.currentTrack || 0) ? 'current' : ''}`}
                   onClick={() => {
-                    setPlaylist(prev => ({ ...prev, currentTrack: index }))
+                    setPlaylist(prev => prev ? { ...prev, currentTrack: index } : null)
                     setCurrentTime(0)
                     if (audioRef.current && playlist.isPlaying) {
                       audioRef.current.currentTime = 0
@@ -624,22 +662,65 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
 
         .player-controls {
           display: flex;
-          justify-content: center;
+          flex-direction: column;
+          gap: var(--space-lg);
+          align-items: center;
+        }
+
+        .track-controls {
+          display: flex;
           gap: var(--space-base);
+          justify-content: center;
+        }
+
+        .seek-controls {
+          display: flex;
+          gap: var(--space-base);
+          justify-content: center;
         }
 
         .control-btn {
-          width: 45px;
-          height: 45px;
           background: var(--color-void);
           border: 2px solid var(--color-light);
           color: var(--color-light);
-          font-size: var(--font-size-lg);
           cursor: crosshair;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           transition: all 0.1s ease;
+          padding: var(--space-sm) var(--space-base);
+          gap: var(--space-xs);
+        }
+
+        .btn-icon {
+          font-size: var(--font-size-lg);
+          line-height: 1;
+        }
+
+        .btn-label {
+          font-size: var(--font-size-xs);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .track-btn {
+          min-width: 70px;
+          height: 55px;
+        }
+
+        .seek-btn {
+          min-width: 60px;
+          height: 45px;
+          background: var(--color-shadow);
+          border-color: var(--color-grey-light);
+        }
+
+        .seek-btn:hover {
+          background: var(--color-grey-light);
+          color: var(--color-void);
+          transform: translate(-1px, -1px);
+          box-shadow: 2px 2px 0 var(--color-shadow);
         }
 
         .control-btn:hover {
@@ -652,6 +733,8 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
         .play-btn {
           background: var(--color-blood);
           border-color: var(--color-blood);
+          min-width: 80px;
+          height: 60px;
         }
 
         .play-btn:hover {
