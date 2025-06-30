@@ -12,6 +12,7 @@ import { AtmosphericBreathingManager } from './AtmosphericBreathingManager'
 import SceneLoader, { LoadingState, PerformancePreset } from './SceneLoader'
 import { ConversationEmotionManager } from './BeaconConstellationManager'
 import WindowManager from './WindowManager'
+import Taskbar from './Taskbar'
 import { Canvas, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
@@ -473,6 +474,16 @@ export default function FilmWindow({
       playSound('windowOpen')
     }
   }
+
+  // Handle restoring minimized window
+  const handleRestoreWindow = (windowId: string) => {
+    setWindows(prev => prev.map(window => 
+      window.id === windowId 
+        ? { ...window, isMinimized: false, isFocused: true }
+        : { ...window, isFocused: false }
+    ))
+    playSound('click')
+  }
   
   return (
     <PersonaManager>
@@ -580,6 +591,9 @@ export default function FilmWindow({
 
         {/* Window Manager for draggable/resizable windows */}
         <WindowManager windows={windows} setWindows={setWindows} />
+
+        {/* Taskbar for minimized windows */}
+        <Taskbar windows={windows} onRestoreWindow={handleRestoreWindow} />
 
       </div>
 

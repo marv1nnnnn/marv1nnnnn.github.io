@@ -6,17 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next build && echo 'Static files exported to ./out/ - open ./out/index.html in browser'"
   },
   "dependencies": {
-    "@ai-sdk/react": "^1.2.12",
-    "@ai-sdk/xai": "^1.2.16",
+    "@google/generative-ai": "^0.21.0",
     "@react-three/drei": "latest",
     "@react-three/fiber": "latest",
     "@react-three/postprocessing": "latest",
     "@tweenjs/tween.js": "^25.0.0",
     "@types/matter-js": "^0.19.8",
-    "ai": "^4.3.16",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.0.0",
     "framer-motion": "^12.18.1",

@@ -123,8 +123,6 @@ export default function WindowManager({ windows, setWindows }: WindowManagerProp
   return (
     <div className="window-manager">
       {windows && Array.isArray(windows) ? windows.map(window => {
-        if (window.isMinimized) return null
-
         return (
           <Rnd
             key={window.id}
@@ -133,8 +131,8 @@ export default function WindowManager({ windows, setWindows }: WindowManagerProp
               height: window.isMaximized ? 'calc(100vh - 40px)' : window.position.height,
             }}
             position={{
-              x: window.isMaximized ? 0 : window.position.x,
-              y: window.isMaximized ? 0 : window.position.y,
+              x: window.isMinimized ? -9999 : (window.isMaximized ? 0 : window.position.x),
+              y: window.isMinimized ? -9999 : (window.isMaximized ? 0 : window.position.y),
             }}
             onDragStart={() => handleDragStart(window.id)}
             onDragStop={(e, data) => handleDragStop(window.id, { x: data.x, y: data.y })}
@@ -147,10 +145,10 @@ export default function WindowManager({ windows, setWindows }: WindowManagerProp
             minWidth={300}
             minHeight={200}
             bounds="window"
-            disableDragging={window.isMaximized}
+            disableDragging={window.isMaximized || window.isMinimized}
             cancel=".window-controls, .window-content, button, input, textarea, select, .scrollable"
             dragHandleClassName="window-header"
-            enableResizing={!window.isMaximized}
+            enableResizing={!window.isMaximized && !window.isMinimized}
             resizeHandleStyles={{
               top: {
                 height: '8px',

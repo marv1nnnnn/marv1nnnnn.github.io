@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { useAudio } from '@/contexts/AudioContext'
 import UserInput from './UserInput'
-import { createXai } from '@ai-sdk/xai'
-import { streamText } from 'ai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 
 interface ChatInterfaceProps {
@@ -35,71 +34,46 @@ export default function ChatInterface({
   const [isThinking, setIsThinking] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // xAI SDK integration with streaming
-  const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
-    const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
+  // Gemini API integration with streaming
+  const callGeminiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
     
     if (!apiKey) {
-      console.log('[DEBUG] No xAI API key found, using fallback response')
-      const fallbackText = generateFallbackResponse(userMessage)
-      // Simulate streaming for fallback
-      for (let i = 0; i < fallbackText.length; i++) {
-        await new Promise<void>(resolve => setTimeout(resolve, 30))
-        onProgress(fallbackText.slice(0, i + 1))
-      }
-      return fallbackText
+      throw new Error('Gemini API key not found')
     }
 
     try {
-      console.log('[DEBUG] Making xAI Grok streaming API call via AI SDK')
+      console.log('[DEBUG] Making Gemini API call')
       
-      const xai = createXai({
-        apiKey: apiKey,
-      })
+      const genAI = new GoogleGenerativeAI(apiKey)
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
       
-      const { textStream } = await streamText({
-        model: xai('grok-3'),
-        messages: [
-          {
-            role: 'system',
-            content: persona.personality.systemPrompt
-          },
-          {
-            role: 'user',
-            content: userMessage
-          }
-        ],
-        temperature: 0.8,
-        maxTokens: 300,
-      })
-
+      const prompt = `${persona.personality.systemPrompt}\n\nUser: ${userMessage}\nAssistant:`
+      
+      const result = await model.generateContentStream(prompt)
+      
       let fullText = ''
-      for await (const textPart of textStream) {
-        fullText += textPart
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text()
+        fullText += chunkText
         onProgress(fullText)
       }
 
-      console.log('[DEBUG] xAI Grok streaming response completed:', {
+      console.log('[DEBUG] Gemini streaming response completed:', {
         content: fullText,
         persona: persona.id,
         timestamp: new Date().toISOString()
       })
 
-      return fullText || generateFallbackResponse(userMessage)
+      return fullText
     } catch (error) {
-      console.error('[DEBUG] xAI Grok streaming API error:', {
+      console.error('[DEBUG] Gemini API error:', {
         error: error instanceof Error ? error.message : error,
         persona: persona.id,
         timestamp: new Date().toISOString()
       })
       
-      const fallbackText = generateFallbackResponse(userMessage)
-      // Simulate streaming for fallback
-      for (let i = 0; i < fallbackText.length; i++) {
-        await new Promise<void>(resolve => setTimeout(resolve, 30))
-        onProgress(fallbackText.slice(0, i + 1))
-      }
-      return fallbackText
+      throw error
     }
   }
 
