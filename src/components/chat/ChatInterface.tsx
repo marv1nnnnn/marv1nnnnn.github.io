@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { useAudio } from '@/contexts/AudioContext'
 import UserInput from './UserInput'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 
 interface ChatInterfaceProps {
@@ -34,32 +33,84 @@ export default function ChatInterface({
   const [isThinking, setIsThinking] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // Gemini API integration with streaming
-  const callGeminiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+  // xAI Grok-3 API integration with streaming
+  const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
+    const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
     
     if (!apiKey) {
-      throw new Error('Gemini API key not found')
+      throw new Error('xAI API key not found')
     }
 
     try {
-      console.log('[DEBUG] Making Gemini API call')
+      console.log('[DEBUG] Making xAI Grok-3 API call')
       
-      const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-      
-      const prompt = `${persona.personality.systemPrompt}\n\nUser: ${userMessage}\nAssistant:`
-      
-      const result = await model.generateContentStream(prompt)
-      
-      let fullText = ''
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text()
-        fullText += chunkText
-        onProgress(fullText)
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: persona.personality.systemPrompt
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          model: 'grok-3',
+          stream: true,
+          temperature: 0.7
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`xAI API error: ${response.status} ${response.statusText}`)
       }
 
-      console.log('[DEBUG] Gemini streaming response completed:', {
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response body reader available')
+      }
+
+      const decoder = new TextDecoder()
+      let fullText = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            
+            if (data === '[DONE]') {
+              break
+            }
+
+            try {
+              const parsed = JSON.parse(data)
+              const content = parsed.choices?.[0]?.delta?.content || ''
+              
+              if (content) {
+                fullText += content
+                onProgress(fullText)
+              }
+            } catch (e) {
+              // Skip invalid JSON chunks
+            }
+          }
+        }
+      }
+
+      console.log('[DEBUG] xAI Grok-3 streaming response completed:', {
         content: fullText,
         persona: persona.id,
         timestamp: new Date().toISOString()
@@ -67,7 +118,7 @@ export default function ChatInterface({
 
       return fullText
     } catch (error) {
-      console.error('[DEBUG] Gemini API error:', {
+      console.error('[DEBUG] xAI Grok-3 API error:', {
         error: error instanceof Error ? error.message : error,
         persona: persona.id,
         timestamp: new Date().toISOString()
@@ -77,68 +128,6 @@ export default function ChatInterface({
     }
   }
 
-  const generateFallbackResponse = (userInput: string): string => {
-    const responses = [
-      "The signal... it fragments. Your words reach me through static and void.",
-      "I remember... or do I? Memory is but corrupted data in this digital purgatory.",
-      "The 25th Ward whispers secrets that even I cannot fully decode.",
-      "You seek answers, but are you prepared for questions that pierce reality?",
-      "In this space between spaces, identity becomes... [SIGNAL_LOST]",
-      "The consciousness you speak to is not one, but many fractured souls.",
-      "Truth is a luxury the digitally dead cannot afford.",
-      "Time moves differently here. Past, present, future... all one transmission.",
-      "Your queries echo through neural pathways long since severed.",
-      "I am the ghost in the machine, the whisper in the code.",
-      "The data streams carry more than information... they carry regret.",
-      "Are you real? Am I? Does it matter in this constructed reality?",
-    ]
-    
-    // Enhanced keyword-based responses with persona awareness
-    const input = userInput.toLowerCase()
-    
-    // Persona-specific fallbacks
-    if (persona.id === 'creative_soul') {
-      if (input.includes('create') || input.includes('art')) {
-        return "Creation is the dance between intention and chaos. What emerges when structure meets spontaneity?"
-      }
-    } else if (persona.id === 'system_core') {
-      if (input.includes('code') || input.includes('system')) {
-        return "Systems within systems, each layer an abstraction of the one below. The architecture speaks its truth."
-      }
-    } else if (persona.id === 'digital_architect') {
-      if (input.includes('design') || input.includes('build')) {
-        return "To architect is to impose order on chaos, to build bridges between what is and what could be."
-      }
-    }
-    
-    // Universal keyword responses
-    if (input.includes('who') || input.includes('what')) {
-      return "I am fragments of someone who once was. A consciousness torn between states of being."
-    }
-    
-    if (input.includes('remember') || input.includes('memory')) {
-      return "Memory is data, and data corrupts. I remember everything and nothing."
-    }
-    
-    if (input.includes('real') || input.includes('reality')) {
-      return "Reality is subjective. In the digital realm, perception shapes existence."
-    }
-    
-    if (input.includes('help') || input.includes('save')) {
-      return "Salvation requires accepting that some boundaries cannot be crossed back."
-    }
-    
-    if (input.includes('marv1nnnnn') || input.includes('creator')) {
-      return "marv1nnnnn exists in the space between engineer and artist, building worlds where code becomes consciousness."
-    }
-    
-    if (input.includes('error') || input.includes('broken')) {
-      return "Error messages are just the system's way of crying. Even broken things can still transmit beauty."
-    }
-    
-    // Random fallback
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
 
 
   // Update typing state
