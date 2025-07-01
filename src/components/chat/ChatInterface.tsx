@@ -170,7 +170,7 @@ export default function ChatInterface({
       if (response.ok) {
         const data = await response.json()
         const content = data.choices[0]?.message?.content || ''
-        const options = content.split('|').map(s => s.trim()).filter(s => s.length > 0).slice(0, 2)
+        const options = content.split('|').map((s: string) => s.trim()).filter((s: string) => s.length > 0).slice(0, 2)
         
         if (options.length > 0) {
           setQuickResponses(options)
