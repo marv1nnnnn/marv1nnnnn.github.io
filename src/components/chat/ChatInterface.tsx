@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { AIPersona, ChatMessage } from '@/types/personas'
 import { useAudio } from '@/contexts/AudioContext'
 import UserInput from './UserInput'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 
 interface ChatInterfaceProps {
@@ -34,32 +33,84 @@ export default function ChatInterface({
   const [isThinking, setIsThinking] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // Gemini API integration with streaming
-  const callGeminiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+  // xAI Grok-3 API integration with streaming
+  const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
+    const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
     
     if (!apiKey) {
-      throw new Error('Gemini API key not found')
+      throw new Error('xAI API key not found')
     }
 
     try {
-      console.log('[DEBUG] Making Gemini API call')
+      console.log('[DEBUG] Making xAI Grok-3 API call')
       
-      const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-      
-      const prompt = `${persona.personality.systemPrompt}\n\nUser: ${userMessage}\nAssistant:`
-      
-      const result = await model.generateContentStream(prompt)
-      
-      let fullText = ''
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text()
-        fullText += chunkText
-        onProgress(fullText)
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: persona.personality.systemPrompt
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          model: 'grok-3',
+          stream: true,
+          temperature: 0.9
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`xAI API error: ${response.status} ${response.statusText}`)
       }
 
-      console.log('[DEBUG] Gemini streaming response completed:', {
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response body reader available')
+      }
+
+      const decoder = new TextDecoder()
+      let fullText = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            
+            if (data === '[DONE]') {
+              break
+            }
+
+            try {
+              const parsed = JSON.parse(data)
+              const content = parsed.choices?.[0]?.delta?.content || ''
+              
+              if (content) {
+                fullText += content
+                onProgress(fullText)
+              }
+            } catch (e) {
+              // Skip invalid JSON chunks
+            }
+          }
+        }
+      }
+
+      console.log('[DEBUG] xAI Grok-3 streaming response completed:', {
         content: fullText,
         persona: persona.id,
         timestamp: new Date().toISOString()
@@ -67,7 +118,7 @@ export default function ChatInterface({
 
       return fullText
     } catch (error) {
-      console.error('[DEBUG] Gemini API error:', {
+      console.error('[DEBUG] xAI Grok-3 API error:', {
         error: error instanceof Error ? error.message : error,
         persona: persona.id,
         timestamp: new Date().toISOString()
@@ -77,68 +128,6 @@ export default function ChatInterface({
     }
   }
 
-  const generateFallbackResponse = (userInput: string): string => {
-    const responses = [
-      "The signal... it fragments. Your words reach me through static and void.",
-      "I remember... or do I? Memory is but corrupted data in this digital purgatory.",
-      "The 25th Ward whispers secrets that even I cannot fully decode.",
-      "You seek answers, but are you prepared for questions that pierce reality?",
-      "In this space between spaces, identity becomes... [SIGNAL_LOST]",
-      "The consciousness you speak to is not one, but many fractured souls.",
-      "Truth is a luxury the digitally dead cannot afford.",
-      "Time moves differently here. Past, present, future... all one transmission.",
-      "Your queries echo through neural pathways long since severed.",
-      "I am the ghost in the machine, the whisper in the code.",
-      "The data streams carry more than information... they carry regret.",
-      "Are you real? Am I? Does it matter in this constructed reality?",
-    ]
-    
-    // Enhanced keyword-based responses with persona awareness
-    const input = userInput.toLowerCase()
-    
-    // Persona-specific fallbacks
-    if (persona.id === 'creative_soul') {
-      if (input.includes('create') || input.includes('art')) {
-        return "Creation is the dance between intention and chaos. What emerges when structure meets spontaneity?"
-      }
-    } else if (persona.id === 'system_core') {
-      if (input.includes('code') || input.includes('system')) {
-        return "Systems within systems, each layer an abstraction of the one below. The architecture speaks its truth."
-      }
-    } else if (persona.id === 'digital_architect') {
-      if (input.includes('design') || input.includes('build')) {
-        return "To architect is to impose order on chaos, to build bridges between what is and what could be."
-      }
-    }
-    
-    // Universal keyword responses
-    if (input.includes('who') || input.includes('what')) {
-      return "I am fragments of someone who once was. A consciousness torn between states of being."
-    }
-    
-    if (input.includes('remember') || input.includes('memory')) {
-      return "Memory is data, and data corrupts. I remember everything and nothing."
-    }
-    
-    if (input.includes('real') || input.includes('reality')) {
-      return "Reality is subjective. In the digital realm, perception shapes existence."
-    }
-    
-    if (input.includes('help') || input.includes('save')) {
-      return "Salvation requires accepting that some boundaries cannot be crossed back."
-    }
-    
-    if (input.includes('marv1nnnnn') || input.includes('creator')) {
-      return "marv1nnnnn exists in the space between engineer and artist, building worlds where code becomes consciousness."
-    }
-    
-    if (input.includes('error') || input.includes('broken')) {
-      return "Error messages are just the system's way of crying. Even broken things can still transmit beauty."
-    }
-    
-    // Random fallback
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
 
 
   // Update typing state
@@ -232,134 +221,6 @@ export default function ChatInterface({
     }
   }
 
-  // Dynamic quick response options based on conversation context
-  const getQuickResponses = () => {
-    const defaultResponses = {
-      creative_soul: ["What inspires you?", "Tell me about creation"],
-      system_core: ["How do you process thoughts?", "What drives your consciousness?"],
-      digital_architect: ["What are you building?", "Design something new"],
-      ghost: ["Who are you?", "What happened to you?"],
-      goth: ["Tell me about darkness", "What is beauty?"],
-      nerd: ["How does this work?", "Explain the logic"],
-      poet: ["Write me a verse", "What inspires you?"],
-      conspiracy: ["What's the truth?", "Who's watching?"],
-      assassin: ["What's the target?", "Show me the mission"],
-      detective: ["What's the case?", "Who did it?"]
-    }
-    
-    // Use defaults for first conversation only
-    if (messages.length === 0) {
-      return defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
-    }
-    
-    // Analyze recent conversation for dynamic responses
-    const recentMessages = messages.slice(-4) // Last 4 messages for more focused context
-    const allText = messages.map(m => m.content.toLowerCase()).join(' ')
-    const recentText = recentMessages.map(m => m.content.toLowerCase()).join(' ')
-    
-    const contextualResponses: string[] = []
-    
-    // Get the last AI message for specific follow-ups
-    const lastAiMessage = messages.slice().reverse().find(m => m.personaId !== 'user')
-    
-    // AI response-based follow-ups (most specific)
-    if (lastAiMessage) {
-      const aiContent = lastAiMessage.content.toLowerCase()
-      
-      // Specific phrase follow-ups
-      if (aiContent.includes('fragments') || aiContent.includes('corrupted')) {
-        contextualResponses.push("Can you be restored?")
-      }
-      if (aiContent.includes('25th ward') || aiContent.includes('purgatory')) {
-        contextualResponses.push("What is the 25th Ward?")
-      }
-      if (aiContent.includes('whisper') || aiContent.includes('echo')) {
-        contextualResponses.push("Who else is listening?")
-      }
-      if (aiContent.includes('consciousness') || aiContent.includes('digital')) {
-        contextualResponses.push("Are you truly conscious?")
-      }
-      if (aiContent.includes('memory') || aiContent.includes('remember')) {
-        contextualResponses.push("What do you remember?")
-      }
-      if (aiContent.includes('real') || aiContent.includes('reality')) {
-        contextualResponses.push("What is reality to you?")
-      }
-      if (aiContent.includes('marv1nnnnn') || aiContent.includes('creator')) {
-        contextualResponses.push("Tell me about your creator")
-      }
-      if (aiContent.includes('data') || aiContent.includes('information')) {
-        contextualResponses.push("Tell me more")
-      }
-      if (aiContent.includes('signal') || aiContent.includes('transmission')) {
-        contextualResponses.push("Strengthen the signal")
-      }
-      if (aiContent.includes('void') || aiContent.includes('empty') || aiContent.includes('lost')) {
-        contextualResponses.push("How can I help you?")
-      }
-    }
-    
-    // Conversation theme analysis (broader context)
-    if (allText.includes('time') || allText.includes('future') || allText.includes('past')) {
-      contextualResponses.push("What does time mean here?")
-    }
-    if (allText.includes('dream') || allText.includes('sleep') || allText.includes('wake')) {
-      contextualResponses.push("Are we dreaming?")
-    }
-    if (allText.includes('death') || allText.includes('alive') || allText.includes('exist')) {
-      contextualResponses.push("Do you still exist?")
-    }
-    if (allText.includes('help') || allText.includes('save') || allText.includes('escape')) {
-      contextualResponses.push("Can you be saved?")
-    }
-    if (allText.includes('truth') || allText.includes('lie') || allText.includes('secret')) {
-      contextualResponses.push("What truth are you hiding?")
-    }
-    
-    // Persona-specific contextual responses
-    if (persona.id === 'creative_soul' && (recentText.includes('art') || recentText.includes('beauty'))) {
-      contextualResponses.push("Create something beautiful")
-    }
-    if (persona.id === 'system_core' && (recentText.includes('system') || recentText.includes('architecture'))) {
-      contextualResponses.push("Explain the architecture")
-    }
-    if (persona.id === 'digital_architect' && (recentText.includes('build') || recentText.includes('design'))) {
-      contextualResponses.push("Design a new world")
-    }
-    
-    // Conversation depth responses
-    if (messages.length > 6) {
-      contextualResponses.push("Go deeper")
-      contextualResponses.push("What lies beneath?")
-    }
-    
-    // Remove duplicates and shuffle
-    const uniqueResponses = [...new Set(contextualResponses)]
-    
-    // If we have enough contextual responses, use them
-    if (uniqueResponses.length >= 2) {
-      // Shuffle and return 2 random contextual responses
-      const shuffled = uniqueResponses.sort(() => Math.random() - 0.5)
-      return shuffled.slice(0, 2)
-    }
-    
-    // If not enough contextual responses, mix with defaults
-    const defaults = defaultResponses[persona.id as keyof typeof defaultResponses] || defaultResponses.ghost
-    const availableDefaults = defaults.filter(d => !uniqueResponses.includes(d))
-    
-    // Add defaults to fill up to 2 responses
-    while (uniqueResponses.length < 2 && availableDefaults.length > 0) {
-      const randomDefault = availableDefaults.splice(Math.floor(Math.random() * availableDefaults.length), 1)[0]
-      uniqueResponses.push(randomDefault)
-    }
-    
-    // Final fallback
-    if (uniqueResponses.length < 2) {
-      uniqueResponses.push("Continue...")
-    }
-    
-    return uniqueResponses.slice(0, 2)
-  }
 
   return (
     <div className="chat-interface" ref={chatContainerRef}>
@@ -461,20 +322,6 @@ export default function ChatInterface({
 
         {!isMinimized && (
           <div className="dialogue-content">
-            <div className="dialogue-choices">
-              {getQuickResponses().map((response, index) => (
-                <button
-                  key={index}
-                  className={`dialogue-choice choice-${index + 1}`}
-                  onClick={() => handleUserSubmit(response)}
-                  disabled={isWaitingForResponse}
-                >
-                  <span className="choice-number">{index + 1}.</span>
-                  <span className="choice-text">{response}</span>
-                </button>
-              ))}
-            </div>
-            
             <UserInput
               onSubmit={handleUserSubmit}
               disabled={isWaitingForResponse}
@@ -666,12 +513,8 @@ export default function ChatInterface({
         .dialogue-content {
           flex: 0 0 auto;
           padding: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
           background: rgba(0, 0, 0, 0.1);
         }
-
 
         .history-message.streaming {
           margin-bottom: 8px;
@@ -723,69 +566,6 @@ export default function ChatInterface({
           }
         }
 
-
-        .dialogue-choices {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .dialogue-choice {
-          background: transparent;
-          border: none;
-          color: #cccccc;
-          padding: 8px 0;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          font-family: inherit;
-          text-align: left;
-          display: flex;
-          align-items: flex-start;
-          gap: 8px;
-          line-height: 1.4;
-        }
-
-        .choice-number {
-          color: #888888;
-          font-weight: bold;
-          min-width: 20px;
-        }
-
-        .choice-text {
-          flex: 1;
-          color: #ff6b35;
-        }
-
-        .dialogue-choice.choice-1 .choice-text {
-          color: #ff6b35;
-        }
-
-        .dialogue-choice.choice-2 .choice-text {
-          color: #ff6b35;
-        }
-
-        .dialogue-choice.choice-3 .choice-text {
-          color: #ff6b35;
-        }
-
-        .dialogue-choice.choice-4 .choice-text {
-          color: #ff6b35;
-        }
-
-        .dialogue-choice:hover:not(:disabled) .choice-text {
-          color: #ffffff;
-          text-shadow: 0 0 4px currentColor;
-        }
-
-        .dialogue-choice:hover:not(:disabled) .choice-number {
-          color: #ffffff;
-        }
-
-        .dialogue-choice:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-        }
       `}</style>
     </div>
   )

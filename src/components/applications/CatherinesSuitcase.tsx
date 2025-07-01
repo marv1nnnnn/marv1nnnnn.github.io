@@ -214,7 +214,7 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
       audioRef.current.src = `/music/${currentTrack.filename}`
       audioRef.current.load()
     }
-  }, [playlist.currentTrack, currentTrack])
+  }, [playlist?.currentTrack, currentTrack])
 
   // Handle audio time updates
   useEffect(() => {
