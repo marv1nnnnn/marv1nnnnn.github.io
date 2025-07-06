@@ -269,11 +269,9 @@ export default function Persona3D({
   
   // Only render for figure persona types
   if (persona.avatar.model !== 'figure') {
-    console.log('[DEBUG] Persona3D not rendering - model type is:', persona.avatar.model)
     return null
   }
   
-  console.log('[DEBUG] Persona3D rendering with onClick handler:', !!onClick)
   
   return (
     <group
@@ -294,7 +292,6 @@ export default function Persona3D({
           onPointerLeave?.()
         }}
         onClick={(e) => {
-          console.log('[DEBUG] Persona3D clicked!', e)
           e.stopPropagation()
           onClick?.()
         }}

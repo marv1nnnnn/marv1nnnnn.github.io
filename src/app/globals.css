@@ -14,6 +14,15 @@
   --color-unease: #cccc66;     /* Default yellow accent */
   --color-static: #999999;     /* Digital interference */
   
+  /* Disco Elysium Dialogue Colors - Exact from screenshot */
+  --disco-bg: #0a0a0a;         /* Very dark background matching screenshot */
+  --disco-bg-hover: #1a1a1a;   /* Slightly lighter on hover */
+  --disco-bg-active: #000000;  /* Pure black when active */
+  --disco-text: #d0d0d0;       /* Light grey text matching screenshot */
+  --disco-text-hover: #ffffff; /* White text on hover */
+  --disco-border: #2a2a2a;     /* Very subtle border, barely visible */
+  --disco-border-hover: #3a3a3a; /* Slightly more visible on hover */
+  
   /* Persona-specific Variables (dynamically updated) */
   --persona-bg: #0a0a0a;
   --persona-text: #cccccc;

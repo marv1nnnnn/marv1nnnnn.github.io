@@ -95,13 +95,14 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
 
       <style jsx>{`
         .typewriter-message {
-          background: rgba(0, 0, 0, 0.6);
-          border: 1px solid var(--persona-accent, #cccc66);
-          border-radius: 6px;
-          padding: 16px;
+          background: rgba(0, 0, 0, 0.8);
+          border: 1px solid rgba(255, 107, 71, 0.2);
+          border-radius: 4px;
+          padding: 20px;
           position: relative;
-          margin-bottom: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          margin-bottom: 16px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(2px);
         }
 
         .message-header {
@@ -120,34 +121,47 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
         }
 
         .persona-name {
-          color: #ffff88;
+          color: #ff6b47;
           font-weight: bold;
-          text-shadow: 0 0 5px #ffff88;
+          text-shadow: 0 0 8px rgba(255, 107, 71, 0.4);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-size: 15px;
         }
 
         .persona-status {
-          color: #ffffff;
-          opacity: 0.8;
+          color: #cccccc;
+          opacity: 0.7;
           font-style: italic;
+          font-size: 12px;
         }
 
         .timestamp {
-          color: #ffffff;
-          opacity: 0.7;
+          color: #cccccc;
+          opacity: 0.6;
+          font-size: 12px;
         }
 
         .message-content {
           color: #ffffff;
-          line-height: 1.7;
+          line-height: 1.6;
           min-height: 24px;
           position: relative;
-          font-size: 16px;
+          font-size: 15px;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+          font-weight: 300;
         }
 
         .cursor {
-          /* animation: cursor-blink 1s infinite; */
-          color: var(--persona-accent, #cccc66);
+          animation: cursor-blink 1s infinite;
+          color: #ff6b47;
           font-weight: bold;
+          text-shadow: 0 0 6px rgba(255, 107, 71, 0.3);
+        }
+        
+        @keyframes cursor-blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
         }
 
         /* @keyframes cursor-blink {
@@ -162,10 +176,10 @@ export default function TypewriterMessage({ message, persona, speed }: Typewrite
           left: -1px;
           right: -1px;
           bottom: -1px;
-          background: linear-gradient(45deg, var(--persona-accent, #cccc66), transparent);
+          background: linear-gradient(45deg, rgba(255, 107, 71, 0.1), transparent);
           z-index: -1;
-          opacity: 0.2;
-          border-radius: 6px;
+          opacity: 0.3;
+          border-radius: 4px;
         }
       `}</style>
     </div>

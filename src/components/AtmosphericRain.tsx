@@ -170,7 +170,6 @@ export default function AtmosphericRain({
   })
   
   useEffect(() => {
-    console.log('[DEBUG] AtmosphericRain initialized with', raindropCount, 'raindrops')
   }, [raindropCount])
   
   return (

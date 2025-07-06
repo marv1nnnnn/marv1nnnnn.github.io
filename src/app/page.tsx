@@ -37,13 +37,11 @@ export default function Home() {
     // Preload all 3D components during boot sequence with progress tracking
     preloadAllComponents((progress, componentName) => {
       setPreloadProgress(progress)
-      console.log(`[DEBUG] Preload progress: ${progress}% (${componentName})`)
     }).then(() => {
-      console.log('[DEBUG] Component preloading completed during boot')
       setComponentsPreloaded(true)
       setPreloadProgress(100)
     }).catch(error => {
-      console.warn('[DEBUG] Component preloading failed:', error)
+      console.warn('Component preloading failed:', error)
       setComponentsPreloaded(true) // Still allow progression
       setPreloadProgress(100)
     })

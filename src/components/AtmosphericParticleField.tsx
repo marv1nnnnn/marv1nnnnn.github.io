@@ -215,9 +215,7 @@ function ParticleLayer({
 
   // Subscribe to emotion updates
   useEffect(() => {
-    console.log('[DEBUG] ParticleLayer', layerIndex, 'initializing with config:', layerConfig)
     emotionManager.subscribeToEmotionUpdates((newEmotion, intensity) => {
-      console.log('[DEBUG] ParticleLayer', layerIndex, 'emotion update:', { emotion: newEmotion, intensity })
       setEmotion({ type: newEmotion, intensity })
     })
   }, [emotionManager, layerIndex, layerConfig])
@@ -320,7 +318,6 @@ export function AtmosphericParticleField({
   emotionManager: ConversationEmotionManager
   breathingManager: AtmosphericBreathingManager
 }) {
-  console.log('[DEBUG] AtmosphericParticleField initializing with', atmosphericLayers.length, 'layers')
   
   return (
     <group name="atmospheric-particle-field">

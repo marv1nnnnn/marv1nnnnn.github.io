@@ -171,7 +171,7 @@ export default function CaseFileDisplay({ position, onCaseFileClick }: CaseFileD
           anchorX="center"
           anchorY="middle"
         >
-          {hovered ? "[CLICK TO ACCESS]" : "ARCHIVE"}
+          {hovered ? "CLICK TO read" : "ARCHIVE"}
         </Text>
 
         {/* Subtle glow effect when hovered */}
