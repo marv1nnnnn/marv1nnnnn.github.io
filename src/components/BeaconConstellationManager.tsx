@@ -129,11 +129,9 @@ export class ConversationEmotionManager {
 
   // Process both user and AI messages for emotion
   processConversationTurn(userMessage: string, aiMessage?: string): void {
-    console.log('[DEBUG] Processing conversation turn:', { userMessage, aiMessage })
     
     // Analyze user message first
     const userAnalysis = this.analyzeMessage(userMessage, true)
-    console.log('[DEBUG] User message analysis:', userAnalysis)
     
     // Update emotion based on user input
     this.updateBeaconEmotion(userAnalysis.emotion, userAnalysis.intensity)
@@ -142,7 +140,6 @@ export class ConversationEmotionManager {
     if (aiMessage) {
       setTimeout(() => {
         const aiAnalysis = this.analyzeMessage(aiMessage, false)
-        console.log('[DEBUG] AI message analysis:', aiAnalysis)
         
         // Blend user and AI emotions for final state
         const blendedIntensity = (userAnalysis.intensity * 0.7 + aiAnalysis.intensity * 0.3)
@@ -164,7 +161,6 @@ export class ConversationEmotionManager {
   updateBeaconEmotion(emotion: string, intensity: number = 1.0) {
     this.currentEmotion = { type: emotion, intensity }
     this.lastEmotionChange = Date.now()
-    console.log('[DEBUG] Beacon emotion updated:', { emotion, intensity })
     this.beaconUpdateCallbacks.forEach(callback => callback(emotion, intensity))
   }
 
@@ -396,7 +392,6 @@ export function BeaconConstellation({
 }) {
   const [beaconStates, setBeaconStates] = useState<any[]>(new Array(6).fill({}))
   
-  console.log('[DEBUG] BeaconConstellation initializing with', beaconNetwork.length, 'beacons')
 
   return (
     <group>

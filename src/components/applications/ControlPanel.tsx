@@ -123,8 +123,6 @@ export default function ControlPanel({
     // Call callback to update parent component
     onVisualEffectToggle?.(effectName, newEffects[effectName])
     playSound('click')
-    
-    console.log(`[DEBUG] Visual effect ${effectName} toggled:`, newEffects[effectName])
   }
 
   // Aurora settings handlers

@@ -37,7 +37,6 @@ function CameraController({
     // Point the camera toward the scene center with slight adjustment for atmosphere
     camera.lookAt(new THREE.Vector3(0, 0, 0))
     
-    console.log('[DEBUG] Camera updated:', { position, rotation })
   }, [camera, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z])
   
   return null
@@ -260,17 +259,14 @@ export default function FilmWindow({
   // 3D Scene control handlers
   const handleCameraPositionChange = (position: { x: number; y: number; z: number }) => {
     setCameraPosition(position)
-    console.log('[DEBUG] Camera position changed:', position)
   }
 
   const handleCameraRotationChange = (rotation: { x: number; y: number; z: number }) => {
     setCameraRotation(rotation)
-    console.log('[DEBUG] Camera rotation changed:', rotation)
   }
 
   const handleSceneLightingChange = (lighting: any) => {
     setSceneLighting(lighting)
-    console.log('[DEBUG] Scene lighting changed:', lighting)
   }
 
   const handleAtmosphericIntensityChange = (intensity: number) => {
@@ -281,48 +277,39 @@ export default function FilmWindow({
     const emotionTypeMap = { 0: 'contemplative', 1: 'excited', 2: 'melancholic', 3: 'mysterious', 4: 'urgent' }
     const emotionName = emotionTypeMap[currentEmotionType as keyof typeof emotionTypeMap] || 'contemplative'
     breathingManager.updateEmotionState(emotionName, intensity)
-    console.log('[DEBUG] Atmospheric intensity changed:', intensity)
   }
 
   const handleAudioVolumeChange = (volume: number) => {
     setAudioVolume(volume)
-    console.log('[DEBUG] Audio volume changed:', volume)
   }
 
   const handleVisualEffectToggle = (effectName: string, enabled: boolean | any) => {
     if (effectName === 'auroraSettings') {
       setAuroraSettings(enabled)
-      console.log('[DEBUG] Aurora settings updated:', enabled)
     } else {
       setVisualEffects(prev => ({
         ...prev,
         [effectName]: enabled
       }))
-      console.log(`[DEBUG] Visual effect ${effectName} toggled:`, enabled)
     }
   }
 
   // Persona 3D control handlers
   const handlePersonaPositionChange = (position: { x: number; y: number; z: number }) => {
     setPersonaPosition(position)
-    console.log('[DEBUG] Persona position changed:', position)
   }
 
   const handlePersonaScaleChange = (scale: number) => {
     setPersonaScale(scale)
-    console.log('[DEBUG] Persona scale changed:', scale)
   }
 
   const handlePersonaHoverEffectsChange = (effects: typeof personaHoverEffects) => {
     setPersonaHoverEffects(effects)
-    console.log('[DEBUG] Persona hover effects changed:', effects)
   }
 
   const handleToggleChatMinimize = () => {
-    console.log('[DEBUG] handleToggleChatMinimize called! Current state:', isChatMinimized)
     setIsChatMinimized(prev => !prev)
     playSound(isChatMinimized ? 'windowOpen' : 'windowClose')
-    console.log('[DEBUG] Chat minimized state toggled:', !isChatMinimized)
   }
 
   const handleMessageAdd = (message: ChatMessage) => {
@@ -337,7 +324,6 @@ export default function FilmWindow({
 
   // Handle emotion updates from chat interface
   const handleEmotionUpdate = (userMessage: string, aiMessage?: string) => {
-    console.log('[DEBUG] FilmWindow received emotion update:', { userMessage, aiMessage })
     
     // Simple emotion detection based on keywords
     const analyzeEmotion = (message: string) => {
@@ -362,74 +348,57 @@ export default function FilmWindow({
 
   // Debug logging to verify components are working
   useEffect(() => {
-    console.log('[DEBUG] FilmWindow atmospheric systems initialized:', {
-      breathingManager,
-      hasAuroraSystem: true,
-      hasParticleSystem: false
-    })
     
     // Test emotion update
     setTimeout(() => {
-      console.log('[DEBUG] Testing emotion update...')
       breathingManager.updateEmotionState('excited', 0.8)
     }, 2000)
   }, [])
 
   // Handle gamepad controller click to open control panel
   const handleGamepadClick = () => {
-    console.log('[DEBUG] FilmWindow handleGamepadClick called!')
-    const existingPanel = windows.find(w => w.component === 'ControlPanel')
+    // Close all existing Control Panel windows first
+    setWindows(prev => prev.filter(w => w.component !== 'ControlPanel'))
     
-    if (existingPanel) {
-      // Close window if already open
-      console.log('[DEBUG] Closing existing control panel')
-      setWindows(prev => prev.filter(w => w.id !== existingPanel.id))
-      playSound('windowClose')
-    } else {
-      // Open control panel window
-      console.log('[DEBUG] Opening new control panel')
-      const newWindow: WindowState = {
-        id: 'control-panel-' + Date.now(),
-        title: 'marv1nnnnn Personal Control Panel',
-        isMinimized: false,
-        isMaximized: false,
-        isFocused: true,
-        position: { x: 200, y: 100, width: 800, height: 600 },
-        zIndex: 100,
-        component: 'ControlPanel',
-        props: {
-          currentPersona,
-          glitchLevel,
-          onGlitchLevelChange: setGlitchLevel,
-          onCameraPositionChange: handleCameraPositionChange,
-          onCameraRotationChange: handleCameraRotationChange,
-          onSceneLightingChange: handleSceneLightingChange,
-          onAtmosphericIntensityChange: handleAtmosphericIntensityChange,
-          onAudioVolumeChange: handleAudioVolumeChange,
-          onVisualEffectToggle: handleVisualEffectToggle,
-          onPersonaPositionChange: handlePersonaPositionChange,
-          onPersonaScaleChange: handlePersonaScaleChange,
-          onPersonaHoverEffectsChange: handlePersonaHoverEffectsChange
-        }
+    // Then open a new one
+    const newWindow: WindowState = {
+      id: 'control-panel-' + Date.now(),
+      title: 'marv1nnnnn Personal Control Panel',
+      isMinimized: false,
+      isMaximized: false,
+      isFocused: true,
+      position: { x: 200, y: 100, width: 800, height: 600 },
+      zIndex: 100,
+      component: 'ControlPanel',
+      props: {
+        currentPersona,
+        glitchLevel,
+        onGlitchLevelChange: setGlitchLevel,
+        onCameraPositionChange: handleCameraPositionChange,
+        onCameraRotationChange: handleCameraRotationChange,
+        onSceneLightingChange: handleSceneLightingChange,
+        onAtmosphericIntensityChange: handleAtmosphericIntensityChange,
+        onAudioVolumeChange: handleAudioVolumeChange,
+        onVisualEffectToggle: handleVisualEffectToggle,
+        onPersonaPositionChange: handlePersonaPositionChange,
+        onPersonaScaleChange: handlePersonaScaleChange,
+        onPersonaHoverEffectsChange: handlePersonaHoverEffectsChange
       }
-      setWindows(prev => [...prev, newWindow])
-      playSound('windowOpen')
     }
+    setWindows(prev => [...prev, newWindow])
+    playSound('windowOpen')
   }
 
   // Handle case file display click to open case file reader
   const handleCaseFileClick = () => {
-    console.log('[DEBUG] FilmWindow handleCaseFileClick called!')
     const existingReader = windows.find(w => w.component === 'CaseFileReader')
     
     if (existingReader) {
       // Close window if already open
-      console.log('[DEBUG] Closing existing case file reader')
       setWindows(prev => prev.filter(w => w.id !== existingReader.id))
       playSound('windowClose')
     } else {
       // Open case file reader window
-      console.log('[DEBUG] Opening new case file reader')
       const newWindow: WindowState = {
         id: 'case-file-reader-' + Date.now(),
         title: 'Case File Reader - CLASSIFIED ACCESS',
@@ -448,17 +417,14 @@ export default function FilmWindow({
 
   // Handle suitcase display click to open Catherine's Suitcase
   const handleSuitcaseClick = () => {
-    console.log('[DEBUG] FilmWindow handleSuitcaseClick called!')
     const existingSuitcase = windows.find(w => w.component === 'CatherinesSuitcase')
     
     if (existingSuitcase) {
       // Close window if already open
-      console.log('[DEBUG] Closing existing suitcase')
       setWindows(prev => prev.filter(w => w.id !== existingSuitcase.id))
       playSound('windowClose')
     } else {
       // Open suitcase window
-      console.log('[DEBUG] Opening new suitcase')
       const newWindow: WindowState = {
         id: 'catherines-suitcase-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         title: "Catherine's Suitcase - Retro Music Player",

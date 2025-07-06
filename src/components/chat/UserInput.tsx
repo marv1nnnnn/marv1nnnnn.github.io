@@ -91,10 +91,11 @@ export default function UserInput({ onSubmit, disabled, persona }: UserInputProp
         }
 
         .input-container {
-          background: transparent;
-          border: none;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 107, 71, 0.1);
+          border-radius: 2px;
           color: #cccccc;
-          padding: 8px 0;
+          padding: 8px 12px;
           font-size: 14px;
           cursor: text;
           transition: all 0.2s ease;
@@ -107,12 +108,13 @@ export default function UserInput({ onSubmit, disabled, persona }: UserInputProp
         }
 
         .choice-number {
-          color: #888888;
+          color: #ff6b47;
           font-weight: bold;
           flex-shrink: 0;
           font-family: inherit;
           font-size: 14px;
           margin-right: 0;
+          text-shadow: 0 0 6px rgba(255, 107, 71, 0.3);
         }
 
         .message-input {
@@ -129,11 +131,13 @@ export default function UserInput({ onSubmit, disabled, persona }: UserInputProp
           height: auto;
           min-height: 20px;
           flex: 1;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
         }
 
         .message-input::placeholder {
           color: #888888;
-          font-style: normal;
+          font-style: italic;
+          opacity: 0.7;
         }
 
         .message-input:disabled {
@@ -142,9 +146,15 @@ export default function UserInput({ onSubmit, disabled, persona }: UserInputProp
         }
 
         .input-container:hover .choice-number {
-          color: #cccccc;
+          color: #ff6b47;
+          text-shadow: 0 0 8px rgba(255, 107, 71, 0.4);
         }
 
+        .input-container:hover {
+          border-color: rgba(255, 107, 71, 0.3);
+          box-shadow: 0 0 8px rgba(255, 107, 71, 0.1);
+        }
+        
         .input-container:hover .message-input {
           color: #ffffff;
         }

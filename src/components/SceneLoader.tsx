@@ -25,7 +25,6 @@ async function preloadComponent(componentName: string, lazyComponent: () => Prom
   }
   
   try {
-    console.log(`[DEBUG] Preloading component: ${componentName}`)
     const componentModule = await lazyComponent()
     const component = componentModule.default || componentModule
     
@@ -33,10 +32,9 @@ async function preloadComponent(componentName: string, lazyComponent: () => Prom
     PRELOADED_COMPONENTS.set(componentName, componentModule)
     COMPONENT_CACHE.set(componentName, component)
     
-    console.log(`[DEBUG] Successfully preloaded: ${componentName}`)
     return componentModule
   } catch (error) {
-    console.warn(`[DEBUG] Failed to preload component ${componentName}:`, error)
+    console.warn(`Failed to preload component ${componentName}:`, error)
     return null
   }
 }
@@ -61,7 +59,6 @@ export async function preloadAllComponents(
   }
   
   preloadingPromise = (async () => {
-    console.log('[DEBUG] Starting component preloading...')
     const startTime = performance.now()
     
     const componentList = [
@@ -83,14 +80,11 @@ export async function preloadAllComponents(
       completed++
       const progress = Math.round((completed / total) * 100)
       onProgress?.(progress, name)
-      console.log(`[DEBUG] Preload progress: ${progress}% (${name})`)
     })
     
     await Promise.all(preloadPromises)
     
     const endTime = performance.now()
-    console.log(`[DEBUG] All 3D components preloaded successfully in ${Math.round(endTime - startTime)}ms`)
-    console.log(`[DEBUG] Cached components:`, Array.from(PRELOADED_COMPONENTS.keys()))
   })()
   
   return preloadingPromise
@@ -280,7 +274,6 @@ export function SceneLoader({
     const loadSequence = async () => {
       // If components are preloaded, skip loading sequence entirely
       if (componentsPreloaded) {
-        console.log('[DEBUG] Components preloaded - instant scene activation')
         setLoadedComponents({
           ocean: visualEffects.oceanWaves,
           aurora: visualEffects.aurora,
@@ -462,7 +455,6 @@ export function SceneLoader({
             position={[personaPosition.x, personaPosition.y, personaPosition.z]}
             scale={personaScale}
             onClick={() => {
-              console.log('[DEBUG] SceneLoader persona click handler called')
               handlePersonaClick?.()
             }}
           />

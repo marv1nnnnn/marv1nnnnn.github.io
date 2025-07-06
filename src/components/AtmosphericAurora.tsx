@@ -363,7 +363,6 @@ function generateFullSkyAuroras(
   
   // Screen size responsive scaling - larger screens get bigger auroras
   const screenScale = Math.max(1, viewportScale) // Minimum scale of 1
-  console.log('[DEBUG] Aurora generation with viewport scale:', screenScale, 'density:', densityMultiplier, 'coverage:', coverageMultiplier)
   
   // Create multiple layers covering the entire sky - positioned above horizon
   // Increase layer count based on density multiplier
@@ -450,7 +449,6 @@ export function AtmosphericAurora({
     // 1366px = scale 1.0, 1920px = scale 1.5, 2560px = scale 2.0
     const baseWidth = 13.7 // Viewport width for 1366px screen
     const scale = Math.max(1.0, Math.min(2.5, Math.pow(viewportWidth / baseWidth, 0.8))) // Capped scaling
-    console.log('[DEBUG] Viewport scaling - width:', viewportWidth, 'scale:', scale.toFixed(2))
     return scale
   }
   
@@ -471,7 +469,6 @@ export function AtmosphericAurora({
     const coverageDifference = Math.abs(coverageMultiplier - lastCoverage)
     
     if (scaleDifference > 0.2 || densityDifference > 0.1 || coverageDifference > 0.1) {
-      console.log('[DEBUG] Significant parameter change detected, regenerating auroras')
       const newConfigs = generateFullSkyAuroras(auroraCount, viewportScale, densityMultiplier, coverageMultiplier)
       setCurrentConfigs(newConfigs)
       setLastViewportScale(viewportScale)
@@ -481,7 +478,6 @@ export function AtmosphericAurora({
   }, [viewportScale, lastViewportScale, densityMultiplier, lastDensity, coverageMultiplier, lastCoverage, auroraCount])
   
   useEffect(() => {
-    console.log('[DEBUG] Full-sky AtmosphericAurora initialized with', currentConfigs.length, 'aurora layers covering the entire sky at scale', viewportScale.toFixed(2))
   }, [currentConfigs.length, viewportScale])
 
   return (

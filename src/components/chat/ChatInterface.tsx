@@ -43,8 +43,16 @@ export default function ChatInterface({
       throw new Error('xAI API key not found')
     }
 
+    const startTime = Date.now()
+    
     try {
-      console.log('[DEBUG] Making xAI Grok-3 API call')
+      console.log('[xAI API] Starting streaming request:', {
+        model: 'grok-3',
+        temperature: 0.9,
+        personaId: persona.id,
+        timestamp: new Date().toISOString(),
+        messageLength: userMessage.length
+      })
       
       const response = await fetch('https://api.x.ai/v1/chat/completions', {
         method: 'POST',
@@ -112,18 +120,20 @@ export default function ChatInterface({
         }
       }
 
-      console.log('[DEBUG] xAI Grok-3 streaming response completed:', {
-        content: fullText,
-        persona: persona.id,
-        timestamp: new Date().toISOString()
+      console.log('[xAI API] Streaming completed:', {
+        responseLength: fullText.length,
+        personaId: persona.id,
+        timestamp: new Date().toISOString(),
+        duration: `${Date.now() - startTime}ms`
       })
 
       return fullText
     } catch (error) {
-      console.error('[DEBUG] xAI Grok-3 API error:', {
+      console.error('[xAI API] Error during streaming:', {
         error: error instanceof Error ? error.message : error,
-        persona: persona.id,
-        timestamp: new Date().toISOString()
+        personaId: persona.id,
+        timestamp: new Date().toISOString(),
+        stack: error instanceof Error ? error.stack : undefined
       })
       
       throw error
@@ -133,8 +143,19 @@ export default function ChatInterface({
   // Generate quick responses based on conversation history
   const generateQuickResponses = async () => {
     const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
-    if (!apiKey || messages.length === 0) return
+    if (!apiKey || messages.length === 0) {
+      console.log('[xAI API] Quick responses skipped:', {
+        hasApiKey: !!apiKey,
+        messagesCount: messages.length
+      })
+      return
+    }
 
+    console.log('[xAI API] Generating quick responses:', {
+      messagesCount: messages.length,
+      timestamp: new Date().toISOString()
+    })
+    
     setIsGeneratingQuickResponses(true)
     
     try {
@@ -172,12 +193,28 @@ export default function ChatInterface({
         const content = data.choices[0]?.message?.content || ''
         const options = content.split('|').map((s: string) => s.trim()).filter((s: string) => s.length > 0).slice(0, 2)
         
+        console.log('[xAI API] Quick responses generated:', {
+          rawContent: content,
+          optionsCount: options.length,
+          options: options,
+          timestamp: new Date().toISOString()
+        })
+        
         if (options.length > 0) {
           setQuickResponses(options)
         }
+      } else {
+        console.error('[xAI API] Quick response request failed:', {
+          status: response.status,
+          statusText: response.statusText
+        })
       }
     } catch (error) {
-      console.error('[DEBUG] Error generating quick responses:', error)
+      console.error('[xAI API] Error generating quick responses:', {
+        error: error instanceof Error ? error.message : error,
+        timestamp: new Date().toISOString(),
+        messagesCount: messages.length
+      })
     } finally {
       setIsGeneratingQuickResponses(false)
     }
@@ -208,10 +245,11 @@ export default function ChatInterface({
   }, [messages, streamingMessage])
 
   const handleUserSubmit = async (userMessage: string) => {
-    console.log('[DEBUG] User message submitted:', {
-      message: userMessage,
-      persona: persona.id,
-      timestamp: new Date().toISOString()
+    console.log('[xAI API] User message submitted:', {
+      messageLength: userMessage.length,
+      personaId: persona.id,
+      timestamp: new Date().toISOString(),
+      isWaitingForResponse: isWaitingForResponse
     })
 
     // Add user message immediately
@@ -274,7 +312,11 @@ export default function ChatInterface({
       }
       
     } catch (error) {
-      console.error('[DEBUG] Error in handleUserSubmit:', error)
+      console.error('[xAI API] Error in message handling:', {
+        error: error instanceof Error ? error.message : error,
+        timestamp: new Date().toISOString(),
+        stack: error instanceof Error ? error.stack : undefined
+      })
       setStreamingMessage(null)
     } finally {
       setIsWaitingForResponse(false)
@@ -482,11 +524,11 @@ export default function ChatInterface({
           height: ${isMinimized ? 'auto' : 'calc(100vh - 40px)'};
           display: flex;
           flex-direction: column;
-          background: ${isMinimized ? 'transparent' : 'rgba(0, 0, 0, 0.3)'};
-          border: ${isMinimized ? 'none' : '2px solid #4a4a4a'};
-          border-radius: ${isMinimized ? '0' : '8px'};
+          background: ${isMinimized ? 'transparent' : 'rgba(0, 0, 0, 0.85)'};
+          border: ${isMinimized ? 'none' : '2px solid #3a3a3a'};
+          border-radius: ${isMinimized ? '0' : '6px'};
           overflow: hidden;
-          box-shadow: ${isMinimized ? 'none' : '0 8px 32px rgba(0, 0, 0, 0.7)'};
+          box-shadow: ${isMinimized ? 'none' : '0 8px 32px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.1)'};
           pointer-events: auto;
           transition: all 0.3s ease;
         }
@@ -494,50 +536,64 @@ export default function ChatInterface({
         .recent-history {
           flex: 1;
           overflow-y: auto;
-          padding: 16px;
+          padding: 20px;
           border-bottom: 1px solid #4a4a4a;
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.7);
           min-height: 0;
+          backdrop-filter: blur(2px);
         }
 
         .history-message {
-          margin-bottom: 12px;
+          margin-bottom: 16px;
           font-size: 14px;
+          position: relative;
         }
 
         .user-response {
           color: #ffffff;
-          margin-bottom: 8px;
-          opacity: 0.9;
+          margin-bottom: 12px;
+          opacity: 0.95;
+          font-size: 14px;
+          line-height: 1.5;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
         }
 
         .speaker-label {
-          color: #888888;
+          color: #ff6b47;
           font-weight: bold;
+          text-shadow: 0 0 6px rgba(255, 107, 71, 0.3);
+          font-size: 14px;
+          letter-spacing: 0.5px;
         }
 
         .ai-response {
-          margin-bottom: 12px;
+          margin-bottom: 16px;
+          padding: 2px 0;
         }
 
         .ai-name {
-          color: #ffffff;
+          color: #ff6b47;
           font-weight: bold;
-          margin-bottom: 4px;
+          margin-bottom: 8px;
           text-transform: uppercase;
-          font-size: 13px;
+          font-size: 15px;
+          text-shadow: 0 0 8px rgba(255, 107, 71, 0.4);
+          letter-spacing: 1px;
         }
 
         .ai-text {
-          color: #cccccc;
-          line-height: 1.4;
-          font-size: 14px;
+          color: #ffffff;
+          line-height: 1.6;
+          font-size: 15px;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+          font-weight: 300;
         }
 
         .character-header {
           padding: 16px 20px;
-          background: rgba(0, 0, 0, 0.5);
-          border-bottom: ${isMinimized ? 'none' : '1px solid #4a4a4a'};
+          background: rgba(0, 0, 0, 0.7);
+          border-bottom: ${isMinimized ? 'none' : '1px solid rgba(255, 107, 71, 0.2)'};
+          backdrop-filter: blur(4px);
         }
 
         .header-top {
@@ -548,11 +604,12 @@ export default function ChatInterface({
         }
 
         .character-name {
-          color: #ffffff;
-          font-size: 14px;
+          color: #ff6b47;
+          font-size: 15px;
           font-weight: bold;
-          letter-spacing: 1px;
+          letter-spacing: 1.5px;
           text-transform: uppercase;
+          text-shadow: 0 0 8px rgba(255, 107, 71, 0.4);
         }
 
         .header-controls {
@@ -636,61 +693,74 @@ export default function ChatInterface({
         .character-description {
           color: #cccccc;
           font-size: 12px;
-          line-height: 1.4;
+          line-height: 1.5;
           font-style: italic;
-          opacity: 0.9;
+          opacity: 0.8;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
         }
 
         .dialogue-content {
           flex: 0 0 auto;
           padding: 20px;
-          background: rgba(0, 0, 0, 0.1);
+          background: rgba(0, 0, 0, 0.4);
+          border-top: 1px solid rgba(255, 107, 71, 0.1);
         }
 
         .quick-responses {
           display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
+          flex-direction: column;
+          gap: 6px;
           margin-bottom: 16px;
         }
 
         .quick-response-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: #cccccc;
-          padding: 8px 12px;
-          border-radius: 4px;
-          font-size: 12px;
-          font-family: inherit;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          flex: 0 0 calc(50% - 4px);
-          text-align: center;
-        }
-
-        .quick-response-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.4);
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 107, 71, 0.2);
           color: #ffffff;
-          transform: translateY(-1px);
-        }
-
-        .quick-response-btn:active {
-          transform: translateY(0);
-        }
-
-        .quick-response-btn.dynamic {
-          flex: 1 1 auto;
-          max-width: 100%;
+          padding: 10px 12px;
+          border-radius: 2px;
+          font-size: 14px;
+          font-family: inherit;
+          font-weight: normal;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          width: 100%;
+          text-align: left;
           display: flex;
           align-items: center;
           gap: 6px;
+          min-height: 36px;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .quick-response-btn:hover {
+          background: rgba(255, 107, 71, 0.1);
+          border-color: rgba(255, 107, 71, 0.4);
+          color: #ffffff;
+          box-shadow: 0 0 8px rgba(255, 107, 71, 0.2);
+        }
+
+        .quick-response-btn:active {
+          background: rgba(255, 107, 71, 0.2);
+          transform: none;
+        }
+
+        .quick-response-btn.dynamic {
+          flex: none;
+          max-width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
         .option-number {
-          color: #888888;
+          color: #ff6b47;
           font-weight: bold;
           flex-shrink: 0;
+          font-size: 14px;
+          opacity: 1;
+          text-shadow: 0 0 6px rgba(255, 107, 71, 0.3);
+          margin-right: 2px;
         }
 
         .quick-response-loading {
@@ -779,6 +849,19 @@ export default function ChatInterface({
             opacity: 1;
             transform: scale(1.2);
           }
+        }
+        
+        @keyframes subtle-glow {
+          0%, 100% {
+            box-shadow: 0 0 8px rgba(255, 107, 71, 0.1);
+          }
+          50% {
+            box-shadow: 0 0 12px rgba(255, 107, 71, 0.2);
+          }
+        }
+        
+        .dialogue-panel:not(.minimized) {
+          animation: subtle-glow 4s ease-in-out infinite;
         }
 
       `}</style>
