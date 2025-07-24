@@ -13,6 +13,7 @@ import SceneLoader, { LoadingState, PerformancePreset } from './SceneLoader'
 import { ConversationEmotionManager } from './BeaconConstellationManager'
 import WindowManager from './WindowManager'
 import Taskbar from './Taskbar'
+import LoadingMusicManager from './LoadingMusicManager'
 import { Canvas, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
@@ -454,6 +455,13 @@ export default function FilmWindow({
   return (
     <PersonaManager>
       <div ref={filmWindowRef} className="film-window">
+        {/* Loading Music Manager - Atmospheric soundscape during loading */}
+        <LoadingMusicManager
+          loadingState={loadingState}
+          isLoading={loadingState !== 'complete'}
+          progress={loadingProgress}
+        />
+
         {/* Digital Ocean Background */}
         <DigitalOceanBackground glitchLevel={glitchLevel} breathingManager={breathingManager} />
 

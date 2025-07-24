@@ -33,7 +33,25 @@ export default function ChatInterface({
   const [isThinking, setIsThinking] = useState(false)
   const [quickResponses, setQuickResponses] = useState<string[]>([])
   const [isGeneratingQuickResponses, setIsGeneratingQuickResponses] = useState(false)
+  const [quickResponseError, setQuickResponseError] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
+
+  // Fallback quick responses when API fails or for offline use
+  const getFallbackQuickResponses = (): string[] => {
+    const fallbackSets = [
+      ["Tell me more", "That's interesting"],
+      ["How does that work?", "Can you explain?"],
+      ["What do you think?", "Any suggestions?"],
+      ["Go on", "I see"],
+      ["What's next?", "Anything else?"],
+      ["Why is that?", "Makes sense"],
+      ["Really?", "Cool"],
+      ["What about you?", "I understand"]
+    ]
+    
+    // Return a random set of fallback responses
+    return fallbackSets[Math.floor(Math.random() * fallbackSets.length)]
+  }
 
   // xAI Grok-3 API integration with streaming
   const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
@@ -143,11 +161,16 @@ export default function ChatInterface({
   // Generate quick responses based on conversation history
   const generateQuickResponses = async () => {
     const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
-    if (!apiKey || messages.length === 0) {
-      console.log('[xAI API] Quick responses skipped:', {
-        hasApiKey: !!apiKey,
-        messagesCount: messages.length
-      })
+    
+    // Always ensure we have quick responses, even without API
+    if (!apiKey) {
+      console.log('[Quick Response] No API key, using fallback responses')
+      setQuickResponses(getFallbackQuickResponses())
+      return
+    }
+
+    if (messages.length === 0) {
+      console.log('[Quick Response] No messages, skipping generation')
       return
     }
 
@@ -157,6 +180,7 @@ export default function ChatInterface({
     })
     
     setIsGeneratingQuickResponses(true)
+    setQuickResponseError(false)
     
     try {
       // Get last few messages for context
@@ -200,14 +224,22 @@ export default function ChatInterface({
           timestamp: new Date().toISOString()
         })
         
-        if (options.length > 0) {
+        if (options.length >= 2) {
           setQuickResponses(options)
+        } else {
+          // Fallback if API didn't return enough options
+          console.log('[Quick Response] Insufficient options from API, using fallback')
+          setQuickResponses(getFallbackQuickResponses())
+          setQuickResponseError(true)
         }
       } else {
         console.error('[xAI API] Quick response request failed:', {
           status: response.status,
           statusText: response.statusText
         })
+        // Use fallback responses on API failure
+        setQuickResponses(getFallbackQuickResponses())
+        setQuickResponseError(true)
       }
     } catch (error) {
       console.error('[xAI API] Error generating quick responses:', {
@@ -215,16 +247,26 @@ export default function ChatInterface({
         timestamp: new Date().toISOString(),
         messagesCount: messages.length
       })
+      // Use fallback responses on error
+      setQuickResponses(getFallbackQuickResponses())
+      setQuickResponseError(true)
     } finally {
       setIsGeneratingQuickResponses(false)
     }
   }
 
-  // Generate quick responses when messages change
+  // Generate quick responses when messages change (with debouncing)
   useEffect(() => {
+    // Only generate for conversation messages (not initial welcome)
     if (messages.length > 0 && !isWaitingForResponse && !streamingMessage) {
-      generateQuickResponses()
+      // Small delay to avoid rapid regeneration
+      const timer = setTimeout(() => {
+        generateQuickResponses()
+      }, 500)
+      
+      return () => clearTimeout(timer)
     } else if (messages.length === 0) {
+      // Clear quick responses for new conversations
       setQuickResponses([])
     }
   }, [messages.length, isWaitingForResponse, streamingMessage])
@@ -325,6 +367,8 @@ export default function ChatInterface({
     }
   }
 
+  // Determine if we should show quick responses
+  const shouldShowQuickResponses = !isWaitingForResponse && !streamingMessage && !isMinimized
 
   return (
     <div className="chat-interface" ref={chatContainerRef}>
@@ -426,7 +470,7 @@ export default function ChatInterface({
 
         {!isMinimized && (
           <div className="dialogue-content">
-            {!isWaitingForResponse && !streamingMessage && (
+            {shouldShowQuickResponses && (
               <div className="quick-responses">
                 {messages.length === 0 ? (
                   // Default quick responses for new conversations
@@ -438,16 +482,7 @@ export default function ChatInterface({
                         handleUserSubmit("Tell me about yourself")
                       }}
                     >
-                      Tell me about yourself
-                    </button>
-                    <button 
-                      className="quick-response-btn"
-                      onClick={() => {
-                        playSound('click')
-                        handleUserSubmit("What kind of music do you like?")
-                      }}
-                    >
-                      What kind of music do you like?
+                      <span className="option-number">1.</span> Tell me about yourself
                     </button>
                     <button 
                       className="quick-response-btn"
@@ -456,16 +491,7 @@ export default function ChatInterface({
                         handleUserSubmit("What are you working on?")
                       }}
                     >
-                      What are you working on?
-                    </button>
-                    <button 
-                      className="quick-response-btn"
-                      onClick={() => {
-                        playSound('click')
-                        handleUserSubmit("What's your philosophy?")
-                      }}
-                    >
-                      What's your philosophy?
+                      <span className="option-number">2.</span> What are you working on?
                     </button>
                   </>
                 ) : (
@@ -473,6 +499,7 @@ export default function ChatInterface({
                   <>
                     {isGeneratingQuickResponses ? (
                       <div className="quick-response-loading">
+                        <span className="loading-text">Generating responses</span>
                         <span className="loading-dots">●</span>
                         <span className="loading-dots">●</span>
                         <span className="loading-dots">●</span>
@@ -480,12 +507,13 @@ export default function ChatInterface({
                     ) : (
                       quickResponses.map((response, index) => (
                         <button 
-                          key={index}
-                          className="quick-response-btn dynamic"
+                          key={`${index}-${response}`}
+                          className={`quick-response-btn dynamic ${quickResponseError ? 'fallback' : ''}`}
                           onClick={() => {
                             playSound('click')
                             handleUserSubmit(response)
                           }}
+                          title={quickResponseError ? 'Fallback response (API unavailable)' : 'AI-generated response'}
                         >
                           <span className="option-number">{index + 1}.</span> {response}
                         </button>
@@ -709,7 +737,7 @@ export default function ChatInterface({
         .quick-responses {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 8px;
           margin-bottom: 16px;
         }
 
@@ -717,8 +745,8 @@ export default function ChatInterface({
           background: rgba(0, 0, 0, 0.3);
           border: 1px solid rgba(255, 107, 71, 0.2);
           color: #ffffff;
-          padding: 10px 12px;
-          border-radius: 2px;
+          padding: 12px 14px;
+          border-radius: 4px;
           font-size: 14px;
           font-family: inherit;
           font-weight: normal;
@@ -728,29 +756,39 @@ export default function ChatInterface({
           text-align: left;
           display: flex;
           align-items: center;
-          gap: 6px;
-          min-height: 36px;
+          gap: 8px;
+          min-height: 44px;
           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+          position: relative;
         }
 
         .quick-response-btn:hover {
-          background: rgba(255, 107, 71, 0.1);
-          border-color: rgba(255, 107, 71, 0.4);
+          background: rgba(255, 107, 71, 0.15);
+          border-color: rgba(255, 107, 71, 0.5);
           color: #ffffff;
-          box-shadow: 0 0 8px rgba(255, 107, 71, 0.2);
+          box-shadow: 0 0 12px rgba(255, 107, 71, 0.25);
+          transform: translateY(-1px);
         }
 
         .quick-response-btn:active {
-          background: rgba(255, 107, 71, 0.2);
-          transform: none;
+          background: rgba(255, 107, 71, 0.25);
+          transform: translateY(0);
         }
 
         .quick-response-btn.dynamic {
-          flex: none;
-          max-width: 100%;
-          display: flex;
-          align-items: center;
-          gap: 8px;
+          background: rgba(0, 0, 0, 0.4);
+          border-color: rgba(255, 107, 71, 0.3);
+        }
+
+        .quick-response-btn.fallback {
+          border-color: rgba(255, 200, 100, 0.3);
+          background: rgba(255, 200, 100, 0.1);
+        }
+
+        .quick-response-btn.fallback:hover {
+          border-color: rgba(255, 200, 100, 0.5);
+          background: rgba(255, 200, 100, 0.15);
+          box-shadow: 0 0 12px rgba(255, 200, 100, 0.2);
         }
 
         .option-number {
@@ -760,33 +798,45 @@ export default function ChatInterface({
           font-size: 14px;
           opacity: 1;
           text-shadow: 0 0 6px rgba(255, 107, 71, 0.3);
-          margin-right: 2px;
+          margin-right: 4px;
+          min-width: 20px;
         }
 
         .quick-response-loading {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 4px;
-          padding: 12px;
+          gap: 8px;
+          padding: 16px;
           width: 100%;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 107, 71, 0.1);
+          border-radius: 4px;
+          margin-bottom: 8px;
+        }
+
+        .loading-text {
+          color: #888888;
+          font-size: 12px;
+          font-style: italic;
+          margin-right: 8px;
         }
 
         .loading-dots {
           animation: loading-pulse 1.5s infinite;
-          color: #888888;
+          color: #ff6b47;
           font-size: 12px;
         }
 
-        .loading-dots:nth-child(1) {
+        .loading-dots:nth-child(2) {
           animation-delay: 0s;
         }
 
-        .loading-dots:nth-child(2) {
+        .loading-dots:nth-child(3) {
           animation-delay: 0.5s;
         }
 
-        .loading-dots:nth-child(3) {
+        .loading-dots:nth-child(4) {
           animation-delay: 1s;
         }
 

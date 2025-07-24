@@ -4,12 +4,20 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 
 interface AudioContextType {
   playSound: (soundId: string, volume?: number) => void
+  startLoadingMusic: (loadingState: string) => void
+  stopLoadingMusic: () => void
+  fadeInLoadingMusic: (loadingState: string, duration?: number) => void
+  fadeOutLoadingMusic: (duration?: number) => void
   setMasterVolume: (volume: number) => void
   setEffectsVolume: (volume: number) => void
+  setMusicVolume: (volume: number) => void
   masterVolume: number
   effectsVolume: number
+  musicVolume: number
   isMuted: boolean
   toggleMute: () => void
+  isLoadingMusicPlaying: boolean
+  currentLoadingState: string | null
 }
 
 interface SoundDefinition {
@@ -221,6 +229,96 @@ const SYSTEM_SOUNDS: Record<string, SoundDefinition> = {
     filter: { frequency: 1000, resonance: 6 },
     sweep: { start: 100, end: 200 }
   },
+
+  // === LOADING MUSIC SOUNDSCAPES ===
+  
+  // Deep atmospheric base for all loading states
+  loadingAmbience: {
+    frequency: 30, // Very low sub-bass
+    duration: 8000, // Long duration for looping
+    type: 'sine' as OscillatorType,
+    harmonics: [45, 60, 90, 120], // Rich harmonic series
+    reverb: 0.9,
+    filter: { frequency: 200, resonance: 2 },
+    sweep: { start: 28, end: 32 } // Subtle breathing
+  },
+  
+  // Ethereal loading drone - consciousness awakening
+  loadingDrone: {
+    frequency: 82.41, // E2
+    duration: 6000,
+    type: 'triangle' as OscillatorType,
+    harmonics: [164.82, 246.94, 329.63, 412.3], // Perfect fifths and octaves
+    reverb: 0.8,
+    filter: { frequency: 800, resonance: 3 },
+    sweep: { start: 80, end: 85 }
+  },
+  
+  // Digital consciousness pulse pattern
+  loadingPulse: {
+    frequency: 110, // A2
+    duration: 3000,
+    type: 'sine' as OscillatorType,
+    harmonics: [220, 330, 440], // Harmonic series
+    reverb: 0.6,
+    filter: { frequency: 1200, resonance: 4 },
+    sweep: { start: 105, end: 115 }
+  },
+  
+  // Crystalline data stream texture
+  loadingCrystalline: {
+    frequency: 523.25, // C5
+    duration: 2000,
+    type: 'sine' as OscillatorType,
+    harmonics: [1046.5, 1569.75, 2093], // Octaves and fifths
+    reverb: 0.7,
+    filter: { frequency: 3000, resonance: 2 },
+    randomize: true // Gentle sparkles
+  },
+  
+  // Neural network processing sounds
+  loadingNeural: {
+    frequency: 220, // A3
+    duration: 4000,
+    type: 'triangle' as OscillatorType,
+    harmonics: [440, 660, 880, 1100],
+    reverb: 0.5,
+    filter: { frequency: 1500, resonance: 5 },
+    distortion: 0.1 // Subtle digital texture
+  },
+  
+  // Ocean consciousness loading theme
+  loadingOceanFlow: {
+    frequency: 73.42, // D#2
+    duration: 5000,
+    type: 'sine' as OscillatorType,
+    harmonics: [146.84, 220.26, 293.68], // Rich underwater harmonics
+    reverb: 0.9,
+    filter: { frequency: 600, resonance: 6 },
+    sweep: { start: 70, end: 77 }
+  },
+  
+  // Atmospheric loading - aurora-like
+  loadingAtmospheric: {
+    frequency: 196, // G3
+    duration: 7000,
+    type: 'sine' as OscillatorType,
+    harmonics: [294, 392, 588, 784], // Perfect consonant intervals
+    reverb: 0.8,
+    filter: { frequency: 2000, resonance: 3 },
+    sweep: { start: 190, end: 200 }
+  },
+  
+  // System emergence completion
+  loadingComplete: {
+    frequency: 329.63, // E4
+    duration: 3000,
+    type: 'sine' as OscillatorType,
+    harmonics: [659.26, 987.77, 1318.5], // Major chord harmonics
+    reverb: 0.7,
+    filter: { frequency: 2500, resonance: 2 },
+    sweep: { start: 320, end: 340 }
+  }
 }
 
 interface AudioProviderProps {
@@ -230,8 +328,17 @@ interface AudioProviderProps {
 export function AudioProvider({ children }: AudioProviderProps) {
   const [masterVolume, setMasterVolumeState] = useState(0.3)
   const [effectsVolume, setEffectsVolumeState] = useState(0.5)
+  const [musicVolume, setMusicVolumeState] = useState(0.4)
   const [isMuted, setIsMuted] = useState(false)
+  const [isLoadingMusicPlaying, setIsLoadingMusicPlaying] = useState(false)
+  const [currentLoadingState, setCurrentLoadingState] = useState<string | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const loadingMusicRef = useRef<{ 
+    oscillators: OscillatorNode[], 
+    gainNodes: GainNode[], 
+    timeoutIds: NodeJS.Timeout[],
+    isPlaying: boolean 
+  }>({ oscillators: [], gainNodes: [], timeoutIds: [], isPlaying: false })
 
   useEffect(() => {
     // Initialize Web Audio API context
@@ -244,6 +351,8 @@ export function AudioProvider({ children }: AudioProviderProps) {
     }
 
     return () => {
+      // Cleanup loading music
+      stopLoadingMusic()
       if (audioContextRef.current) {
         audioContextRef.current.close()
       }
@@ -265,6 +374,240 @@ export function AudioProvider({ children }: AudioProviderProps) {
     
     convolver.buffer = impulse
     return convolver
+  }
+
+  // Create looping ambient music system
+  const createLoadingMusicLayer = (soundId: string, ctx: AudioContext, volume: number, delay: number = 0) => {
+    const sound = SYSTEM_SOUNDS[soundId as keyof typeof SYSTEM_SOUNDS]
+    if (!sound) return null
+
+    const mainGain = ctx.createGain()
+    const filter = ctx.createBiquadFilter()
+    
+    // Set up filter
+    if (sound.filter) {
+      filter.type = 'lowpass'
+      filter.frequency.setValueAtTime(sound.filter.frequency, ctx.currentTime)
+      filter.Q.setValueAtTime(sound.filter.resonance || 1, ctx.currentTime)
+    } else {
+      filter.frequency.setValueAtTime(20000, ctx.currentTime)
+    }
+    
+    // Create reverb if specified
+    let reverb: ConvolverNode | null = null
+    let reverbSend: GainNode | null = null
+    if (sound.reverb && sound.reverb > 0) {
+      reverb = createReverb(ctx, 3) // Longer reverb for ambient music
+      reverbSend = ctx.createGain()
+      reverbSend.gain.setValueAtTime(sound.reverb * volume * 0.4, ctx.currentTime + delay)
+    }
+    
+    // Connect main chain
+    filter.connect(mainGain)
+    mainGain.connect(ctx.destination)
+    
+    // Connect reverb send if exists
+    if (reverb && reverbSend) {
+      filter.connect(reverbSend)
+      reverbSend.connect(reverb)
+      reverb.connect(ctx.destination)
+    }
+    
+    // Set up main gain envelope
+    mainGain.gain.setValueAtTime(0, ctx.currentTime + delay)
+    mainGain.gain.linearRampToValueAtTime(volume * 0.3, ctx.currentTime + delay + 0.5) // Fade in
+    
+    return { filter, mainGain, reverb, reverbSend, sound }
+  }
+
+  const startLoadingMusicInternal = (loadingState: string) => {
+    if (!audioContextRef.current || isMuted || loadingMusicRef.current.isPlaying) return
+    
+    try {
+      const ctx = audioContextRef.current
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
+
+      const volume = musicVolume * masterVolume
+      loadingMusicRef.current.isPlaying = true
+      
+      // Loading state to sound mapping
+      const loadingSounds = {
+        'initial': ['loadingAmbience'],
+        'loading_core': ['loadingAmbience', 'loadingDrone'],
+        'loading_ocean': ['loadingAmbience', 'loadingDrone', 'loadingOceanFlow'],
+        'loading_atmosphere': ['loadingAmbience', 'loadingDrone', 'loadingAtmospheric'],
+        'loading_objects': ['loadingAmbience', 'loadingDrone', 'loadingNeural'],
+        'complete': ['loadingComplete']
+      }
+      
+      const soundsToPlay = loadingSounds[loadingState as keyof typeof loadingSounds] || ['loadingAmbience']
+      
+      // Create and start each layer with staggered entry
+      soundsToPlay.forEach((soundId, index) => {
+        const delay = index * 0.3 // Stagger each layer by 300ms
+        const layer = createLoadingMusicLayer(soundId, ctx, volume, delay)
+        
+        if (layer) {
+          const { filter, mainGain, sound } = layer
+          
+          // Create looping oscillator pattern
+          const playLoop = () => {
+            if (!loadingMusicRef.current.isPlaying) return
+            
+            const osc = ctx.createOscillator()
+            osc.type = sound.type
+            
+            // Set frequency with sweep if specified
+            if (sound.sweep) {
+              osc.frequency.setValueAtTime(sound.sweep.start, ctx.currentTime + delay)
+              osc.frequency.exponentialRampToValueAtTime(sound.sweep.end, ctx.currentTime + delay + sound.duration / 1000)
+            } else if (sound.randomize) {
+              const baseFreq = sound.frequency
+              const modAmount = baseFreq * 0.2
+              osc.frequency.setValueAtTime(baseFreq + (Math.random() - 0.5) * modAmount, ctx.currentTime + delay)
+            } else {
+              osc.frequency.setValueAtTime(sound.frequency, ctx.currentTime + delay)
+            }
+            
+            osc.connect(filter)
+            osc.start(ctx.currentTime + delay)
+            osc.stop(ctx.currentTime + delay + sound.duration / 1000)
+            
+            loadingMusicRef.current.oscillators.push(osc)
+            
+            // Add harmonics
+            if (sound.harmonics) {
+              sound.harmonics.forEach((freq, harmIndex) => {
+                const harmOsc = ctx.createOscillator()
+                const harmGain = ctx.createGain()
+                
+                harmOsc.type = sound.type
+                harmOsc.frequency.setValueAtTime(freq, ctx.currentTime + delay)
+                
+                if (sound.sweep) {
+                  const ratio = freq / sound.frequency
+                  harmOsc.frequency.setValueAtTime(sound.sweep.start * ratio, ctx.currentTime + delay)
+                  harmOsc.frequency.exponentialRampToValueAtTime(sound.sweep.end * ratio, ctx.currentTime + delay + sound.duration / 1000)
+                }
+                
+                harmOsc.connect(harmGain)
+                harmGain.connect(filter)
+                
+                const harmVolume = volume * 0.15 / (harmIndex + 2)
+                harmGain.gain.setValueAtTime(harmVolume, ctx.currentTime + delay)
+                
+                harmOsc.start(ctx.currentTime + delay)
+                harmOsc.stop(ctx.currentTime + delay + sound.duration / 1000)
+                
+                loadingMusicRef.current.oscillators.push(harmOsc)
+                loadingMusicRef.current.gainNodes.push(harmGain)
+              })
+            }
+            
+            // Schedule next loop iteration
+            const timeoutId = setTimeout(() => {
+              if (loadingMusicRef.current.isPlaying) {
+                playLoop()
+              }
+            }, sound.duration)
+            
+            loadingMusicRef.current.timeoutIds.push(timeoutId)
+          }
+          
+          // Start the loop
+          playLoop()
+          loadingMusicRef.current.gainNodes.push(mainGain)
+        }
+      })
+      
+      setIsLoadingMusicPlaying(true)
+      setCurrentLoadingState(loadingState)
+      
+    } catch (error) {
+      console.warn('Error starting loading music:', error)
+    }
+  }
+
+  const stopLoadingMusicInternal = () => {
+    try {
+      // Stop all oscillators
+      loadingMusicRef.current.oscillators.forEach(osc => {
+        try {
+          osc.stop()
+        } catch (e) {
+          // Oscillator might already be stopped
+        }
+      })
+      
+      // Clear all timeouts
+      loadingMusicRef.current.timeoutIds.forEach(id => clearTimeout(id))
+      
+      // Disconnect gain nodes
+      loadingMusicRef.current.gainNodes.forEach(gainNode => {
+        try {
+          gainNode.disconnect()
+        } catch (e) {
+          // Node might already be disconnected
+        }
+      })
+      
+      // Reset arrays
+      loadingMusicRef.current.oscillators = []
+      loadingMusicRef.current.gainNodes = []
+      loadingMusicRef.current.timeoutIds = []
+      loadingMusicRef.current.isPlaying = false
+      
+      setIsLoadingMusicPlaying(false)
+      setCurrentLoadingState(null)
+    } catch (error) {
+      console.warn('Error stopping loading music:', error)
+    }
+  }
+
+  const startLoadingMusic = (loadingState: string) => {
+    // Stop current music if different state
+    if (currentLoadingState !== loadingState) {
+      stopLoadingMusicInternal()
+      // Small delay before starting new music
+      setTimeout(() => {
+        startLoadingMusicInternal(loadingState)
+      }, 100)
+    } else if (!isLoadingMusicPlaying) {
+      startLoadingMusicInternal(loadingState)
+    }
+  }
+
+  const stopLoadingMusic = () => {
+    stopLoadingMusicInternal()
+  }
+
+  const fadeInLoadingMusic = (loadingState: string, duration: number = 2000) => {
+    startLoadingMusic(loadingState)
+    // Fade is built into the startLoadingMusicInternal function
+  }
+
+  const fadeOutLoadingMusic = (duration: number = 2000) => {
+    if (!audioContextRef.current || !isLoadingMusicPlaying) return
+    
+    const ctx = audioContextRef.current
+    const fadeStartTime = ctx.currentTime
+    const fadeEndTime = fadeStartTime + duration / 1000
+    
+    // Fade out all gain nodes
+    loadingMusicRef.current.gainNodes.forEach(gainNode => {
+      try {
+        gainNode.gain.linearRampToValueAtTime(0.001, fadeEndTime)
+      } catch (e) {
+        // Node might be disconnected
+      }
+    })
+    
+    // Stop music after fade completes
+    setTimeout(() => {
+      stopLoadingMusicInternal()
+    }, duration)
   }
 
   const playSound = (soundId: string, customVolume?: number) => {
@@ -419,6 +762,10 @@ export function AudioProvider({ children }: AudioProviderProps) {
     setEffectsVolumeState(Math.max(0, Math.min(1, volume)))
   }
 
+  const setMusicVolume = (volume: number) => {
+    setMusicVolumeState(Math.max(0, Math.min(1, volume)))
+  }
+
   const toggleMute = () => {
     setIsMuted(!isMuted)
   }
@@ -427,12 +774,20 @@ export function AudioProvider({ children }: AudioProviderProps) {
     <AudioContext.Provider
       value={{
         playSound,
+        startLoadingMusic,
+        stopLoadingMusic,
+        fadeInLoadingMusic,
+        fadeOutLoadingMusic,
         setMasterVolume,
         setEffectsVolume,
+        setMusicVolume,
         masterVolume,
         effectsVolume,
+        musicVolume,
         isMuted,
         toggleMute,
+        isLoadingMusicPlaying,
+        currentLoadingState,
       }}
     >
       {children}

@@ -8,6 +8,7 @@ import { useAudio } from '@/contexts/AudioContext'
 import { AtmosphericBreathingManager } from './AtmosphericBreathingManager'
 import { DEFAULT_PERSONA, AI_PERSONAS } from '@/config/personas'
 import { AIPersona } from '@/types/personas'
+import LoadingMusicManager from './LoadingMusicManager'
 
 interface ConsciousnessEmergenceProps {
   onEmergenceComplete: (finalPersona?: AIPersona) => void
@@ -513,6 +514,13 @@ export default function ConsciousnessEmergence({
   
   return (
     <div className={`consciousness-emergence ${isTransitioning ? 'transitioning-out' : ''}`}>
+      {/* Loading Music Manager - Atmospheric soundscape during consciousness emergence */}
+      <LoadingMusicManager
+        loadingState={currentPhase >= EMERGENCE_PHASES.length ? 'complete' : 'loading_core'}
+        isLoading={currentPhase < EMERGENCE_PHASES.length}
+        progress={Math.min((currentPhase / EMERGENCE_PHASES.length) * 70 + (preloadProgress * 0.3), 100)}
+      />
+
       {/* 3D Consciousness Scene */}
       <Canvas
         camera={{ position: [0, 50, 200], fov: 60 }}
