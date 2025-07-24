@@ -36,17 +36,17 @@ export default function ChatInterface({
   const [quickResponseError, setQuickResponseError] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // Debug: Log environment variables (only in development)
+  // Debug: Log environment variables (including production for debugging)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[API Debug] Environment check:', {
-        NODE_ENV: process.env.NODE_ENV,
-        NEXT_PUBLIC_XAI_API_KEY_exists: !!process.env.NEXT_PUBLIC_XAI_API_KEY,
-        NEXT_PUBLIC_XAI_API_KEY_length: process.env.NEXT_PUBLIC_XAI_API_KEY?.length || 0,
-        NEXT_PUBLIC_XAI_API_KEY_prefix: process.env.NEXT_PUBLIC_XAI_API_KEY?.substring(0, 8) || 'NONE',
-        ALL_NEXT_PUBLIC_VARS: Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC'))
-      })
-    }
+    console.log('[API Debug] Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      NEXT_PUBLIC_XAI_API_KEY_exists: !!process.env.NEXT_PUBLIC_XAI_API_KEY,
+      NEXT_PUBLIC_XAI_API_KEY_length: process.env.NEXT_PUBLIC_XAI_API_KEY?.length || 0,
+      NEXT_PUBLIC_XAI_API_KEY_prefix: process.env.NEXT_PUBLIC_XAI_API_KEY?.substring(0, 8) || 'NONE',
+      ALL_NEXT_PUBLIC_VARS: Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC')),
+      ALL_ENV_VARS: Object.keys(process.env),
+      FULL_PROCESS_ENV: process.env
+    })
   }, [])
 
   // Fallback quick responses when API fails or for offline use
@@ -70,7 +70,16 @@ export default function ChatInterface({
   const callXaiApiStream = async (userMessage: string, onProgress: (chunk: string) => void) => {
     const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
     
+    console.log('[API Debug] callXaiApiStream - API key check:', {
+      apiKey_exists: !!apiKey,
+      apiKey_length: apiKey?.length || 0,
+      apiKey_type: typeof apiKey,
+      process_env_keys: Object.keys(process.env),
+      next_public_vars: Object.keys(process.env).filter(k => k.startsWith('NEXT_PUBLIC'))
+    })
+    
     if (!apiKey) {
+      console.error('[API Debug] No API key found. Available env vars:', process.env)
       throw new Error('xAI API key not found')
     }
 
@@ -174,6 +183,13 @@ export default function ChatInterface({
   // Generate quick responses based on conversation history
   const generateQuickResponses = async () => {
     const apiKey = process.env.NEXT_PUBLIC_XAI_API_KEY
+    
+    console.log('[API Debug] generateQuickResponses - API key check:', {
+      apiKey_exists: !!apiKey,
+      apiKey_length: apiKey?.length || 0,
+      process_env: process.env,
+      next_public_vars: Object.keys(process.env).filter(k => k.startsWith('NEXT_PUBLIC'))
+    })
     
     // Always ensure we have quick responses, even without API
     if (!apiKey) {
