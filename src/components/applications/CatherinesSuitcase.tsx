@@ -5,6 +5,7 @@ import { Canvas, useFrame, extend } from '@react-three/fiber'
 import { OrbitControls, Box, Cylinder, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { type Track, type Playlist } from '@/types'
+import { useAudio } from '@/contexts/AudioContext'
 
 // Extend Three.js objects for JSX usage
 extend({ 
@@ -160,6 +161,7 @@ function SuitcaseModel({ isPlaying, volume }: { isPlaying: boolean; volume: numb
 }
 
 export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
+  const { isMuted, masterVolume, musicVolume } = useAudio()
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(0.7)
@@ -238,12 +240,14 @@ export default function CatherinesSuitcase({ }: CatherinesSuitcaseProps) {
     }
   }, [handleNext])
 
-  // Update audio volume
+  // Update audio volume - respect global mute state
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume
+      // Apply global mute state and master volume
+      const effectiveVolume = isMuted ? 0 : volume * masterVolume * musicVolume
+      audioRef.current.volume = Math.max(0, Math.min(1, effectiveVolume))
     }
-  }, [volume])
+  }, [volume, isMuted, masterVolume, musicVolume])
 
   const handlePrevious = () => {
     if (!playlist) return

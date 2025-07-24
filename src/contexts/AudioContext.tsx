@@ -767,7 +767,16 @@ export function AudioProvider({ children }: AudioProviderProps) {
   }
 
   const toggleMute = () => {
-    setIsMuted(!isMuted)
+    const newMutedState = !isMuted
+    setIsMuted(newMutedState)
+    
+    // Immediately stop loading music when muting
+    if (newMutedState && isLoadingMusicPlaying) {
+      console.log('[Audio] Muting - stopping loading music immediately')
+      stopLoadingMusicInternal()
+    }
+    
+    console.log('[Audio] Mute toggled:', { isMuted: newMutedState, wasPlayingMusic: isLoadingMusicPlaying })
   }
 
   return (
