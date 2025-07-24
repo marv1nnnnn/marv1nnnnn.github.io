@@ -15,7 +15,6 @@ import WindowManager from './WindowManager'
 import Taskbar from './Taskbar'
 import LoadingMusicManager from './LoadingMusicManager'
 import { SoundToggle } from './SoundToggle'
-import { WebGLContextManager, useWebGLMemoryMonitor } from './WebGLContextManager'
 import { Canvas, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
@@ -118,9 +117,6 @@ export default function FilmWindow({
   const { playSound } = useAudio()
   const currentPersona = DEFAULT_PERSONA // Always use default persona
   const { messages, addMessage, clearMessages, isLoaded: messagesLoaded } = usePersistentMessages()
-  
-  // WebGL memory monitoring
-  useWebGLMemoryMonitor()
   const [isTyping, setIsTyping] = useState(false)
   const [glitchLevel, setGlitchLevel] = useState(0)
   const [isChatMinimized, setIsChatMinimized] = useState(true)
@@ -459,8 +455,7 @@ export default function FilmWindow({
   
   return (
     <PersonaManager>
-      <WebGLContextManager>
-        <div ref={filmWindowRef} className="film-window">
+      <div ref={filmWindowRef} className="film-window">
         {/* Loading Music Manager - Atmospheric soundscape during loading */}
         <LoadingMusicManager
           loadingState={loadingState}
@@ -579,7 +574,6 @@ export default function FilmWindow({
         <SoundToggle />
 
       </div>
-      </WebGLContextManager>
 
       <style jsx>{`
         .film-window {
