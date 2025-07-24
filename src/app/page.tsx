@@ -79,17 +79,7 @@ export default function Home() {
           preloadProgress={preloadProgress}
           componentsPreloaded={componentsPreloaded}
         />
-        {/* Scene preloads hidden behind boot screen */}
-        {scenePreloading && (
-          <div style={{ position: 'absolute', top: '-100vh', left: '-100vw', width: '100px', height: '100px', overflow: 'hidden', pointerEvents: 'none' }}>
-            <FilmWindow 
-              isPreloading={true} 
-              onSceneReady={handleSceneReady}
-              performancePreset={performancePreset}
-              componentsPreloaded={componentsPreloaded}
-            />
-          </div>
-        )}
+        {/* Components preload without Canvas during boot - reduces WebGL conflicts */}
       </AudioProvider>
     )
   }

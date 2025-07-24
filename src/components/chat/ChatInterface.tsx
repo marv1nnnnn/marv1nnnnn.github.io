@@ -36,6 +36,19 @@ export default function ChatInterface({
   const [quickResponseError, setQuickResponseError] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
+  // Debug: Log environment variables (only in development)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API Debug] Environment check:', {
+        NODE_ENV: process.env.NODE_ENV,
+        NEXT_PUBLIC_XAI_API_KEY_exists: !!process.env.NEXT_PUBLIC_XAI_API_KEY,
+        NEXT_PUBLIC_XAI_API_KEY_length: process.env.NEXT_PUBLIC_XAI_API_KEY?.length || 0,
+        NEXT_PUBLIC_XAI_API_KEY_prefix: process.env.NEXT_PUBLIC_XAI_API_KEY?.substring(0, 8) || 'NONE',
+        ALL_NEXT_PUBLIC_VARS: Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC'))
+      })
+    }
+  }, [])
+
   // Fallback quick responses when API fails or for offline use
   const getFallbackQuickResponses = (): string[] => {
     const fallbackSets = [

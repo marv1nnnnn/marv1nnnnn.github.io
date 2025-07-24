@@ -3,6 +3,7 @@ const nextConfig = {
   // App directory is now the default in Next.js 14
   // Static export for local HTML/JS/CSS runnable files
   // xAI API calls are now made client-side
+  // Build timestamp: 2025-01-24T16:15:00Z - Force rebuild for API key fix
   output: 'export',
   trailingSlash: true,
   images: {

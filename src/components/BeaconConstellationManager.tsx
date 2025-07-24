@@ -414,35 +414,5 @@ export function BeaconConstellation({
   )
 }
 
-// Three.js Canvas wrapper for the beacon system
-export function BeaconCanvasOverlay({
-  emotionManager,
-  breathingManager
-}: {
-  emotionManager: ConversationEmotionManager
-  breathingManager: AtmosphericBreathingManager
-}) {
-  return (
-    <div className="beacon-canvas-overlay">
-      <Canvas
-        camera={{ position: [0, 150, 400], fov: 60 }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 2,
-          background: 'transparent'
-        }}
-        gl={{ alpha: true, antialias: true, premultipliedAlpha: false }}
-        dpr={[1, 2]}
-      >
-        <ambientLight intensity={0.2} />
-        <pointLight position={[10, 10, 10]} intensity={0.5} />
-        <BeaconConstellation emotionManager={emotionManager} breathingManager={breathingManager} />
-      </Canvas>
-    </div>
-  )
-}
+// Note: BeaconCanvasOverlay removed to prevent WebGL context conflicts
+// BeaconConstellation can be integrated directly into main Canvas if needed
