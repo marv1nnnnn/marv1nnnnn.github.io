@@ -34,7 +34,11 @@
       "Bash(mkdir:*)",
       "mcp__ide__getDiagnostics",
       "WebFetch(domain:latenode.com)",
-      "WebFetch(domain:apidog.com)"
+      "WebFetch(domain:apidog.com)",
+      "WebSearch",
+      "Bash(npm cache clean:*)",
+      "Read(//Users/marv1nnnnn/.npm/_logs/**)",
+      "Bash(pnpm install:*)"
     ],
     "deny": []
   }
