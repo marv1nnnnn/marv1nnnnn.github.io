@@ -38,7 +38,9 @@
       "WebSearch",
       "Bash(npm cache clean:*)",
       "Read(//Users/marv1nnnnn/.npm/_logs/**)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": []
   }

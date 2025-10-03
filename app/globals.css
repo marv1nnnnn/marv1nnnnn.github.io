@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --scanner-bg: #0A0B0A;
+  --scanner-panel: #000000;
+  --scanner-text: #D1D1D1;
+  --scanner-glow: #7FFFD4;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--scanner-bg);
+  color: var(--scanner-text);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* Phosphor glow effect */
+.phosphor-text {
+  text-shadow: 0 0 5px rgba(127, 255, 212, 0.3);
+}
+
+/* Flicker animation */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
+}
+
+.flicker {
+  animation: flicker 0.15s infinite;
+}
+
+/* Scanline effect */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 51%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Noise texture overlay */
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--scanner-panel);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scanner-panel);
+  border-left: 1px solid var(--scanner-text);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scanner-text);
+  border: 1px solid var(--scanner-panel);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scanner-glow);
+}
