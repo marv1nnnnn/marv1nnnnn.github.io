@@ -6,18 +6,19 @@ import { generateCardGradient, getContrastColor } from '@/lib/cardGradients';
 import { getAllSignalCards, getSignalCard } from '@/lib/signals';
 
 interface CardPageProps {
-  params: {
+  params: Promise<{
     signalId: string;
     cardId: string;
-  };
+  }>;
 }
 
 export function generateStaticParams() {
   return getAllSignalCards();
 }
 
-export function generateMetadata({ params }: CardPageProps): Metadata {
-  const payload = getSignalCard(params.signalId, params.cardId);
+export async function generateMetadata({ params }: CardPageProps): Promise<Metadata> {
+  const { signalId, cardId } = await params;
+  const payload = getSignalCard(signalId, cardId);
 
   if (!payload) {
     return {
@@ -33,8 +34,9 @@ export function generateMetadata({ params }: CardPageProps): Metadata {
   };
 }
 
-export default function SignalCardPage({ params }: CardPageProps) {
-  const payload = getSignalCard(params.signalId, params.cardId);
+export default async function SignalCardPage({ params }: CardPageProps) {
+  const { signalId, cardId } = await params;
+  const payload = getSignalCard(signalId, cardId);
 
   if (!payload) {
     notFound();

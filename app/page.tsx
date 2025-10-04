@@ -24,15 +24,15 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content - Two Column Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Scanner Controls */}
-        <div className="w-80 border-r border-white/10 bg-black/50 backdrop-blur-sm">
+      {/* Main Content - Responsive Layout */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* Scanner Controls Panel */}
+        <div className="h-[50vh] md:h-auto md:w-80 border-b md:border-b-0 md:border-r border-white/10 bg-black/50 backdrop-blur-sm">
           <ScannerPanel />
         </div>
 
-        {/* Right Panel - Display Screen */}
-        <div className="flex-1 bg-black/30 backdrop-blur">
+        {/* Display Screen Panel */}
+        <div className="flex-1 bg-black/30 backdrop-blur overflow-y-auto">
           <DisplayScreen />
         </div>
       </div>

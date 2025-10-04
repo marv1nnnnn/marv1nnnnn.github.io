@@ -7,31 +7,18 @@ import { SIGNALS } from '@/lib/signals';
 
 const MIN_FREQ = 88.0;
 const MAX_FREQ = 108.0;
-const START_ANGLE = -135;
-const END_ANGLE = 135;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-const formatFrequency = (value: number) => `${value.toFixed(1)} MHz`;
+const formatFrequency = (value: number) => `${value.toFixed(1)}`;
 
 export default function ScannerPanel() {
-  const { currentFrequency, setFrequency, setIsTuning, setIsOverdrive, lockedOnSignalId } = useScannerStore();
-  const [isRotating, setIsRotating] = useState(false);
-  const knobRef = useRef<HTMLDivElement>(null);
+  const { currentFrequency, setFrequency, setIsTuning, setIsOverdrive } = useScannerStore();
+  const [isDragging, setIsDragging] = useState(false);
+  const sliderTrackRef = useRef<HTMLDivElement>(null);
   const overdriveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const rafRef = useRef<number | null>(null);
   const pendingFrequencyRef = useRef<number | null>(null);
-
-  const frequencyToAngle = useCallback((freq: number) => {
-    const ratio = (freq - MIN_FREQ) / (MAX_FREQ - MIN_FREQ);
-    return START_ANGLE + ratio * (END_ANGLE - START_ANGLE);
-  }, []);
-
-  const angleToFrequency = useCallback((angle: number) => {
-    const ratio = (angle - START_ANGLE) / (END_ANGLE - START_ANGLE);
-    const freq = MIN_FREQ + ratio * (MAX_FREQ - MIN_FREQ);
-    return clamp(freq, MIN_FREQ, MAX_FREQ);
-  }, []);
 
   const scheduleFrequencyUpdate = useCallback((value: number) => {
     if (typeof window === 'undefined') {
@@ -54,51 +41,34 @@ export default function ScannerPanel() {
     });
   }, [setFrequency]);
 
-  const updateFrequencyFromPoint = useCallback((clientX: number, clientY: number) => {
-    if (!knobRef.current) return;
+  const updateFrequencyFromPoint = useCallback((clientY: number) => {
+    if (!sliderTrackRef.current) return;
 
-    const rect = knobRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const rect = sliderTrackRef.current.getBoundingClientRect();
+    const y = clientY - rect.top;
+    const ratio = 1 - clamp(y / rect.height, 0, 1); // Inverted: top = max, bottom = min
+    const newFrequency = MIN_FREQ + ratio * (MAX_FREQ - MIN_FREQ);
 
-    const dx = clientX - centerX;
-    const dy = centerY - clientY; // invert Y axis for screen coords
-
-    // Calculate raw angle from cursor position (-180 to 180, 0° = east)
-    let rawAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-    // Handle dead zone (bottom semicircle): snap to nearest valid edge
-    // Valid range is -135° to 135° (top semicircle)
-    if (rawAngle < START_ANGLE || rawAngle > END_ANGLE) {
-      // Calculate distance to both edges considering circular nature
-      const distToStart = Math.abs(rawAngle - START_ANGLE);
-      const distToEnd = Math.abs(rawAngle - END_ANGLE);
-
-      // For angles in the dead zone, pick the closer edge
-      rawAngle = distToStart < distToEnd ? START_ANGLE : END_ANGLE;
-    }
-
-    const newFrequency = angleToFrequency(rawAngle);
     scheduleFrequencyUpdate(Number(newFrequency.toFixed(1)));
-  }, [angleToFrequency, scheduleFrequencyUpdate]);
+  }, [scheduleFrequencyUpdate]);
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setIsRotating(true);
+    setIsDragging(true);
     setIsTuning(true);
-    knobRef.current?.setPointerCapture(event.pointerId);
+    sliderTrackRef.current?.setPointerCapture(event.pointerId);
     event.currentTarget.focus();
-    updateFrequencyFromPoint(event.clientX, event.clientY);
+    updateFrequencyFromPoint(event.clientY);
   }, [setIsTuning, updateFrequencyFromPoint]);
 
   const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!isRotating) return;
-    updateFrequencyFromPoint(event.clientX, event.clientY);
-  }, [isRotating, updateFrequencyFromPoint]);
+    if (!isDragging) return;
+    updateFrequencyFromPoint(event.clientY);
+  }, [isDragging, updateFrequencyFromPoint]);
 
   const handlePointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    knobRef.current?.releasePointerCapture(event.pointerId);
-    setIsRotating(false);
+    sliderTrackRef.current?.releasePointerCapture(event.pointerId);
+    setIsDragging(false);
     setIsTuning(false);
   }, [setIsTuning]);
 
@@ -112,13 +82,13 @@ export default function ScannerPanel() {
   }, [currentFrequency, setFrequency, setIsTuning]);
 
   const handleKeyDown = useCallback((event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
       event.preventDefault();
       const next = clamp(currentFrequency - 0.1, MIN_FREQ, MAX_FREQ);
       setIsTuning(true);
       setFrequency(parseFloat(next.toFixed(1)));
       setTimeout(() => setIsTuning(false), 150);
-    } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
       event.preventDefault();
       const next = clamp(currentFrequency + 0.1, MIN_FREQ, MAX_FREQ);
       setIsTuning(true);
@@ -128,10 +98,10 @@ export default function ScannerPanel() {
   }, [currentFrequency, setFrequency, setIsTuning]);
 
   useEffect(() => {
-    if (!isRotating) {
+    if (!isDragging) {
       setIsTuning(false);
     }
-  }, [isRotating, setIsTuning]);
+  }, [isDragging, setIsTuning]);
 
   useEffect(() => {
     return () => {
@@ -141,7 +111,7 @@ export default function ScannerPanel() {
     };
   }, []);
 
-  // Overdrive detection mirrors previous behaviour
+  // Overdrive detection
   useEffect(() => {
     const isAtExtreme = currentFrequency === MIN_FREQ || currentFrequency === MAX_FREQ;
 
@@ -166,110 +136,166 @@ export default function ScannerPanel() {
     };
   }, [currentFrequency, setIsOverdrive]);
 
-  const knobAngle = useMemo(() => frequencyToAngle(currentFrequency), [currentFrequency, frequencyToAngle]);
+  // Calculate position percentage (0-100) for the current frequency
+  const handlePosition = useMemo(() => {
+    const ratio = (currentFrequency - MIN_FREQ) / (MAX_FREQ - MIN_FREQ);
+    return (1 - ratio) * 100; // Inverted: top = max
+  }, [currentFrequency]);
 
-  const tickMarks = useMemo(() => {
-    const ticks: Array<{ angle: number; isMajor: boolean; color?: string; freq: number }> = [];
-    const minorDivisions = 10; // 每1MHz分成10个小刻度，即0.1MHz步进
+  // Generate frequency markers
+  const frequencyMarkers = useMemo(() => {
+    const markers: Array<{ freq: number; position: number; isMajor: boolean }> = [];
 
-    // 检查频率是否接近信号频率
-    const getSignalColor = (freq: number) => {
-      for (const signal of SIGNALS) {
-        if (Math.abs(freq - signal.freq) < 0.05) {
-          return signal.accentColor;
-        }
-      }
-      return null;
-    };
-
-    // 生成刻度：每0.1MHz一个小刻度，每1MHz一个大刻度
-    for (let f = MIN_FREQ; f <= MAX_FREQ + 0.01; f += 0.1) {
-      const freq = Number(f.toFixed(1));
-      const isMajor = Math.abs(freq - Math.round(freq)) < 0.01;
-      const color = getSignalColor(freq);
-
-      ticks.push({
-        angle: frequencyToAngle(freq),
-        isMajor,
-        freq,
-        color: color || undefined
+    for (let f = MIN_FREQ; f <= MAX_FREQ; f += 1) {
+      const ratio = (f - MIN_FREQ) / (MAX_FREQ - MIN_FREQ);
+      markers.push({
+        freq: f,
+        position: (1 - ratio) * 100, // Inverted
+        isMajor: true,
       });
     }
 
-    return ticks;
-  }, [frequencyToAngle]);
+    return markers;
+  }, []);
+
+  // Generate signal indicators
+  const signalIndicators = useMemo(() => {
+    return SIGNALS.map((signal) => {
+      const ratio = (signal.freq - MIN_FREQ) / (MAX_FREQ - MIN_FREQ);
+      return {
+        ...signal,
+        position: (1 - ratio) * 100, // Inverted
+      };
+    });
+  }, []);
 
   return (
-    <div className="h-full flex flex-col p-6 gap-8">
-      <div className="flex-1 flex flex-col items-center justify-center gap-10">
-        <div className="relative flex items-center justify-center w-80 h-80">
-          {/* Tick marks around the dial */}
-          <div className="absolute inset-6 pointer-events-none">
-            {tickMarks.map((tick, index) => (
-              <div
-                key={`tick-${index}`}
-                className="absolute left-1/2 top-1/2 origin-bottom"
-                style={{
-                  height: '50%',
-                  transform: `translate(-50%, -100%) rotate(${tick.angle}deg)`,
-                }}
-              >
-                <div
-                  className={`absolute top-0 left-1/2 -translate-x-1/2 ${tick.isMajor ? 'w-0.5 h-4' : 'w-px h-2'}`}
-                  style={{
-                    backgroundColor: tick.color || (tick.isMajor ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'),
-                    boxShadow: tick.color ? `0 0 10px ${tick.color}, 0 0 20px ${tick.color}` : 'none'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+    <div className="h-full flex flex-col items-center justify-center p-4 md:p-6 gap-6">
+      {/* Title */}
+      <div className="text-center">
+        <div className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40 font-mono">
+          Frequency Tuner
+        </div>
+      </div>
 
-          {/* Main dial */}
-          <div className="relative w-64 h-64">
+      {/* Vertical Slider Container */}
+      <div className="flex-1 flex items-center gap-4 md:gap-6 w-full max-w-md">
+        {/* Frequency Scale */}
+        <div className="relative h-full w-12 md:w-16 flex flex-col justify-between py-2">
+          {frequencyMarkers.map((marker) => (
             <div
-              ref={knobRef}
-              role="slider"
-              aria-label="frequency tuner knob"
-              aria-valuemin={MIN_FREQ}
-              aria-valuemax={MAX_FREQ}
-              aria-valuenow={currentFrequency}
-              aria-valuetext={formatFrequency(currentFrequency)}
-              tabIndex={0}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
-              onWheel={handleWheel}
-              onKeyDown={handleKeyDown}
-              className={`relative w-full h-full rounded-full bg-gradient-to-br from-zinc-900 via-black to-zinc-950 shadow-[0_10px_50px_rgba(0,0,0,0.8)] ${isRotating ? 'cursor-grabbing' : 'cursor-grab'} focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 touch-none select-none`}
+              key={marker.freq}
+              className="absolute right-0 flex items-center gap-2"
+              style={{ top: `${marker.position}%` }}
             >
-              {/* Metallic shine */}
-              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1),transparent_50%)]" />
+              <span className="text-xs md:text-sm font-mono text-white/60 tabular-nums">
+                {marker.freq}
+              </span>
+            </div>
+          ))}
+        </div>
 
-              {/* Inner ring */}
-              <div className="absolute inset-8 rounded-full border border-white/5" />
+        {/* Slider Track */}
+        <div className="relative flex-1 h-full min-h-[300px] md:min-h-[400px] flex items-center">
+          <div
+            ref={sliderTrackRef}
+            role="slider"
+            aria-label="frequency tuner slider"
+            aria-valuemin={MIN_FREQ}
+            aria-valuemax={MAX_FREQ}
+            aria-valuenow={currentFrequency}
+            aria-valuetext={`${formatFrequency(currentFrequency)} MHz`}
+            aria-orientation="vertical"
+            tabIndex={0}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onWheel={handleWheel}
+            onKeyDown={handleKeyDown}
+            className={`relative w-full h-full rounded-lg overflow-hidden ${
+              isDragging ? 'cursor-grabbing' : 'cursor-grab'
+            } focus:outline-none focus-visible:ring-2 focus-visible:ring-scanner-glow/50 touch-none select-none`}
+          >
+            {/* Metal panel background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950" />
 
-              {/* Red indicator needle */}
+            {/* Worn texture overlay */}
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.1),transparent_40%)]" />
+
+            {/* Scanlines */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-30"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+              }}
+            />
+
+            {/* Center track groove */}
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1.5 md:w-2 bg-black/80 border-x border-white/10" />
+
+            {/* Signal indicators */}
+            {signalIndicators.map((signal) => (
               <div
-                className="absolute inset-0 pointer-events-none"
-                style={{ transform: `rotate(${knobAngle}deg)` }}
-              >
-                <div className="absolute left-1/2 top-8 h-16 w-1 -translate-x-1/2 bg-gradient-to-b from-red-500 to-red-700 shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-              </div>
+                key={signal.id}
+                className="absolute left-1/2 -translate-x-1/2 w-16 md:w-20 h-0.5 pointer-events-none"
+                style={{
+                  top: `${signal.position}%`,
+                  backgroundColor: signal.accentColor,
+                  boxShadow: `0 0 8px ${signal.accentColor}, 0 0 16px ${signal.accentColor}`,
+                }}
+              />
+            ))}
 
-              {/* Center cap */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-white/10 shadow-inner" />
+            {/* Draggable handle */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 w-16 md:w-20 h-12 md:h-14 transition-none pointer-events-none"
+              style={{ top: `${handlePosition}%`, transform: 'translate(-50%, -50%)' }}
+            >
+              {/* Handle body */}
+              <div className="relative w-full h-full rounded-md bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-2 border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+                {/* Metallic shine */}
+                <div className="absolute inset-0 rounded-md bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
+
+                {/* Center indicator line */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 md:w-8 h-0.5 bg-gradient-to-r from-transparent via-scanner-glow to-transparent shadow-[0_0_10px_rgba(127,255,212,0.8)]" />
+
+                {/* Grip lines */}
+                <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-px bg-white/10" />
+                  ))}
+                </div>
               </div>
             </div>
+
+            {/* Top rivet */}
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/20 shadow-inner pointer-events-none" />
+
+            {/* Bottom rivet */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/20 shadow-inner pointer-events-none" />
           </div>
         </div>
 
-        <div className="w-full max-w-sm rounded-md border border-white/10 bg-black/70 px-6 py-4 text-center shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
-          <div className="text-[10px] uppercase tracking-[0.45em] text-white/50">current frequency</div>
-          <div className="mt-3 text-4xl font-semibold tracking-[0.18em] text-white">{currentFrequency.toFixed(1)}</div>
-          <div className="mt-1 text-xs uppercase tracking-[0.5em] text-white/40">MHz</div>
+        {/* MHz label */}
+        <div
+          className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/40 font-mono"
+          style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+        >
+          MHz
+        </div>
+      </div>
+
+      {/* Current Frequency Display */}
+      <div className="w-full max-w-xs rounded border border-white/20 bg-black/80 px-4 py-3 md:px-6 md:py-4 text-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+        <div className="text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-white/50 font-mono mb-1.5">
+          Current Frequency
+        </div>
+        <div className="text-5xl md:text-6xl font-mono tracking-wider text-scanner-glow phosphor-text font-bold tabular-nums">
+          {formatFrequency(currentFrequency)}
+        </div>
+        <div className="text-xs md:text-sm uppercase tracking-[0.5em] text-white/40 font-mono mt-1">
+          MHz
         </div>
       </div>
     </div>
