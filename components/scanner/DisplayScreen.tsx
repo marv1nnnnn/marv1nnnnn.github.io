@@ -23,24 +23,22 @@ export default function DisplayScreen() {
   }, [signalState, signal, setLockedOnSignalId]);
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      {/* Static/Noise Effect - Always present, but fades based on clarity */}
+    <div className="relative h-full w-full bg-[#050505]">
       <div
-        className="absolute inset-0 transition-opacity duration-300"
+        className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-500"
         style={{ opacity: 1 - clarity }}
       >
         <StaticEffect intensity={1 - clarity} />
       </div>
 
-      {/* Zine Viewer - Fades in as clarity increases */}
-      {signal && (
-        <div
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{ opacity: clarity }}
-        >
+      <div
+        className="absolute inset-0 z-20 overflow-y-auto"
+        style={{ opacity: 0.35 + clarity * 0.65 }}
+      >
+        {signal && (
           <ZineViewer signal={signal} clarity={clarity} />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

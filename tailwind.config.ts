@@ -17,6 +17,10 @@ const config: Config = {
       fontFamily: {
         'mono': ['VT323', 'monospace'],
       },
+      borderWidth: {
+        '3': '3px',
+        '5': '5px',
+      },
     },
   },
   plugins: [],

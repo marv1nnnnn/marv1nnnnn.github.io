@@ -4,50 +4,38 @@ import { useScannerStore } from '@/store/scanner';
 import ScannerPanel from '@/components/scanner/ScannerPanel';
 import DisplayScreen from '@/components/scanner/DisplayScreen';
 import AudioEngine from '@/components/audio/AudioEngine';
+import RotatingBillboard from '@/components/RotatingBillboard';
 
 export default function Home() {
-  const currentFrequency = useScannerStore((state) => state.currentFrequency);
   const isOverdrive = useScannerStore((state) => state.isOverdrive);
 
   return (
-    <main className={`h-screen flex flex-col bg-scanner-bg noise-overlay transition-all ${isOverdrive ? 'overdrive' : ''}`}>
+    <main className={`relative h-screen flex flex-col bg-gradient-to-br from-black via-[#0f0f10] to-[#17171c] text-white transition-all noise-overlay ${isOverdrive ? 'overdrive' : ''}`}>
       {/* Audio Engine */}
       <AudioEngine />
 
       {/* Header */}
-      <header className={`border-b border-scanner-text/30 px-6 py-3 scanlines ${isOverdrive ? 'border-red-500/50' : ''}`}>
-        <div className="flex justify-between items-center">
-          <div className={`phosphor-text text-2xl tracking-wider ${isOverdrive ? 'text-red-500 animate-pulse' : ''}`}>
-            {isOverdrive ? '⚠ OVERDRIVE WARNING ⚠' : 'ANOMALY SCANNER v1.0'}
-          </div>
-          <div className={`phosphor-text text-3xl font-bold tracking-widest ${isOverdrive ? 'text-red-500' : ''}`}>
-            {currentFrequency.toFixed(1)} MHz
-          </div>
+      <header className={`relative border-b px-6 py-4 overflow-hidden ${isOverdrive ? 'border-red-500/70 bg-red-600/20' : 'border-white/10 bg-black/60'}`}>
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:28px_28px] opacity-40" />
+        <div className="pointer-events-none absolute -left-10 top-0 h-full w-72 -skew-x-12 bg-scanner-glow/10 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col gap-4">
+          <RotatingBillboard />
         </div>
       </header>
 
       {/* Main Content - Two Column Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Scanner Controls */}
-        <div className="w-80 border-r border-scanner-text/30 bg-scanner-panel">
+        <div className="w-80 border-r border-white/10 bg-black/50 backdrop-blur-sm">
           <ScannerPanel />
         </div>
 
         {/* Right Panel - Display Screen */}
-        <div className="flex-1 bg-scanner-panel">
+        <div className="flex-1 bg-black/30 backdrop-blur">
           <DisplayScreen />
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className={`border-t border-scanner-text/30 px-6 py-2 text-sm opacity-50 ${isOverdrive ? 'border-red-500/50' : ''}`}>
-        <div className="flex justify-between">
-          <span className={isOverdrive ? 'text-red-500' : ''}>
-            SYSTEM STATUS: {isOverdrive ? 'CRITICAL OVERDRIVE' : 'OPERATIONAL'}
-          </span>
-          <span>SIGNAL LOCK: {useScannerStore((state) => state.lockedOnSignalId) || 'NONE'}</span>
-        </div>
-      </footer>
     </main>
   );
 }
