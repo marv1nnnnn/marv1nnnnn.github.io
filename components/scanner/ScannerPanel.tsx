@@ -20,6 +20,10 @@ export default function ScannerPanel() {
   const rafRef = useRef<number | null>(null);
   const pendingFrequencyRef = useRef<number | null>(null);
 
+  // Swipe gesture tracking
+  const touchStartY = useRef<number | null>(null);
+  const touchStartFreq = useRef<number | null>(null);
+
   const scheduleFrequencyUpdate = useCallback((value: number) => {
     if (typeof window === 'undefined') {
       setFrequency(value);
@@ -96,6 +100,37 @@ export default function ScannerPanel() {
       setTimeout(() => setIsTuning(false), 150);
     }
   }, [currentFrequency, setFrequency, setIsTuning]);
+
+  // Swipe gesture handlers
+  const handleTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length === 1) {
+      touchStartY.current = event.touches[0].clientY;
+      touchStartFreq.current = currentFrequency;
+    }
+  }, [currentFrequency]);
+
+  const handleTouchMove = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartY.current === null || touchStartFreq.current === null) return;
+    if (event.touches.length !== 1) return;
+
+    const deltaY = touchStartY.current - event.touches[0].clientY;
+    // Improved sensitivity: 100px of swipe = 5 MHz change
+    const frequencyDelta = (deltaY / 100) * 5;
+    const newFrequency = clamp(
+      touchStartFreq.current + frequencyDelta,
+      MIN_FREQ,
+      MAX_FREQ
+    );
+
+    setIsTuning(true);
+    scheduleFrequencyUpdate(parseFloat(newFrequency.toFixed(1)));
+  }, [setIsTuning, scheduleFrequencyUpdate]);
+
+  const handleTouchEnd = useCallback(() => {
+    touchStartY.current = null;
+    touchStartFreq.current = null;
+    setIsTuning(false);
+  }, [setIsTuning]);
 
   useEffect(() => {
     if (!isDragging) {
@@ -179,7 +214,12 @@ export default function ScannerPanel() {
       </div>
 
       {/* Vertical Slider Container */}
-      <div className="flex-1 flex items-center gap-4 md:gap-6 w-full max-w-md">
+      <div
+        className="flex-1 flex items-center gap-4 md:gap-6 w-full max-w-md"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Frequency Scale */}
         <div className="relative h-full w-12 md:w-16 flex flex-col justify-between py-2">
           {frequencyMarkers.map((marker) => (

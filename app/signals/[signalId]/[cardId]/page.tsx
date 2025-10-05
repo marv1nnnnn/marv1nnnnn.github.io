@@ -22,15 +22,40 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
 
   if (!payload) {
     return {
-      title: 'Transmission Not Found · D Parfum Atelier',
+      title: 'Transmission Not Found · MARV1NNNNN',
     };
   }
 
   const { signal, card } = payload;
+  const title = `${card.title} · ${signal.title}`;
+  const description = card.summary;
+  const url = `/signals/${signalId}/${cardId}`;
 
   return {
-    title: `${card.title} · ${signal.title}`,
-    description: card.summary,
+    title,
+    description,
+    openGraph: {
+      type: 'article',
+      url,
+      title,
+      description,
+      publishedTime: card.date,
+      tags: card.tags,
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/images/og-image.png'],
+    },
   };
 }
 
@@ -46,8 +71,26 @@ export default async function SignalCardPage({ params }: CardPageProps) {
   const cardColor = generateCardGradient(card.id);
   const textColor = getContrastColor(cardColor);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: card.title,
+    description: card.summary,
+    datePublished: card.date,
+    author: {
+      '@type': 'Person',
+      name: 'Marvin',
+    },
+    keywords: card.tags?.join(', '),
+  };
+
   return (
-    <main className="relative min-h-screen overflow-y-auto bg-[#0f0f12]">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main className="relative min-h-screen overflow-y-auto bg-[#0f0f12]">
       {/* Checkered pattern overlay like scanner */}
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{
         backgroundImage: `repeating-conic-gradient(#fff 0% 25%, transparent 0% 50%) 50% / 20px 20px`
@@ -139,5 +182,6 @@ export default async function SignalCardPage({ params }: CardPageProps) {
         </article>
       </div>
     </main>
+    </>
   );
 }

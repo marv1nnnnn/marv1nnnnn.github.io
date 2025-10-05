@@ -41,7 +41,17 @@ export default function StaticEffect({ intensity = 1.0 }: StaticEffectProps) {
 
     let time = 0;
     let frameCount = 0;
-    const pixelSize = 4;
+
+    // Adaptive pixel size based on device capabilities
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const isLowEnd = typeof window !== 'undefined' && (
+      navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4
+    );
+    const pixelSize = isMobile ? (isLowEnd ? 6 : 5) : 4;
+
+    let lastFrameTime = 0;
+    const targetFPS = 30; // Throttle to 30fps for better performance
+    const frameInterval = 1000 / targetFPS;
 
     // Pattern generation functions
     const patterns = {
@@ -249,7 +259,21 @@ export default function StaticEffect({ intensity = 1.0 }: StaticEffectProps) {
       },
     };
 
-    const render = () => {
+    const render = (currentTime: number = 0) => {
+      // Throttle frame rate
+      const elapsed = currentTime - lastFrameTime;
+
+      // Adaptive frame rate based on intensity
+      const adaptiveFPS = intensity > 0.7 ? targetFPS : targetFPS * 0.5;
+      const adaptiveInterval = 1000 / adaptiveFPS;
+
+      if (elapsed < adaptiveInterval) {
+        animationFrameRef.current = requestAnimationFrame(render);
+        return;
+      }
+
+      lastFrameTime = currentTime - (elapsed % adaptiveInterval);
+
       const width = canvas.width;
       const height = canvas.height;
 

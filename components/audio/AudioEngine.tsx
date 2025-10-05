@@ -2,15 +2,13 @@
 
 import { useEffect, useRef } from 'react';
 import { useScannerStore } from '@/store/scanner';
-import { findClosestSignal, getSignalState } from '@/lib/signals';
+import { findClosestSignal } from '@/lib/signals';
 
 export default function AudioEngine() {
   const { currentFrequency, isTuning } = useScannerStore();
   const audioContextRef = useRef<AudioContext | null>(null);
   const noiseNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const noiseGainRef = useRef<GainNode | null>(null);
-  const ambientGainRef = useRef<GainNode | null>(null);
-  const ambientSourceRef = useRef<HTMLAudioElement | null>(null);
   const isInitializedRef = useRef(false);
 
   // Initialize Web Audio on first user interaction
@@ -55,43 +53,38 @@ export default function AudioEngine() {
 
       noiseNodeRef.current = createNoiseSource();
 
-      // Create gain for ambient track
-      const ambientGain = audioContext.createGain();
-      ambientGain.gain.value = 0;
-      ambientGainRef.current = ambientGain;
-
       isInitializedRef.current = true;
+      console.log('🔊 White noise initialized!');
     } catch (error) {
       console.error('Failed to initialize audio:', error);
     }
   };
 
-  // Handle frequency changes
+  // Handle frequency changes - adjust noise volume based on signal clarity and tuning state
   useEffect(() => {
     if (!isInitializedRef.current) return;
-    if (!audioContextRef.current || !noiseGainRef.current || !ambientGainRef.current) return;
+    if (!audioContextRef.current || !noiseGainRef.current) return;
 
-    const { signal, clarity } = findClosestSignal(currentFrequency);
-    const signalState = getSignalState(clarity);
+    const { clarity } = findClosestSignal(currentFrequency);
 
-    // Adjust noise volume (inverse of clarity)
-    const noiseVolume = Math.max(0, (1 - clarity) * 0.1);
+    // Adjust noise volume based on clarity (inverse relationship)
+    // Louder when far from signal, quieter when near target frequency
+    let noiseVolume: number;
+    if (isTuning) {
+      // While tuning: dynamic noise that decreases as you approach a signal
+      // Near signal (clarity ~1): very quiet (0.05)
+      // Far from signal (clarity ~0): loud (0.45)
+      noiseVolume = 0.05 + (1 - clarity) * 0.4;
+    } else {
+      // When idle: subtle noise based on clarity
+      noiseVolume = Math.max(0, (1 - clarity) * 0.1);
+    }
+
     noiseGainRef.current.gain.linearRampToValueAtTime(
       noiseVolume,
-      audioContextRef.current.currentTime + 0.2
+      audioContextRef.current.currentTime + 0.1
     );
-
-    // Adjust ambient volume (proportional to clarity)
-    const ambientVolume = Math.max(0, Math.min(1, (clarity - 0.3) / 0.7)) * 0.3;
-    ambientGainRef.current.gain.linearRampToValueAtTime(
-      ambientVolume,
-      audioContextRef.current.currentTime + 0.5
-    );
-
-    // TODO: Load and play signal-specific ambient track
-    // For now, we just adjust the gain
-
-  }, [currentFrequency]);
+  }, [currentFrequency, isTuning]);
 
   // Initialize audio on mount (requires user interaction)
   useEffect(() => {
@@ -118,9 +111,6 @@ export default function AudioEngine() {
       }
       if (audioContextRef.current) {
         audioContextRef.current.close();
-      }
-      if (ambientSourceRef.current) {
-        ambientSourceRef.current.pause();
       }
     };
   }, []);

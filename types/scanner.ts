@@ -92,9 +92,13 @@ export interface ScannerStore {
   // Is the system in overdrive mode (frequency at extremes)?
   isOverdrive: boolean;
 
+  // Is the tuner panel collapsed on mobile?
+  isPanelCollapsed: boolean;
+
   // Actions
   setFrequency: (freq: number) => void;
   setIsTuning: (tuning: boolean) => void;
   setLockedOnSignalId: (id: string | null) => void;
   setIsOverdrive: (overdrive: boolean) => void;
+  setIsPanelCollapsed: (collapsed: boolean) => void;
 }

@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import type { Signal, SignalCardsPage, SignalProfilePage, SignalListPage } from '@/types/scanner';
 import SignalCard from './SignalCard';
-import ProjectSinglePage from './ProjectSinglePage';
+
+// Code-split ProjectSinglePage for better performance
+const ProjectSinglePage = dynamic(() => import('./ProjectSinglePage'), {
+  loading: () => <div className="flex items-center justify-center p-12 text-white/60">Loading...</div>
+});
 
 interface ZineViewerProps {
   signal: Signal;

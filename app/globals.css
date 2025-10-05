@@ -47,6 +47,56 @@ body {
   animation: flicker 0.15s infinite;
 }
 
+.animate-flicker {
+  animation: subtle-flicker 3s infinite;
+}
+
+@keyframes subtle-flicker {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0.97; }
+  20% { opacity: 1; }
+  30% { opacity: 0.99; }
+  40% { opacity: 1; }
+  50% { opacity: 0.98; }
+  60% { opacity: 1; }
+  70% { opacity: 0.97; }
+  80% { opacity: 1; }
+  90% { opacity: 0.99; }
+}
+
+/* Overdrive screen shake */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2px, 1px); }
+  20% { transform: translate(2px, -1px); }
+  30% { transform: translate(-1px, 2px); }
+  40% { transform: translate(1px, -2px); }
+  50% { transform: translate(-2px, -1px); }
+  60% { transform: translate(2px, 1px); }
+  70% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+  90% { transform: translate(-2px, 2px); }
+}
+
+.overdrive {
+  animation: screen-shake 0.15s infinite;
+}
+
+/* Chromatic aberration for overdrive */
+.overdrive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 48% 50%, rgba(255, 0, 0, 0.15), transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1), transparent 60%),
+    radial-gradient(circle at 52% 50%, rgba(0, 0, 255, 0.15), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 9999;
+  animation: subtle-flicker 0.1s infinite;
+}
+
 /* Scanline effect */
 @keyframes scanline {
   0% { transform: translateY(-100%); }

@@ -5,6 +5,7 @@ const matter = require('gray-matter');
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 const BILLBOARDS_FILE = path.join(process.cwd(), 'content', 'billboards.json');
 const OUTPUT_FILE = path.join(process.cwd(), 'lib', 'signals.json');
+const SITEMAP_FILE = path.join(process.cwd(), 'public', 'sitemap.xml');
 
 function loadSignalMetadata(signalDir) {
   const signalJsonPath = path.join(signalDir, 'signal.json');
@@ -118,6 +119,44 @@ function generateSignals() {
   };
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
   console.log(`✅ Generated ${signals.length} signals and ${billboards.length} billboards to ${OUTPUT_FILE}`);
+
+  return signals;
 }
 
-generateSignals();
+function generateSitemap(signals) {
+  const baseUrl = 'https://marv1nnnnn.github.io';
+  const today = new Date().toISOString().split('T')[0];
+
+  // Collect all card URLs
+  const cardUrls = [];
+  signals.forEach(signal => {
+    if (signal.page.type === 'cards' && signal.page.cards) {
+      signal.page.cards.forEach(card => {
+        cardUrls.push(`${baseUrl}/signals/${signal.id}/${card.id}`);
+      });
+    }
+  });
+
+  // Generate XML
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+${cardUrls.map(url => `  <url>
+    <loc>${url}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  fs.writeFileSync(SITEMAP_FILE, xml);
+  console.log(`✅ Generated sitemap with ${cardUrls.length + 1} URLs to ${SITEMAP_FILE}`);
+}
+
+const signals = generateSignals();
+generateSitemap(signals);
