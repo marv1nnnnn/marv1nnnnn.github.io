@@ -59,26 +59,30 @@ export default function DisplayScreen() {
 
   // Calculate color transition based on signal clarity
   const accentColor = signal?.accentColor || '#7FFFD4';
-  const backgroundStyle = signal && clarity > 0.3
+  const isLocked = clarity > 0.95;
+  const backgroundStyle = isLocked
     ? {
-        background: `radial-gradient(circle at 50% 120%, ${accentColor}${Math.floor(clarity * 15).toString(16).padStart(2, '0')}, #050505 60%)`,
-        transition: 'background 800ms ease-out',
+        background: '#FFFFFF',
+        transition: 'none',
+      }
+    : signal && clarity > 0.3
+    ? {
+        background: `linear-gradient(180deg, ${accentColor}15, #0A0A0A 40%)`,
+        transition: 'none',
       }
     : {
-        background: '#050505',
-        transition: 'background 800ms ease-out',
+        background: '#0A0A0A',
+        transition: 'none',
       };
 
   return (
-    <div className="relative h-full w-full" style={backgroundStyle}>
-      {/* Accent color glow when approaching signal */}
-      {signal && clarity > 0.5 && (
+    <div className="relative h-full w-full halftone-overlay" style={backgroundStyle}>
+      {/* Accent color block when locked on signal */}
+      {signal && clarity > 0.95 && (
         <div
-          className="absolute inset-0 z-[5] pointer-events-none transition-opacity duration-700"
+          className="absolute top-0 left-0 right-0 h-2 z-[5] pointer-events-none"
           style={{
-            opacity: (clarity - 0.5) * 0.4, // Fade in from 50% clarity
-            background: `radial-gradient(ellipse at center, ${accentColor}10, transparent 70%)`,
-            boxShadow: `inset 0 0 100px ${accentColor}20`,
+            background: accentColor,
           }}
         />
       )}
@@ -90,15 +94,15 @@ export default function DisplayScreen() {
       />
 
       <div
-        className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-500"
-        style={{ opacity: 1 - clarity }}
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ opacity: clarity < 0.95 ? 1 : 0 }}
       >
         <StaticEffect intensity={1 - clarity} />
       </div>
 
       <div
         className="absolute inset-0 z-20 overflow-y-auto"
-        style={{ opacity: 0.35 + clarity * 0.65 }}
+        style={{ opacity: clarity > 0.5 ? 1 : 0.2 }}
       >
         {signal && (
           <ZineViewer signal={signal} clarity={clarity} />

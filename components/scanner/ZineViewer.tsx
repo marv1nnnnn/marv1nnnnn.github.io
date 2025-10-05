@@ -18,59 +18,59 @@ interface ZineViewerProps {
 function ProfilePage({ page }: { page: SignalProfilePage }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-      <div className="flex flex-col gap-6 border border-white/10 bg-black/40 p-6">
-        <span className="text-[11px] uppercase tracking-[0.32em] text-white/50">
+      <div className="flex flex-col gap-6 border-6 border-black bg-white p-6 shadow-brutal-lg halftone-overlay">
+        <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
           {page.hero.eyebrow}
         </span>
-        <h2 className="text-3xl font-semibold tracking-[0.14em] text-white">
+        <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
           {page.hero.title}
         </h2>
         {page.hero.subtitle && (
-          <p className="text-sm uppercase tracking-[0.28em] text-white/60">
+          <p className="text-sm uppercase tracking-[0.2em] font-bold text-black/60">
             {page.hero.subtitle}
           </p>
         )}
         {page.hero.description && (
-          <p className="text-sm leading-relaxed text-white/75">
+          <p className="text-base leading-relaxed text-black/80 normal-case">
             {page.hero.description}
           </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-4 border border-white/10 bg-black/40 p-6">
-        <h3 className="text-[11px] uppercase tracking-[0.32em] text-white/60">
+      <div className="flex flex-col gap-4 border-6 border-black bg-brutal-cyan p-6 shadow-brutal-lg">
+        <h3 className="text-xs uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
           Contact
         </h3>
         <ul className="flex flex-col gap-3 text-sm">
           {page.contact.map((entry) => (
-            <li key={`${entry.label}-${entry.value}`} className="flex items-center justify-between gap-4">
-              <span className="text-white/60 uppercase tracking-[0.25em] text-[11px]">
+            <li key={`${entry.label}-${entry.value}`} className="flex items-center justify-between gap-4 border-b-2 border-black/20 pb-2">
+              <span className="font-black uppercase tracking-[0.2em] text-[11px]">
                 {entry.label}
               </span>
               {entry.href ? (
                 <a
                   href={entry.href}
-                  className="text-white underline decoration-white/30 decoration-dotted underline-offset-4 transition hover:text-white/90"
+                  className="font-bold underline decoration-black decoration-2 underline-offset-4 hover:bg-black hover:text-white px-1 transition-none"
                   target="_blank"
                   rel="noreferrer"
                 >
                   {entry.value}
                 </a>
               ) : (
-                <span className="text-white/80">{entry.value}</span>
+                <span className="font-bold">{entry.value}</span>
               )}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="lg:col-span-2 grid gap-4 border border-white/10 bg-black/30 p-6">
+      <div className="lg:col-span-2 grid gap-4 border-6 border-black bg-white p-6 shadow-brutal-lg halftone-overlay">
         {page.sections.map((section) => (
-          <div key={section.title} className="space-y-2 border border-white/10 bg-black/40 p-5">
-            <h3 className="text-xs uppercase tracking-[0.32em] text-white/60">
+          <div key={section.title} className="space-y-3 border-l-6 border-black bg-white pl-5 py-2">
+            <h3 className="text-xs uppercase tracking-[0.25em] font-black">
               {section.title}
             </h3>
-            <p className="text-sm leading-relaxed text-white/80 whitespace-pre-line">{section.body}</p>
+            <p className="text-sm leading-relaxed text-black/80 whitespace-pre-line">{section.body}</p>
           </div>
         ))}
       </div>
@@ -110,18 +110,18 @@ function CardsPage({
   return (
     <div className="flex flex-col gap-8">
       {page.intro && (
-        <div className="border border-white/10 bg-black/40 p-6">
+        <div className="border-6 border-black bg-brutal-pink p-6 shadow-brutal-lg">
           <div className="flex flex-col gap-3">
             {page.intro.eyebrow && (
-              <span className="text-[11px] uppercase tracking-[0.32em] text-white/50">
+              <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-3xl font-semibold tracking-[0.14em] text-white">
+            <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
               {page.intro.title}
             </h2>
             {page.intro.description && (
-              <p className="text-sm leading-relaxed text-white/75">
+              <p className="text-base leading-relaxed text-black/90 normal-case font-medium">
                 {page.intro.description}
               </p>
             )}
@@ -141,27 +141,27 @@ function CardsPage({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border border-white/10 bg-black/50 px-5 py-4 text-[11px] uppercase tracking-[0.28em] text-white/60">
+        <div className="flex items-center justify-between border-6 border-black bg-white px-5 py-4 text-xs uppercase tracking-[0.2em] font-black shadow-brutal">
           <button
             type="button"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
             disabled={currentPage === 0}
-            className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-white/70 transition disabled:cursor-not-allowed disabled:border-white/10 disabled:text-white/30 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            className="border-4 border-black bg-white px-4 py-2 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 transition-none shadow-brutal"
           >
-            Prev Batch
+            ← PREV
           </button>
 
-          <span className="tracking-[0.32em] text-white/50">
-            Page {currentPage + 1} / {totalPages}
+          <span className="tracking-[0.25em] font-black">
+            {currentPage + 1} / {totalPages}
           </span>
 
           <button
             type="button"
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
             disabled={currentPage >= totalPages - 1}
-            className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-white/70 transition disabled:cursor-not-allowed disabled:border-white/10 disabled:text-white/30 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            className="border-4 border-black bg-white px-4 py-2 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 transition-none shadow-brutal"
           >
-            Next Batch
+            NEXT →
           </button>
         </div>
       )}
@@ -214,18 +214,18 @@ function ListPage({ page }: { page: SignalListPage }) {
   return (
     <div className="flex flex-col gap-8">
       {page.intro && (
-        <div className="border border-white/10 bg-black/40 p-6">
+        <div className="border-6 border-black bg-brutal-lime p-6 shadow-brutal-lg">
           <div className="flex flex-col gap-3">
             {page.intro.eyebrow && (
-              <span className="text-[11px] uppercase tracking-[0.32em] text-white/50">
+              <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-3xl font-semibold tracking-[0.14em] text-white">
+            <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
               {page.intro.title}
             </h2>
             {page.intro.description && (
-              <p className="text-sm leading-relaxed text-white/75">
+              <p className="text-base leading-relaxed text-black/90 normal-case font-medium">
                 {page.intro.description}
               </p>
             )}
@@ -233,7 +233,7 @@ function ListPage({ page }: { page: SignalListPage }) {
         </div>
       )}
 
-      <div className="border border-white/10 bg-black/40 px-8 py-6">
+      <div className="border-6 border-black bg-white px-8 py-6 shadow-brutal-lg halftone-overlay">
         {Object.entries(groupedItems).map(([category, items]) => {
           if (items.length === 0) return null;
           const isOpen = openCategories.has(category);
@@ -242,39 +242,39 @@ function ListPage({ page }: { page: SignalListPage }) {
             <div key={category} className="mb-6 last:mb-0">
               <button
                 onClick={() => toggleCategory(category)}
-                className="mb-3 flex w-full items-center gap-2 text-left text-[11px] uppercase tracking-[0.32em] text-white/50 transition-colors hover:text-white/70"
+                className="mb-3 flex w-full items-center gap-2 text-left text-xs uppercase tracking-[0.25em] font-black hover:bg-black hover:text-white px-2 py-1 transition-none border-b-4 border-black"
               >
-                <span className="font-mono transition-transform" style={{
+                <span className="font-mono" style={{
                   transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)'
                 }}>
-                  [&gt;]
+                  ▶
                 </span>
                 <span>{category}</span>
-                <span className="text-white/30">({items.length})</span>
+                <span className="opacity-50">({items.length})</span>
               </button>
 
               {isOpen && (
                 <div className="ml-6 flex flex-col gap-2">
                   {items.map((item, index) => {
                     const content = (
-                      <div className="flex-1 text-right text-white/80">
-                        <span className="font-light">{item.title}</span>
-                        <span className="mx-2 text-white/40">—</span>
-                        <span className="text-white/60">{item.creator}</span>
+                      <div className="flex-1 text-right">
+                        <span className="font-bold">{item.title}</span>
+                        <span className="mx-2 opacity-40">—</span>
+                        <span className="opacity-70">{item.creator}</span>
                       </div>
                     );
 
                     return (
                       <div
                         key={`${item.title}-${index}`}
-                        className="group flex items-baseline justify-between gap-4 border-l border-white/10 pl-4 text-sm transition-all duration-200 hover:border-white/50 hover:bg-white/5 hover:pl-5"
+                        className="group flex items-baseline justify-between gap-4 border-l-4 border-black/20 pl-4 text-sm hover:border-black hover:bg-black/5 hover:pl-5 transition-none py-1"
                       >
                         {item.url ? (
                           <a
                             href={item.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 cursor-pointer transition-all duration-200 group-hover:text-white"
+                            className="flex-1 cursor-pointer hover:underline decoration-2 underline-offset-2"
                           >
                             {content}
                           </a>
@@ -282,7 +282,7 @@ function ListPage({ page }: { page: SignalListPage }) {
                           content
                         )}
                         {item.date && (
-                          <span className="text-[10px] uppercase tracking-wider text-white/40 transition-colors group-hover:text-white/60">
+                          <span className="text-[10px] uppercase tracking-wider opacity-50 font-black">
                             {formatDate(item.date)}
                           </span>
                         )}
