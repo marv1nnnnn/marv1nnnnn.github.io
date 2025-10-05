@@ -1,5 +1,6 @@
 [
   { "title": "A Brief History of Intelligence", "creator": "Max Bennett", "type": "text", "date": "2025-10-04" },
   { "title": "Richard Sutton – Father of RL thinks LLMs are a dead end", "creator": "Richard Sutton", "type": "video", "date": "2025-10-05", "url": "https://www.youtube.com/watch?v=21EYKqUsPfg" },
-  { "title": "Better call saul season 2", "creator": "Vince Gilligan", "type": "video", "date": "2025-10-05"}
+  {"title": "Let the model write the prompt", "creator": "David Reunig", "type": "text", "date": "2025-10-05", "url": "https://www.dbreunig.com/2025/06/10/let-the-model-write-the-prompt.html"},
+  { "title": "Better Call Saul Season 2", "creator": "Vince Gilligan", "type": "video", "date": "2025-10-05"}
 ]
