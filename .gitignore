@@ -56,4 +56,7 @@ dev-debug.log
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+
+# Generated content
+lib/signals.json 

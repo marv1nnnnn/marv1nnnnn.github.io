@@ -1,15 +1,17 @@
 {
-  "name": "anomaly-scanner",
+  "name": "marv1nnnnn",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "generate": "node scripts/generate-signals.js",
+    "dev": "pnpm generate && next dev",
+    "build": "pnpm generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "framer-motion": "^11.15.0",
+    "gray-matter": "^4.0.3",
     "next": "15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

@@ -1,0 +1,10 @@
+{
+  "id": "about",
+  "freq": 88.1,
+  "title": "About",
+  "pages": 1,
+  "audioUrl": "/audio/about-ambient.mp3",
+  "accentColor": "#F5F05B",
+  "background": "linear-gradient(135deg, #F5F05B 0%, #FF8DA1 38%, #161616 100%)",
+  "pageType": "profile"
+}

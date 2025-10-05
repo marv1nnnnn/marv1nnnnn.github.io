@@ -1,0 +1,14 @@
+{
+  "id": "projects",
+  "freq": 94.5,
+  "title": "Projects",
+  "pages": 1,
+  "audioUrl": "/audio/project-ambient.mp3",
+  "accentColor": "#65E0FF",
+  "background": "linear-gradient(145deg, #081C2B 0%, #65E0FF 52%, #111111 100%)",
+  "pageType": "cards",
+  "renderMode": "single",
+  "intro": {
+    "title": "Selected Work"
+  }
+}

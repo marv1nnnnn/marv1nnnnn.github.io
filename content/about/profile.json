@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "eyebrow": "About",
+    "title": "Marvin",
+    "subtitle": "AI Engineer@YouWare, @Cursor Ambassador",
+    "description": "Enthuastic in vibe coding / meditation / games. INFP. Just curious about things."
+  },
+  "sections": [
+    {
+      "title": "Current",
+      "body": "I currently work at YouWare as an AI Engineer. YouWare is the world's first vibe coders' community. I am also a Cursor ambassador, having held 10+ events in China with thousands of attendees."
+    },
+    {
+      "title": "Fun facts",
+      "body": "- Started college at 14\n- Bachelor's in physics, master's in acoustics; learned to code after starting my career\n- Performed live coding and circuit bending shows in Beijing\n- Have two cats and once had a lizard\n- Worked at Douban, was an active user, and was banned for supporting a protest\n - I tried to develop indie games in my free time, but haven't come up with anything complete yet\n - I choose this radio like approach, because I am a huge fan of radio stations like NTS and LYL. They supported me through hard times"
+    }
+  ],
+  "contact": [
+    {
+      "label": "Email",
+      "value": "marvin199632@gmail.com",
+      "href": "mailto:marvin199632@gmail.com"
+    },
+    {
+      "label": "GitHub",
+      "value": "@marv1nnnnn",
+      "href": "https://github.com/marv1nnnnn"
+    },
+    {
+      "label": "LinkedIn",
+      "value": "马进 (Marvin)",
+      "href": "https://www.linkedin.com/in/%E8%BF%9B-%E9%A9%AC-14b950113/"
+    },
+    {
+      "label": "Twitter",
+      "value": "@marv1nnnnn1",
+      "href": "https://twitter.com/marv1nnnnn1"
+    },
+    {
+      "label": "Steam",
+      "value": "marv1n",
+      "href": "https://steamcommunity.com/id/marv1nnnnn/"
+    }
+  ]
+}

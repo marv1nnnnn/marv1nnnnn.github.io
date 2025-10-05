@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ANOMALY SCANNER // SIGNAL DETECTION SYSTEM",
-  description: "Vertical signal scanner for detecting anomalous frequencies",
+  title: "MARV1NNNNN // Creative Technologist",
+  description: "Personal website and portfolio of Marvin, a designer and creative technologist exploring narrative systems and experiential web installations.",
 };
 
 export default function RootLayout({

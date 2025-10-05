@@ -40,7 +40,8 @@
       "Read(//Users/marv1nnnnn/.npm/_logs/**)",
       "Bash(pnpm install:*)",
       "Bash(npx create-next-app:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm generate:*)"
     ],
     "deny": []
   }

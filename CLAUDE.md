@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ```bash
-pnpm dev         # Start Next.js dev server with hot reload
-pnpm build       # Production build with type checking
+pnpm dev         # Generate signals + start Next.js dev server
+pnpm build       # Generate signals + production build with type checking
+pnpm generate    # Generate lib/signals.json from content/ folder
 pnpm start       # Run production build locally
 pnpm lint        # Run ESLint (follows interactive setup on first run)
 ```
@@ -27,15 +28,16 @@ All UI components consume this store via the `useScannerStore` hook.
 
 ### Signal System
 
-Signals are configured in `lib/signals.ts`:
-- **Signal Array**: Defines 4 frequencies (88.1, 94.5, 101.2, 107.8 MHz) with metadata (title, pages, audio, colors)
+Signals are loaded from the `content/` directory and compiled at build time:
+- **Content Structure**: Each signal lives in `content/<signal-id>/` with a `signal.json` metadata file
+- **Signal Array**: Dynamically generated from content folder via `scripts/generate-signals.js`
 - **Clarity Calculation**: Uses `findClosestSignal()` to compute distance-based clarity (1.0 at exact frequency, 0.0 at 1.5 MHz falloff)
 - **State Detection**: `getSignalState()` determines three states:
   - `NOISE` (clarity < 30%): Pure static
   - `APPROACHING` (30-95%): Blurred zine + fading noise
   - `LOCKED_ON` (≥95%): Clear zine + ambient audio
 
-When adding new signals, update `SIGNALS` array and ensure corresponding zine images exist in `public/zines/<signal-id>/`.
+**Adding new signals**: Create a folder in `content/` with `signal.json` and page content (see `content/README.md` for details).
 
 ### Component Structure
 
@@ -82,17 +84,37 @@ When extending functionality, update types first to ensure type safety across th
 4. **Canvas Rendering**: Uses `image-rendering: pixelated` CSS for retro aesthetic
 5. **Audio Context**: Must be initialized via user gesture; check `AudioEngine.tsx` for implementation
 
-## Content System
+## Content Management System
 
-Zine pages are static images stored in `public/zines/<signal-id>/page-<N>.png` (N = 1-indexed). The `ZineViewer` component:
-- Reads `pages` count from signal config
-- Cycles through pages with [PREV]/[NEXT] navigation
-- Applies `filter: blur()` CSS based on signal clarity
+Content is file-based and lives in the `content/` directory. Each signal has its own folder with JSON metadata and markdown/JSON content files.
 
-When adding content:
-1. Design pages in Figma with redaction/stamp aesthetics
-2. Export as PNG to `public/zines/<signal-id>/`
-3. Update signal config in `lib/signals.ts` with correct `pages` count
+### Content Structure
+
+```
+content/
+├── <signal-id>/
+│   ├── signal.json          # Signal metadata (freq, title, colors, etc.)
+│   ├── profile.json         # For profile pages
+│   ├── items.json           # For list pages
+│   └── cards/               # For card pages
+│       └── *.md             # Markdown files with frontmatter
+```
+
+### Page Types
+
+1. **Profile** (`pageType: "profile"`): Hero section + contact info (see `content/about/`)
+2. **Cards** (`pageType: "cards"`): Grid of project cards with markdown content (see `content/projects/`)
+3. **List** (`pageType: "list"`): Categorized list of items (see `content/listening/`)
+
+### Editing Content
+
+1. Edit files in `content/<signal-id>/`
+2. Run `pnpm generate` (or `pnpm dev`/`pnpm build` which auto-generate)
+3. Content automatically appears on the site
+
+**Important**: Always quote YAML frontmatter values in markdown files to avoid parsing errors.
+
+See `content/README.md` for detailed documentation on adding signals and content.
 
 ## Testing Approach
 

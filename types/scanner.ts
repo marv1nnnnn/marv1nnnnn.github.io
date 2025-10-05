@@ -33,6 +33,7 @@ export interface SignalProfilePage {
 
 export interface SignalCardsPage {
   type: 'cards';
+  renderMode?: 'single' | 'cards';
   intro?: {
     eyebrow?: string;
     title: string;
@@ -46,6 +47,7 @@ export interface SignalListItem {
   creator: string;
   type: 'album' | 'text' | 'video';
   date?: string;
+  url?: string;
 }
 
 export interface SignalListPage {

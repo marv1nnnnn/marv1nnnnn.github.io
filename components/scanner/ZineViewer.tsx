@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Signal, SignalCardsPage, SignalProfilePage, SignalListPage } from '@/types/scanner';
 import SignalCard from './SignalCard';
+import ProjectSinglePage from './ProjectSinglePage';
 
 interface ZineViewerProps {
   signal: Signal;
@@ -64,7 +65,7 @@ function ProfilePage({ page }: { page: SignalProfilePage }) {
             <h3 className="text-xs uppercase tracking-[0.32em] text-white/60">
               {section.title}
             </h3>
-            <p className="text-sm leading-relaxed text-white/80">{section.body}</p>
+            <p className="text-sm leading-relaxed text-white/80 whitespace-pre-line">{section.body}</p>
           </div>
         ))}
       </div>
@@ -249,23 +250,40 @@ function ListPage({ page }: { page: SignalListPage }) {
 
               {isOpen && (
                 <div className="ml-6 flex flex-col gap-2">
-                  {items.map((item, index) => (
-                    <div
-                      key={`${item.title}-${index}`}
-                      className="flex items-baseline justify-between gap-4 border-l border-white/10 pl-4 text-sm transition-colors hover:border-white/30"
-                    >
+                  {items.map((item, index) => {
+                    const content = (
                       <div className="flex-1 text-right text-white/80">
                         <span className="font-light">{item.title}</span>
                         <span className="mx-2 text-white/40">—</span>
                         <span className="text-white/60">{item.creator}</span>
                       </div>
-                      {item.date && (
-                        <span className="text-[10px] uppercase tracking-wider text-white/40">
-                          {formatDate(item.date)}
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    );
+
+                    return (
+                      <div
+                        key={`${item.title}-${index}`}
+                        className="group flex items-baseline justify-between gap-4 border-l border-white/10 pl-4 text-sm transition-all duration-200 hover:border-white/50 hover:bg-white/5 hover:pl-5"
+                      >
+                        {item.url ? (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 cursor-pointer transition-all duration-200 group-hover:text-white"
+                          >
+                            {content}
+                          </a>
+                        ) : (
+                          content
+                        )}
+                        {item.date && (
+                          <span className="text-[10px] uppercase tracking-wider text-white/40 transition-colors group-hover:text-white/60">
+                            {formatDate(item.date)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -284,6 +302,8 @@ export default function ZineViewer({ signal }: ZineViewerProps) {
           <ProfilePage page={signal.page} />
         ) : signal.page.type === 'list' ? (
           <ListPage page={signal.page} />
+        ) : signal.page.renderMode === 'single' ? (
+          <ProjectSinglePage cards={signal.page.cards} signalId={signal.id} />
         ) : (
           <CardsPage page={signal.page} signalId={signal.id} />
         )}
