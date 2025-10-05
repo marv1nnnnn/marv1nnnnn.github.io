@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useScannerStore } from '@/store/scanner';
 import { findClosestSignal, getSignalState } from '@/lib/signals';
 import StaticEffect from './StaticEffect';
@@ -10,6 +10,27 @@ import SignalLockParticles from '@/components/effects/SignalLockParticles';
 export default function DisplayScreen() {
   const { currentFrequency, setLockedOnSignalId } = useScannerStore();
   const previousSignalState = useRef<string>('NOISE');
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  // Track user interaction for vibration API
+  useEffect(() => {
+    const markInteraction = () => {
+      setHasUserInteracted(true);
+      document.removeEventListener('mousedown', markInteraction);
+      document.removeEventListener('touchstart', markInteraction);
+      document.removeEventListener('keydown', markInteraction);
+    };
+
+    document.addEventListener('mousedown', markInteraction);
+    document.addEventListener('touchstart', markInteraction);
+    document.addEventListener('keydown', markInteraction);
+
+    return () => {
+      document.removeEventListener('mousedown', markInteraction);
+      document.removeEventListener('touchstart', markInteraction);
+      document.removeEventListener('keydown', markInteraction);
+    };
+  }, []);
 
   // Calculate current signal state
   const { signal, distance, clarity } = findClosestSignal(currentFrequency);
@@ -20,8 +41,12 @@ export default function DisplayScreen() {
     if (signalState === 'LOCKED_ON' && signal) {
       setLockedOnSignalId(signal.id);
 
-      // Haptic feedback when locking onto a signal
-      if (previousSignalState.current !== 'LOCKED_ON' && 'vibrate' in navigator) {
+      // Haptic feedback when locking onto a signal (only after user interaction)
+      if (
+        previousSignalState.current !== 'LOCKED_ON' &&
+        hasUserInteracted &&
+        'vibrate' in navigator
+      ) {
         // Short vibration pattern: [vibrate, pause, vibrate]
         navigator.vibrate([40, 20, 60]);
       }
@@ -30,7 +55,7 @@ export default function DisplayScreen() {
     }
 
     previousSignalState.current = signalState;
-  }, [signalState, signal, setLockedOnSignalId]);
+  }, [signalState, signal, setLockedOnSignalId, hasUserInteracted]);
 
   // Calculate color transition based on signal clarity
   const accentColor = signal?.accentColor || '#7FFFD4';

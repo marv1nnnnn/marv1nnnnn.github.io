@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useScannerStore } from '@/store/scanner';
 import { findClosestSignal } from '@/lib/signals';
 
@@ -9,11 +9,11 @@ export default function AudioEngine() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const noiseNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const noiseGainRef = useRef<GainNode | null>(null);
-  const isInitializedRef = useRef(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize Web Audio on first user interaction
   const initAudio = () => {
-    if (isInitializedRef.current) return;
+    if (isInitialized) return;
 
     try {
       const audioContext = new AudioContext();
@@ -53,7 +53,7 @@ export default function AudioEngine() {
 
       noiseNodeRef.current = createNoiseSource();
 
-      isInitializedRef.current = true;
+      setIsInitialized(true);
       console.log('🔊 White noise initialized!');
     } catch (error) {
       console.error('Failed to initialize audio:', error);
@@ -62,7 +62,7 @@ export default function AudioEngine() {
 
   // Handle frequency changes - adjust noise volume based on signal clarity and tuning state
   useEffect(() => {
-    if (!isInitializedRef.current) return;
+    if (!isInitialized) return;
     if (!audioContextRef.current || !noiseGainRef.current) return;
 
     const { clarity } = findClosestSignal(currentFrequency);
@@ -72,34 +72,48 @@ export default function AudioEngine() {
     let noiseVolume: number;
     if (isTuning) {
       // While tuning: dynamic noise that decreases as you approach a signal
-      // Near signal (clarity ~1): very quiet (0.05)
+      // At target frequency (clarity = 1): silent (0)
       // Far from signal (clarity ~0): loud (0.45)
-      noiseVolume = 0.05 + (1 - clarity) * 0.4;
+      noiseVolume = (1 - clarity) * 0.45;
     } else {
-      // When idle: subtle noise based on clarity
-      noiseVolume = Math.max(0, (1 - clarity) * 0.1);
+      // When idle: subtle noise based on clarity, silent at target
+      noiseVolume = (1 - clarity) * 0.1;
     }
 
     noiseGainRef.current.gain.linearRampToValueAtTime(
       noiseVolume,
       audioContextRef.current.currentTime + 0.1
     );
-  }, [currentFrequency, isTuning]);
+  }, [currentFrequency, isTuning, isInitialized]);
 
   // Initialize audio on mount (requires user interaction)
   useEffect(() => {
     const handleInteraction = () => {
       initAudio();
+      // Remove all listeners after first interaction
+      document.removeEventListener('pointerdown', handleInteraction);
       document.removeEventListener('mousedown', handleInteraction);
       document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('scroll', handleInteraction);
+      document.removeEventListener('wheel', handleInteraction);
     };
 
+    // Listen to multiple interaction types for faster audio initialization
+    document.addEventListener('pointerdown', handleInteraction);
     document.addEventListener('mousedown', handleInteraction);
     document.addEventListener('keydown', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
+    document.addEventListener('scroll', handleInteraction, { passive: true });
+    document.addEventListener('wheel', handleInteraction, { passive: true });
 
     return () => {
+      document.removeEventListener('pointerdown', handleInteraction);
       document.removeEventListener('mousedown', handleInteraction);
       document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('scroll', handleInteraction);
+      document.removeEventListener('wheel', handleInteraction);
     };
   }, []);
 

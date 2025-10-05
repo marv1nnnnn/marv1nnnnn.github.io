@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent, WheelEvent as ReactWheelEvent } from 'react';
+import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useScannerStore } from '@/store/scanner';
 import { SIGNALS } from '@/lib/signals';
 
@@ -76,7 +76,7 @@ export default function ScannerPanel() {
     setIsTuning(false);
   }, [setIsTuning]);
 
-  const handleWheel = useCallback((event: ReactWheelEvent<HTMLDivElement>) => {
+  const handleWheel = useCallback((event: WheelEvent) => {
     event.preventDefault();
     const delta = event.deltaY > 0 ? -0.1 : 0.1;
     const nextFrequency = clamp(currentFrequency + delta, MIN_FREQ, MAX_FREQ);
@@ -102,17 +102,18 @@ export default function ScannerPanel() {
   }, [currentFrequency, setFrequency, setIsTuning]);
 
   // Swipe gesture handlers
-  const handleTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+  const handleTouchStart = useCallback((event: TouchEvent) => {
     if (event.touches.length === 1) {
       touchStartY.current = event.touches[0].clientY;
       touchStartFreq.current = currentFrequency;
     }
   }, [currentFrequency]);
 
-  const handleTouchMove = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+  const handleTouchMove = useCallback((event: TouchEvent) => {
     if (touchStartY.current === null || touchStartFreq.current === null) return;
     if (event.touches.length !== 1) return;
 
+    event.preventDefault(); // Prevent scrolling while tuning
     const deltaY = touchStartY.current - event.touches[0].clientY;
     // Improved sensitivity: 100px of swipe = 5 MHz change
     const frequencyDelta = (deltaY / 100) * 5;
@@ -137,6 +138,25 @@ export default function ScannerPanel() {
       setIsTuning(false);
     }
   }, [isDragging, setIsTuning]);
+
+  // Add wheel and touch event listeners with passive: false to allow preventDefault
+  useEffect(() => {
+    const container = sliderTrackRef.current?.parentElement;
+    const slider = sliderTrackRef.current;
+    if (!slider || !container) return;
+
+    slider.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      slider.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [handleWheel, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   useEffect(() => {
     return () => {
@@ -216,9 +236,6 @@ export default function ScannerPanel() {
       {/* Vertical Slider Container */}
       <div
         className="flex-1 flex items-center gap-4 md:gap-6 w-full max-w-md"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Frequency Scale */}
         <div className="relative h-full w-12 md:w-16 flex flex-col justify-between py-2">
@@ -251,7 +268,6 @@ export default function ScannerPanel() {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            onWheel={handleWheel}
             onKeyDown={handleKeyDown}
             className={`relative w-full h-full rounded-lg overflow-hidden ${
               isDragging ? 'cursor-grabbing' : 'cursor-grab'
