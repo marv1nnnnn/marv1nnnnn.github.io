@@ -18,60 +18,60 @@ interface ZineViewerProps {
 
 function ProfilePage({ page }: { page: SignalProfilePage }) {
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-      <div className="flex flex-col gap-6 border-6 border-black bg-white p-6 shadow-brutal-lg halftone-overlay">
-        <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+    <div className="grid gap-4 md:gap-8 lg:grid-cols-[1.2fr_1fr]">
+      <div className="flex flex-col gap-3 md:gap-6 border-4 md:border-6 border-black bg-white p-4 md:p-6 shadow-brutal-lg halftone-overlay">
+        <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
           {page.hero.eyebrow}
         </span>
-        <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
+        <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
           {page.hero.title}
         </h2>
         {page.hero.subtitle && (
-          <p className="text-sm uppercase tracking-[0.2em] font-bold text-black/60">
+          <p className="text-xs md:text-sm uppercase tracking-[0.15em] md:tracking-[0.2em] font-bold text-black/60">
             {page.hero.subtitle}
           </p>
         )}
         {page.hero.description && (
-          <p className="text-base leading-relaxed text-black/80 normal-case">
+          <p className="text-sm md:text-base leading-relaxed text-black/80 normal-case">
             {page.hero.description}
           </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-4 border-6 border-black bg-brutal-cyan p-6 shadow-brutal-lg">
-        <h3 className="text-xs uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+      <div className="flex flex-col gap-3 md:gap-4 border-4 md:border-6 border-black bg-brutal-cyan p-4 md:p-6 shadow-brutal-lg">
+        <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
           Contact
         </h3>
-        <ul className="flex flex-col gap-3 text-sm">
+        <ul className="flex flex-col gap-2 md:gap-3 text-xs md:text-sm">
           {page.contact.map((entry) => (
-            <li key={`${entry.label}-${entry.value}`} className="flex items-center justify-between gap-4 border-b-2 border-black/20 pb-2">
-              <span className="font-black uppercase tracking-[0.2em] text-[11px]">
+            <li key={`${entry.label}-${entry.value}`} className="flex items-center justify-between gap-2 md:gap-4 border-b-2 border-black/20 pb-1.5 md:pb-2">
+              <span className="font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[9px] md:text-[11px]">
                 {entry.label}
               </span>
               {entry.href ? (
                 <a
                   href={entry.href}
-                  className="font-bold underline decoration-black decoration-2 underline-offset-4 hover:bg-black hover:text-white px-1 transition-none"
+                  className="font-bold underline decoration-black decoration-2 underline-offset-4 hover:bg-black hover:text-white px-1 transition-none break-all"
                   target="_blank"
                   rel="noreferrer"
                 >
                   {entry.value}
                 </a>
               ) : (
-                <span className="font-bold">{entry.value}</span>
+                <span className="font-bold break-all">{entry.value}</span>
               )}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="lg:col-span-2 grid gap-4 border-6 border-black bg-white p-6 shadow-brutal-lg halftone-overlay">
+      <div className="lg:col-span-2 grid gap-3 md:gap-4 border-4 md:border-6 border-black bg-white p-4 md:p-6 shadow-brutal-lg halftone-overlay">
         {page.sections.map((section) => (
-          <div key={section.title} className="space-y-3 border-l-6 border-black bg-white pl-5 py-2">
-            <h3 className="text-xs uppercase tracking-[0.25em] font-black">
+          <div key={section.title} className="space-y-2 md:space-y-3 border-l-4 md:border-l-6 border-black bg-white pl-3 md:pl-5 py-2">
+            <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black">
               {section.title}
             </h3>
-            <p className="text-sm leading-relaxed text-black/80 whitespace-pre-line">{section.body}</p>
+            <p className="text-xs md:text-sm leading-relaxed text-black/80 whitespace-pre-line">{section.body}</p>
           </div>
         ))}
       </div>
@@ -109,20 +109,20 @@ function CardsPage({
   const startIndex = currentPage * PAGE_SIZE;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4 md:gap-8">
       {page.intro && (
-        <div className="border-6 border-black bg-brutal-pink p-6 shadow-brutal-lg">
-          <div className="flex flex-col gap-3">
+        <div className="border-4 md:border-6 border-black bg-brutal-pink p-4 md:p-6 shadow-brutal-lg">
+          <div className="flex flex-col gap-2 md:gap-3">
             {page.intro.eyebrow && (
-              <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+              <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
+            <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
               {page.intro.title}
             </h2>
             {page.intro.description && (
-              <p className="text-base leading-relaxed text-black/90 normal-case font-medium">
+              <p className="text-sm md:text-base leading-relaxed text-black/90 normal-case font-medium">
                 {page.intro.description}
               </p>
             )}
@@ -130,7 +130,7 @@ function CardsPage({
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 auto-rows-[minmax(240px,1fr)]">
+      <div className="grid gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-3 auto-rows-[minmax(240px,1fr)]">
         {pagedCards.map((card, index) => (
           <SignalCard
             key={card.id}
@@ -213,20 +213,20 @@ function ListPage({ page }: { page: SignalListPage }) {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4 md:gap-8">
       {page.intro && (
-        <div className="border-6 border-black bg-brutal-lime p-6 shadow-brutal-lg">
-          <div className="flex flex-col gap-3">
+        <div className="border-4 md:border-6 border-black bg-brutal-lime p-4 md:p-6 shadow-brutal-lg">
+          <div className="flex flex-col gap-2 md:gap-3">
             {page.intro.eyebrow && (
-              <span className="text-[11px] uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+              <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-4xl font-black tracking-[0.08em] text-black uppercase">
+            <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
               {page.intro.title}
             </h2>
             {page.intro.description && (
-              <p className="text-base leading-relaxed text-black/90 normal-case font-medium">
+              <p className="text-sm md:text-base leading-relaxed text-black/90 normal-case font-medium">
                 {page.intro.description}
               </p>
             )}
@@ -234,18 +234,18 @@ function ListPage({ page }: { page: SignalListPage }) {
         </div>
       )}
 
-      <div className="border-6 border-black bg-white px-8 py-6 shadow-brutal-lg halftone-overlay">
+      <div className="border-4 md:border-6 border-black bg-white px-4 md:px-8 py-4 md:py-6 shadow-brutal-lg halftone-overlay">
         {Object.entries(groupedItems).map(([category, items]) => {
           if (items.length === 0) return null;
           const isOpen = openCategories.has(category);
 
           return (
-            <div key={category} className="mb-6 last:mb-0">
+            <div key={category} className="mb-4 md:mb-6 last:mb-0">
               <button
                 onClick={() => toggleCategory(category)}
-                className="mb-3 flex w-full items-center gap-2 text-left text-xs uppercase tracking-[0.25em] font-black hover:bg-black hover:text-white px-2 py-1 transition-none border-b-4 border-black"
+                className="mb-2 md:mb-3 flex w-full items-center gap-1.5 md:gap-2 text-left text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black hover:bg-black hover:text-white px-2 py-1 transition-none border-b-3 md:border-b-4 border-black"
               >
-                <span className="font-mono" style={{
+                <span className="font-mono text-xs md:text-sm" style={{
                   transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)'
                 }}>
                   ▶
@@ -255,20 +255,20 @@ function ListPage({ page }: { page: SignalListPage }) {
               </button>
 
               {isOpen && (
-                <div className="ml-6 flex flex-col gap-2">
+                <div className="ml-3 md:ml-6 flex flex-col gap-1.5 md:gap-2">
                   {items.map((item, index) => {
                     const content = (
                       <div className="flex-1 text-right">
-                        <span className="font-bold">{item.title}</span>
-                        <span className="mx-2 opacity-40">—</span>
-                        <span className="opacity-70">{item.creator}</span>
+                        <span className="font-bold text-xs md:text-sm">{item.title}</span>
+                        <span className="mx-1 md:mx-2 opacity-40">—</span>
+                        <span className="opacity-70 text-xs md:text-sm">{item.creator}</span>
                       </div>
                     );
 
                     return (
                       <div
                         key={`${item.title}-${index}`}
-                        className="group flex items-baseline justify-between gap-4 border-l-4 border-black/20 pl-4 text-sm hover:border-black hover:bg-black/5 hover:pl-5 transition-none py-1"
+                        className="group flex items-baseline justify-between gap-2 md:gap-4 border-l-3 md:border-l-4 border-black/20 pl-2 md:pl-4 text-xs md:text-sm hover:border-black hover:bg-black/5 hover:pl-3 md:hover:pl-5 transition-none py-1"
                       >
                         {item.url ? (
                           <a
@@ -283,7 +283,7 @@ function ListPage({ page }: { page: SignalListPage }) {
                           content
                         )}
                         {item.date && (
-                          <span className="text-[10px] uppercase tracking-wider opacity-50 font-black">
+                          <span className="text-[8px] md:text-[10px] uppercase tracking-wider opacity-50 font-black whitespace-nowrap">
                             {formatDate(item.date)}
                           </span>
                         )}
@@ -302,8 +302,8 @@ function ListPage({ page }: { page: SignalListPage }) {
 
 export default function ZineViewer({ signal, clarity }: ZineViewerProps) {
   return (
-    <div className="relative min-h-full w-full px-6 sm:px-10 lg:px-16 py-12 sm:py-16">
-      <div className="relative z-10 flex flex-col gap-10">
+    <div className="relative min-h-full w-full px-3 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-12 md:py-16">
+      <div className="relative z-10 flex flex-col gap-6 md:gap-10">
         {signal.page.type === 'profile' ? (
           <ProfilePage page={signal.page} />
         ) : signal.page.type === 'list' ? (

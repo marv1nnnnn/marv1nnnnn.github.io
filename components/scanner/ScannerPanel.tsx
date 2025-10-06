@@ -229,29 +229,29 @@ export default function ScannerPanel() {
   }, []);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center p-4 md:p-6 gap-6">
+    <div className="h-full flex flex-col items-center justify-center p-2 md:p-6 gap-3 md:gap-6">
       {/* Title */}
       <div className="text-center">
-        <div className="text-xs md:text-sm uppercase tracking-[0.25em] font-black bg-black text-white px-4 py-2">
+        <div className="text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-3 md:px-4 py-1.5 md:py-2">
           TUNER
         </div>
       </div>
 
       {/* Vertical Slider Container */}
-      <div className="flex-1 flex items-center gap-4 md:gap-6 w-full max-w-lg min-h-[360px] md:min-h-[460px]">
+      <div className="flex-1 flex items-center gap-2 md:gap-6 w-full max-w-lg min-h-[360px] md:min-h-[460px]">
         {/* Frequency Scale - BOLD & BRUTAL */}
-        <div className="relative h-full w-16 md:w-20">
+        <div className="relative h-full w-10 md:w-20">
           <div className="relative h-full py-10">
             {frequencyMarkers.filter(m => m.isMajor).map((marker) => (
               <div
                 key={marker.freq}
-                className="absolute right-0 flex items-center gap-1 -translate-y-1/2"
+                className="absolute right-0 flex items-center gap-0.5 md:gap-1 -translate-y-1/2"
                 style={{ top: `${marker.position}%` }}
               >
-                <span className="text-base md:text-lg font-mono font-black tabular-nums text-black leading-none">
+                <span className="text-xs md:text-lg font-mono font-black tabular-nums text-black leading-none">
                   {Math.round(marker.freq)}
                 </span>
-                <div className="w-3 h-0.5 bg-black" />
+                <div className="w-2 md:w-3 h-0.5 bg-black" />
               </div>
             ))}
           </div>
@@ -299,22 +299,22 @@ export default function ScannerPanel() {
                   className="absolute pointer-events-none"
                   style={{
                     top: `${signal.position}%`,
-                    left: isLeft ? '8px' : 'auto',
-                    right: isLeft ? 'auto' : '8px',
+                    left: isLeft ? '4px' : 'auto',
+                    right: isLeft ? 'auto' : '4px',
                   }}
                 >
                   {/* Station label card */}
                   <div
-                    className="border-4 border-black px-2 py-1"
+                    className="border-2 md:border-4 border-black px-1 md:px-2 py-0.5 md:py-1"
                     style={{
                       backgroundColor: signal.accentColor,
                       transform: `translateY(-50%) rotate(${isLeft ? -1 : 1}deg)`
                     }}
                   >
-                    <div className="text-[11px] md:text-xs font-black uppercase tracking-[0.15em] text-black whitespace-nowrap">
+                    <div className="text-[9px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.15em] text-black whitespace-nowrap">
                       {signal.title}
                     </div>
-                    <div className="text-[9px] font-mono font-bold tabular-nums text-black/70">
+                    <div className="text-[7px] md:text-[9px] font-mono font-bold tabular-nums text-black/70">
                       {signal.freq.toFixed(1)}
                     </div>
                   </div>
@@ -379,7 +379,7 @@ export default function ScannerPanel() {
 
         {/* MHz label - BRUTAL */}
         <div
-          className="text-sm md:text-base uppercase tracking-[0.25em] font-black bg-black text-white px-2 py-2"
+          className="text-[10px] md:text-base uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-1 md:px-2 py-2"
           style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
         >
           MHz
@@ -387,19 +387,19 @@ export default function ScannerPanel() {
       </div>
 
       {/* Current Frequency Display - BRUTAL */}
-      <div className="w-auto border-6 border-black bg-white px-6 py-3 halftone-overlay relative -rotate-1">
+      <div className="w-auto border-4 md:border-6 border-black bg-white px-4 md:px-6 py-2 md:py-3 halftone-overlay relative -rotate-1">
         {/* Corner rivets */}
-        <div className="absolute top-2 left-2 w-3 h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border-2 border-black"></div>
-        <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border-2 border-black"></div>
-        <div className="absolute bottom-2 left-2 w-3 h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border-2 border-black"></div>
-        <div className="absolute bottom-2 right-2 w-3 h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border-2 border-black"></div>
+        <div className="absolute top-1 md:top-2 left-1 md:left-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
+        <div className="absolute top-1 md:top-2 right-1 md:right-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
+        <div className="absolute bottom-1 md:bottom-2 left-1 md:left-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
+        <div className="absolute bottom-1 md:bottom-2 right-1 md:right-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
 
         {/* Frequency display */}
-        <div className="flex items-baseline gap-3">
-          <span className="text-5xl font-mono tracking-tight text-brutal-pink font-black tabular-nums">
+        <div className="flex items-baseline gap-2 md:gap-3">
+          <span className="text-3xl md:text-5xl font-mono tracking-tight text-brutal-pink font-black tabular-nums">
             {formatFrequency(currentFrequency)}
           </span>
-          <span className="text-base uppercase tracking-[0.25em] text-black/80 font-black">
+          <span className="text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.25em] text-black/80 font-black">
             MHz
           </span>
         </div>

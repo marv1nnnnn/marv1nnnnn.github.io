@@ -28,8 +28,14 @@ body {
   background-color: var(--scanner-bg);
   color: var(--scanner-text);
   font-family: 'Space Grotesk', 'VT323', monospace;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 18px;
+  }
 }
 
 /* Phosphor glow effect */
@@ -198,23 +204,42 @@ body {
 .markdown-body {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   color: rgba(255, 255, 255, 0.95);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .markdown-body {
+    gap: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
 }
 
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
-  border-bottom: 4px solid rgba(255, 255, 255, 0.8);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.8rem;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.8);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
   font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    font-size: 1.5rem;
+    border-bottom: 4px solid rgba(255, 255, 255, 0.8);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
 }
 
 .markdown-body p {

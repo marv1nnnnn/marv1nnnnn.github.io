@@ -36,7 +36,7 @@ export default function Home() {
       <AudioEngine />
 
       {/* Header */}
-      <header className={`relative border-b-6 px-6 py-2 overflow-hidden ${isOverdrive ? 'border-brutal-pink bg-brutal-pink/20' : 'border-black bg-white'}`}>
+      <header className={`relative border-b-4 md:border-b-6 px-3 md:px-6 py-1 md:py-2 overflow-hidden ${isOverdrive ? 'border-brutal-pink bg-brutal-pink/20' : 'border-black bg-white'}`}>
         <div className="relative z-10 flex flex-col">
           <RotatingBillboard />
         </div>
@@ -49,10 +49,10 @@ export default function Home() {
           className={`
             transition-all duration-200
             border-black bg-white
-            md:h-auto md:w-80 md:border-b-0 md:border-r-6
+            md:h-auto md:w-80 md:border-b-0 md:border-r-4 lg:border-r-6
             ${isPanelCollapsed
               ? 'h-0 border-b-0 overflow-hidden'
-              : 'h-[50vh] border-b-6'
+              : 'h-[50vh] border-b-4'
             }
           `}
         >
@@ -74,16 +74,16 @@ export default function Home() {
           onTouchStart={(e) => e.stopPropagation()}
           onTouchEnd={(e) => e.stopPropagation()}
           className={`
-            fixed bottom-6 right-6 z-50
-            w-16 h-16
+            fixed bottom-4 right-4 z-50
+            w-12 h-12 md:w-16 md:h-16
             flex items-center justify-center
-            border-6 border-black
+            border-4 md:border-6 border-black
             bg-brutal-pink
-            shadow-brutal-lg
+            shadow-brutal
             hover:bg-black hover:text-brutal-pink
             transition-none
             md:hidden
-            font-black text-2xl
+            font-black text-xl md:text-2xl
           `}
           aria-label={isPanelCollapsed ? 'Show tuner' : 'Hide tuner'}
         >
