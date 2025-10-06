@@ -60,7 +60,25 @@ export interface SignalListPage {
   items: SignalListItem[];
 }
 
-export type SignalPage = SignalProfilePage | SignalCardsPage | SignalListPage;
+export interface VinylRecord {
+  id: string;
+  artist: string;
+  title: string;
+  year: number;
+  medium: 'music' | 'film' | 'book' | 'anime' | 'game';
+  color?: string;  // Optional: auto-generated from medium if not provided
+  image_url?: string;
+  personalNote: string;
+  tags?: string[];
+  links?: Array<{ label: string; url: string }>;
+}
+
+export interface SignalInfluencesPage {
+  type: 'influences';
+  records: VinylRecord[];
+}
+
+export type SignalPage = SignalProfilePage | SignalCardsPage | SignalListPage | SignalInfluencesPage;
 
 export interface Signal {
   id: string;

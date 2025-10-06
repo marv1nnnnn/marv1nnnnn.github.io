@@ -1,0 +1,121 @@
+{
+  "records": [
+    {
+      "id": "xiuxiu-knife-play",
+      "artist": "Xiu Xiu",
+      "title": "Knife Play",
+      "year": 2002,
+      "medium": "music",
+      "personalNote": "Still the most brutal and honest album I have ever heard",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/9/91/Xiuxiu-knifeplay.jpg"
+    },
+    {
+      "id": "htrk-work-work",
+      "artist": "HTRK",
+      "title": "Work Work",
+      "year": 2011,
+      "medium": "music",
+      "personalNote": "Music that belong to 3am. Their vibe is so unique and nothing else sounds like it.",
+      "image_url": "https://images.genius.com/323e595aeb3dc859ffa0fc04d6085650.300x300x1.jpg"
+    },
+    {
+      "id": "coil-ape-of-naples",
+      "artist": "Coil",
+      "title": "The Ape of Naples",
+      "year": 2005,
+      "medium": "music",
+      "personalNote": "Basically I love every album from them. This one is not their best, but the album cover is so iconic.",
+      "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYomQMkRyS-9Jt0hjyuKZcUvnmzVi2VQf1IA&s"
+    },
+    {
+      "id": "william-basinski",
+      "artist": "William Basinski",
+      "title": "The Disintegration Loops",
+      "year": 2002,
+      "medium": "music",
+      "personalNote": "Beauty in decay. Impermanence as art.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/7/79/DisLoop_1.jpg"
+    },
+    {
+      "id": "autechre",
+      "artist": "Autechre",
+      "title": "Amber",
+      "year": 1994,
+      "medium": "music",
+      "personalNote": "Complexity for its own sake is valid. Embrace the alien.",
+      "image_url": "https://f4.bcbits.com/img/a3508978113_16.jpg"
+    },
+    {
+      "id": "swans-are-dead",
+      "artist": "Swans",
+      "title": "Swans are Dead",
+      "year": 1997,
+      "medium": "music",
+      "personalNote": "I don't like swans without Jarboe, and this is their best period",
+      "image_url": "https://f4.bcbits.com/img/a0004397024_10.jpg"
+    },
+    {
+      "id": "fishmans",
+      "artist": "Fishmans",
+      "title": "98.12.28",
+      "year": 1998,
+      "medium": "music",
+      "personalNote": "If music of god ever come to earth for one night, this is it.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/3/30/98.12.28_%E7%94%B7%E9%81%94%E3%81%AE%E5%88%A5%E3%82%8C_Album_Art.jpg"
+    },
+    {
+      "id": "talk-talk",
+      "artist": "Talk Talk",
+      "title": "London 1986",
+      "year": 1986,
+      "medium": "music",
+      "personalNote": "They stop playing live after this album, I always wonder how their later albums would sound like in live.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/6/61/Talk_Talk_-_London_1986.png"
+    },
+    {
+      "id": "david-lynch",
+      "artist": "David Lynch",
+      "title": "Twin Peaks",
+      "year": 1989,
+      "medium": "film",
+      "personalNote": "Honestly I love every moment from season 1 to season 3.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/e/ea/TwinPeaks_openingshotcredits.jpg"
+    },
+    {
+      "id": "suda51-kill-the past",
+      "artist": "Suda51",
+      "title": "The Silver Case",
+      "year": 1999,
+      "medium": "game",
+      "personalNote": "This is that kind of game I would sacrfice everything for making.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/en/c/c0/The_Silver_Case_cover.png"
+    },
+    {
+      "id": "2666",
+      "artist": "Robert Balano",
+      "title": "2666",
+      "year": 2004,
+      "medium": "book",
+      "personalNote": "How did he write this book? It's so much ahead of its time.",
+      "image_url": "https://i.etsystatic.com/18611779/r/il/83fd6d/2614827046/il_fullxfull.2614827046_dfmb.jpg"
+    },
+    {
+      "id": "dfw-infinite-jest",
+      "artist": "David Foster Wallace",
+      "title": "Infinite Jest",
+      "year": 1996,
+      "medium": "book",
+      "personalNote": "I once vowed once I finish this book, I will marry my girlfriend. I still haven't finished it, but I married her. I started to play tennis because of DFW",
+      "image_url": "https://nathanholic.com/wp-content/uploads/2013/08/cover_ij.jpg"
+    },
+    {
+      "id": "lain",
+      "artist": "Chiaki J. Konaka",
+      "title": "Lain",
+      "year": 1999,
+      "medium": "anime",
+      "personalNote": "A person like me must love lain right? The aesthetics here is truly something else.",
+      "image_url": "https://preview.redd.it/serial-experiments-lain-anime-of-the-week-v0-i9eehu7ix07d1.png?width=1520&format=png&auto=webp&s=70b4c4b79af17899111517a7642652bd51853d55"
+    }
+  ]
+}

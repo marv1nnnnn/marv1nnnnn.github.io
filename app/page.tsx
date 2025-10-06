@@ -66,7 +66,13 @@ export default function Home() {
 
         {/* Mobile Tuner Toggle Button */}
         <button
-          onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setIsPanelCollapsed(!isPanelCollapsed);
+          }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
           className={`
             fixed bottom-6 right-6 z-50
             w-16 h-16

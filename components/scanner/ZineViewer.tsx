@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { Signal, SignalCardsPage, SignalProfilePage, SignalListPage } from '@/types/scanner';
+import type { Signal, SignalCardsPage, SignalProfilePage, SignalListPage, SignalInfluencesPage } from '@/types/scanner';
 import SignalCard from './SignalCard';
+import InfluencesPage from './InfluencesPage';
 
 // Code-split ProjectSinglePage for better performance
 const ProjectSinglePage = dynamic(() => import('./ProjectSinglePage'), {
@@ -299,7 +300,7 @@ function ListPage({ page }: { page: SignalListPage }) {
   );
 }
 
-export default function ZineViewer({ signal }: ZineViewerProps) {
+export default function ZineViewer({ signal, clarity }: ZineViewerProps) {
   return (
     <div className="relative min-h-full w-full px-6 sm:px-10 lg:px-16 py-12 sm:py-16">
       <div className="relative z-10 flex flex-col gap-10">
@@ -307,6 +308,8 @@ export default function ZineViewer({ signal }: ZineViewerProps) {
           <ProfilePage page={signal.page} />
         ) : signal.page.type === 'list' ? (
           <ListPage page={signal.page} />
+        ) : signal.page.type === 'influences' ? (
+          <InfluencesPage page={signal.page} clarity={clarity} />
         ) : signal.page.renderMode === 'single' ? (
           <ProjectSinglePage cards={signal.page.cards} signalId={signal.id} />
         ) : (

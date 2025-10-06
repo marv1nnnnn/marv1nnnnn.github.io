@@ -255,3 +255,281 @@ body {
   background: rgba(255, 255, 255, 0.1);
   padding: 1rem 1.5rem;
 }
+
+/* ===== VINYL CRATE / INFLUENCES PAGE STYLES ===== */
+
+/* Brutalist vinyl crate container */
+.vinyl-crate-brutal {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #3E2723 0px,
+      #382119 2px,
+      #3E2723 4px,
+      #362018 6px
+    ),
+    linear-gradient(135deg, #3E2723 0%, #2E1A12 100%);
+  border: 8px solid #000;
+  box-shadow:
+    inset 0 12px 20px rgba(0, 0, 0, 0.6),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.4),
+    12px 12px 0 #000;
+  padding: 3rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wood grain texture overlay */
+.vinyl-crate-brutal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 2px,
+      transparent 8px
+    );
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Vinyl record spine - thin vertical view */
+.vinyl-spine {
+  width: 55px;
+  height: 240px;
+  background: #FFF;
+  border: 4px solid #000;
+  border-left-style: solid;
+  box-shadow: 4px 4px 0 #000;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.vinyl-spine.center {
+  transform: translateY(-20px) scale(1.05);
+  box-shadow: 6px 6px 0 #000;
+  z-index: 10;
+}
+
+.vinyl-spine .spine-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 16px 6px;
+}
+
+.vinyl-spine .spine-artist {
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #000;
+  text-align: center;
+  line-height: 1.4;
+  word-break: break-word;
+  hyphens: auto;
+  padding: 0 2px;
+}
+
+/* Vinyl card - full album art + metadata */
+.vinyl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 350px;
+}
+
+.vinyl-art {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vinyl-art-large {
+  width: 450px;
+  height: 450px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vinyl-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Crate container */
+.vinyl-crate-container {
+  width: 100%;
+  max-width: 900px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #3E2723 0px,
+      #382119 2px,
+      #3E2723 4px,
+      #362018 6px
+    ),
+    linear-gradient(135deg, #3E2723 0%, #2E1A12 100%);
+  border: 8px solid #000;
+  box-shadow:
+    inset 0 12px 20px rgba(0, 0, 0, 0.6),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.4),
+    12px 12px 0 #000;
+  padding: 2rem 1rem;
+  position: relative;
+}
+
+/* Old vinyl record styles (deprecated, keeping for compatibility) */
+.vinyl-record-brutal {
+  width: 180px;
+  height: 180px;
+  border: 6px solid #000;
+  box-shadow: 8px 8px 0 #000;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.vinyl-record-brutal.center {
+  transform: scale(1.2) translateY(-20px);
+  z-index: 10;
+}
+
+.vinyl-record-brutal.adjacent {
+  transform: scale(0.8);
+  opacity: 0.6;
+}
+
+/* Pink price sticker */
+.brutal-sticker {
+  background: #FF1493;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #000;
+  letter-spacing: 0.05em;
+}
+
+/* Sharpie note */
+.sharpie-brutal {
+  font-family: 'Permanent Marker', cursive, 'VT323', monospace;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #000;
+  padding: 3px 8px;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  transform: rotate(2deg);
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Navigation arrow buttons */
+.crate-arrow {
+  width: 60px;
+  height: 60px;
+  background: #FF1493;
+  border: 6px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
+  cursor: pointer;
+  transition: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crate-arrow:hover:not(:disabled) {
+  background: #000;
+  color: #FF1493;
+}
+
+.crate-arrow:active:not(:disabled) {
+  box-shadow: 3px 3px 0 #000;
+  transform: translate(3px, 3px);
+}
+
+.crate-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Flip animations */
+@keyframes flip-left {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes flip-right {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.flip-left {
+  animation: flip-left 0.3s ease-out forwards;
+}
+
+.flip-right {
+  animation: flip-right 0.3s ease-out forwards;
+}
+
+/* Record pull-out overlay */
+.record-detail-overlay {
+  backdrop-filter: blur(8px);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .vinyl-record-brutal {
+    width: 140px;
+    height: 140px;
+  }
+
+  .vinyl-art-large {
+    width: 320px;
+    height: 320px;
+  }
+
+  .vinyl-crate-brutal {
+    padding: 2rem 0.5rem;
+  }
+
+  .crate-arrow {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}

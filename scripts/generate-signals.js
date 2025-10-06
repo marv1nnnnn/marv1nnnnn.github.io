@@ -68,6 +68,17 @@ function loadListPage(signalDir, metadata) {
   };
 }
 
+function loadInfluencesPage(signalDir) {
+  const influencesJsonPath = path.join(signalDir, 'influences.json');
+  const influencesJson = fs.readFileSync(influencesJsonPath, 'utf-8');
+  const { records } = JSON.parse(influencesJson);
+
+  return {
+    type: 'influences',
+    records,
+  };
+}
+
 function generateSignals() {
   const signalDirs = fs.readdirSync(CONTENT_DIR).filter((dir) => {
     const fullPath = path.join(CONTENT_DIR, dir);
@@ -85,6 +96,8 @@ function generateSignals() {
       page = loadCardsPage(signalDir, metadata);
     } else if (metadata.pageType === 'list') {
       page = loadListPage(signalDir, metadata);
+    } else if (metadata.pageType === 'influences') {
+      page = loadInfluencesPage(signalDir);
     } else {
       throw new Error(`Unknown page type: ${metadata.pageType}`);
     }

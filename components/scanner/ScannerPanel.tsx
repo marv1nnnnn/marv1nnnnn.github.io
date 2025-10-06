@@ -13,7 +13,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 const formatFrequency = (value: number) => `${value.toFixed(1)}`;
 
 export default function ScannerPanel() {
-  const { currentFrequency, setFrequency, setIsTuning, setIsOverdrive } = useScannerStore();
+  const { currentFrequency, setFrequency, setIsTuning, setIsOverdrive, isPanelCollapsed } = useScannerStore();
   const [isDragging, setIsDragging] = useState(false);
   const sliderTrackRef = useRef<HTMLDivElement>(null);
   const overdriveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -103,13 +103,15 @@ export default function ScannerPanel() {
 
   // Swipe gesture handlers
   const handleTouchStart = useCallback((event: TouchEvent) => {
+    if (isPanelCollapsed) return; // Don't handle touch when panel is collapsed
     if (event.touches.length === 1) {
       touchStartY.current = event.touches[0].clientY;
       touchStartFreq.current = currentFrequency;
     }
-  }, [currentFrequency]);
+  }, [currentFrequency, isPanelCollapsed]);
 
   const handleTouchMove = useCallback((event: TouchEvent) => {
+    if (isPanelCollapsed) return; // Don't handle touch when panel is collapsed
     if (touchStartY.current === null || touchStartFreq.current === null) return;
     if (event.touches.length !== 1) return;
 
@@ -125,7 +127,7 @@ export default function ScannerPanel() {
 
     setIsTuning(true);
     scheduleFrequencyUpdate(parseFloat(newFrequency.toFixed(1)));
-  }, [setIsTuning, scheduleFrequencyUpdate]);
+  }, [setIsTuning, scheduleFrequencyUpdate, isPanelCollapsed]);
 
   const handleTouchEnd = useCallback(() => {
     touchStartY.current = null;

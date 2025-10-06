@@ -24,6 +24,12 @@ const config: Config = {
           'yellow': '#FFFF00',
           'orange': '#FF6600',
         },
+        // Vinyl crate colors
+        'crate-wood': '#3E2723',
+        'crate-wood-light': '#5D4037',
+        'vinyl-black': '#0A0A0A',
+        'sticker-pink': '#FF1493',
+        'sticker-yellow': '#FFFF00',
       },
       fontFamily: {
         'mono': ['VT323', 'monospace'],
@@ -43,6 +49,11 @@ const config: Config = {
         'brutal-pink': '6px 6px 0 0 #FF1493',
         'brutal-cyan': '6px 6px 0 0 #00FFFF',
         'brutal-lime': '6px 6px 0 0 #00FF00',
+        'brutal-record': '8px 8px 0 0 #000000',
+        'brutal-crate': 'inset 0 8px 16px rgba(0,0,0,0.5), 12px 12px 0 #000',
+      },
+      dropShadow: {
+        'brutal': '2px 2px 0 #000000',
       },
       rotate: {
         '1': '1deg',
