@@ -1,6 +1,8 @@
 [
   { "title": "A Brief History of Intelligence", "creator": "Max Bennett", "type": "text", "date": "2025-10-04" },
   { "title": "Richard Sutton – Father of RL thinks LLMs are a dead end", "creator": "Richard Sutton", "type": "video", "date": "2025-10-05", "url": "https://www.youtube.com/watch?v=21EYKqUsPfg" },
-  {"title": "Let the model write the prompt", "creator": "David Reunig", "type": "text", "date": "2025-10-05", "url": "https://www.dbreunig.com/2025/06/10/let-the-model-write-the-prompt.html"},
-  { "title": "Better Call Saul Season 2", "creator": "Vince Gilligan", "type": "video", "date": "2025-10-05"}
+  { "title": "Let the model write the prompt", "creator": "David Reunig", "type": "text", "date": "2025-10-05", "url": "https://www.dbreunig.com/2025/06/10/let-the-model-write-the-prompt.html"},
+  { "title": "Better Call Saul Season 2", "creator": "Vince Gilligan", "type": "video", "date": "2025-10-05"},
+  { "title": "NTS Guide to: Hungarian Classical", "creator": "NTS", "type": "music", "date": "2025-10-09", "url": "https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025"}
+  { "title": "Deseo, Carne y Voluntad", "creator": "Candelabro", "type": "music", "date": "2025-10-09", "url": "https://registromovil.bandcamp.com/album/deseo-carne-y-voluntad"}
 ]
