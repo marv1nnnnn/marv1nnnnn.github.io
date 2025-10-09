@@ -45,7 +45,7 @@ export interface SignalCardsPage {
 export interface SignalListItem {
   title: string;
   creator: string;
-  type: 'album' | 'text' | 'video';
+  type: string;
   date?: string;
   url?: string;
 }

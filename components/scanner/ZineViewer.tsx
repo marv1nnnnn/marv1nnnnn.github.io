@@ -171,24 +171,25 @@ function CardsPage({
 }
 
 function ListPage({ page }: { page: SignalListPage }) {
-  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set(['AUDIO', 'VIDEO', 'TEXT']));
+  // Initialize with all categories open
+  const [openCategories, setOpenCategories] = useState<Set<string>>(() => {
+    const categories = new Set<string>();
+    page.items.forEach((item) => {
+      categories.add(item.type.toUpperCase());
+    });
+    return categories;
+  });
 
-  // Group items by category
+  // Dynamically group items by their type
   const groupedItems = useMemo(() => {
-    const groups: Record<string, typeof page.items> = {
-      AUDIO: [],
-      VIDEO: [],
-      TEXT: [],
-    };
+    const groups: Record<string, typeof page.items> = {};
 
     page.items.forEach((item) => {
-      if (item.type === 'album') {
-        groups.AUDIO.push(item);
-      } else if (item.type === 'video') {
-        groups.VIDEO.push(item);
-      } else if (item.type === 'text') {
-        groups.TEXT.push(item);
+      const category = item.type.toUpperCase();
+      if (!groups[category]) {
+        groups[category] = [];
       }
+      groups[category].push(item);
     });
 
     return groups;
@@ -235,7 +236,9 @@ function ListPage({ page }: { page: SignalListPage }) {
       )}
 
       <div className="border-4 md:border-6 border-black bg-white px-4 md:px-8 py-4 md:py-6 shadow-brutal-lg halftone-overlay">
-        {Object.entries(groupedItems).map(([category, items]) => {
+        {Object.entries(groupedItems)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([category, items]) => {
           if (items.length === 0) return null;
           const isOpen = openCategories.has(category);
 
