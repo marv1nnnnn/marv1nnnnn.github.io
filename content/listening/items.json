@@ -10,5 +10,11 @@
   {"title": "Exorcise the Demons", "creator": "Source Direct", "type": "music", "date": "2025-10-09", "url": "https://www.youtube.com/watch?v=uyutP6B-j68&list=PL698F378A0979E190"},
   {"title": "La Brea", "creator": "Hesse Kassel", "type": "music", "date": "2025-10-09", "url": "https://hessekassel.bandcamp.com/album/la-brea"},
   {"title": "Through The Wall", "creator": "Rochelle Jordan", "type": "music", "date": "2025-10-13", "url": "https://rochellejordan.bandcamp.com/album/through-the-wall"},
-  {"title": "Unleashing AI Slop Swarms", "creator": "Emergent Garden", "type": "video", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=--CteUWzErk"}
+  {"title": "Unleashing AI Slop Swarms", "creator": "Emergent Garden", "type": "video", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=--CteUWzErk"},
+  {"title": "Learning DSPy (3): Working with optimizers", "creator": "The Data Quarry", "type": "text", "date": "2025-10-13", "url": "https://thedataquarry.com/blog/learning-dspy-3-working-with-optimizers"},
+  {"title": "The Sunrise is Brutal", "creator": "Thrilliam Angels", "type": "music", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=8MV7hMuuxfE&list=OLAK5uy_n8dTctP8ciTvOlWIc-NWquNsXRB4bmxeU"},
+  {"title": "Lychee Reggae Mix", "creator": "Wild Wata", "type": "music", "date": "2025-10-13", "url": "https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025"},
+  {"title": "Just Talk To It - the no-bs Way of Agentic Engineering", "creator": "Peter Steinberger", "type": "text", "date": "2025-10-13", "url": "https://steipete.me/posts/just-talk-to-it"},
+  {"title": "Optimizing Coding Agent Rules (CLAUDE.md, agents.md, ./clinerules, .cursor/rules) for Improved Accuracy", "creator": "Priyan Jindal", "type": "text", "date": "2025-10-13", "url": "https://arize.com/blog/optimizing-coding-agent-rules-claude-md-agents-md-clinerules-cursor-rules-for-improved-accuracy/"},
+  {"title": "Context Engineering for AI Agents with LangChain and Manus", "creator": "Langchain", "type": "video", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=6_BcCthVvb8"}
 ]
