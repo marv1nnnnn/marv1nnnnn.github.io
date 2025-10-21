@@ -21,5 +21,7 @@
   {"title": "One Battle After Another", "creator": "Paul Thomas Anderson", "type": "video", "date": "2025-10-17"},
   {"title": "The Master", "creator": "Paul Thomas Anderson", "type": "video", "date": "2025-10-18"},  
   {"title": "Andrej Karpathy — “We’re summoning ghosts, not building animals”", "creator": "Dwarkesh Patel", "type": "video", "date": "2025-10-18", "url": "https://www.youtube.com/watch?v=lXUZvyajciY&t=1849s"},
-  {"title": "TXQ Fiction", "creator": "TXQ Fiction", "type": "video", "date": "2025-10-19"}
+  {"title": "TXQ Fiction", "creator": "TXQ Fiction", "type": "video", "date": "2025-10-19"},
+  {"title": "Frequently Asked Questions (And Answers) About AI Evals", "creator": "Hamal", "type": "text", "date": "2025-10-19", "url": "https://hamel.dev/blog/posts/evals-faq"},
+  {"title": "Later Than You Think", "artist": "John Maus", "type": "music", "date": "2025-10-19", "url": "https://johnmaus.bandcamp.com/album/later-than-you-think"}
 ]

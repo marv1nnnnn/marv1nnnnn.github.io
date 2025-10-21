@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Retro radio/scanner icon with cute aesthetic -->
+  <rect x="4" y="8" width="24" height="20" fill="#1a1a1a" stroke="#00ff00" stroke-width="2" rx="2"/>
+  <circle cx="16" cy="13" r="3" fill="#00ff00"/>
+  <path d="M 10 20 L 14 20 M 18 20 L 22 20" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/>
+  <!-- Antenna -->
+  <line x1="16" y1="8" x2="16" y2="3" stroke="#00ff00" stroke-width="2"/>
+  <circle cx="16" cy="2" r="1.5" fill="#00ff00"/>
+  <!-- Radio waves -->
+  <path d="M 8 13 Q 6 13 6 10" stroke="#00ff00" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M 24 13 Q 26 13 26 10" stroke="#00ff00" stroke-width="1.5" fill="none" opacity="0.6"/>
+</svg>
+

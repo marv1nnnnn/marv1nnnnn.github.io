@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   title: "MARV1NNNNN // Creative Technologist",
   description: "Personal website and portfolio of Marvin, a designer and creative technologist exploring narrative systems and experiential web installations.",
   metadataBase: new URL('https://marv1nnnnn.github.io'),
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' }
+    ],
+    apple: { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
