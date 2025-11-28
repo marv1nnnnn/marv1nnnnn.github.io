@@ -36,23 +36,23 @@ export default function Home() {
       <AudioEngine />
 
       {/* Header */}
-      <header className={`relative border-b-4 md:border-b-6 px-3 md:px-6 py-1 md:py-2 overflow-hidden ${isOverdrive ? 'border-brutal-pink bg-brutal-pink/20' : 'border-black bg-white'}`}>
+      <header className={`relative border-b-4 border-black px-4 py-2 overflow-hidden ${isOverdrive ? 'bg-brutal-pink/20' : 'bg-white'}`}>
         <div className="relative z-10 flex flex-col">
           <RotatingBillboard />
         </div>
       </header>
 
       {/* Main Content - Responsive Layout */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative bg-brutal-gray">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative bg-brutal-off-white">
         {/* Scanner Controls Panel */}
         <div
           className={`
-            transition-all duration-200
-            border-black bg-white
-            md:h-auto md:w-80 md:border-b-0 md:border-r-4 lg:border-r-6
+            transition-all duration-300 ease-in-out
+            border-black bg-white z-30
+            md:relative md:h-auto md:w-80 md:border-b-0 md:border-r-4
             ${isPanelCollapsed
-              ? 'h-0 border-b-0 overflow-hidden'
-              : 'h-[50vh] border-b-4'
+              ? 'h-0 border-b-0 overflow-hidden opacity-0 md:opacity-100 md:h-auto'
+              : 'h-[50vh] border-b-4 opacity-100'
             }
           `}
         >
@@ -60,7 +60,7 @@ export default function Home() {
         </div>
 
         {/* Display Screen Panel */}
-        <div className="flex-1 bg-brutal-gray overflow-y-auto">
+        <div className="flex-1 bg-brutal-off-white overflow-hidden relative z-20">
           <DisplayScreen />
         </div>
 
@@ -74,16 +74,17 @@ export default function Home() {
           onTouchStart={(e) => e.stopPropagation()}
           onTouchEnd={(e) => e.stopPropagation()}
           className={`
-            fixed bottom-4 right-4 z-50
-            w-12 h-12 md:w-16 md:h-16
+            fixed bottom-6 right-6 z-50
+            w-14 h-14
             flex items-center justify-center
-            border-4 md:border-6 border-black
-            bg-brutal-pink
+            border-brutal
+            bg-brutal-pink text-black
             shadow-brutal
+            active:shadow-none active:translate-x-[6px] active:translate-y-[6px]
             hover:bg-black hover:text-brutal-pink
-            transition-none
+            transition-all duration-100
             md:hidden
-            font-black text-xl md:text-2xl
+            font-black text-2xl
           `}
           aria-label={isPanelCollapsed ? 'Show tuner' : 'Hide tuner'}
         >

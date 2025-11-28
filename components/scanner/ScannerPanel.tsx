@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useScannerStore } from '@/store/scanner';
 import { SIGNALS } from '@/lib/signals';
+import { motion } from 'framer-motion';
 
 const MIN_FREQ = 88.0;
 const MAX_FREQ = 108.0;
@@ -229,40 +230,48 @@ export default function ScannerPanel() {
   }, []);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center p-2 md:p-6 gap-3 md:gap-6">
-      {/* Title */}
-      <div className="text-center">
-        <div className="text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-3 md:px-4 py-1.5 md:py-2">
-          TUNER
+    <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 gap-6 bg-brutal-off-white border-brutal shadow-brutal relative overflow-hidden">
+       {/* Texture Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/textures/noise.svg')] bg-repeat" />
+
+      {/* Header / Title Block */}
+      <div className="w-full flex justify-between items-center border-b-4 border-black pb-4 mb-2">
+        <div className="bg-black text-white px-4 py-2">
+          <h1 className="text-xl md:text-2xl font-black uppercase tracking-widest font-sans">TUNER</h1>
+        </div>
+        <div className="flex gap-2">
+           <div className="w-3 h-3 bg-brutal-cyan rounded-full border-2 border-black animate-pulse" />
+           <div className="w-3 h-3 bg-brutal-pink rounded-full border-2 border-black" />
         </div>
       </div>
 
-      {/* Vertical Slider Container */}
-      <div className="flex-1 flex items-center gap-2 md:gap-6 w-full max-w-lg min-h-[360px] md:min-h-[460px]">
-        {/* Frequency Scale - BOLD & BRUTAL */}
-        <div className="relative h-full w-10 md:w-20">
-          <div className="relative h-full py-10">
-            {frequencyMarkers.filter(m => m.isMajor).map((marker) => (
+      {/* Main Tuner Area */}
+      <div className="flex-1 flex items-stretch gap-4 w-full max-w-md min-h-[400px] relative">
+        
+        {/* Frequency Scale (Left) */}
+        <div className="w-16 md:w-24 relative border-r-4 border-black/10">
+          <div className="relative h-full py-12">
+             {frequencyMarkers.filter(m => m.isMajor).map((marker) => (
               <div
                 key={marker.freq}
-                className="absolute right-0 flex items-center gap-0.5 md:gap-1 -translate-y-1/2"
+                className="absolute right-0 flex items-center gap-2 -translate-y-1/2 pr-2"
                 style={{ top: `${marker.position}%` }}
               >
-                <span className="text-xs md:text-lg font-mono font-black tabular-nums text-black leading-none">
+                <span className="text-lg font-mono font-bold tabular-nums text-black/60">
                   {Math.round(marker.freq)}
                 </span>
-                <div className="w-2 md:w-3 h-0.5 bg-black" />
+                <div className="w-4 h-1 bg-black" />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Tuner Window - NEO-BRUTALIST */}
-        <div className="relative flex-1 h-full flex items-center">
-          <div
+        {/* Interactive Slider Track */}
+        <div className="flex-1 relative h-full">
+           <div
             ref={sliderTrackRef}
             role="slider"
-            aria-label="frequency tuner slider"
+            aria-label="Frequency Tuner"
             aria-valuemin={MIN_FREQ}
             aria-valuemax={MAX_FREQ}
             aria-valuenow={currentFrequency}
@@ -274,136 +283,82 @@ export default function ScannerPanel() {
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
             onKeyDown={handleKeyDown}
-            className={`relative w-full h-full py-10 ${
+            className={`relative w-full h-full py-12 ${
               isDragging ? 'cursor-grabbing' : 'cursor-grab'
-            } focus:outline-none touch-none select-none`}
+            } focus:outline-none touch-none select-none group`}
           >
-            {/* Window background - no border */}
-            <div className="absolute inset-0 bg-white" />
+            {/* Track Background */}
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-black/10" />
 
-            {/* Grid lines */}
-            {frequencyMarkers.filter(m => m.isMajor).map((marker) => (
-              <div
-                key={`line-${marker.freq}`}
-                className="absolute left-0 right-0 h-px bg-black/15 pointer-events-none"
+            {/* Minor Ticks (Grid) */}
+            {frequencyMarkers.map((marker) => (
+               <div
+                key={`tick-${marker.freq}`}
+                className={`absolute left-1/2 -translate-x-1/2 h-0.5 bg-black/20 pointer-events-none ${marker.isMajor ? 'w-full' : 'w-1/3'}`}
                 style={{ top: `${marker.position}%` }}
               />
             ))}
 
-            {/* Station Cards - BRUTAL STYLE */}
+             {/* Station Indicators (Stickers) */}
             {signalIndicators.map((signal, idx) => {
               const isLeft = idx % 2 === 0;
               return (
                 <div
                   key={signal.id}
-                  className="absolute pointer-events-none"
-                  style={{
-                    top: `${signal.position}%`,
-                    left: isLeft ? '4px' : 'auto',
-                    right: isLeft ? 'auto' : '4px',
-                  }}
+                  className="absolute pointer-events-none z-10 w-full flex justify-center"
+                  style={{ top: `${signal.position}%` }}
                 >
-                  {/* Station label card */}
-                  <div
-                    className="border-2 md:border-4 border-black px-1 md:px-2 py-0.5 md:py-1"
-                    style={{
-                      backgroundColor: signal.accentColor,
-                      transform: `translateY(-50%) rotate(${isLeft ? -1 : 1}deg)`
-                    }}
+                  <div 
+                    className={`
+                      absolute top-0 
+                      ${isLeft ? 'left-0 -translate-x-2' : 'right-0 translate-x-2'}
+                      -translate-y-1/2
+                      border-3 border-black bg-white
+                      px-2 py-1 shadow-brutal-hover
+                      transform transition-transform
+                      ${isLeft ? '-rotate-2' : 'rotate-2'}
+                    `}
+                    style={{ backgroundColor: signal.accentColor || '#FFF' }}
                   >
-                    <div className="text-[9px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.15em] text-black whitespace-nowrap">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-black whitespace-nowrap">
                       {signal.title}
-                    </div>
-                    <div className="text-[7px] md:text-[9px] font-mono font-bold tabular-nums text-black/70">
-                      {signal.freq.toFixed(1)}
-                    </div>
+                    </span>
                   </div>
                 </div>
               );
             })}
 
-            {/* CHUNKY Red Tuning Line */}
-            <div
-              className="absolute w-full pointer-events-none z-20"
-              style={{ top: `${handlePosition}%` }}
+            {/* The Tuning Needle (Interactive Element) */}
+            <motion.div
+               className="absolute left-0 right-0 z-30 pointer-events-none flex items-center justify-center"
+               style={{ top: `${handlePosition}%` }}
+               animate={{ scale: isDragging ? 1.05 : 1 }}
             >
-              <div className="relative w-full flex items-center -translate-y-1/2">
-                {/* Main chunky line */}
-                <div className="absolute inset-x-0 h-2 bg-red-600 border-2 border-black shadow-[0_0_12px_rgba(220,38,38,0.8),0_2px_0_0_rgba(0,0,0,1)]" />
+               {/* Line */}
+               <div className="w-full h-1 bg-brutal-pink border-y border-black absolute" />
+               
+               {/* Handle */}
+               <div className="w-full h-12 border-4 border-black bg-white/80 backdrop-blur-sm shadow-brutal-hover flex items-center justify-between px-2 relative z-10">
+                   <div className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[8px] border-r-black" />
+                   <div className="w-16 h-1 bg-black/10 rounded-full" />
+                   <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[8px] border-l-black" />
+               </div>
+            </motion.div>
 
-                {/* Left arrow pointer - BRUTAL */}
-                <div
-                  className="absolute left-0 w-0 h-0"
-                  style={{
-                    transform: 'translateX(-12px)',
-                    borderTop: '8px solid transparent',
-                    borderBottom: '8px solid transparent',
-                    borderRight: '12px solid #dc2626',
-                  }}
-                />
-                <div
-                  className="absolute left-0 w-0 h-0"
-                  style={{
-                    transform: 'translateX(-14px)',
-                    borderTop: '10px solid transparent',
-                    borderBottom: '10px solid transparent',
-                    borderRight: '14px solid #000',
-                    zIndex: -1,
-                  }}
-                />
-
-                {/* Right arrow pointer - BRUTAL */}
-                <div
-                  className="absolute right-0 w-0 h-0"
-                  style={{
-                    transform: 'translateX(12px)',
-                    borderTop: '8px solid transparent',
-                    borderBottom: '8px solid transparent',
-                    borderLeft: '12px solid #dc2626',
-                  }}
-                />
-                <div
-                  className="absolute right-0 w-0 h-0"
-                  style={{
-                    transform: 'translateX(14px)',
-                    borderTop: '10px solid transparent',
-                    borderBottom: '10px solid transparent',
-                    borderLeft: '14px solid #000',
-                    zIndex: -1,
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
+      </div>
 
-        {/* MHz label - BRUTAL */}
-        <div
-          className="text-[10px] md:text-base uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-1 md:px-2 py-2"
-          style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-        >
-          MHz
+      {/* Frequency Display (Footer) */}
+      <div className="w-full bg-black p-4 text-center border-t-4 border-black shadow-brutal-lg transform rotate-1">
+        <div className="flex items-end justify-center gap-2 leading-none">
+           <span className="text-6xl font-mono font-bold text-brutal-lime tracking-tighter">
+              {formatFrequency(currentFrequency)}
+           </span>
+           <span className="text-xl font-black text-white mb-2">MHz</span>
         </div>
       </div>
 
-      {/* Current Frequency Display - BRUTAL */}
-      <div className="w-auto border-4 md:border-6 border-black bg-white px-4 md:px-6 py-2 md:py-3 halftone-overlay relative -rotate-1">
-        {/* Corner rivets */}
-        <div className="absolute top-1 md:top-2 left-1 md:left-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
-        <div className="absolute top-1 md:top-2 right-1 md:right-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
-        <div className="absolute bottom-1 md:bottom-2 left-1 md:left-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
-        <div className="absolute bottom-1 md:bottom-2 right-1 md:right-2 w-2 md:w-3 h-2 md:h-3 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-900 border border-black md:border-2"></div>
-
-        {/* Frequency display */}
-        <div className="flex items-baseline gap-2 md:gap-3">
-          <span className="text-3xl md:text-5xl font-mono tracking-tight text-brutal-pink font-black tabular-nums">
-            {formatFrequency(currentFrequency)}
-          </span>
-          <span className="text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.25em] text-black/80 font-black">
-            MHz
-          </span>
-        </div>
-      </div>
     </div>
   );
 }

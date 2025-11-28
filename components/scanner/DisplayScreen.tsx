@@ -58,29 +58,38 @@ export default function DisplayScreen() {
   }, [signalState, signal, setLockedOnSignalId, hasUserInteracted]);
 
   // Calculate color transition based on signal clarity
-  const accentColor = signal?.accentColor || '#7FFFD4';
+  const accentColor = signal?.accentColor || '#00FFFF';
   const isLocked = clarity > 0.95;
+  
+  // Brutalist background logic:
+  // - Locked: White paper texture
+  // - Close: Dark gray with tint
+  // - Noise: Black
   const backgroundStyle = isLocked
     ? {
-        background: '#FFFFFF',
-        transition: 'none',
+        background: '#F0F0F0', // Off-white paper
+        transition: 'background 0.2s steps(4)',
       }
     : signal && clarity > 0.3
     ? {
-        background: `linear-gradient(180deg, ${accentColor}15, #0A0A0A 40%)`,
-        transition: 'none',
+        background: `linear-gradient(180deg, ${accentColor}22, #111111 40%)`,
+        transition: 'background 0.2s steps(4)',
       }
     : {
         background: '#0A0A0A',
-        transition: 'none',
+        transition: 'background 0.2s steps(4)',
       };
 
   return (
-    <div className="relative h-full w-full halftone-overlay" style={backgroundStyle}>
-      {/* Accent color block when locked on signal */}
+    <div className="relative h-full w-full overflow-hidden border-l-0 md:border-l-4 border-black shadow-[inset_6px_6px_0_0_rgba(0,0,0,0.1)]" style={backgroundStyle}>
+      
+      {/* Texture Overlay (Always present but subtle) */}
+      <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('/textures/noise.svg')] bg-repeat z-[1]" />
+
+      {/* Accent color stripe when locked */}
       {signal && clarity > 0.95 && (
         <div
-          className="absolute top-0 left-0 right-0 h-2 z-[5] pointer-events-none"
+          className="absolute top-0 left-0 right-0 h-4 z-[5] pointer-events-none border-b-4 border-black"
           style={{
             background: accentColor,
           }}
@@ -93,15 +102,26 @@ export default function DisplayScreen() {
         accentColor={accentColor}
       />
 
+      {/* Static / Noise Layer */}
       <div
-        className="absolute inset-0 z-10 pointer-events-none"
+        className="absolute inset-0 z-10 pointer-events-none mix-blend-hard-light"
         style={{ opacity: clarity < 0.95 ? 1 : 0 }}
       >
         <StaticEffect intensity={1 - clarity} />
       </div>
 
+      {/* "Searching..." Empty State Indicator */}
+      {!signal && (
+         <div className="absolute inset-0 flex items-center justify-center z-0 opacity-20">
+            <div className="text-6xl md:text-9xl font-black text-white uppercase tracking-widest animate-pulse">
+               NO SIGNAL
+            </div>
+         </div>
+      )}
+
+      {/* Main Content Container */}
       <div
-        className="absolute inset-0 z-20 overflow-y-auto"
+        className="absolute inset-0 z-20 overflow-y-auto scrollbar-hide"
         style={{ opacity: clarity > 0.5 ? 1 : 0.2 }}
       >
         {signal && (

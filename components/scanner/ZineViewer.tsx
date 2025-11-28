@@ -8,7 +8,7 @@ import InfluencesPage from './InfluencesPage';
 
 // Code-split ProjectSinglePage for better performance
 const ProjectSinglePage = dynamic(() => import('./ProjectSinglePage'), {
-  loading: () => <div className="flex items-center justify-center p-12 text-white/60">Loading...</div>
+  loading: () => <div className="flex items-center justify-center p-12 font-mono font-bold text-xl uppercase animate-pulse">Loading Data...</div>
 });
 
 interface ZineViewerProps {
@@ -18,60 +18,71 @@ interface ZineViewerProps {
 
 function ProfilePage({ page }: { page: SignalProfilePage }) {
   return (
-    <div className="grid gap-4 md:gap-8 lg:grid-cols-[1.2fr_1fr]">
-      <div className="flex flex-col gap-3 md:gap-6 border-4 md:border-6 border-black bg-white p-4 md:p-6 shadow-brutal-lg halftone-overlay">
-        <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+    <div className="grid gap-6 md:gap-8 lg:grid-cols-[1.2fr_1fr]">
+      {/* Hero Section */}
+      <div className="flex flex-col gap-4 md:gap-6 border-brutal bg-white p-6 md:p-8 shadow-brutal-lg relative overflow-hidden">
+         {/* Decorative corner */}
+         <div className="absolute top-0 right-0 w-12 h-12 bg-brutal-cyan border-l-4 border-b-4 border-black" />
+
+        <span className="text-xs md:text-sm uppercase tracking-widest font-black bg-black text-white px-3 py-1 inline-block self-start transform -rotate-1">
           {page.hero.eyebrow}
         </span>
-        <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
+        
+        <h2 className="text-4xl md:text-6xl font-black tracking-tight text-black uppercase leading-[0.9]">
           {page.hero.title}
         </h2>
+        
         {page.hero.subtitle && (
-          <p className="text-xs md:text-sm uppercase tracking-[0.15em] md:tracking-[0.2em] font-bold text-black/60">
+          <p className="text-sm md:text-base uppercase tracking-widest font-bold text-black/60 border-l-4 border-brutal-pink pl-4">
             {page.hero.subtitle}
           </p>
         )}
+        
         {page.hero.description && (
-          <p className="text-sm md:text-base leading-relaxed text-black/80 normal-case">
+          <p className="text-base md:text-lg leading-relaxed font-medium text-black/90">
             {page.hero.description}
           </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-3 md:gap-4 border-4 md:border-6 border-black bg-brutal-cyan p-4 md:p-6 shadow-brutal-lg">
-        <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
-          Contact
+      {/* Contact / Info Box */}
+      <div className="flex flex-col gap-4 md:gap-6 border-brutal bg-brutal-cyan p-6 md:p-8 shadow-brutal-lg transform rotate-1">
+        <h3 className="text-sm md:text-base uppercase tracking-widest font-black bg-black text-white px-3 py-1 inline-block self-start">
+          Contact Protocol
         </h3>
-        <ul className="flex flex-col gap-2 md:gap-3 text-xs md:text-sm">
+        <ul className="flex flex-col gap-3 md:gap-4">
           {page.contact.map((entry) => (
-            <li key={`${entry.label}-${entry.value}`} className="flex items-center justify-between gap-2 md:gap-4 border-b-2 border-black/20 pb-1.5 md:pb-2">
-              <span className="font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[9px] md:text-[11px]">
+            <li key={`${entry.label}-${entry.value}`} className="flex flex-col gap-1 border-b-4 border-black pb-2">
+              <span className="font-black uppercase tracking-wider text-[10px] md:text-xs opacity-60">
                 {entry.label}
               </span>
               {entry.href ? (
                 <a
                   href={entry.href}
-                  className="font-bold underline decoration-black decoration-2 underline-offset-4 hover:bg-black hover:text-white px-1 transition-none break-all"
+                  className="font-mono font-bold text-sm md:text-base hover:bg-black hover:text-white px-1 -mx-1 transition-colors break-all"
                   target="_blank"
                   rel="noreferrer"
                 >
                   {entry.value}
                 </a>
               ) : (
-                <span className="font-bold break-all">{entry.value}</span>
+                <span className="font-mono font-bold text-sm md:text-base break-all">{entry.value}</span>
               )}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="lg:col-span-2 grid gap-3 md:gap-4 border-4 md:border-6 border-black bg-white p-4 md:p-6 shadow-brutal-lg halftone-overlay">
+      {/* Detail Sections */}
+      <div className="lg:col-span-2 grid gap-6 md:gap-8 border-brutal bg-white p-6 md:p-8 shadow-brutal-lg">
         {page.sections.map((section) => (
-          <div key={section.title} className="space-y-2 md:space-y-3 border-l-4 md:border-l-6 border-black bg-white pl-3 md:pl-5 py-2">
-            <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black">
+          <div key={section.title} className="space-y-3 md:space-y-4">
+            <h3 className="text-xl md:text-2xl uppercase tracking-widest font-black border-b-4 border-black pb-2">
               {section.title}
             </h3>
-            <p className="text-xs md:text-sm leading-relaxed text-black/80 whitespace-pre-line">{section.body}</p>
+            <p className="text-sm md:text-base leading-relaxed font-medium text-black/80 whitespace-pre-line">
+              {section.body}
+            </p>
           </div>
         ))}
       </div>
@@ -109,20 +120,20 @@ function CardsPage({
   const startIndex = currentPage * PAGE_SIZE;
 
   return (
-    <div className="flex flex-col gap-4 md:gap-8">
+    <div className="flex flex-col gap-8 md:gap-12">
       {page.intro && (
-        <div className="border-4 md:border-6 border-black bg-brutal-pink p-4 md:p-6 shadow-brutal-lg">
-          <div className="flex flex-col gap-2 md:gap-3">
+        <div className="border-brutal bg-brutal-pink p-6 md:p-10 shadow-brutal-lg transform -rotate-1">
+          <div className="flex flex-col gap-4">
             {page.intro.eyebrow && (
-              <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+              <span className="text-xs md:text-sm uppercase tracking-widest font-black bg-black text-white px-3 py-1 inline-block self-start border-2 border-white">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-black uppercase leading-none text-outline-white">
               {page.intro.title}
             </h2>
             {page.intro.description && (
-              <p className="text-sm md:text-base leading-relaxed text-black/90 normal-case font-medium">
+              <p className="text-base md:text-lg leading-relaxed text-black font-bold max-w-prose">
                 {page.intro.description}
               </p>
             )}
@@ -130,7 +141,7 @@ function CardsPage({
         </div>
       )}
 
-      <div className="grid gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-3 auto-rows-[minmax(240px,1fr)]">
+      <div className="grid gap-6 md:gap-8 md:grid-cols-2 xl:grid-cols-3 auto-rows-[minmax(300px,1fr)]">
         {pagedCards.map((card, index) => (
           <SignalCard
             key={card.id}
@@ -142,27 +153,27 @@ function CardsPage({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-6 border-black bg-white px-5 py-4 text-xs uppercase tracking-[0.2em] font-black shadow-brutal">
+        <div className="flex items-center justify-between border-brutal bg-white px-6 py-4 shadow-brutal sticky bottom-4 z-50">
           <button
             type="button"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
             disabled={currentPage === 0}
-            className="border-4 border-black bg-white px-4 py-2 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 transition-none shadow-brutal"
+            className="border-2 border-black bg-brutal-off-white px-4 py-2 text-sm font-black uppercase tracking-wider hover:bg-black hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-brutal hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
           >
-            ← PREV
+            ← Prev
           </button>
 
-          <span className="tracking-[0.25em] font-black">
-            {currentPage + 1} / {totalPages}
+          <span className="font-mono font-bold text-lg tracking-widest">
+             PAGE {String(currentPage + 1).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
           </span>
 
           <button
             type="button"
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
             disabled={currentPage >= totalPages - 1}
-            className="border-4 border-black bg-white px-4 py-2 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 transition-none shadow-brutal"
+            className="border-2 border-black bg-brutal-off-white px-4 py-2 text-sm font-black uppercase tracking-wider hover:bg-black hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-brutal hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
           >
-            NEXT →
+            Next →
           </button>
         </div>
       )}
@@ -171,7 +182,6 @@ function CardsPage({
 }
 
 function ListPage({ page }: { page: SignalListPage }) {
-  // Initialize with all categories open
   const [openCategories, setOpenCategories] = useState<Set<string>>(() => {
     const categories = new Set<string>();
     page.items.forEach((item) => {
@@ -180,7 +190,6 @@ function ListPage({ page }: { page: SignalListPage }) {
     return categories;
   });
 
-  // Dynamically group items by their type
   const groupedItems = useMemo(() => {
     const groups: Record<string, typeof page.items> = {};
 
@@ -210,24 +219,24 @@ function ListPage({ page }: { page: SignalListPage }) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
   };
 
   return (
-    <div className="flex flex-col gap-4 md:gap-8">
+    <div className="flex flex-col gap-8 md:gap-12">
       {page.intro && (
-        <div className="border-4 md:border-6 border-black bg-brutal-lime p-4 md:p-6 shadow-brutal-lg">
-          <div className="flex flex-col gap-2 md:gap-3">
-            {page.intro.eyebrow && (
-              <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-black bg-black text-white px-2 py-1 inline-block">
+        <div className="border-brutal bg-brutal-lime p-6 md:p-10 shadow-brutal-lg transform rotate-1">
+          <div className="flex flex-col gap-4">
+             {page.intro.eyebrow && (
+              <span className="text-xs md:text-sm uppercase tracking-widest font-black bg-black text-white px-3 py-1 inline-block self-start">
                 {page.intro.eyebrow}
               </span>
             )}
-            <h2 className="text-2xl md:text-4xl font-black tracking-[0.08em] text-black uppercase">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-black uppercase leading-none">
               {page.intro.title}
             </h2>
-            {page.intro.description && (
-              <p className="text-sm md:text-base leading-relaxed text-black/90 normal-case font-medium">
+             {page.intro.description && (
+              <p className="text-base md:text-lg leading-relaxed text-black font-bold max-w-prose border-l-4 border-black pl-4">
                 {page.intro.description}
               </p>
             )}
@@ -235,7 +244,7 @@ function ListPage({ page }: { page: SignalListPage }) {
         </div>
       )}
 
-      <div className="border-4 md:border-6 border-black bg-white px-4 md:px-8 py-4 md:py-6 shadow-brutal-lg halftone-overlay">
+      <div className="border-brutal bg-white px-4 md:px-8 py-6 md:py-8 shadow-brutal-xl">
         {Object.entries(groupedItems)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([category, items]) => {
@@ -243,56 +252,56 @@ function ListPage({ page }: { page: SignalListPage }) {
           const isOpen = openCategories.has(category);
 
           return (
-            <div key={category} className="mb-4 md:mb-6 last:mb-0">
+            <div key={category} className="mb-8 last:mb-0">
               <button
                 onClick={() => toggleCategory(category)}
-                className="mb-2 md:mb-3 flex w-full items-center gap-1.5 md:gap-2 text-left text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.25em] font-black hover:bg-black hover:text-white px-2 py-1 transition-none border-b-3 md:border-b-4 border-black"
+                className="w-full flex items-center justify-between bg-black text-white px-4 py-3 border-brutal hover:bg-brutal-pink hover:text-black transition-colors group mb-4 shadow-brutal"
               >
-                <span className="font-mono text-xs md:text-sm" style={{
-                  transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)'
-                }}>
-                  ▶
+                <span className="text-lg md:text-xl font-black uppercase tracking-widest">
+                  {category}
                 </span>
-                <span>{category}</span>
-                <span className="opacity-50">({items.length})</span>
+                 <div className="flex items-center gap-4">
+                    <span className="font-mono text-sm bg-white text-black px-2 py-0.5 font-bold">
+                      {String(items.length).padStart(2, '0')}
+                    </span>
+                    <span className={`transform transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
+                      ▶
+                    </span>
+                 </div>
               </button>
 
               {isOpen && (
-                <div className="ml-3 md:ml-6 flex flex-col gap-1.5 md:gap-2">
-                  {items.map((item, index) => {
-                    const content = (
-                      <div className="flex-1 text-right">
-                        <span className="font-bold text-xs md:text-sm">{item.title}</span>
-                        <span className="mx-1 md:mx-2 opacity-40">—</span>
-                        <span className="opacity-70 text-xs md:text-sm">{item.creator}</span>
-                      </div>
-                    );
-
-                    return (
-                      <div
+                <div className="grid gap-3 pl-2 md:pl-0">
+                  {items.map((item, index) => (
+                     <a
                         key={`${item.title}-${index}`}
-                        className="group flex items-baseline justify-between gap-2 md:gap-4 border-l-3 md:border-l-4 border-black/20 pl-2 md:pl-4 text-xs md:text-sm hover:border-black hover:bg-black/5 hover:pl-3 md:hover:pl-5 transition-none py-1"
-                      >
-                        {item.url ? (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex-1 cursor-pointer hover:underline decoration-2 underline-offset-2"
-                          >
-                            {content}
-                          </a>
-                        ) : (
-                          content
-                        )}
-                        {item.date && (
-                          <span className="text-[8px] md:text-[10px] uppercase tracking-wider opacity-50 font-black whitespace-nowrap">
-                            {formatDate(item.date)}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`
+                          group block border-l-4 border-black/20 pl-4 py-3 
+                          hover:border-brutal-cyan hover:bg-brutal-off-white 
+                          transition-all duration-200
+                          ${!item.url ? 'pointer-events-none' : 'cursor-pointer'}
+                        `}
+                     >
+                        <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-1 md:gap-4">
+                           <div className="flex-1">
+                              <h4 className="text-lg font-bold leading-tight group-hover:text-brutal-pink transition-colors">
+                                {item.title}
+                              </h4>
+                              <p className="text-sm font-mono text-black/60 mt-1">
+                                {item.creator}
+                              </p>
+                           </div>
+                           {item.date && (
+                              <div className="text-xs font-black uppercase tracking-wider bg-black/5 px-2 py-1 self-start md:self-center">
+                                {formatDate(item.date)}
+                              </div>
+                           )}
+                        </div>
+                     </a>
+                  ))}
                 </div>
               )}
             </div>
@@ -305,8 +314,10 @@ function ListPage({ page }: { page: SignalListPage }) {
 
 export default function ZineViewer({ signal, clarity }: ZineViewerProps) {
   return (
-    <div className="relative min-h-full w-full px-3 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-12 md:py-16">
-      <div className="relative z-10 flex flex-col gap-6 md:gap-10">
+    <div className="relative min-h-full w-full px-4 sm:px-8 md:px-12 lg:px-20 py-10 sm:py-16 md:py-20 bg-[url('/textures/grid.svg')] bg-fixed">
+      
+      {/* Main Content Wrapper */}
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col gap-10 md:gap-16">
         {signal.page.type === 'profile' ? (
           <ProfilePage page={signal.page} />
         ) : signal.page.type === 'list' ? (
@@ -320,7 +331,9 @@ export default function ZineViewer({ signal, clarity }: ZineViewerProps) {
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-0 border border-white/5" />
+      {/* Background decorative line */}
+      <div className="absolute top-0 left-8 md:left-16 bottom-0 w-px bg-black/10 pointer-events-none" />
+      <div className="absolute top-0 right-8 md:right-16 bottom-0 w-px bg-black/10 pointer-events-none" />
     </div>
   );
 }
