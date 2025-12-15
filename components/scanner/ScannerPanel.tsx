@@ -5,6 +5,7 @@ import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardE
 import { useScannerStore } from '@/store/scanner';
 import { SIGNALS } from '@/lib/signals';
 import { motion } from 'framer-motion';
+import WaveformVisualizer from '@/components/audio/WaveformVisualizer';
 
 const MIN_FREQ = 88.0;
 const MAX_FREQ = 108.0;
@@ -225,6 +226,8 @@ export default function ScannerPanel() {
       return {
         ...signal,
         position: (1 - ratio) * 100, // Inverted
+        // Add random rotation to indicators for organic feel
+        rotation: (Math.random() - 0.5) * 4 
       };
     });
   }, []);
@@ -239,9 +242,11 @@ export default function ScannerPanel() {
         <div className="bg-black text-white px-4 py-2">
           <h1 className="text-xl md:text-2xl font-black uppercase tracking-widest font-sans">TUNER</h1>
         </div>
-        <div className="flex gap-2">
-           <div className="w-3 h-3 bg-brutal-cyan rounded-full border-2 border-black animate-pulse" />
-           <div className="w-3 h-3 bg-brutal-pink rounded-full border-2 border-black" />
+        
+        {/* Visualizer */}
+        <div className="h-10 w-24 border-2 border-black bg-black relative overflow-hidden shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+             <WaveformVisualizer color="#CCFF00" />
+             <div className="absolute inset-0 border border-white/10 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[size:100%_4px]" />
         </div>
       </div>
 

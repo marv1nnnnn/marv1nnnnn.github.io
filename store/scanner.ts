@@ -8,6 +8,7 @@ export const useScannerStore = create<ScannerStore>((set) => ({
   lockedOnSignalId: null,
   isOverdrive: false,
   isPanelCollapsed: false,
+  audioAnalyser: null,
 
   // Actions
   setFrequency: (freq) => set({ currentFrequency: freq }),
@@ -15,4 +16,5 @@ export const useScannerStore = create<ScannerStore>((set) => ({
   setLockedOnSignalId: (id) => set({ lockedOnSignalId: id }),
   setIsOverdrive: (overdrive) => set({ isOverdrive: overdrive }),
   setIsPanelCollapsed: (collapsed) => set({ isPanelCollapsed: collapsed }),
+  setAudioAnalyser: (analyser) => set({ audioAnalyser: analyser }),
 }));

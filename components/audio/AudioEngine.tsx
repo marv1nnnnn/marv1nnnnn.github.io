@@ -5,7 +5,7 @@ import { useScannerStore } from '@/store/scanner';
 import { findClosestSignal } from '@/lib/signals';
 
 export default function AudioEngine() {
-  const { currentFrequency, isTuning } = useScannerStore();
+  const { currentFrequency, isTuning, setAudioAnalyser } = useScannerStore();
   const audioContextRef = useRef<AudioContext | null>(null);
   const noiseNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const noiseGainRef = useRef<GainNode | null>(null);
@@ -18,6 +18,11 @@ export default function AudioEngine() {
     try {
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
+
+      // Create Analyser Node for Visualization
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      setAudioAnalyser(analyser);
 
       // Create noise generator
       const bufferSize = 2 * audioContext.sampleRate;
@@ -45,7 +50,11 @@ export default function AudioEngine() {
 
         noiseSource.connect(filter);
         filter.connect(noiseGain);
-        noiseGain.connect(audioContext.destination);
+        
+        // Connect gain to BOTH destination (speakers) and analyser (visuals)
+        noiseGain.connect(analyser);
+        analyser.connect(audioContext.destination);
+        
         noiseSource.start();
 
         return noiseSource;
@@ -126,8 +135,9 @@ export default function AudioEngine() {
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
+      setAudioAnalyser(null); // Clear store
     };
-  }, []);
+  }, [setAudioAnalyser]);
 
   return null; // This component doesn't render anything
 }

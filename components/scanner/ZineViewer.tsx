@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import type { Signal, SignalCardsPage, SignalProfilePage, SignalListPage, SignalInfluencesPage } from '@/types/scanner';
 import SignalCard from './SignalCard';
 import InfluencesPage from './InfluencesPage';
+import DecodedText from '@/components/effects/DecodedText';
 
 // Code-split ProjectSinglePage for better performance
 const ProjectSinglePage = dynamic(() => import('./ProjectSinglePage'), {
@@ -29,7 +30,7 @@ function ProfilePage({ page }: { page: SignalProfilePage }) {
         </span>
         
         <h2 className="text-4xl md:text-6xl font-black tracking-tight text-black uppercase leading-[0.9]">
-          {page.hero.title}
+          <DecodedText text={page.hero.title} animateOnHover revealSpeed={40} />
         </h2>
         
         {page.hero.subtitle && (
@@ -48,7 +49,7 @@ function ProfilePage({ page }: { page: SignalProfilePage }) {
       {/* Contact / Info Box */}
       <div className="flex flex-col gap-4 md:gap-6 border-brutal bg-brutal-cyan p-6 md:p-8 shadow-brutal-lg transform rotate-1">
         <h3 className="text-sm md:text-base uppercase tracking-widest font-black bg-black text-white px-3 py-1 inline-block self-start">
-          Contact Protocol
+          <DecodedText text="Contact Protocol" revealSpeed={30} />
         </h3>
         <ul className="flex flex-col gap-3 md:gap-4">
           {page.contact.map((entry) => (
@@ -78,7 +79,7 @@ function ProfilePage({ page }: { page: SignalProfilePage }) {
         {page.sections.map((section) => (
           <div key={section.title} className="space-y-3 md:space-y-4">
             <h3 className="text-xl md:text-2xl uppercase tracking-widest font-black border-b-4 border-black pb-2">
-              {section.title}
+              <DecodedText text={section.title} animateOnHover revealSpeed={30} />
             </h3>
             <p className="text-sm md:text-base leading-relaxed font-medium text-black/80 whitespace-pre-line">
               {section.body}
@@ -130,7 +131,7 @@ function CardsPage({
               </span>
             )}
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-black uppercase leading-none text-outline-white">
-              {page.intro.title}
+              <DecodedText text={page.intro.title} animateOnHover revealSpeed={40} />
             </h2>
             {page.intro.description && (
               <p className="text-base md:text-lg leading-relaxed text-black font-bold max-w-prose">
@@ -233,7 +234,7 @@ function ListPage({ page }: { page: SignalListPage }) {
               </span>
             )}
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-black uppercase leading-none">
-              {page.intro.title}
+              <DecodedText text={page.intro.title} animateOnHover revealSpeed={40} />
             </h2>
              {page.intro.description && (
               <p className="text-base md:text-lg leading-relaxed text-black font-bold max-w-prose border-l-4 border-black pl-4">
@@ -258,7 +259,7 @@ function ListPage({ page }: { page: SignalListPage }) {
                 className="w-full flex items-center justify-between bg-black text-white px-4 py-3 border-brutal hover:bg-brutal-pink hover:text-black transition-colors group mb-4 shadow-brutal"
               >
                 <span className="text-lg md:text-xl font-black uppercase tracking-widest">
-                  {category}
+                  <DecodedText text={category} revealSpeed={30} />
                 </span>
                  <div className="flex items-center gap-4">
                     <span className="font-mono text-sm bg-white text-black px-2 py-0.5 font-bold">

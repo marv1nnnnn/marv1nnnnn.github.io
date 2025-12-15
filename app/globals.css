@@ -45,6 +45,21 @@ body {
   }
 }
 
+/* Fix Next.js portal elements */
+nextjs-portal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+nextjs-portal > * {
+  pointer-events: auto;
+}
+
 @layer utilities {
   .border-brutal {
     @apply border-4 border-black;

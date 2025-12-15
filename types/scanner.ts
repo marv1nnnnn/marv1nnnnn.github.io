@@ -113,10 +113,14 @@ export interface ScannerStore {
   // Is the tuner panel collapsed on mobile?
   isPanelCollapsed: boolean;
 
+  // Audio Analyser for visualization
+  audioAnalyser: AnalyserNode | null;
+
   // Actions
   setFrequency: (freq: number) => void;
   setIsTuning: (tuning: boolean) => void;
   setLockedOnSignalId: (id: string | null) => void;
   setIsOverdrive: (overdrive: boolean) => void;
   setIsPanelCollapsed: (collapsed: boolean) => void;
+  setAudioAnalyser: (analyser: AnalyserNode | null) => void;
 }
