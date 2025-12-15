@@ -1,5 +1,12 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from "fs";
-import { join, basename } from "path";
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  existsSync,
+  mkdirSync,
+  unlinkSync,
+} from "fs";
+import { join } from "path";
 import { getContentPath, getProjectPath } from "./constants";
 import { ListeningItem, Card, CardFrontmatter, Signal } from "../types";
 import { exec } from "child_process";
@@ -56,7 +63,10 @@ export function deleteListeningItem(index: number): void {
 // Markdown/Card Utilities
 // ============================================
 
-function parseFrontmatter(content: string): { frontmatter: CardFrontmatter; body: string } {
+function parseFrontmatter(content: string): {
+  frontmatter: CardFrontmatter;
+  body: string;
+} {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
   const match = content.match(frontmatterRegex);
 
@@ -79,14 +89,19 @@ function parseFrontmatter(content: string): { frontmatter: CardFrontmatter; body
     let value = line.slice(colonIndex + 1).trim();
 
     // Handle quoted strings
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       value = value.slice(1, -1);
     }
 
     // Handle arrays
     if (value.startsWith("[") && value.endsWith("]")) {
       const arrayContent = value.slice(1, -1);
-      frontmatter[key] = arrayContent.split(",").map((item) => item.trim().replace(/^["']|["']$/g, ""));
+      frontmatter[key] = arrayContent
+        .split(",")
+        .map((item) => item.trim().replace(/^["']|["']$/g, ""));
     } else {
       frontmatter[key] = value;
     }
@@ -144,7 +159,11 @@ export function getCards(signalType: "projects" | "journal"): Card[] {
   }
 
   // Sort by date descending
-  cards.sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+  cards.sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
 
   return cards;
 }
@@ -152,7 +171,7 @@ export function getCards(signalType: "projects" | "journal"): Card[] {
 export function createCard(
   signalType: "projects" | "journal",
   frontmatter: CardFrontmatter,
-  content: string = ""
+  content: string = "",
 ): string {
   const cardsPath = join(getContentPath(), signalType, "cards");
 
@@ -169,14 +188,17 @@ export function createCard(
   return filePath;
 }
 
-export function updateCard(filePath: string, frontmatter: CardFrontmatter, content: string): void {
+export function updateCard(
+  filePath: string,
+  frontmatter: CardFrontmatter,
+  content: string,
+): void {
   const fileContent = `${generateFrontmatter(frontmatter)}\n\n${content}`;
   writeFileSync(filePath, fileContent, "utf-8");
 }
 
 export function deleteCard(filePath: string): void {
-  const fs = require("fs");
-  fs.unlinkSync(filePath);
+  unlinkSync(filePath);
 }
 
 // ============================================
@@ -264,8 +286,10 @@ export function generateSlug(title: string): string {
     .trim();
 }
 
-export function isIdUnique(id: string, signalType: "projects" | "journal"): boolean {
+export function isIdUnique(
+  id: string,
+  signalType: "projects" | "journal",
+): boolean {
   const cards = getCards(signalType);
   return !cards.some((card) => card.frontmatter.id === id);
 }
-

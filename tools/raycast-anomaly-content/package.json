@@ -3,8 +3,8 @@
   "name": "anomaly-scanner-content",
   "title": "Anomaly Scanner Content",
   "description": "Manage content for the Anomaly Scanner portfolio site",
-  "icon": "icon.png",
-  "author": "marv1nnnnn",
+  "icon": "command-icon.png",
+  "author": "raycast",
   "categories": ["Productivity", "Developer Tools"],
   "license": "MIT",
   "commands": [

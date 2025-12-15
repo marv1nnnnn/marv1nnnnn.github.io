@@ -1,4 +1,12 @@
-import { Action, ActionPanel, Form, showToast, Toast, showHUD, popToRoot } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  showToast,
+  Toast,
+  showHUD,
+  popToRoot,
+} from "@raycast/api";
 import { useState } from "react";
 import { addListeningItem, getTodayDate, runGenerate } from "./utils/content";
 import { CONTENT_TYPES, TYPE_ICONS } from "./utils/constants";
@@ -67,7 +75,10 @@ export default function AddListeningItem() {
       isLoading={isLoading}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Add Listening Item" onSubmit={handleSubmit} />
+          <Action.SubmitForm
+            title="Add Listening Item"
+            onSubmit={handleSubmit}
+          />
         </ActionPanel>
       }
     >
@@ -88,11 +99,24 @@ export default function AddListeningItem() {
       />
       <Form.Dropdown id="type" title="Type" defaultValue="music">
         {CONTENT_TYPES.map((type) => (
-          <Form.Dropdown.Item key={type} value={type} title={`${TYPE_ICONS[type]} ${type}`} />
+          <Form.Dropdown.Item
+            key={type}
+            value={type}
+            title={`${TYPE_ICONS[type]} ${type}`}
+          />
         ))}
       </Form.Dropdown>
-      <Form.TextField id="url" title="URL" placeholder="https://... (optional)" />
-      <Form.DatePicker id="date" title="Date" defaultValue={new Date()} type={Form.DatePicker.Type.Date} />
+      <Form.TextField
+        id="url"
+        title="URL"
+        placeholder="https://... (optional)"
+      />
+      <Form.DatePicker
+        id="date"
+        title="Date"
+        defaultValue={new Date()}
+        type={Form.DatePicker.Type.Date}
+      />
     </Form>
   );
 }

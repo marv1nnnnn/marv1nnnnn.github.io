@@ -24,7 +24,13 @@ export function getProjectPath(): string {
   return expandPath(prefs.projectPath);
 }
 
-export const CONTENT_TYPES = ["music", "video", "text", "game", "live"] as const;
+export const CONTENT_TYPES = [
+  "music",
+  "video",
+  "text",
+  "game",
+  "live",
+] as const;
 
 export const SIGNAL_TYPES = {
   projects: {

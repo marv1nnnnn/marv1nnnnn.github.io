@@ -7,15 +7,17 @@ import {
   showHUD,
   popToRoot,
   open,
-  getPreferenceValues,
 } from "@raycast/api";
 import { useState } from "react";
-import { createCard, getTodayDate, runGenerate, getAllTags, generateSlug, isIdUnique } from "./utils/content";
+import {
+  createCard,
+  getTodayDate,
+  runGenerate,
+  getAllTags,
+  generateSlug,
+  isIdUnique,
+} from "./utils/content";
 import { CardFrontmatter } from "./types";
-
-interface Preferences {
-  projectPath: string;
-}
 
 type SignalType = "projects" | "journal";
 
@@ -57,7 +59,9 @@ export default function AddCard() {
         id,
         title: values.title.trim(),
         subtitle: values.subtitle.trim() || values.title.trim(),
-        date: values.date ? values.date.toISOString().split("T")[0] : getTodayDate(),
+        date: values.date
+          ? values.date.toISOString().split("T")[0]
+          : getTodayDate(),
         summary: values.summary.trim() || "",
         tags: values.tags
           .split(",")
@@ -65,9 +69,15 @@ export default function AddCard() {
           .filter((t) => t.length > 0),
       };
 
-      const content = values.content.trim() || `# ${frontmatter.title}\n\nWrite your content here...`;
+      const content =
+        values.content.trim() ||
+        `# ${frontmatter.title}\n\nWrite your content here...`;
 
-      const filePath = createCard(values.signalType as SignalType, frontmatter, content);
+      const filePath = createCard(
+        values.signalType as SignalType,
+        frontmatter,
+        content,
+      );
 
       await showToast({
         style: Toast.Style.Animated,
@@ -132,21 +142,45 @@ export default function AddCard() {
         onChange={() => setIdError(undefined)}
         info="Used for the filename and URL. Leave empty to auto-generate from title."
       />
-      <Form.TextField id="subtitle" title="Subtitle" placeholder="Short subtitle (optional)" />
-      <Form.TextArea id="summary" title="Summary" placeholder="Brief description for cards grid" />
+      <Form.TextField
+        id="subtitle"
+        title="Subtitle"
+        placeholder="Short subtitle (optional)"
+      />
+      <Form.TextArea
+        id="summary"
+        title="Summary"
+        placeholder="Brief description for cards grid"
+      />
       <Form.TextField
         id="tags"
         title="Tags"
         placeholder="tag1, tag2, tag3"
-        info={existingTags.length > 0 ? `Existing tags: ${existingTags.slice(0, 10).join(", ")}` : undefined}
+        info={
+          existingTags.length > 0
+            ? `Existing tags: ${existingTags.slice(0, 10).join(", ")}`
+            : undefined
+        }
       />
-      <Form.DatePicker id="date" title="Date" defaultValue={new Date()} type={Form.DatePicker.Type.Date} />
+      <Form.DatePicker
+        id="date"
+        title="Date"
+        defaultValue={new Date()}
+        type={Form.DatePicker.Type.Date}
+      />
 
       <Form.Separator />
 
-      <Form.TextArea id="content" title="Content" placeholder="Markdown content (optional, can edit later)" />
-      <Form.Checkbox id="openInEditor" label="Open in Cursor after creating" defaultValue={true} />
+      <Form.TextArea
+        id="content"
+        title="Content"
+        placeholder="Markdown content (optional, can edit later)"
+      />
+      <Form.Checkbox
+        id="openInEditor"
+        label="Open in Cursor after creating"
+        defaultValue={true}
+      />
     </Form>
   );
 }
-

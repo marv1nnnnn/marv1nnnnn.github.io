@@ -59,5 +59,10 @@ export interface ProfileData {
   }>;
 }
 
-export type SignalType = "projects" | "journal" | "listening" | "about" | "influences";
+export type SignalType =
+  | "projects"
+  | "journal"
+  | "listening"
+  | "about"
+  | "influences";
 
