@@ -59,4 +59,7 @@ dev-debug.log
 # tasks/
 
 # Generated content
-lib/signals.json 
+lib/signals.json
+
+# Raycast extension (local development tool)
+tools/

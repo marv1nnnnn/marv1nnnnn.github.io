@@ -1,54 +1,380 @@
 [
-  { "title": "A Brief History of Intelligence", "creator": "Max Bennett", "type": "text", "date": "2025-10-04" },
-  { "title": "Richard Sutton – Father of RL thinks LLMs are a dead end", "creator": "Richard Sutton", "type": "video", "date": "2025-10-05", "url": "https://www.youtube.com/watch?v=21EYKqUsPfg" },
-  { "title": "Let the model write the prompt", "creator": "David Reunig", "type": "text", "date": "2025-10-05", "url": "https://www.dbreunig.com/2025/06/10/let-the-model-write-the-prompt.html"},
-  { "title": "Better Call Saul Season 2", "creator": "Vince Gilligan", "type": "video", "date": "2025-10-05"},
-  { "title": "NTS Guide to: Hungarian Classical", "creator": "NTS", "type": "music", "date": "2025-10-09", "url": "https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025"},
-  { "title": "Deseo, Carne y Voluntad", "creator": "Candelabro", "type": "music", "date": "2025-10-09", "url": "https://registromovil.bandcamp.com/album/deseo-carne-y-voluntad"},
-  {"title": "Nick Land vs. Aleksandr Dugin Debate", "creator": "Auron MacIntyre", "type": "video", "date": "2025-10-09", "url": "https://www.youtube.com/live/J86C4IJTaFw"},
-  {"title": "fiestas del Alto", "creator":"mamá Tora", "type": "music", "date": "2025-10-09", "url": "https://www.nts.live/shows/roots-2025/episodes/roots-2025-fiestas-del-alto-w-mama-tora-21st-september-2025"},
-  {"title": "Exorcise the Demons", "creator": "Source Direct", "type": "music", "date": "2025-10-09", "url": "https://www.youtube.com/watch?v=uyutP6B-j68&list=PL698F378A0979E190"},
-  {"title": "La Brea", "creator": "Hesse Kassel", "type": "music", "date": "2025-10-09", "url": "https://hessekassel.bandcamp.com/album/la-brea"},
-  {"title": "Through The Wall", "creator": "Rochelle Jordan", "type": "music", "date": "2025-10-13", "url": "https://rochellejordan.bandcamp.com/album/through-the-wall"},
-  {"title": "Unleashing AI Slop Swarms", "creator": "Emergent Garden", "type": "video", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=--CteUWzErk"},
-  {"title": "Learning DSPy (3): Working with optimizers", "creator": "The Data Quarry", "type": "text", "date": "2025-10-13", "url": "https://thedataquarry.com/blog/learning-dspy-3-working-with-optimizers"},
-  {"title": "The Sunrise is Brutal", "creator": "Thrilliam Angels", "type": "music", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=8MV7hMuuxfE&list=OLAK5uy_n8dTctP8ciTvOlWIc-NWquNsXRB4bmxeU"},
-  {"title": "Lychee Reggae Mix", "creator": "Wild Wata", "type": "music", "date": "2025-10-13", "url": "https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025"},
-  {"title": "Just Talk To It - the no-bs Way of Agentic Engineering", "creator": "Peter Steinberger", "type": "text", "date": "2025-10-13", "url": "https://steipete.me/posts/just-talk-to-it"},
-  {"title": "Optimizing Coding Agent Rules (CLAUDE.md, agents.md, ./clinerules, .cursor/rules) for Improved Accuracy", "creator": "Priyan Jindal", "type": "text", "date": "2025-10-13", "url": "https://arize.com/blog/optimizing-coding-agent-rules-claude-md-agents-md-clinerules-cursor-rules-for-improved-accuracy/"},
-  {"title": "Context Engineering for AI Agents with LangChain and Manus", "creator": "Langchain", "type": "video", "date": "2025-10-13", "url": "https://www.youtube.com/watch?v=6_BcCthVvb8"},
-  {"title": "Thank You For Almost Everything", "creator": "Headache", "type": "music", "date": "2025-10-17", "url": "https://plzmakeitruins.bandcamp.com/album/thank-you-for-almost-everything"},
-  {"title": "One Battle After Another", "creator": "Paul Thomas Anderson", "type": "video", "date": "2025-10-17"},
-  {"title": "The Master", "creator": "Paul Thomas Anderson", "type": "video", "date": "2025-10-18"},  
-  {"title": "Andrej Karpathy — “We’re summoning ghosts, not building animals”", "creator": "Dwarkesh Patel", "type": "video", "date": "2025-10-18", "url": "https://www.youtube.com/watch?v=lXUZvyajciY&t=1849s"},
-  {"title": "TXQ Fiction", "creator": "TXQ Fiction", "type": "video", "date": "2025-10-19"},
-  {"title": "Frequently Asked Questions (And Answers) About AI Evals", "creator": "Hamal", "type": "text", "date": "2025-10-19", "url": "https://hamel.dev/blog/posts/evals-faq"},
-  {"title": "Later Than You Think", "creator": "John Maus", "type": "music", "date": "2025-10-19", "url": "https://johnmaus.bandcamp.com/album/later-than-you-think"},
-  {"title": "节奏的主人", "creator": "DJ 小女孩", "type": "music", "date": "2025-10-22", "url": "https://djgurl.bandcamp.com/album/--2"},
-  {"title": "Inland Empire", "creator": "David Lynch", "type": "video", "date": "2025-10-26", "url": "https://www.imdb.com/title/tt0378180/"},
-  {"title": "Armenian Cassette Special", "creator": "Panorama Yerevan", "type": "music", "date": "2025-10-30", "url": "https://www.nts.live/shows/panorama-yerevan/episodes/panorama-yerevan-25th-october-2025"},
-  {"title": "Evangelion 3.0+1.0: Thrice Upon A Time", "creator": "Hideaki Anno", "type": "video", "date": "2025-11-02", "url": "https://www.imdb.com/title/tt13964840/"},
-  {"title": "Britpop", "creator": "A.G.Cook", "type": "music", "date": "2025-11-03", "url": "https://agcook.bandcamp.com/album/britpop"},
-  {"title": " Inside Cursor —— Sixty days with the AI coding decacorn", "creator": "Brie Wolfson", "type": "text", "date": "2025-11-07", "url": "https://joincolossus.com/article/inside-cursor/"},
-  {"title": "Lux", "type": "music", "creator": "Rosalia", "date": "2025-11-07", "url": "https://www.youtube.com/watch?v=KYVf37pRXCw"},
-  {"title": "电视开播69年！您手上有这盘录像带吗？", "type": "video", "creator": "大森时生", "date": "2025-11-09", "url": "https://www.bilibili.com/video/BV15buuzoEeB/"},
-  {"title": "Hades 2", "type": "game", "creator": "Supergiant Games", "date": "2025-11-09", "url": "https://www.supergiantgames.com/games/hades-2/"},
-  {"title": "Mind beneath us", "type": "game", "creator": "Bearbone Studios", "date": "2025-11-11", "url": "https://www.bearbones.studio/mind-beneath-us"},
-  {"title": "Here's What's Next in Agentic Coding", "creator": "Seconds", "type": "text", "date": "2025-11-11", "url": "https://seconds0.substack.com/p/heres-whats-next-in-agentic-coding"},
-  {"title": "东四十条", "creator": "覃牧秋", "type": "video", "date": "2025-11-11", "url": "https://movie.douban.com/subject/36215199/"},
-  {"title": "Resurrection", "creator": "毕赣", "type": "video", "date": "2025-11-15", "url": "https://movie.douban.com/subject/35416174"},
-  {"title": "AIE Code 2025: AI Leadership", "creator": "AIE", "type": "video", "date": "2025-11-22", "url": "https://www.youtube.com/watch?v=cMSprbJ95jg"},
-  {"title": "AIE CODE Day 2", "creator": "AIE", "type": "video", "date": "2025-11-22", "url": "https://www.youtube.com/watch?v=xmbSQz-PNMM"},
-  {"title": "Radiohead Bologna Concert", "creator": "Radiohead", "type": "live", "date": "2025-11-18"},
-  {"title": "Tranquilizer", "creator": "Oneohtrix Point Never", "type": "music", "date": "2025-11-27", "url": "https://oneohtrixpointnever.bandcamp.com/album/tranquilizer"},
-  {"title": "Stranger Things 5 ep1-4", "creator": "Netflix", "type": "video", "date": "2025-11-27", "url": "https://www.imdb.com/title/tt1517268/"},
-  {"title": "FC26", "creator": "EA", "type": "game", "date": "2025-12-03", "url": "https://www.ea.com/fc26"},
-  {"title": "Zootopia 2", "creator": "Disney", "type": "video", "date": "2025-12-02"},
-  {"title": "Behind the Scenes of Vibe Code Bench", "creator": "Rayan Krishnan", "type": "text", "date": "2025-12-03", "url": "https://x.com/RayanKrishnan/status/1993829654428590566"},
-  {"title": "Clockenflap 2025", "creator": "Clockenflap", "type": "live", "date": "2025-12-07", "url": "https://www.clockenflap.com/"},
-  {"title": "Agents Should Be More Opinionated", "creator": "Vivek Trivedi", "type": "text", "date": "2025-12-11", "url": "https://www.vtrivedy.com/posts/agents-should-be-more-opinionated/"},
-{"title": "200k Tokens Is Plenty", "creator": "Lewis Metcalf", "type": "text", "date": "2025-12-11", "url": "https://ampcode.com/200k-tokens-is-plenty"},
-  {"title": "Despolote", "creator": "Julián Cordero", "type": "game", "date": "2025-12-15", "url": "https://store.steampowered.com/app/2367820/despelote/"},
-  {"title": "Skate Story", "creator": "Sam Eng", "type": "game", "date": "2025-12-15", "url": "https://store.steampowered.com/app/1263240/Skate_Story/"},
-  {"title": "Consume Me", "creator": "Jenny Jiao Hsia", "type": "game", "date": "2025-12-15", "url": "https://store.steampowered.com/app/2359120/Consume_Me/"}
-] 
+  {
+    "title": "A Brief History of Intelligence",
+    "creator": "Max Bennett",
+    "type": "text",
+    "date": "2025-10-04"
+  },
+  {
+    "title": "Richard Sutton – Father of RL thinks LLMs are a dead end",
+    "creator": "Richard Sutton",
+    "type": "video",
+    "date": "2025-10-05",
+    "url": "https://www.youtube.com/watch?v=21EYKqUsPfg"
+  },
+  {
+    "title": "Let the model write the prompt",
+    "creator": "David Reunig",
+    "type": "text",
+    "date": "2025-10-05",
+    "url": "https://www.dbreunig.com/2025/06/10/let-the-model-write-the-prompt.html"
+  },
+  {
+    "title": "Better Call Saul Season 2",
+    "creator": "Vince Gilligan",
+    "type": "video",
+    "date": "2025-10-05"
+  },
+  {
+    "title": "NTS Guide to: Hungarian Classical",
+    "creator": "NTS",
+    "type": "music",
+    "date": "2025-10-09",
+    "url": "https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025"
+  },
+  {
+    "title": "Deseo, Carne y Voluntad",
+    "creator": "Candelabro",
+    "type": "music",
+    "date": "2025-10-09",
+    "url": "https://registromovil.bandcamp.com/album/deseo-carne-y-voluntad"
+  },
+  {
+    "title": "Nick Land vs. Aleksandr Dugin Debate",
+    "creator": "Auron MacIntyre",
+    "type": "video",
+    "date": "2025-10-09",
+    "url": "https://www.youtube.com/live/J86C4IJTaFw"
+  },
+  {
+    "title": "fiestas del Alto",
+    "creator": "mamá Tora",
+    "type": "music",
+    "date": "2025-10-09",
+    "url": "https://www.nts.live/shows/roots-2025/episodes/roots-2025-fiestas-del-alto-w-mama-tora-21st-september-2025"
+  },
+  {
+    "title": "Exorcise the Demons",
+    "creator": "Source Direct",
+    "type": "music",
+    "date": "2025-10-09",
+    "url": "https://www.youtube.com/watch?v=uyutP6B-j68&list=PL698F378A0979E190"
+  },
+  {
+    "title": "La Brea",
+    "creator": "Hesse Kassel",
+    "type": "music",
+    "date": "2025-10-09",
+    "url": "https://hessekassel.bandcamp.com/album/la-brea"
+  },
+  {
+    "title": "Through The Wall",
+    "creator": "Rochelle Jordan",
+    "type": "music",
+    "date": "2025-10-13",
+    "url": "https://rochellejordan.bandcamp.com/album/through-the-wall"
+  },
+  {
+    "title": "Unleashing AI Slop Swarms",
+    "creator": "Emergent Garden",
+    "type": "video",
+    "date": "2025-10-13",
+    "url": "https://www.youtube.com/watch?v=--CteUWzErk"
+  },
+  {
+    "title": "Learning DSPy (3): Working with optimizers",
+    "creator": "The Data Quarry",
+    "type": "text",
+    "date": "2025-10-13",
+    "url": "https://thedataquarry.com/blog/learning-dspy-3-working-with-optimizers"
+  },
+  {
+    "title": "The Sunrise is Brutal",
+    "creator": "Thrilliam Angels",
+    "type": "music",
+    "date": "2025-10-13",
+    "url": "https://www.youtube.com/watch?v=8MV7hMuuxfE&list=OLAK5uy_n8dTctP8ciTvOlWIc-NWquNsXRB4bmxeU"
+  },
+  {
+    "title": "Lychee Reggae Mix",
+    "creator": "Wild Wata",
+    "type": "music",
+    "date": "2025-10-13",
+    "url": "https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025"
+  },
+  {
+    "title": "Just Talk To It - the no-bs Way of Agentic Engineering",
+    "creator": "Peter Steinberger",
+    "type": "text",
+    "date": "2025-10-13",
+    "url": "https://steipete.me/posts/just-talk-to-it"
+  },
+  {
+    "title": "Optimizing Coding Agent Rules (CLAUDE.md, agents.md, ./clinerules, .cursor/rules) for Improved Accuracy",
+    "creator": "Priyan Jindal",
+    "type": "text",
+    "date": "2025-10-13",
+    "url": "https://arize.com/blog/optimizing-coding-agent-rules-claude-md-agents-md-clinerules-cursor-rules-for-improved-accuracy/"
+  },
+  {
+    "title": "Context Engineering for AI Agents with LangChain and Manus",
+    "creator": "Langchain",
+    "type": "video",
+    "date": "2025-10-13",
+    "url": "https://www.youtube.com/watch?v=6_BcCthVvb8"
+  },
+  {
+    "title": "Thank You For Almost Everything",
+    "creator": "Headache",
+    "type": "music",
+    "date": "2025-10-17",
+    "url": "https://plzmakeitruins.bandcamp.com/album/thank-you-for-almost-everything"
+  },
+  {
+    "title": "One Battle After Another",
+    "creator": "Paul Thomas Anderson",
+    "type": "video",
+    "date": "2025-10-17"
+  },
+  {
+    "title": "The Master",
+    "creator": "Paul Thomas Anderson",
+    "type": "video",
+    "date": "2025-10-18"
+  },
+  {
+    "title": "Andrej Karpathy — “We’re summoning ghosts, not building animals”",
+    "creator": "Dwarkesh Patel",
+    "type": "video",
+    "date": "2025-10-18",
+    "url": "https://www.youtube.com/watch?v=lXUZvyajciY&t=1849s"
+  },
+  {
+    "title": "TXQ Fiction",
+    "creator": "TXQ Fiction",
+    "type": "video",
+    "date": "2025-10-19"
+  },
+  {
+    "title": "Frequently Asked Questions (And Answers) About AI Evals",
+    "creator": "Hamal",
+    "type": "text",
+    "date": "2025-10-19",
+    "url": "https://hamel.dev/blog/posts/evals-faq"
+  },
+  {
+    "title": "Later Than You Think",
+    "creator": "John Maus",
+    "type": "music",
+    "date": "2025-10-19",
+    "url": "https://johnmaus.bandcamp.com/album/later-than-you-think"
+  },
+  {
+    "title": "节奏的主人",
+    "creator": "DJ 小女孩",
+    "type": "music",
+    "date": "2025-10-22",
+    "url": "https://djgurl.bandcamp.com/album/--2"
+  },
+  {
+    "title": "Inland Empire",
+    "creator": "David Lynch",
+    "type": "video",
+    "date": "2025-10-26",
+    "url": "https://www.imdb.com/title/tt0378180/"
+  },
+  {
+    "title": "Armenian Cassette Special",
+    "creator": "Panorama Yerevan",
+    "type": "music",
+    "date": "2025-10-30",
+    "url": "https://www.nts.live/shows/panorama-yerevan/episodes/panorama-yerevan-25th-october-2025"
+  },
+  {
+    "title": "Evangelion 3.0+1.0: Thrice Upon A Time",
+    "creator": "Hideaki Anno",
+    "type": "video",
+    "date": "2025-11-02",
+    "url": "https://www.imdb.com/title/tt13964840/"
+  },
+  {
+    "title": "Britpop",
+    "creator": "A.G.Cook",
+    "type": "music",
+    "date": "2025-11-03",
+    "url": "https://agcook.bandcamp.com/album/britpop"
+  },
+  {
+    "title": " Inside Cursor —— Sixty days with the AI coding decacorn",
+    "creator": "Brie Wolfson",
+    "type": "text",
+    "date": "2025-11-07",
+    "url": "https://joincolossus.com/article/inside-cursor/"
+  },
+  {
+    "title": "Lux",
+    "type": "music",
+    "creator": "Rosalia",
+    "date": "2025-11-07",
+    "url": "https://www.youtube.com/watch?v=KYVf37pRXCw"
+  },
+  {
+    "title": "电视开播69年！您手上有这盘录像带吗？",
+    "type": "video",
+    "creator": "大森时生",
+    "date": "2025-11-09",
+    "url": "https://www.bilibili.com/video/BV15buuzoEeB/"
+  },
+  {
+    "title": "Hades 2",
+    "type": "game",
+    "creator": "Supergiant Games",
+    "date": "2025-11-09",
+    "url": "https://www.supergiantgames.com/games/hades-2/"
+  },
+  {
+    "title": "Mind beneath us",
+    "type": "game",
+    "creator": "Bearbone Studios",
+    "date": "2025-11-11",
+    "url": "https://www.bearbones.studio/mind-beneath-us"
+  },
+  {
+    "title": "Here's What's Next in Agentic Coding",
+    "creator": "Seconds",
+    "type": "text",
+    "date": "2025-11-11",
+    "url": "https://seconds0.substack.com/p/heres-whats-next-in-agentic-coding"
+  },
+  {
+    "title": "东四十条",
+    "creator": "覃牧秋",
+    "type": "video",
+    "date": "2025-11-11",
+    "url": "https://movie.douban.com/subject/36215199/"
+  },
+  {
+    "title": "Resurrection",
+    "creator": "毕赣",
+    "type": "video",
+    "date": "2025-11-15",
+    "url": "https://movie.douban.com/subject/35416174"
+  },
+  {
+    "title": "AIE Code 2025: AI Leadership",
+    "creator": "AIE",
+    "type": "video",
+    "date": "2025-11-22",
+    "url": "https://www.youtube.com/watch?v=cMSprbJ95jg"
+  },
+  {
+    "title": "AIE CODE Day 2",
+    "creator": "AIE",
+    "type": "video",
+    "date": "2025-11-22",
+    "url": "https://www.youtube.com/watch?v=xmbSQz-PNMM"
+  },
+  {
+    "title": "Radiohead Bologna Concert",
+    "creator": "Radiohead",
+    "type": "live",
+    "date": "2025-11-18"
+  },
+  {
+    "title": "Tranquilizer",
+    "creator": "Oneohtrix Point Never",
+    "type": "music",
+    "date": "2025-11-27",
+    "url": "https://oneohtrixpointnever.bandcamp.com/album/tranquilizer"
+  },
+  {
+    "title": "Stranger Things 5 ep1-4",
+    "creator": "Netflix",
+    "type": "video",
+    "date": "2025-11-27",
+    "url": "https://www.imdb.com/title/tt1517268/"
+  },
+  {
+    "title": "FC26",
+    "creator": "EA",
+    "type": "game",
+    "date": "2025-12-03",
+    "url": "https://www.ea.com/fc26"
+  },
+  {
+    "title": "Zootopia 2",
+    "creator": "Disney",
+    "type": "video",
+    "date": "2025-12-02"
+  },
+  {
+    "title": "Behind the Scenes of Vibe Code Bench",
+    "creator": "Rayan Krishnan",
+    "type": "text",
+    "date": "2025-12-03",
+    "url": "https://x.com/RayanKrishnan/status/1993829654428590566"
+  },
+  {
+    "title": "Clockenflap 2025",
+    "creator": "Clockenflap",
+    "type": "live",
+    "date": "2025-12-07",
+    "url": "https://www.clockenflap.com/"
+  },
+  {
+    "title": "Agents Should Be More Opinionated",
+    "creator": "Vivek Trivedi",
+    "type": "text",
+    "date": "2025-12-11",
+    "url": "https://www.vtrivedy.com/posts/agents-should-be-more-opinionated/"
+  },
+  {
+    "title": "200k Tokens Is Plenty",
+    "creator": "Lewis Metcalf",
+    "type": "text",
+    "date": "2025-12-11",
+    "url": "https://ampcode.com/200k-tokens-is-plenty"
+  },
+  {
+    "title": "Despolote",
+    "creator": "Julián Cordero",
+    "type": "game",
+    "date": "2025-12-15",
+    "url": "https://store.steampowered.com/app/2367820/despelote/"
+  },
+  {
+    "title": "Skate Story",
+    "creator": "Sam Eng",
+    "type": "game",
+    "date": "2025-12-15",
+    "url": "https://store.steampowered.com/app/1263240/Skate_Story/"
+  },
+  {
+    "title": "Consume Me",
+    "creator": "Jenny Jiao Hsia",
+    "type": "game",
+    "date": "2025-12-15",
+    "url": "https://store.steampowered.com/app/2359120/Consume_Me/"
+  },
+  {
+    "title": "IT: Welcome to Derry",
+    "creator": "HBPO",
+    "type": "video",
+    "date": "2025-12-22T02:14:26.062Z",
+    "url": "https://www.imdb.com/title/tt19244304/"
+  },
+  {
+    "title": "Dredge",
+    "creator": "Black Salt Games",
+    "type": "game",
+    "date": "2025-12-22T02:15:35.106Z",
+    "url": "https://store.steampowered.com/app/1562430/_/"
+  },
+  {
+    "title": "The new AI growth playbook for 2026 | How Lovable hit $200M ARR in one year",
+    "creator": "Lenny's Podcast",
+    "type": "video",
+    "date": "2026-12-19T16:00:00.001Z",
+    "url": "https://www.youtube.com/watch?v=6qAB6aUMIeA"
+  }
+]
