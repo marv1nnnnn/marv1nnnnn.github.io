@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "MARV1NNNNN // Creative Technologist",
@@ -53,8 +54,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" style={{ backgroundColor: '#050505' }}>
+      <body className="antialiased" style={{ backgroundColor: '#050505', color: '#ffffff' }}>
+        <CustomCursor />
         {children}
       </body>
     </html>

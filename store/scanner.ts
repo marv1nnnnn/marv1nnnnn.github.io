@@ -3,7 +3,7 @@ import { ScannerStore } from '@/types/scanner';
 
 export const useScannerStore = create<ScannerStore>((set) => ({
   // Initial state
-  currentFrequency: 90.0,
+  currentFrequency: 100.0,
   isTuning: false,
   lockedOnSignalId: null,
   isOverdrive: false,

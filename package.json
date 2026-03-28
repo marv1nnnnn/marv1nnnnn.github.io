@@ -10,18 +10,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/three": "^0.183.1",
     "framer-motion": "^11.15.0",
     "gray-matter": "^4.0.3",
     "next": "15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "three": "^0.183.2",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^18.3.25",
+    "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
     "eslint-config-next": "15.0.3",

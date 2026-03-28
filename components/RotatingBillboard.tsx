@@ -20,7 +20,7 @@ export default function RotatingBillboard() {
   const active = BILLBOARDS[index];
 
   return (
-    <div className="relative overflow-hidden border-6 border-black bg-white text-black uppercase">
+    <div className="relative overflow-hidden border-6 border-black bg-white text-black uppercase audio-border audio-pulse">
       {/* Accent bar */}
       <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-1 bg-brutal-pink" />
 
@@ -40,7 +40,7 @@ export default function RotatingBillboard() {
             </div>
           )}
 
-          <span className="text-sm sm:text-lg md:text-2xl lg:text-3xl font-black tracking-[0.1em] md:tracking-[0.15em] text-black break-words">
+          <span className="text-sm sm:text-lg md:text-2xl lg:text-3xl font-black tracking-[0.1em] md:tracking-[0.15em] text-black break-words reactive-text">
             {active.headline}
           </span>
 

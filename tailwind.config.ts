@@ -15,18 +15,18 @@ const config: Config = {
         'scanner-text': '#D1D1D1',
         'scanner-glow': '#00FFFF', // Updated to Cyan
         
-        // Neo-Brutalist Palette
+        // Avant-Garde / Industrial Palette
         'brutal': {
-          'black': '#000000',
-          'white': '#FFFFFF',
-          'off-white': '#F0F0F0',
-          'gray': '#1A1A1A',
-          'dark-gray': '#111111',
-          'cyan': '#00FFFF',
-          'pink': '#FF1493',
-          'lime': '#CCFF00', // Acid Lime
-          'yellow': '#FFFF00',
-          'orange': '#FF6600',
+          'black': '#050505',
+          'white': '#F5F5F5',
+          'off-white': '#EAEAEA',
+          'gray': '#111111',
+          'dark-gray': '#0A0A0A',
+          'cyan': '#0033FF', // Deep Electric Blue
+          'pink': '#FF0033', // Racing Red/Pink
+          'lime': '#00FF41', // Matrix Green
+          'yellow': '#FFD700',
+          'orange': '#FF4D00', // Industrial Orange
         },
         // Vinyl crate colors
         'crate-wood': '#3E2723',
@@ -67,6 +67,15 @@ const config: Config = {
         '2': '2deg',
         '3': '3deg',
       },
+      animation: {
+        'marquee': 'marquee 25s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        }
+      }
     },
   },
   plugins: [],
