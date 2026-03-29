@@ -399,7 +399,7 @@
     "url": "https://thebugmusic.bandcamp.com/album/pressure-3"
   },
   {
-    "title":"Culinary Class Wars Season 2",
+    "title": "Culinary Class Wars Season 2",
     "creator": "Netflix",
     "type": "video",
     "date": "2026-01-04",
@@ -418,5 +418,12 @@
     "type": "video",
     "date": "2026-01-26",
     "url": "https://www.imdb.com/title/tt14230458/"
+  },
+  {
+    "title": "slay the spire 2",
+    "creator": "Mega Crit",
+    "type": "game",
+    "date": "2026-03-05",
+    "url": "https://store.steampowered.com/app/2868840/Slay_the_Spire_2/"
   }
 ]
