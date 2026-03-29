@@ -4,11 +4,7 @@ import { SIGNALS } from '@/lib/signals';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-const StaircaseScene = dynamic(() => import('@/components/StaircaseScene'), {
-  ssr: false,
-});
+import StaircaseScene from '@/components/StaircaseScene';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -37,7 +33,6 @@ export default function Home() {
               signal.id === 'projects' ? 'Selected Lab' : 
               signal.id === 'influences' ? 'Echoes & Grids' : 
               signal.id === 'listening' ? 'Archive Feed' : 'Thoughts',
-    meta: `[${signal.freq.toFixed(1)} MHz]`,
   })), []);
 
   if (!mounted) return null;
@@ -59,23 +54,8 @@ export default function Home() {
 
       <div className="noise-overlay" />
 
-      {/* Banner Highway Marquee */}
-      <div className="fixed top-0 left-0 w-full border-b border-white/10 bg-[#050505] z-[100] overflow-hidden py-2">
-        <div className="animate-marquee whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.2em] opacity-40">
-          <span className="mx-4">Personal_Archive // v0.6 [2026]</span>
-          <span className="mx-4">Location: Hong Kong // 22.3193° N</span>
-          <span className="mx-4">Status: System_Operational</span>
-          <span className="mx-4">Personal_Archive // v0.6 [2026]</span>
-          <span className="mx-4">Location: Hong Kong // 22.3193° N</span>
-          <span className="mx-4">Status: System_Operational</span>
-          <span className="mx-4">Personal_Archive // v0.6 [2026]</span>
-          <span className="mx-4">Location: Hong Kong // 22.3193° N</span>
-          <span className="mx-4">Status: System_Operational</span>
-        </div>
-      </div>
-
       {/* Fixed Header */}
-      <div className="fixed top-24 left-12 z-[100] mix-blend-difference pointer-events-none">
+      <div className="fixed top-8 left-8 md:top-12 md:left-12 z-[100] mix-blend-difference pointer-events-none">
         <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif italic tracking-tighter leading-none kinetic-text text-white">
           marv1nnnnn
         </h1>

@@ -3,8 +3,8 @@ import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
-  title: "MARV1NNNNN // Creative Technologist",
-  description: "Personal website and portfolio of Marvin, a designer and creative technologist exploring narrative systems and experiential web installations.",
+  title: "MARV1NNNNN",
+  description: "Personal website and portfolio of Marvin.",
   metadataBase: new URL('https://marv1nnnnn.github.io'),
   icons: {
     icon: [
@@ -17,22 +17,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://marv1nnnnn.github.io',
-    title: "MARV1NNNNN // Creative Technologist",
-    description: "Personal website and portfolio of Marvin, a designer and creative technologist exploring narrative systems and experiential web installations.",
+    title: "MARV1NNNNN",
+    description: "Personal website and portfolio of Marvin.",
     siteName: "MARV1NNNNN",
     images: [
       {
         url: '/images/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'MARV1NNNNN - Creative Technologist Portfolio',
+        alt: 'MARV1NNNNN',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "MARV1NNNNN // Creative Technologist",
-    description: "Personal website and portfolio of Marvin, a designer and creative technologist exploring narrative systems and experiential web installations.",
+    title: "MARV1NNNNN",
+    description: "Personal website and portfolio of Marvin.",
     images: ['/images/og-image.png'],
   },
   robots: {

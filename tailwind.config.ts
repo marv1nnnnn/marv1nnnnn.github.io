@@ -9,12 +9,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Legacy colors - mapped to new brutal palette where appropriate
-        'scanner-bg': '#0A0B0A',
-        'scanner-panel': '#000000',
-        'scanner-text': '#D1D1D1',
-        'scanner-glow': '#00FFFF', // Updated to Cyan
-        
         // Avant-Garde / Industrial Palette
         'brutal': {
           'black': '#050505',

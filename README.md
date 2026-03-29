@@ -1,151 +1,35 @@
-# The Anomaly Scanner
+# marv1nnnnn.github.io
 
-A mysterious vertical signal scanner device that tunes into fragmented case files from a parallel dimension.
+Personal site: a 3D **index** (spiral staircase) on `/` that links to **signal** routes under `/signals/[id]`. Content is file-based in `content/` and compiled to `lib/signals.json` at build time.
 
-## 🎯 Project Status
+## Stack
 
-### ✅ **Completed (Phase 1-4)**
+- Next.js 15 (App Router), TypeScript, Tailwind CSS, Framer Motion
+- Three.js for `StaircaseScene` and per-signal page scenes (`components/pages/*`)
 
-**Foundation & Core Mechanics:**
-- ✅ Next.js 15 + TypeScript setup
-- ✅ Zustand state management
-- ✅ Two-column scanner interface layout
-- ✅ Vertical frequency slider (88.0 - 108.0 MHz)
-- ✅ Signal configuration system
-- ✅ Tuning logic with clarity calculation
-- ✅ Signal state detection (NOISE/APPROACHING/LOCKED_ON)
-
-**Visual Effects:**
-- ✅ Industrial Decay aesthetic (phosphor glow, noise textures, scanlines)
-- ✅ 1-Bit StaticEffect canvas with Bayer dithering
-- ✅ Organic swirling noise patterns
-- ✅ VT323 monospace font integration
-- ✅ Custom color palette
-
-**Audio System:**
-- ✅ Web Audio API integration
-- ✅ 50Hz electrical hum oscillator
-- ✅ Dynamic noise generation
-- ✅ Clarity-based audio mixing
-- ✅ User interaction-based initialization
-
-**Polish Features:**
-- ✅ Framer Motion page transitions
-- ✅ Overdrive detection (1s at frequency extremes)
-- ✅ Overdrive visual warnings (red theme)
-- ✅ Diegetic navigation controls ([PREV]/[NEXT])
-- ✅ Signal strength indicator bars
-- ✅ Real-time frequency display
-
-### 📋 **Next Steps (Phase 5)**
-
-**Content Creation:**
-- [ ] Design zine pages in Figma with redaction/stamp aesthetics
-- [ ] Export zine pages as PNG images
-- [ ] Create 4 zines:
-  - **88.1 MHz**: ABOUT - Personal introduction (3-4 pages)
-  - **94.5 MHz**: PROJECTS - Case files for projects (5-7 pages each)
-  - **101.2 MHz**: LOG - Blog entries as redacted reports (4+ pages)
-  - **107.8 MHz**: CONTACT - Communication protocols (2 pages)
-
-**Audio Assets:**
-- [ ] Create/source ambient tracks for each signal
-- [ ] Generate noise cacophony soundscape
-- [ ] Add UI sound effects (slider drag, page flip)
-
-**Advanced Polish:**
-- [ ] Implement Signal Ghosting (3s fade-out on signal change)
-- [ ] Boot-up sequence animation
-- [ ] Easter eggs in noise patterns
-- [ ] Accessibility (prefers-reduced-motion)
-- [ ] Mobile responsiveness considerations
-
-**Testing & Optimization:**
-- [ ] Cross-browser testing
-- [ ] Canvas performance optimization
-- [ ] Audio loading states
-- [ ] Error handling
-
-## 🎨 Design Philosophy
-
-Three aesthetic pillars guide this project:
-
-1. **Industrial Decay** - A Cold War-era device with phosphor screens and worn metal
-2. **1-Bit Cosmic Horror** - Procedural dithered noise representing a hostile dimension
-3. **The Redacted Manuscript** - Case files with stamps, annotations, and damage
-
-## 🚀 Development
+## Commands
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Run development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
+pnpm install   # dependencies
+pnpm dev       # generate signals + Next dev server
+pnpm build     # generate + production build
+pnpm start     # run production build locally
+pnpm lint      # ESLint
 ```
 
-## 📁 Project Structure
+`pnpm dev` and `pnpm build` run `scripts/generate-signals.js` first.
 
-```
-.
-├── app/                    # Next.js app directory
-│   ├── globals.css        # Global styles & aesthetic
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Main scanner interface
-├── components/
-│   ├── scanner/           # Scanner UI components
-│   │   ├── ScannerPanel.tsx    # Frequency slider
-│   │   ├── DisplayScreen.tsx   # Main display logic
-│   │   ├── StaticEffect.tsx    # 1-bit canvas noise
-│   │   └── ZineViewer.tsx      # Zine page renderer
-│   └── audio/
-│       └── AudioEngine.tsx     # Web Audio API manager
-├── store/
-│   └── scanner.ts         # Zustand global state
-├── lib/
-│   └── signals.ts         # Signal configuration & utilities
-├── types/
-│   └── scanner.ts         # TypeScript definitions
-└── public/
-    ├── zines/            # Zine page images (to be created)
-    ├── audio/            # Audio files (to be created)
-    └── textures/         # Noise/scratch textures
-```
+## Layout
 
-## 🎛️ Key Features
+| Path | Role |
+|------|------|
+| `app/page.tsx` | Home: staircase index, navigates to `/signals/:id` |
+| `app/signals/[signalId]/SignalClientPage.tsx` | Chooses layout by `page.type` (profile, cards, list, influences) |
+| `app/signals/[signalId]/[cardId]/` | Markdown card pages for `cards`-type signals |
+| `content/<signal>/` | `signal.json` + page JSON / `cards/*.md` |
+| `lib/signals.json` | Generated — do not edit by hand |
+| `public/` | Static assets (`audio/`, `images/`, `resume/`, etc.) |
 
-- **Tuning System**: Drag the vertical slider to scan frequencies
-- **Clarity Calculation**: Signal strength based on distance (1.5 MHz falloff)
-- **Three Signal States**:
-  - `NOISE` (clarity < 30%): Pure static
-  - `APPROACHING` (30% - 95%): Blurred zine + fading noise
-  - `LOCKED_ON` (≥ 95%): Clear zine + ambient audio
-- **Overdrive Mode**: Hold at 88.0 or 108.0 MHz for 1 second
-- **Procedural Graphics**: Real-time Bayer-dithered organic patterns
+## Content
 
-## 🔧 Technical Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **State**: Zustand
-- **Animation**: Framer Motion
-- **Styling**: Tailwind CSS
-- **Graphics**: HTML Canvas 2D
-- **Audio**: Web Audio API
-
-## 📝 Notes
-
-- Audio requires user interaction to initialize (browser autoplay policy)
-- All frequencies are in MHz (88.0 - 108.0 range)
-- Zine content is currently placeholder text
-- Canvas uses pixelated rendering for retro aesthetic
-
----
-
-**Generated with Claude Code** 🤖
+See **`content/README.md`** for signal folders, `pageType` values, and how to add or edit pages.
