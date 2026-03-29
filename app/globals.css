@@ -26,8 +26,15 @@ body {
   font-family: Georgia, serif;
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
-  cursor: none !important;
   min-height: 100vh;
+}
+
+@media (pointer: fine) {
+  body { cursor: none !important; }
+}
+
+html.touch-device body {
+  cursor: auto !important;
 }
 
 .project-specific-cursor {
@@ -199,7 +206,104 @@ body.theme-journal { background-color: #050505; color: #fff; }
   transition: all 0.2s ease;
 }
 
-.markdown-body a:hover {
-  text-decoration-color: #fff;
-  font-style: italic;
+/* =========================================
+   Cinematic Background Effects
+   ========================================= */
+
+/* 1. 边缘暗角 (Vignette) */
+.vignette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998; /* 提高层级，确保在 3D canvas 之上，但在 custom cursor 之下 */
+  background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%); /* 减弱暗角，扩大中心透明区域，降低边缘黑度 */
+}
+
+/* 2. 动态噪点 (Animated Grain) */
+.grain-overlay {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  width: 200%;
+  height: 200vh;
+  pointer-events: none;
+  z-index: 9998; /* 提高层级 */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03; /* 降低透明度，让噪点变得非常微弱克制 */
+  animation: grain-animation 0.5s steps(2) infinite;
+}
+
+@keyframes grain-animation {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -2%); }
+  20% { transform: translate(-4%, 2%); }
+  30% { transform: translate(2%, -4%); }
+  40% { transform: translate(-2%, 6%); }
+  50% { transform: translate(-4%, 2%); }
+  60% { transform: translate(6%, 0); }
+  70% { transform: translate(0, 6%); }
+  80% { transform: translate(1%, 8%); }
+  90% { transform: translate(-4%, 4%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* =========================================
+   Mobile Responsive
+   ========================================= */
+
+@media (max-width: 768px) {
+  .markdown-body {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.75rem; }
+  .markdown-body h3 { font-size: 1.4rem; }
+
+  .markdown-body blockquote {
+    font-size: 1.2rem;
+  }
+
+  .markdown-body p:first-of-type::first-letter {
+    font-size: 3rem;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@keyframes flow-texture {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-3%, -2%) rotate(0.5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes flow-texture-reverse {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(2%, 3%) rotate(-0.5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.05); opacity: 0.8; }
 }

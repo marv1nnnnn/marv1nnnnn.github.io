@@ -3,18 +3,29 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
+function isTouchDevice() {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+}
+
 export default function CustomCursor() {
   const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
   const [isClicking, setIsClicking] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    if (isTouchDevice()) {
+      setIsTouch(true);
+      document.documentElement.classList.add('touch-device');
+      return;
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
       
-      // Check if hovering over a clickable element
       const target = e.target as HTMLElement;
       const isClickable = 
         window.getComputedStyle(target).cursor === 'pointer' ||
@@ -39,7 +50,7 @@ export default function CustomCursor() {
     };
   }, []);
 
-  if (!isMounted) return null;
+  if (!isMounted || isTouch) return null;
 
   return (
     <>

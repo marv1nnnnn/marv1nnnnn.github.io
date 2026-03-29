@@ -1,6 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
+import FluidBackground from "@/components/FluidBackground";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#050505',
+};
 
 export const metadata: Metadata = {
   title: "MARV1NNNNN",
@@ -56,7 +64,10 @@ export default function RootLayout({
   return (
     <html lang="en" style={{ backgroundColor: '#050505' }}>
       <body className="antialiased" style={{ backgroundColor: '#050505', color: '#ffffff' }}>
+        <FluidBackground />
         <CustomCursor />
+        <div className="vignette-overlay" aria-hidden="true"></div>
+        <div className="grain-overlay" aria-hidden="true"></div>
         {children}
       </body>
     </html>

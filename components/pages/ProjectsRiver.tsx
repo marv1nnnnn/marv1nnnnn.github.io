@@ -21,6 +21,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
     let onWheel: (e: WheelEvent) => void;
     let onClick: () => void;
     let onResize: () => void;
+    let onTouchStart: (e: TouchEvent) => void;
+    let onTouchMove: (e: TouchEvent) => void;
 
     (async () => {
       const THREE = await import('three');
@@ -167,6 +169,7 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       const mouse = new THREE.Vector2();
       let scrollY = 0;
       let targetScrollY = 0;
+      let touchStartY = 0;
 
       onMouseMove = (e: MouseEvent) => {
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -175,7 +178,17 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       
       onWheel = (e: WheelEvent) => {
         targetScrollY += e.deltaY * 0.02;
-        // Limit scroll
+        targetScrollY = Math.max(-5, Math.min(targetScrollY, 20));
+      };
+
+      onTouchStart = (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+      };
+
+      onTouchMove = (e: TouchEvent) => {
+        const deltaY = touchStartY - e.touches[0].clientY;
+        touchStartY = e.touches[0].clientY;
+        targetScrollY += deltaY * 0.03;
         targetScrollY = Math.max(-5, Math.min(targetScrollY, 20));
       };
 
@@ -190,6 +203,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('wheel', onWheel);
       window.addEventListener('click', onClick);
+      renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+      renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -249,6 +264,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       window.removeEventListener('resize', onResize);
       document.body.style.cursor = '';
       if (renderer) {
+        renderer.domElement.removeEventListener('touchstart', onTouchStart);
+        renderer.domElement.removeEventListener('touchmove', onTouchMove);
         renderer.dispose();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
@@ -258,7 +275,7 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
   }, [page, signalId, router]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0" />
       
       <AnimatePresence>
@@ -267,25 +284,48 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mix-blend-difference w-full max-w-2xl text-center"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mix-blend-difference w-full max-w-2xl text-center px-4 hidden md:block"
           >
-            <h2 className="text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4">
               {hoveredCard.title}
             </h2>
-            <p className="font-mono text-sm uppercase tracking-[0.3em] text-white/60 mb-6">
+            <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.3em] text-white/60 mb-6">
               {hoveredCard.date?.replace(/-/g, '.')} // {hoveredCard.tags?.join(', ')}
             </p>
-            <p className="font-serif text-xl italic text-white/80">
+            <p className="font-serif text-base sm:text-xl italic text-white/80">
               {hoveredCard.summary}
             </p>
           </motion.div>
         )}
       </AnimatePresence>
       
-      <div className="fixed bottom-12 right-12 z-10 mix-blend-difference pointer-events-none">
+      <div className="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 z-10 mix-blend-difference pointer-events-none">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 flex flex-col items-end gap-2">
-          <span>Scroll to navigate river</span>
-          <span>Click pebble to inspect</span>
+          <span className="hidden sm:block">Scroll to navigate river</span>
+          <span className="hidden sm:block">Click pebble to inspect</span>
+          <span className="sm:hidden">Drag to navigate</span>
+          <span className="sm:hidden">Tap pebble to inspect</span>
+        </div>
+      </div>
+
+      {/* Mobile card list fallback */}
+      <div className="md:hidden relative z-20 pt-[60vh] pb-12 px-4">
+        <div className="flex flex-col gap-4">
+          {(page.cards || []).map((card: any) => (
+            <button
+              key={card.id}
+              onClick={() => router.push(`/signals/${signalId}/${card.id}`)}
+              className="text-left border border-white/20 p-5 bg-black/60 backdrop-blur-sm hover:bg-white/10 transition-colors"
+            >
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">
+                {card.date?.replace(/-/g, '.')} {card.tags?.length ? `// ${card.tags.join(', ')}` : ''}
+              </div>
+              <h3 className="text-xl font-serif italic font-bold mb-1">{card.title}</h3>
+              {card.summary && (
+                <p className="text-sm text-white/60 font-serif italic">{card.summary}</p>
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </div>

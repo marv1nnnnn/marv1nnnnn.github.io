@@ -17,8 +17,9 @@ export default function InfluencesVortex({ page }: { page: any }) {
     let camera: any;
     let onWheel: (e: WheelEvent) => void;
     let onResize: () => void;
-
     let onMouseMove: (e: MouseEvent) => void;
+    let onTouchStart: (e: TouchEvent) => void;
+    let onTouchMove: (e: TouchEvent) => void;
 
     (async () => {
       const THREE = await import('three');
@@ -120,6 +121,7 @@ export default function InfluencesVortex({ page }: { page: any }) {
 
       let scrollY = 0;
       let targetScrollY = 0;
+      let touchStartY = 0;
 
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2();
@@ -136,7 +138,20 @@ export default function InfluencesVortex({ page }: { page: any }) {
         targetScrollY = Math.max(0, Math.min(targetScrollY, records.length * 8));
       };
 
+      onTouchStart = (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+      };
+
+      onTouchMove = (e: TouchEvent) => {
+        const deltaY = touchStartY - e.touches[0].clientY;
+        touchStartY = e.touches[0].clientY;
+        targetScrollY += deltaY * 0.02;
+        targetScrollY = Math.max(0, Math.min(targetScrollY, records.length * 8));
+      };
+
       window.addEventListener('wheel', onWheel);
+      container.addEventListener('touchstart', onTouchStart, { passive: true });
+      container.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -194,6 +209,8 @@ export default function InfluencesVortex({ page }: { page: any }) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('mousemove', onMouseMove);
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
       document.body.style.cursor = 'default';
       if (renderer) {
         renderer.dispose();
@@ -205,11 +222,12 @@ export default function InfluencesVortex({ page }: { page: any }) {
   }, [page]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
-      <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
+      <div ref={containerRef} className="fixed inset-0 z-0 md:pointer-events-none" />
 
+      {/* Desktop hover info */}
       {hoveredRecord && (
-        <div className="fixed bottom-12 right-12 z-20 max-w-md bg-black/80 backdrop-blur-md border border-white/20 p-6 pointer-events-none">
+        <div className="hidden md:block fixed bottom-12 right-12 z-20 max-w-md bg-black/80 backdrop-blur-md border border-white/20 p-6 pointer-events-none">
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-white/50 mb-2">
             {hoveredRecord.medium} // {hoveredRecord.year}
           </div>
@@ -220,6 +238,36 @@ export default function InfluencesVortex({ page }: { page: any }) {
           </p>
         </div>
       )}
+
+      {/* Mobile card list fallback */}
+      <div className="md:hidden relative z-20 pt-[50vh] pb-12 px-4">
+        <div className="flex flex-col gap-4">
+          {(page.records || []).map((record: any, idx: number) => (
+            <div
+              key={idx}
+              className="border border-white/20 bg-black/60 backdrop-blur-sm p-5 flex gap-4 items-start"
+            >
+              {record.image_url && (
+                <img
+                  src={record.image_url}
+                  alt={record.title}
+                  className="w-16 h-16 object-cover shrink-0"
+                />
+              )}
+              <div className="min-w-0">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-1">
+                  {record.medium} // {record.year}
+                </div>
+                <h3 className="text-lg font-serif italic font-bold mb-0.5">{record.title}</h3>
+                <div className="text-sm font-sans text-white/70 mb-2">{record.artist}</div>
+                {record.personalNote && (
+                  <p className="text-xs font-mono text-white/60 leading-relaxed">{record.personalNote}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -197,7 +197,7 @@ export default function AboutFluid({ page }: { page: any }) {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" />
       
       <div className="relative z-10 px-6 sm:px-10 lg:px-16 xl:px-24 pt-36 md:pt-44 pb-16 md:pb-24 min-h-screen flex flex-col justify-start">

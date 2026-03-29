@@ -21,6 +21,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
     let onWheel: (e: WheelEvent) => void;
     let onClick: () => void;
     let onResize: () => void;
+    let onTouchStart: (e: TouchEvent) => void;
+    let onTouchMove: (e: TouchEvent) => void;
 
     (async () => {
       const THREE = await import('three');
@@ -151,6 +153,7 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       const mouse = new THREE.Vector2();
       let scrollY = 0;
       let targetScrollY = 0;
+      let touchStartY = 0;
 
       onMouseMove = (e: MouseEvent) => {
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -159,6 +162,17 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       
       onWheel = (e: WheelEvent) => {
         targetScrollY += e.deltaY * 0.01;
+        targetScrollY = Math.max(0, Math.min(targetScrollY, cards.length * 3));
+      };
+
+      onTouchStart = (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+      };
+
+      onTouchMove = (e: TouchEvent) => {
+        const deltaY = touchStartY - e.touches[0].clientY;
+        touchStartY = e.touches[0].clientY;
+        targetScrollY += deltaY * 0.02;
         targetScrollY = Math.max(0, Math.min(targetScrollY, cards.length * 3));
       };
 
@@ -173,6 +187,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('wheel', onWheel);
       window.addEventListener('click', onClick);
+      renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+      renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -225,6 +241,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       window.removeEventListener('resize', onResize);
       document.body.style.cursor = '';
       if (renderer) {
+        renderer.domElement.removeEventListener('touchstart', onTouchStart);
+        renderer.domElement.removeEventListener('touchmove', onTouchMove);
         renderer.dispose();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
@@ -234,10 +252,11 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
   }, [page, signalId, router]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0" />
       
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none w-full max-w-4xl">
+      {/* Desktop hover card overlay */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none w-full max-w-4xl px-4 hidden md:block">
         {(page.cards || []).map((card: any) => (
           <motion.div
             key={card.id}
@@ -262,6 +281,27 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
             </p>
           </motion.div>
         ))}
+      </div>
+
+      {/* Mobile card list fallback */}
+      <div className="md:hidden relative z-20 pt-[60vh] pb-12 px-4">
+        <div className="flex flex-col gap-4">
+          {(page.cards || []).map((card: any) => (
+            <button
+              key={card.id}
+              onClick={() => router.push(`/signals/${signalId}/${card.id}`)}
+              className="text-left border border-white/20 p-5 bg-black/60 backdrop-blur-sm hover:bg-white/10 transition-colors"
+            >
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">
+                {card.date?.replace(/-/g, '.')}
+              </div>
+              <h3 className="text-xl font-serif italic font-bold mb-1">{card.title}</h3>
+              {card.summary && (
+                <p className="text-sm text-white/60 font-serif italic">{card.summary}</p>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

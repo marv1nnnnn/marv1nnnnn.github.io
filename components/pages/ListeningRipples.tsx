@@ -28,7 +28,7 @@ export default function ListeningRipples({ page }: { page: any }) {
   };
 
   return (
-    <div className="relative min-h-screen w-full text-white pt-32 md:pt-48 pb-24 px-4 md:px-12">
+    <div className="relative min-h-screen w-full bg-transparent text-white pt-32 md:pt-48 pb-24 px-4 md:px-12">
       <div className="max-w-[100vw] mx-auto relative z-10">
         {/* Desktop Matrix View */}
         <div className="hidden md:block w-full border-t-2 border-l-2 border-white/20 bg-black/40 backdrop-blur-sm relative">

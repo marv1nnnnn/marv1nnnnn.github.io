@@ -56,6 +56,7 @@ export default function StaircaseScene({
       
       if (renderer) {
         renderer.domElement.removeEventListener('click', onClick);
+        renderer.domElement.removeEventListener('touchend', onTouchEnd);
         renderer.dispose();
         renderer.forceContextLoss();
         if (container.contains(renderer.domElement)) {
@@ -83,6 +84,7 @@ export default function StaircaseScene({
     let isTransitioning = false;
     let transitionTargetIndex: number | null = null;
     let transitionProgress = 0;
+    let touchTappedIndex: number | null = null;
 
     const onClick = () => {
       if (hoveredIndex !== null && !isTransitioning) {
@@ -92,10 +94,52 @@ export default function StaircaseScene({
         } else {
           isTransitioning = true;
           transitionTargetIndex = hoveredIndex;
-          // We will call onSelectRef.current(item.id) after the animation finishes
         }
       }
     };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (isTransitioning || !camera || !stepMeshesRef.length) return;
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+
+      mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+
+      const THREE_mod = (window as any).__THREE__;
+      if (!THREE_mod || !raycasterRef) return;
+
+      raycasterRef.setFromCamera(mouse as any, camera);
+      const intersects = raycasterRef.intersectObjects(stepMeshesRef);
+      const tappedIdx = intersects.length > 0
+        ? (intersects[0].object.userData.index as number)
+        : null;
+
+      if (tappedIdx === null) {
+        touchTappedIndex = null;
+        hoveredIndex = null;
+        onHoverRef.current(null);
+        return;
+      }
+
+      if (touchTappedIndex === tappedIdx) {
+        const item = items[tappedIdx];
+        if (item.onClick) {
+          item.onClick();
+        } else {
+          isTransitioning = true;
+          transitionTargetIndex = tappedIdx;
+        }
+        touchTappedIndex = null;
+      } else {
+        touchTappedIndex = tappedIdx;
+        hoveredIndex = tappedIdx;
+        onHoverRef.current(items[tappedIdx].id);
+      }
+    };
+
+    let stepMeshesRef: any[] = [];
+    let raycasterRef: any = null;
 
     const onResize = () => {
       if (!renderer || !camera) return;
@@ -314,13 +358,16 @@ export default function StaircaseScene({
       labelsContainer.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:10;';
       container.appendChild(labelsContainer);
 
+      const isMobile = window.innerWidth < 768;
+      const titleSize = isMobile ? '1.4rem' : '2.4rem';
+      const subtitleMargin = isMobile ? '2rem' : '3.5rem';
+
       const labelElements: HTMLDivElement[] = [];
       items.forEach((item, index) => {
         const label = document.createElement('div');
         label.style.cssText = `
           position:absolute;
           pointer-events:none;
-          white-space:nowrap;
           font-family:Georgia,serif;
           color:#fff;
           transform-origin:center;
@@ -333,17 +380,17 @@ export default function StaircaseScene({
           text-shadow: 0 0 10px rgba(255,255,255,0.3);
         `;
         label.innerHTML = `
-          <div style="display:flex; align-items:center; gap:1rem;">
-            <span style="font-family:monospace;font-size:10px;opacity:0.4;text-transform:uppercase;letter-spacing:0.5em;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:2px;">
+          <div style="display:flex; align-items:center; gap:${isMobile ? '0.5rem' : '1rem'};">
+            <span style="font-family:monospace;font-size:${isMobile ? '8px' : '10px'};opacity:0.4;text-transform:uppercase;letter-spacing:0.5em;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:2px;">
               ${String(index + 1).padStart(2, '0')}
             </span>
-            <span style="font-size:2.4rem;letter-spacing:-0.04em;font-weight:900;font-style:italic;text-transform:uppercase;">
+            <span style="font-size:${titleSize};letter-spacing:-0.04em;font-weight:900;font-style:italic;text-transform:uppercase;">
               ${item.title}
             </span>
           </div>
-          <div style="display:flex; align-items:center; gap:1rem; margin-left:3.5rem;">
+          <div style="display:flex; align-items:center; gap:1rem; margin-left:${subtitleMargin};">
             ${item.subtitle ? `
-            <span style="font-family:monospace;font-size:10px;opacity:0.6;text-transform:uppercase;letter-spacing:0.2em;font-style:normal;">
+            <span style="font-family:monospace;font-size:${isMobile ? '8px' : '10px'};opacity:0.6;text-transform:uppercase;letter-spacing:0.2em;font-style:normal;">
               // ${item.subtitle}
             </span>
             ` : ''}
@@ -354,9 +401,13 @@ export default function StaircaseScene({
       });
 
       const raycaster = new THREE.Raycaster();
+      raycasterRef = raycaster;
+      stepMeshesRef = stepMeshes;
+      (window as any).__THREE__ = THREE;
 
       window.addEventListener('pointermove', onPointerMove, { passive: true });
       renderer.domElement.addEventListener('click', onClick);
+      renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: true });
 
       let smoothScroll = 0;
 
