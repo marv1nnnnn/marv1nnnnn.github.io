@@ -25,7 +25,7 @@
       "year": 2005,
       "medium": "music",
       "personalNote": "Basically I love every album from them. This one is not their best, but the album cover is so iconic.",
-      "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYomQMkRyS-9Jt0hjyuKZcUvnmzVi2VQf1IA&s"
+      "image_url": "/images/influences-coil-ape-of-naples.jpg"
     },
     {
       "id": "william-basinski",
@@ -79,7 +79,7 @@
       "year": 1989,
       "medium": "film",
       "personalNote": "Honestly I love every moment from season 1 to season 3.",
-      "image_url": "https://upload.wikimedia.org/wikipedia/en/e/ea/TwinPeaks_openingshotcredits.jpg"
+      "image_url": "/images/twin-peaks-red-room.png"
     },
     {
       "id": "suda51-kill-the past",
@@ -88,7 +88,7 @@
       "year": 1999,
       "medium": "game",
       "personalNote": "This is that kind of game I would sacrfice everything for making.",
-      "image_url": "https://upload.wikimedia.org/wikipedia/en/c/c0/The_Silver_Case_cover.png"
+      "image_url": "/images/influences-silver-case.png"
     },
     {
       "id": "2666",
@@ -97,7 +97,7 @@
       "year": 2004,
       "medium": "book",
       "personalNote": "How did he write this book? It's so much ahead of its time.",
-      "image_url": "https://i.etsystatic.com/18611779/r/il/83fd6d/2614827046/il_fullxfull.2614827046_dfmb.jpg"
+      "image_url": "/images/influences-2666.jpg"
     },
     {
       "id": "dfw-infinite-jest",
@@ -106,7 +106,7 @@
       "year": 1996,
       "medium": "book",
       "personalNote": "I once vowed once I finish this book, I will marry my girlfriend. I still haven't finished it, but I married her. I started to play tennis because of DFW",
-      "image_url": "https://nathanholic.com/wp-content/uploads/2013/08/cover_ij.jpg"
+      "image_url": "/images/influences-infinite-jest.jpg"
     },
     {
       "id": "lain",
@@ -115,7 +115,7 @@
       "year": 1999,
       "medium": "anime",
       "personalNote": "A person like me must love lain right? The aesthetics here is truly something else.",
-      "image_url": "https://preview.redd.it/serial-experiments-lain-anime-of-the-week-v0-i9eehu7ix07d1.png?width=1520&format=png&auto=webp&s=70b4c4b79af17899111517a7642652bd51853d55"
+      "image_url": "/images/influences-serial-experiments-lain.jpg"
     }
   ]
 }

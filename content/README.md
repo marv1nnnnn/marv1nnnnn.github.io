@@ -1,119 +1,77 @@
-# Content Directory
+# Content directory
 
-This folder contains all the content for the Anomaly Scanner signals. Content is organized by signal and automatically compiled to the website during build.
+Site copy lives here and is compiled into `lib/signals.json` by `pnpm generate` (also run by `pnpm dev` / `pnpm build`).
 
-## Structure
+## Signals (folders)
 
-Each signal lives in its own folder:
+| Folder | `pageType` | Notes |
+|--------|------------|--------|
+| `about/` | `profile` | `profile.json`: hero, sections, contact, optional `resume` `{ href, label?, subtitle? }` |
+| `projects/` | `cards` | `cards/*.md` with frontmatter; optional `renderMode` in `signal.json` |
+| `influences/` | `influences` | `influences.json` — vinyl-style records list |
+| `listening/` | `list` | `items.json` — media list with optional URLs |
+| `journal/` | `cards` | Same card pattern as projects |
 
-```
-content/
-├── about/          # 88.1 MHz - Profile signal
-├── projects/       # 94.5 MHz - Projects cards
-├── listening/      # 101.2 MHz - Listening list
-└── journal/        # 107.8 MHz - Journal cards
-```
-
-## Adding a New Signal
-
-1. Create a new folder in `content/` with your signal ID
-2. Add a `signal.json` file with metadata:
+Each signal needs **`signal.json`** (metadata). Example:
 
 ```json
 {
   "id": "your-signal-id",
   "freq": 95.0,
-  "title": "YOUR SIGNAL TITLE",
-  "pages": 3,
+  "title": "YOUR TITLE",
+  "pages": 1,
   "audioUrl": "/audio/your-ambient.mp3",
-  "broadcastDate": "2025-10-04",
-  "location": "YOUR LOCATION",
-  "tags": ["TAG1", "TAG2"],
-  "summary": "Your signal description",
   "accentColor": "#FF0000",
   "background": "linear-gradient(...)",
   "pageType": "cards"
 }
 ```
 
-3. Add your content based on page type:
+`freq` is a numeric ordering key used in generated data (not a live tuner in the current UI).
 
-### Profile Page (`pageType: "profile"`)
+### Profile (`pageType`: `"profile"`)
 
-Create `profile.json`:
+`profile.json` example:
 
 ```json
 {
   "hero": {
-    "eyebrow": "BROADCAST TYPE",
-    "title": "Your Title",
-    "subtitle": "Your subtitle",
-    "description": "Your description"
+    "eyebrow": "About",
+    "title": "Name",
+    "subtitle": "Role",
+    "description": "Short bio paragraph."
   },
-  "sections": [
-    { "title": "Section 1", "body": "Content..." }
-  ],
-  "contact": [
-    { "label": "Email", "value": "email@example.com", "href": "mailto:..." }
-  ]
+  "resume": {
+    "label": "Resume",
+    "subtitle": "Role line",
+    "href": "/resume/your-file.pdf"
+  },
+  "sections": [{ "title": "Section", "body": "Text..." }],
+  "contact": [{ "label": "Email", "value": "x@y.com", "href": "mailto:..." }]
 }
 ```
 
-### Cards Page (`pageType: "cards"`)
+Place PDFs under `public/resume/` and reference them with a path like `/resume/...`.
 
-1. Add `intro` to `signal.json`:
-```json
-{
-  ...
-  "intro": {
-    "title": "Your Section Title"
-  }
-}
-```
+### Cards (`pageType`: `"cards"`)
 
-2. Create `cards/` folder and add `.md` files:
+1. Set `pageType` and optional `intro` in `signal.json`.
+2. Add `content/<id>/cards/*.md` with frontmatter: `id`, `title`, `date`, `summary`, `tags`, etc.
 
-```md
----
-id: "card-id"
-title: "Card Title"
-subtitle: "Card Subtitle"
-date: "2025-10-04"
-summary: "Card description"
-tags: [tag1, tag2]
----
+### List (`pageType`: `"list"`)
 
-## Your Markdown Content
+Use `items.json` (array of objects with `title`, `creator`, `type`, optional `date`, `url`).
 
-Write your content here...
-```
+### Influences (`pageType`: `"influences"`)
 
-### List Page (`pageType: "list"`)
+Use `influences.json` (see `content/influences/` for the expected record shape).
 
-Create `items.json`:
+## Editing workflow
 
-```json
-[
-  {
-    "title": "Item Title",
-    "creator": "Creator Name",
-    "type": "album|text|video",
-    "date": "2025-10-04"
-  }
-]
-```
+1. Edit files under `content/`.
+2. Run `pnpm generate` or `pnpm dev`.
 
-## Editing Content
+## Markdown
 
-1. Edit any file in `content/`
-2. Run `pnpm generate` to regenerate `lib/signals.json`
-3. Run `pnpm dev` or `pnpm build`
-
-The `pnpm dev` and `pnpm build` commands automatically run the generator.
-
-## Important Notes
-
-- Always quote YAML frontmatter values in markdown files
-- Dates should be in YYYY-MM-DD format
-- Card files are automatically sorted by date (newest first)
-- The frequency (freq) determines signal position on the scanner dial
+- Quote frontmatter string values where YAML could misparse.
+- Prefer `YYYY-MM-DD` dates for cards.

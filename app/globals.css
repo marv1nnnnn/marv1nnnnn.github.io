@@ -5,17 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --scanner-bg: #0A0B0A;
-  --scanner-panel: #000000;
-  --scanner-text: #D1D1D1;
-  --scanner-glow: #00FFFF;
-  
-  /* Neo-Brutalist Vars */
-  --brutal-black: #000000;
-  --brutal-white: #FFFFFF;
-  --brutal-cyan: #00FFFF;
-  --brutal-pink: #FF1493;
-  --brutal-lime: #CCFF00;
+  --bg: #050505;
+  --fg: #ffffff;
+  --accent: #0000ff;
 }
 
 * {
@@ -25,557 +17,189 @@
 }
 
 html {
-  height: 100%;
-  overflow-x: hidden;
+  background-color: #050505;
 }
 
 body {
-  height: 100%;
-  overflow-y: auto;
-  background-color: var(--scanner-bg);
-  color: var(--scanner-text);
-  font-family: 'Space Grotesk', 'VT323', monospace;
-  font-size: 16px;
-  line-height: 1.4;
+  background-color: #050505;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: none !important;
+  min-height: 100vh;
 }
 
-@media (min-width: 768px) {
-  body {
-    font-size: 18px;
-  }
-}
-
-/* Fix Next.js portal elements */
-nextjs-portal {
-  position: absolute;
+.project-specific-cursor {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-nextjs-portal > * {
-  pointer-events: auto;
-}
-
-@layer utilities {
-  .border-brutal {
-    @apply border-4 border-black;
-  }
-  
-  .shadow-brutal {
-    box-shadow: 6px 6px 0 0 #000;
-  }
-
-  .shadow-brutal-hover {
-    box-shadow: 8px 8px 0 0 #000;
-  }
-  
-  .text-outline {
-    -webkit-text-stroke: 1px black;
-    text-stroke: 1px black;
-  }
-  
-  .text-outline-white {
-    -webkit-text-stroke: 1px white;
-    text-stroke: 1px white;
-  }
-}
-
-/* Phosphor glow effect */
-.phosphor-text {
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-}
-
-/* Flicker animation */
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.98; }
-}
-
-.flicker {
-  animation: flicker 0.15s infinite;
-}
-
-.animate-flicker {
-  animation: subtle-flicker 3s infinite;
-}
-
-@keyframes subtle-flicker {
-  0%, 100% { opacity: 1; }
-  10% { opacity: 0.97; }
-  20% { opacity: 1; }
-  30% { opacity: 0.99; }
-  40% { opacity: 1; }
-  50% { opacity: 0.98; }
-  60% { opacity: 1; }
-  70% { opacity: 0.97; }
-  80% { opacity: 1; }
-  90% { opacity: 0.99; }
-}
-
-/* Overdrive screen shake */
-@keyframes screen-shake {
-  0%, 100% { transform: translate(0, 0); }
-  10% { transform: translate(-2px, 1px); }
-  20% { transform: translate(2px, -1px); }
-  30% { transform: translate(-1px, 2px); }
-  40% { transform: translate(1px, -2px); }
-  50% { transform: translate(-2px, -1px); }
-  60% { transform: translate(2px, 1px); }
-  70% { transform: translate(-1px, -2px); }
-  80% { transform: translate(1px, 2px); }
-  90% { transform: translate(-2px, 2px); }
-}
-
-.overdrive {
-  animation: screen-shake 0.15s infinite;
-}
-
-/* Chromatic aberration for overdrive */
-.overdrive::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 48% 50%, rgba(255, 0, 0, 0.15), transparent 60%),
-    radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1), transparent 60%),
-    radial-gradient(circle at 52% 50%, rgba(0, 0, 255, 0.15), transparent 60%);
-  mix-blend-mode: screen;
+  width: 80px;
+  height: 80px;
   pointer-events: none;
   z-index: 9999;
-  animation: subtle-flicker 0.1s infinite;
+  mix-blend-mode: difference;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
 }
 
-/* Scanline effect */
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-.scanlines::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent 50%,
-    rgba(0, 0, 0, 0.05) 51%
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-/* Noise texture overlay - reduced for brutal aesthetic */
-.noise-overlay::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 999;
-}
-
-/* Halftone pattern overlay - photocopier aesthetic */
-.halftone-overlay {
-  position: relative;
-}
-
-.halftone-overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, #000 1px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Scrollbar styling - brutal */
-::-webkit-scrollbar {
+.cursor-dot {
   width: 12px;
-  background: #000;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
 }
 
-::-webkit-scrollbar-track {
-  background: #000;
-  border-left: 3px solid #FFF;
+/* Kinetic Typography Animations */
+@keyframes nervous-skew {
+  0% { transform: skewX(0deg) skewY(0deg); }
+  25% { transform: skewX(-2deg) skewY(1deg); }
+  50% { transform: skewX(1deg) skewY(-1deg); }
+  75% { transform: skewX(-1deg) skewY(2deg); }
+  100% { transform: skewX(0deg) skewY(0deg); }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #FFF;
-  border: 3px solid #000;
+.kinetic-text {
+  display: inline-block;
+  animation: nervous-skew 3s infinite ease-in-out;
+  transform-origin: center;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #FF1493;
+.kinetic-text:hover {
+  animation: nervous-skew 0.5s infinite linear;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+
+/* Page Themes - High Contrast Brutalist */
+body.theme-about { background-color: #050505; color: #fff; }
+body.theme-projects { background-color: #050505; color: #fff; }
+body.theme-listening { background-color: #050505; color: #fff; }
+body.theme-influences { background-color: #050505; color: #fff; }
+body.theme-journal { background-color: #050505; color: #fff; }
+
+.afterimage-bg {
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 1px, transparent 1px, transparent 10px);
+  opacity: 0.5;
+  mix-blend-mode: difference;
+}
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.floating-meta {
+  position: absolute;
+  font-family: monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  opacity: 0.2;
 }
 
 .markdown-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #fff;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .markdown-body {
-    gap: 1.5rem;
-    font-size: 1rem;
-    line-height: 1.7;
-  }
+.markdown-body > * {
+  margin-bottom: 1.5rem;
+}
+
+.markdown-body p:first-of-type::first-letter {
+  float: left;
+  font-size: 4rem;
+  line-height: 0.8;
+  padding-right: 0.5rem;
+  font-weight: bold;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .markdown-body h1,
 .markdown-body h2,
-.markdown-body h3 {
-  font-size: 1.25rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.markdown-body h3,
+.markdown-body h4 {
+  font-family: Georgia, serif;
+  font-weight: bold;
   color: #fff;
-  border-bottom: 4px solid rgba(255, 255, 255, 1);
-  padding-bottom: 0.4rem;
-  margin-bottom: 0.6rem;
-  font-weight: 900;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  font-style: italic;
 }
 
-@media (min-width: 768px) {
-  .markdown-body h1,
-  .markdown-body h2,
-  .markdown-body h3 {
-    font-size: 1.75rem;
-    border-bottom: 5px solid rgba(255, 255, 255, 1);
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.8rem;
-  }
+.markdown-body h1 {
+  font-size: 3rem;
+}
+
+.markdown-body h2 {
+  font-size: 2.5rem;
+}
+
+.markdown-body h3 {
+  font-size: 2rem;
 }
 
 .markdown-body p {
-  margin: 0;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.markdown-body ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 1.5rem;
-  display: grid;
-  gap: 0.6rem;
-}
-
-.markdown-body ul li {
-  display: flex;
-  gap: 0.75rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.markdown-body ul li::before {
-  content: '▪';
-  color: #00FFFF;
-  margin-top: 0.15rem;
-  font-weight: 900;
-  font-size: 1.2rem;
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  margin: 3rem 0;
+  display: block;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .markdown-body blockquote {
-  border-left: 6px solid #CCFF00;
-  padding-left: 1.5rem;
-  color: #fff;
   font-style: italic;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1rem 1.5rem;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-/* ===== VINYL CRATE / INFLUENCES PAGE STYLES ===== */
-
-/* Brutalist vinyl crate container */
-.vinyl-crate-brutal {
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #3E2723 0px,
-      #382119 2px,
-      #3E2723 4px,
-      #362018 6px
-    ),
-    linear-gradient(135deg, #3E2723 0%, #2E1A12 100%);
-  border: 8px solid #000;
-  box-shadow:
-    inset 0 12px 20px rgba(0, 0, 0, 0.6),
-    inset 0 -8px 12px rgba(0, 0, 0, 0.4),
-    12px 12px 0 #000;
-  padding: 3rem 1.5rem;
-  position: relative;
-  overflow: hidden;
+.markdown-body ul,
+.markdown-body ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Wood grain texture overlay */
-.vinyl-crate-brutal::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      rgba(0, 0, 0, 0.1) 1px,
-      transparent 2px,
-      transparent 8px
-    );
-  opacity: 0.3;
-  pointer-events: none;
+.markdown-body li {
+  margin-bottom: 0.5rem;
 }
 
-/* Vinyl record spine - thin vertical view */
-.vinyl-spine {
-  width: 55px;
-  height: 240px;
-  background: #FFF;
-  border: 4px solid #000;
-  border-left-style: solid;
-  box-shadow: 4px 4px 0 #000;
-  position: relative;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
-  overflow: hidden;
+.markdown-body a {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 4px;
+  transition: all 0.2s ease;
 }
 
-.vinyl-spine.center {
-  transform: translateY(-20px) scale(1.05);
-  box-shadow: 6px 6px 0 #000;
-  z-index: 10;
-}
-
-.vinyl-spine .spine-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  padding: 16px 6px;
-}
-
-.vinyl-spine .spine-artist {
-  font-weight: 900;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #000;
-  text-align: center;
-  line-height: 1.4;
-  word-break: break-word;
-  hyphens: auto;
-  padding: 0 2px;
-}
-
-/* Vinyl card - full album art + metadata */
-.vinyl-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 350px;
-}
-
-.vinyl-art {
-  width: 300px;
-  height: 300px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.vinyl-art-large {
-  width: 450px;
-  height: 450px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.vinyl-metadata {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Crate container */
-.vinyl-crate-container {
-  width: 100%;
-  max-width: 900px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #3E2723 0px,
-      #382119 2px,
-      #3E2723 4px,
-      #362018 6px
-    ),
-    linear-gradient(135deg, #3E2723 0%, #2E1A12 100%);
-  border: 8px solid #000;
-  box-shadow:
-    inset 0 12px 20px rgba(0, 0, 0, 0.6),
-    inset 0 -8px 12px rgba(0, 0, 0, 0.4),
-    12px 12px 0 #000;
-  padding: 2rem 1rem;
-  position: relative;
-}
-
-/* Old vinyl record styles (deprecated, keeping for compatibility) */
-.vinyl-record-brutal {
-  width: 180px;
-  height: 180px;
-  border: 6px solid #000;
-  box-shadow: 8px 8px 0 #000;
-  position: relative;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
-}
-
-.vinyl-record-brutal.center {
-  transform: scale(1.2) translateY(-20px);
-  z-index: 10;
-}
-
-.vinyl-record-brutal.adjacent {
-  transform: scale(0.8);
-  opacity: 0.6;
-}
-
-/* Pink price sticker */
-.brutal-sticker {
-  background: #FF1493;
-  border: 3px solid #000;
-  box-shadow: 3px 3px 0 #000;
-  padding: 4px 8px;
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #000;
-  letter-spacing: 0.05em;
-}
-
-/* Sharpie note */
-.sharpie-brutal {
-  font-family: 'Permanent Marker', cursive, 'VT323', monospace;
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #000;
-  padding: 3px 8px;
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  transform: rotate(2deg);
-  font-size: 11px;
-  font-weight: 700;
-  color: #000;
-}
-
-/* Navigation arrow buttons */
-.crate-arrow {
-  width: 60px;
-  height: 60px;
-  background: #FF1493;
-  border: 6px solid #000;
-  box-shadow: 6px 6px 0 #000;
-  font-size: 24px;
-  font-weight: 900;
-  color: #000;
-  cursor: pointer;
-  transition: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.crate-arrow:hover:not(:disabled) {
-  background: #000;
-  color: #FF1493;
-}
-
-.crate-arrow:active:not(:disabled) {
-  box-shadow: 3px 3px 0 #000;
-  transform: translate(3px, 3px);
-}
-
-.crate-arrow:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-/* Flip animations */
-@keyframes flip-left {
-  from {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100%) scale(0.8);
-    opacity: 0;
-  }
-}
-
-@keyframes flip-right {
-  from {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%) scale(0.8);
-    opacity: 0;
-  }
-}
-
-.flip-left {
-  animation: flip-left 0.3s ease-out forwards;
-}
-
-.flip-right {
-  animation: flip-right 0.3s ease-out forwards;
-}
-
-/* Record pull-out overlay */
-.record-detail-overlay {
-  backdrop-filter: blur(8px);
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .vinyl-record-brutal {
-    width: 140px;
-    height: 140px;
-  }
-
-  .vinyl-art-large {
-    width: 320px;
-    height: 320px;
-  }
-
-  .vinyl-crate-brutal {
-    padding: 2rem 0.5rem;
-  }
-
-  .crate-arrow {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
+.markdown-body a:hover {
+  text-decoration-color: #fff;
+  font-style: italic;
 }
