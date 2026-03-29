@@ -7,8 +7,6 @@ summary: "A macOS Mixcloud player with Showa-era Ultraman aesthetics and evolvin
 tags: [macos, music, mixcloud, shaders, claude-code, personal-project]
 ---
 
-## Acid Music Player
-
 > The fastest way to build something meaningful for everyone might be to begin by building for yourself.
 
 **Link:** [Original post on X](https://x.com/marv1nnnnn1/status/2013652932508688656)

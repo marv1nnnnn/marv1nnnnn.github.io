@@ -7,8 +7,6 @@ summary: "A minimalist AI orchestration framework for VS Code, featuring a Navig
 tags: [vibe-coding, ai, orchestration, vscode, agents, productivity]
 ---
 
-# 🚀 rooroo (如如): Minimalist AI Orchestration with Specialist Agents 🚀
-
 **Source:** [rooroo](https://github.com/marv1nnnnn/rooroo)
 
 `rooroo` is a **minimalist AI orchestration framework** for VS Code, designed to streamline software development using a team of specialized Rooroo agents. It emphasizes a clear, Navigator-led workflow, efficient task management, and robust communication, all while incorporating advanced prompting techniques for enhanced reliability.

@@ -7,8 +7,6 @@ summary: "The fastest way to build something meaningful for everyone might be to
 tags: [talk, philosophy, vibe-coding, youware, personal-project]
 ---
 
-## Build for Yourself
-
 > The fastest way to build something meaningful for everyone might be to begin by building for yourself.
 
 **Link:** [youbuild-hackathon-marvin.youware.app](https://youbuild-hackathon-marvin.youware.app/)

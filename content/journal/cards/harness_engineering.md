@@ -6,8 +6,6 @@ summary: "Code is mass-producible now. The industry is pouring energy into makin
 tags: [ai, coding-agents, harness-engineering, opinion, essay]
 ---
 
-## Harness Engineering: Same Old Story
-
 **Original post:** [x.com/marv1nnnnn1](https://x.com/marv1nnnnn1/status/2034262240422134053)
 
 ---

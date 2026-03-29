@@ -7,8 +7,6 @@ summary: "A hands-on workshop and talk at Adventure X, China's largest hackathon
 tags: [workshop, talk, hackathon, creative-coding, adventure-x]
 ---
 
-## Vibe is All You Need
-
 Invited workshop and talk at Adventure X, the largest hackathon in China, held on July 26, 2025. The session focused on rapid prototyping, improvisational design, and the power of 'vibe' in collaborative creative processes.
 
 **Link:** [marv1nnnnn.github.io/adventurex_vibe](https://marv1nnnnn.github.io/adventurex_vibe/)

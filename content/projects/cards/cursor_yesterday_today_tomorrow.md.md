@@ -7,8 +7,6 @@ summary: "Opening talk at the inaugural Cursor Meetup in Shenzhen—the first Cu
 tags: [talk, community, cursor, china, meetup]
 ---
 
-## Cursor: Yesterday, Today, Tomorrow
-
 > This is the first speech delivered at Cursor Meetup Shenzhen, marking the very first Cursor community meetup in China.
 
 **Slides & Source:** [marvin-cursor-share](https://marvin-cursor-share.vercel.app/1)

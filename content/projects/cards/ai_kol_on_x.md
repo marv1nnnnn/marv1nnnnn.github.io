@@ -7,8 +7,6 @@ summary: "An interactive visualization tool that maps how information flows betw
 tags: [visualization, data, network-analysis, d3js, python, nextjs]
 ---
 
-## AI KOL Network Analysis
-
 > Who influences the AI conversation? And how does information really flow between communities?
 
 **Live Demo:** [ai-kol-network-analysis.youware.app](https://ai-kol-network-analysis.youware.app/)

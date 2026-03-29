@@ -7,8 +7,6 @@ summary: "A hands-on workshop introducing Vibe Coding at CityUHK's Hack4SDG seri
 tags: [workshop, vibe-coding, ai, youware, cityuhk, hackathon]
 ---
 
-## Hack4sdg workshop
-
 Workshop at the Hack4SDG Workshop Series hosted by City University of Hong Kong on September 25, 2025. The session introduced Vibe Coding as an innovative method for turning abstract ideas into working prototypes using generative AI, regardless of technical background.
 
 **Event:** [Hack4SDG Workshop Series @ CityUHK](https://www.cityu.edu.hk/ted/workshops/20250925_hack4sdg/)
