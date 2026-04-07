@@ -1,0 +1,34 @@
+{
+  "id": "agent-sandbox-isolation",
+  "name": "Agent Sandbox Isolation",
+  "type": "concept",
+  "description": "Two-layer isolation model for agent workloads: an OS sandbox around the agent process itself, and a stronger execution boundary around the entire environment, designed to contain blast radius from prompt injection or compromised agents.",
+  "sources": [
+    "https://x.com/larsencc/status/2027225210412470668",
+    "https://opencomputer.dev/blog/where-should-the-agent-live"
+  ],
+  "createdAt": 1772522057379,
+  "updatedAt": 1774400936164,
+  "edges": [
+    {
+      "to": "control-plane-pattern",
+      "quote": "Isolate the agent. The entire agent runs in a sandbox with zero secrets. It talks to the outside world through a control plane that holds all the credentials",
+      "source": "https://x.com/larsencc/status/2027225210412470668"
+    },
+    {
+      "to": "input-hardening",
+      "quote": "Always assume inputs can be adversarial.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "control-plane-pattern",
+      "quote": "A common answer is to give the sandbox only a short-lived session token and route privileged operations through a proxy or control plane",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live"
+    },
+    {
+      "to": "agentic-workload",
+      "quote": "Agents introduce a new set of deployment needs and constraints",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live"
+    }
+  ]
+}

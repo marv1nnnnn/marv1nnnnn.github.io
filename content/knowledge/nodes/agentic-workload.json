@@ -1,0 +1,18 @@
+{
+  "id": "agentic-workload",
+  "name": "Agentic Workload",
+  "type": "concept",
+  "description": "A class of software workloads fundamentally different from traditional applications, requiring isolated execution, broad tool access, persistent working state, and tight coupling between reasoning and execution to avoid latency from repeated tool calls.",
+  "sources": [
+    "https://opencomputer.dev/blog/where-should-the-agent-live"
+  ],
+  "createdAt": 1774400936164,
+  "updatedAt": 1774400936164,
+  "edges": [
+    {
+      "to": "sandbox-lifecycle-patterns",
+      "quote": "Beyond securing the isolated environment and deciding where to place the agent, there is still the question of how that environment should live over time",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live"
+    }
+  ]
+}

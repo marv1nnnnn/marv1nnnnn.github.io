@@ -1,0 +1,12 @@
+{
+  "id": "nautilus",
+  "name": "Nautilus",
+  "type": "product",
+  "description": "Patek Philippe watch launched in 1976 with highly recognizable, brand-forward design.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": []
+}

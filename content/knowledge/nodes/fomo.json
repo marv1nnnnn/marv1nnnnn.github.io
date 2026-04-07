@@ -1,0 +1,18 @@
+{
+  "id": "fomo",
+  "name": "FOMO",
+  "type": "concept",
+  "description": "Fear of missing out — anxiety-driven compulsion to consume more content faster",
+  "sources": [
+    "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+  ],
+  "createdAt": 1772521918192,
+  "updatedAt": 1772521918192,
+  "edges": [
+    {
+      "to": "1x-speed-consumption",
+      "quote": "why do we want to consume things faster? The answer, if we're being honest, usually comes down to FOMO or anxiety (or a mix of both)",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+    }
+  ]
+}

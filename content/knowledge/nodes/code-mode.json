@@ -1,0 +1,23 @@
+{
+  "id": "code-mode",
+  "name": "Code Mode",
+  "type": "concept",
+  "description": "Pattern where LLMs write and execute code to combine tool calls directly rather than shuttling intermediate results back through the model via conventional tool calling, reducing tokens by orders of magnitude (e.g., 1,000 vs 1.17 million tokens for Cloudflare API)",
+  "sources": [
+    "https://sunilpai.dev/posts/after-wimp/"
+  ],
+  "createdAt": 1773649285547,
+  "updatedAt": 1773649285547,
+  "edges": [
+    {
+      "to": "model-inhabiting-state",
+      "quote": "the model stops trying to generate the program and starts inhabiting the state machine",
+      "source": "https://sunilpai.dev/posts/after-wimp/"
+    },
+    {
+      "to": "mcp",
+      "quote": "the Cloudflare API MCP server exposes access to the entire API using essentially two tools, search() and execute(), while consuming around 1,000 tokens",
+      "source": "https://sunilpai.dev/posts/after-wimp/"
+    }
+  ]
+}

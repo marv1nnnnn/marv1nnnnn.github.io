@@ -1,0 +1,33 @@
+{
+  "id": "patek-philippe",
+  "name": "Patek Philippe",
+  "type": "company",
+  "description": "Prestigious Swiss watchmaker that successfully pivoted toward brand-centric strategy.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "golden-ellipse",
+      "quote": "In 1968 (that year again) Patek Philippe launched a new watch that shifted the center of gravity of case design... The result was a striking new model called the Golden Ellipse.",
+      "source": "https://paulgraham.com/brandage.html"
+    },
+    {
+      "to": "brand-advertising",
+      "quote": "To encourage them, Patek did something that none of the holy trinity had done much of before: brand advertising.",
+      "source": "https://paulgraham.com/brandage.html"
+    },
+    {
+      "to": "g-rald-genta",
+      "quote": "Encouraged by the success of the Royal Oak, Patek Philippe commissioned Gérald Genta in 1974 to design a similar watch for them.",
+      "source": "https://paulgraham.com/brandage.html"
+    },
+    {
+      "to": "nautilus",
+      "quote": "It was called the Nautilus, and it launched at the Basel Watch Fair in 1976.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

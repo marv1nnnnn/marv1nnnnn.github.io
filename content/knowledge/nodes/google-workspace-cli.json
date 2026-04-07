@@ -1,0 +1,68 @@
+{
+  "id": "google-workspace-cli",
+  "name": "Google Workspace CLI",
+  "type": "product",
+  "description": "An agents-first CLI (gws) designed for Google Workspace APIs with machine-readable I/O, schema introspection, input hardening, safety rails, and multi-surface interfaces.",
+  "sources": [
+    "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+  ],
+  "createdAt": 1772766080286,
+  "updatedAt": 1772766080286,
+  "edges": [
+    {
+      "to": "agent-dx",
+      "quote": "I built a CLI for Google Workspace — agents first.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "machine-readable-output",
+      "quote": "Agents don’t need GUIs. They need deterministic, machine-readable output",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "schema-introspection",
+      "quote": "The better pattern: make the CLI itself the documentation, queryable at runtime.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "input-hardening",
+      "quote": "Input Hardening Against Hallucinations",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "context-window-discipline",
+      "quote": "Context Window Discipline",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "skill-md-files",
+      "quote": "`gws` ships 100+ `SKILL.md` files",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "mcp",
+      "quote": "MCP (Model Context Protocol): `gws mcp --services drive,gmail` exposes all commands as JSON-RPC tools over stdio.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "gemini-cli-extension",
+      "quote": "Gemini CLI Extension: `gemini extensions install https://github.com/googleworkspace/cli` installs the binary as a native capability of the agent.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "environment-variable-auth",
+      "quote": "`GOOGLE_WORKSPACE_CLI_TOKEN` and `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` enable credential injection via environment",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "dry-run",
+      "quote": "`--dry-run` validates the request locally without hitting the API.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "response-sanitization",
+      "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor before returning them to the agent.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    }
+  ]
+}

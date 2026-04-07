@@ -1,0 +1,12 @@
+{
+  "id": "evaluation-crisis",
+  "name": "Evaluation Crisis",
+  "type": "concept",
+  "description": "The inability to meaningfully compare scaffold-based systems (Claude Code, Codex, Cursor, Antigravity) because benchmarks were designed for raw model capability, not scaffolded systems. A consequence of the 'language model purist' view.",
+  "sources": [
+    "https://alexzhang13.github.io/blog/2026/scaffold/"
+  ],
+  "createdAt": 1774494446115,
+  "updatedAt": 1774494446115,
+  "edges": []
+}

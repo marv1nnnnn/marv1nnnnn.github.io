@@ -1,0 +1,1792 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "1x-speed-consumption",
+      "name": "1x Speed Consumption",
+      "type": "concept",
+      "description": "Philosophy of consuming all content (podcasts, videos, audiobooks) at normal speed as a quality filter for what deserves attention",
+      "sources": [
+        "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+      ],
+      "createdAt": 1772521918192,
+      "updatedAt": 1772521918192
+    },
+    {
+      "id": "acceptance-criteria",
+      "name": "Acceptance Criteria",
+      "type": "concept",
+      "description": "Human-defined conditions for task success used as primary verification gates.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "agent-dx",
+      "name": "Agent DX",
+      "type": "concept",
+      "description": "Developer experience for AI agents emphasizing predictability, machine-readability, and defense-in-depth.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "agent-frameworks",
+      "name": "Agent frameworks",
+      "type": "technology",
+      "description": "Frameworks for running software agents, including permission and access controls.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "agent-placement",
+      "name": "Agent Placement",
+      "type": "concept",
+      "description": "Architectural decision about where an AI agent process runs relative to its tool-execution environment—outside the sandbox, inside it, or in a hybrid configuration—affecting latency, security, and system complexity.",
+      "sources": [
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1774400936164,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "agent-sandbox-isolation",
+      "name": "Agent Sandbox Isolation",
+      "type": "concept",
+      "description": "Two-layer isolation model for agent workloads: an OS sandbox around the agent process itself, and a stronger execution boundary around the entire environment, designed to contain blast radius from prompt injection or compromised agents.",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668",
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "agentgateway-protocol",
+      "name": "AgentGateway Protocol",
+      "type": "concept",
+      "description": "Interface abstraction allowing agents to use either a control plane HTTP backend or direct local calls without code changes",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1772522057379
+    },
+    {
+      "id": "agentic-workload",
+      "name": "Agentic Workload",
+      "type": "concept",
+      "description": "A class of software workloads fundamentally different from traditional applications, requiring isolated execution, broad tool access, persistent working state, and tight coupling between reasoning and execution to avoid latency from repeated tool calls.",
+      "sources": [
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1774400936164,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "aggregators",
+      "name": "aggregators",
+      "type": "concept",
+      "description": "Mega-companies that control distribution needed by smaller businesses and therefore capture much of the economic value created by broader market activity.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "ai-adoption",
+      "name": "AI adoption",
+      "type": "concept",
+      "description": "The adoption of AI is framed as a force that will increase economic concentration rather than fragment markets, creating fewer, larger companies.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead",
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "ai-assisted-large-scale-development",
+      "name": "AI-assisted Large-scale Development",
+      "type": "concept",
+      "description": "Using AI coding tools (like Claude Code) to accomplish massive implementation work (e.g., 14,000-line PRs) that would otherwise take months, while humans focus on architecture, API design, and review. Exemplified by Matteo Collina's Node.js virtual file system PR.",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "ai-generated-code",
+      "name": "AI-generated code",
+      "type": "concept",
+      "description": "Code produced by AI systems, described as often requiring significant review effort.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "all-or-nothing-permissions",
+      "name": "All-or-nothing permissions",
+      "type": "concept",
+      "description": "A coarse permission model where agents either get broad access or none.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "ankit-jain",
+      "name": "Ankit Jain",
+      "type": "person",
+      "description": "Founder and CEO of Aviator; author credited in the post bio.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "anne-lamott",
+      "name": "Anne Lamott",
+      "type": "person",
+      "description": "Author quoted on the value of unplugging and rest",
+      "sources": [
+        "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+      ],
+      "createdAt": 1772521918192,
+      "updatedAt": 1772521918192
+    },
+    {
+      "id": "audemars-piguet",
+      "name": "Audemars Piguet",
+      "type": "company",
+      "description": "Swiss luxury watchmaker in the holy trinity that advanced branded design through iconic models.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "automated-services-companies",
+      "name": "automated services companies",
+      "type": "concept",
+      "description": "AI-native firms that use agents to perform service work autonomously, allowing fragmented service industries to consolidate around scalable software-like businesses.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "aviator",
+      "name": "Aviator",
+      "type": "company",
+      "description": "Company building infrastructure for AI-native engineering teams and AI adoption.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "aws-lambda",
+      "name": "AWS Lambda",
+      "type": "technology",
+      "description": "Serverless compute service used as Browser Use's initial agent execution environment",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1772522057379
+    },
+    {
+      "id": "behavior-driven-development",
+      "name": "Behavior-Driven Development",
+      "type": "concept",
+      "description": "Method of writing natural-language behavior specs that are automated as tests.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "bitter-lesson-scale",
+      "name": "Bitter Lesson (Scale)",
+      "type": "concept",
+      "description": "Rich Sutton's thesis that scaling compute, data, and model capacity reliably beats clever engineering. Dominated AI strategy from 2017-2025 and drove the rise of OpenAI/Anthropic, but the author argues the second half of the decade calls for a different bet.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "boredom",
+      "name": "Boredom",
+      "type": "concept",
+      "description": "Mental empty space that enables idea generation, processing, and original thought",
+      "sources": [
+        "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+      ],
+      "createdAt": 1772521918192,
+      "updatedAt": 1772521918192
+    },
+    {
+      "id": "brand-advertising",
+      "name": "Brand advertising",
+      "type": "concept",
+      "description": "Advertising strategy emphasizing exclusivity and cost to reinforce luxury brand value.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "brand",
+      "name": "Brand",
+      "type": "concept",
+      "description": "Central force in the essay: value that remains when substantive product differences diminish.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "browser-use",
+      "name": "Browser Use",
+      "type": "company",
+      "description": "Company running millions of web agents, evolved from AWS Lambda to Unikraft micro-VM sandbox architecture",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1772522057379
+    },
+    {
+      "id": "capability-scoped-sandbox",
+      "name": "Capability-scoped sandbox",
+      "type": "concept",
+      "description": "Runtime primitive that begins with nearly no ambient authority and explicitly grants capabilities resource by resource, enabling safe execution of untrusted user-generated code with tight permission control, fast enough for interactive requests",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "code-mode",
+      "name": "Code Mode",
+      "type": "concept",
+      "description": "Pattern where LLMs write and execute code to combine tool calls directly rather than shuttling intermediate results back through the model via conventional tool calling, reducing tokens by orders of magnitude (e.g., 1,000 vs 1.17 million tokens for Cloudflare API)",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "code-review",
+      "name": "Code Review",
+      "type": "concept",
+      "description": "Human approval process for code changes, argued here to be increasingly unscalable in AI-era development.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "context-window-discipline",
+      "name": "Context window discipline",
+      "type": "concept",
+      "description": "Practices to reduce token/context usage for agents by limiting and streaming API responses.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "control-plane-pattern",
+      "name": "Control Plane Pattern",
+      "type": "concept",
+      "description": "Architectural pattern where a privileged external service manages credentials, routes privileged operations, and mediates access between the untrusted sandbox and external services.",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668",
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "data-effects",
+      "name": "data effects",
+      "type": "concept",
+      "description": "A mechanism in AI applications where larger proprietary datasets expand what a product can do, not just how well it does it, strengthening defensibility and scale advantages.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "defense-in-depth",
+      "name": "Defense-in-depth",
+      "type": "concept",
+      "description": "Layered safeguards in CLI design for untrusted or error-prone agent operation.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "design",
+      "name": "Design",
+      "type": "concept",
+      "description": "In the essay, pursuit of optimal solutions that tends to converge, contrasted with branding’s need for distinctiveness.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "discovery-document",
+      "name": "Discovery Document",
+      "type": "technology",
+      "description": "Google API Discovery Doc used as a dynamic source of truth for method schemas and tool generation.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "distribution-bottleneck",
+      "name": "distribution bottleneck",
+      "type": "concept",
+      "description": "The idea that AI makes software easier to build but does not make distribution easier, making access to customers the key constraint.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "dry-run",
+      "name": "Dry-run",
+      "type": "concept",
+      "description": "Local request validation mode to verify operations before making API calls.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "economic-concentration",
+      "name": "economic concentration",
+      "type": "concept",
+      "description": "The long-run concentration of value, revenue, profit, and capital into a small set of top firms, which the essay argues AI will intensify.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "environment-variable-auth",
+      "name": "Environment variable auth",
+      "type": "concept",
+      "description": "Headless credential injection via environment variables for agent authentication.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "ephemeral-software",
+      "name": "Ephemeral Software",
+      "type": "concept",
+      "description": "Software that is generated on-demand by AI agents, performs its task, and then disappears — never stored, versioned, or named. Described as software turning into a liquid that 'drips into every nook and cranny and then evaporates.'",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "evaluation-crisis",
+      "name": "Evaluation Crisis",
+      "type": "concept",
+      "description": "The inability to meaningfully compare scaffold-based systems (Claude Code, Codex, Cursor, Antigravity) because benchmarks were designed for raw model capability, not scaffolded systems. A consequence of the 'language model purist' view.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "fast-vs-smart-model-tradeoff",
+      "name": "Fast-vs-Smart Model Tradeoff",
+      "type": "concept",
+      "description": "The tension between using faster but less capable local models (like Qwen 35B) versus slower but smarter cloud models (like Opus 4.6). Faster models allow extra iteration cycles, but smarter models may reach correct results faster overall.",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "field-masks",
+      "name": "Field masks",
+      "type": "concept",
+      "description": "Selective response fields mechanism to reduce payload size.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "fomo",
+      "name": "FOMO",
+      "type": "concept",
+      "description": "Fear of missing out — anxiety-driven compulsion to consume more content faster",
+      "sources": [
+        "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+      ],
+      "createdAt": 1772521918192,
+      "updatedAt": 1772521918192
+    },
+    {
+      "id": "formal-verification",
+      "name": "Formal Verification",
+      "type": "concept",
+      "description": "Mathematical proof of software correctness checked mechanically, providing guarantees beyond what testing can offer",
+      "sources": [
+        "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+      ],
+      "createdAt": 1772604380714,
+      "updatedAt": 1772604380714
+    },
+    {
+      "id": "friction-as-feature",
+      "name": "Friction as Feature",
+      "type": "concept",
+      "description": "The idea that human involvement, slowness, and process friction are sometimes the point rather than a problem to be automated away. Contrasts with the impulse to replace all friction with AI-based decision-making.",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "g-rald-genta",
+      "name": "Gérald Genta",
+      "type": "person",
+      "description": "Renowned designer commissioned by Audemars Piguet and Patek Philippe for iconic sports-luxury watch designs.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "gemini-cli-extension",
+      "name": "Gemini CLI Extension",
+      "type": "technology",
+      "description": "Extension surface that installs the CLI as a native agent capability.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "golden-ellipse",
+      "name": "Golden Ellipse",
+      "type": "product",
+      "description": "Patek Philippe model introduced in 1968, notable for distinctive case design as brand expression.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "google-cloud-model-armor",
+      "name": "Google Cloud Model Armor",
+      "type": "technology",
+      "description": "Sanitization service used to process API responses for safety.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "google-workspace-cli",
+      "name": "Google Workspace CLI",
+      "type": "product",
+      "description": "An agents-first CLI (gws) designed for Google Workspace APIs with machine-readable I/O, schema introspection, input hardening, safety rails, and multi-surface interfaces.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "human-dx",
+      "name": "Human DX",
+      "type": "concept",
+      "description": "Developer experience for humans emphasizing discoverability and forgiveness.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "input-hardening",
+      "name": "Input hardening",
+      "type": "concept",
+      "description": "Validation and sanitization of CLI inputs to defend against hallucinated or adversarial agent inputs.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "intentionality",
+      "name": "Intentionality",
+      "type": "concept",
+      "description": "Deliberately choosing what to consume based on genuine value rather than optimizing for throughput",
+      "sources": [
+        "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+      ],
+      "createdAt": 1772521918192,
+      "updatedAt": 1772521918192
+    },
+    {
+      "id": "internal-coordination-costs",
+      "name": "internal coordination costs",
+      "type": "concept",
+      "description": "The organizational costs of managing activity within firms; the essay argues AI sharply lowers these costs by reducing required headcount and doing more work directly.",
+      "sources": [
+        "https://x.com/danhockenmaier/status/2034698196098978012"
+      ],
+      "createdAt": 1773985444665,
+      "updatedAt": 1773985444665
+    },
+    {
+      "id": "language-model-definition",
+      "name": "Language Model Definition",
+      "type": "concept",
+      "description": "Pre-Transformer definition: merely a probabilistic function from text to text. The author argues the conflation of 'language model' with 'neural network' obscures the fact that scaffolds themselves are language models.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "larsen-cundric",
+      "name": "Larsen Cundric",
+      "type": "person",
+      "description": "Author describing Browser Use's evolution to secure, scalable agent sandbox infrastructure",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1772522057379
+    },
+    {
+      "id": "lean",
+      "name": "Lean",
+      "type": "language",
+      "description": "Programming language and theorem prover, de facto choice for AI-based formal verification and mathematical reasoning",
+      "sources": [
+        "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+      ],
+      "createdAt": 1772604380714,
+      "updatedAt": 1772604380714
+    },
+    {
+      "id": "leonardo-de-moura",
+      "name": "Leonardo de Moura",
+      "type": "person",
+      "description": "Creator of Lean, argues formal verification must scale with AI code generation",
+      "sources": [
+        "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+      ],
+      "createdAt": 1772604380714,
+      "updatedAt": 1772604380714
+    },
+    {
+      "id": "machine-readable-output",
+      "name": "Machine-readable output",
+      "type": "concept",
+      "description": "CLI output format optimized for programmatic consumption, such as JSON/NDJSON.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "mcp",
+      "name": "MCP",
+      "type": "technology",
+      "description": "Model Context Protocol used for tool integration; code mode applied to MCP dramatically reduces token consumption by exposing APIs through minimal tool surfaces like search() and execute()",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "mechanical-watches",
+      "name": "Mechanical watches",
+      "type": "product",
+      "description": "Traditional watches whose market role shifted from precision instruments to status symbols.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "model-inhabiting-state",
+      "name": "Model inhabiting state",
+      "type": "concept",
+      "description": "Pattern where instead of generating a new application, an LLM analyzes an existing stateful environment and uses code as the mechanism of interaction—reading and mutating state rather than scaffolding fresh programs",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "nautilus",
+      "name": "Nautilus",
+      "type": "product",
+      "description": "Patek Philippe watch launched in 1976 with highly recognizable, brand-forward design.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "ndjson",
+      "name": "NDJSON",
+      "type": "technology",
+      "description": "Newline-delimited JSON streaming format used for incremental page processing.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "neural-language-model",
+      "name": "Neural Language Model",
+      "type": "concept",
+      "description": "End-to-end neural network models (e.g., Opus 4.6, Qwen3-8B) that map text to text. Traditionally the exclusive focus of scaling efforts, but the author argues they are severely underutilized without scaffolding.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "omega",
+      "name": "Omega",
+      "type": "company",
+      "description": "Swiss watchmaker that focused on performance improvements and became insolvent during the crisis.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "opencomputer",
+      "name": "OpenComputer",
+      "type": "company",
+      "description": "Platform building long-running cloud infrastructure for AI agents, taking a middle path between long-lived and hybrid sandbox lifecycle designs with pause/resume and external state persistence.",
+      "sources": [
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1774400936164,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "patek-philippe",
+      "name": "Patek Philippe",
+      "type": "company",
+      "description": "Prestigious Swiss watchmaker that successfully pivoted toward brand-centric strategy.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "procedural-expressibility",
+      "name": "Procedural expressibility",
+      "type": "concept",
+      "description": "The emerging ability of non-programmers to describe procedures via natural language that LLMs can compile into runnable code, weakening the decades-old divide between programmers and interface consumers",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "prompt-injection",
+      "name": "Prompt injection",
+      "type": "concept",
+      "description": "Malicious instructions embedded in retrieved data that can manipulate agent behavior.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "quartz-crisis",
+      "name": "Quartz crisis",
+      "type": "concept",
+      "description": "The multi-factor disruption of the Swiss watch industry in the 1970s, including Japanese competition, currency shock, and quartz movements.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "quartz-movements",
+      "name": "Quartz movements",
+      "type": "technology",
+      "description": "Watch movement technology that made accurate timekeeping cheaper, more accurate, and thinner than mechanical alternatives.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "recursive-language-models",
+      "name": "Recursive Language Models",
+      "type": "concept",
+      "description": "A proposed class of language models that achieve near-infinite input, output, and reasoning context by scaffolding neural LMs with recursive self-calls inside a REPL. Formalized in the author's 2025 preprint.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "red-queen-hypothesis-startups",
+      "name": "Red Queen Hypothesis (Startups)",
+      "type": "concept",
+      "description": "Adapted from Leigh Van Valen's evolutionary biology concept: when new startup methods are quickly adopted by everyone, no one gains relative advantage and success rates stay flat. Startups must develop novel, differentiating strategies before competitors catch up.",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "ren-bittel",
+      "name": "René Bittel",
+      "type": "person",
+      "description": "Head of Patek Philippe's ad agency, credited with positioning the hobnail Calatrava as a brand signature.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "response-sanitization",
+      "name": "Response sanitization",
+      "type": "concept",
+      "description": "Filtering API responses before agent consumption to mitigate malicious prompt content.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "royal-oak",
+      "name": "Royal Oak",
+      "type": "product",
+      "description": "Audemars Piguet steel luxury watch launched in 1972 as a bold branded design.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "sandbox-lifecycle-patterns",
+      "name": "Sandbox Lifecycle Patterns",
+      "type": "concept",
+      "description": "How agent compute environments live over time: ephemeral (created and destroyed per task), long-running (persistent across interactions), hybrid (paused/resumed with preserved state), or shared containers (multi-agent co-tenancy).",
+      "sources": [
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1774400936164,
+      "updatedAt": 1774400936164
+    },
+    {
+      "id": "scaffold",
+      "name": "Scaffold",
+      "type": "concept",
+      "description": "A system built around a neural language model that extends its capabilities (e.g., recursive self-calls, REPL interaction, infinite context). The author argues scaffolds ARE the future form of language models, not mere wrappers.",
+      "sources": [
+        "https://alexzhang13.github.io/blog/2026/scaffold/"
+      ],
+      "createdAt": 1774494446115,
+      "updatedAt": 1774494446115
+    },
+    {
+      "id": "schema-introspection",
+      "name": "Schema introspection",
+      "type": "concept",
+      "description": "Runtime-queryable method signatures and types exposed by the CLI instead of relying on static docs.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1772766080286
+    },
+    {
+      "id": "skill-md-files",
+      "name": "SKILL.md files",
+      "type": "concept",
+      "description": "Files that distill a person's preferences, taste, judgment, and experiences into a format consumable by AI models to help them produce work aligned with the author's style and standards.",
+      "sources": [
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1772766080286,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "spec-driven-development",
+      "name": "Spec-driven development",
+      "type": "concept",
+      "description": "Engineering discipline where precise specifications define what software must do, becoming core as AI takes over implementation",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead",
+        "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772604270442
+    },
+    {
+      "id": "specification",
+      "name": "Specification",
+      "type": "concept",
+      "description": "The source-of-truth artifact defining behavior, constraints, and verification expectations.",
+      "sources": [
+        "https://www.latent.space/p/reviews-dead"
+      ],
+      "createdAt": 1772546664639,
+      "updatedAt": 1772546664639
+    },
+    {
+      "id": "swiss-watch-industry",
+      "name": "Swiss watch industry",
+      "type": "concept",
+      "description": "Industry that underwent a major transformation during and after the quartz crisis, shifting from precision performance to luxury branding.",
+      "sources": [
+        "https://paulgraham.com/brandage.html"
+      ],
+      "createdAt": 1772766032016,
+      "updatedAt": 1772766032016
+    },
+    {
+      "id": "unikraft",
+      "name": "Unikraft",
+      "type": "technology",
+      "description": "Micro-VM platform providing scale-to-zero, sub-second boot, and multi-metro distribution for agent sandboxing",
+      "sources": [
+        "https://x.com/larsencc/status/2027225210412470668"
+      ],
+      "createdAt": 1772522057379,
+      "updatedAt": 1772522057379
+    },
+    {
+      "id": "user-specific-software",
+      "name": "User-specific software",
+      "type": "concept",
+      "description": "Persistent per-user runtime logic attached to accounts/sessions that assembles interfaces, adapts behavior, and synthesizes application code at runtime—going beyond personalization to give each user a somewhat different program",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "vibe-coded-automation",
+      "name": "Vibe-coded Automation",
+      "type": "concept",
+      "description": "Non-programmers using AI agents to create functional software solving real problems (e.g., Bluetooth torque wrench data recording), bypassing expensive specialized tools and traditional software development.",
+      "sources": [
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+      ],
+      "createdAt": 1774243074123,
+      "updatedAt": 1774243074123
+    },
+    {
+      "id": "wimp-model",
+      "name": "WIMP model",
+      "type": "concept",
+      "description": "Windows, Icons, Menus, Pointer paradigm originating from Xerox PARC that organized computing around pre-authored graphical interfaces, splitting users into programmers (who issue procedures) and everyone else (who choose from menus of pre-built actions)",
+      "sources": [
+        "https://sunilpai.dev/posts/after-wimp/"
+      ],
+      "createdAt": 1773649285547,
+      "updatedAt": 1773649285547
+    },
+    {
+      "id": "zero-secret-sandbox",
+      "name": "Zero-Secret Sandbox",
+      "type": "concept",
+      "description": "Security pattern where the agent inside the sandbox holds no credentials at all; every privileged operation including model inference is routed through an external control plane that owns secrets on the agent's behalf.",
+      "sources": [
+        "https://opencomputer.dev/blog/where-should-the-agent-live"
+      ],
+      "createdAt": 1774400936164,
+      "updatedAt": 1774400936164
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-1",
+      "from": "1x-speed-consumption",
+      "to": "boredom",
+      "quote": "Your brain needs empty space too. This is the part we've collectively forgotten. Boredom is a feature, not a bug.",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/",
+      "createdAt": 1772521918192
+    },
+    {
+      "id": "E-2",
+      "from": "1x-speed-consumption",
+      "to": "intentionality",
+      "quote": "if something isn't worth consuming at 1x, it's not worth consuming at all",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/",
+      "createdAt": 1772521918192
+    },
+    {
+      "id": "E-3",
+      "from": "agent-dx",
+      "to": "human-dx",
+      "quote": "Human DX optimizes for discoverability and forgiveness.\n\nAgent DX optimizes for predictability and defense-in-depth.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-4",
+      "from": "agent-frameworks",
+      "to": "all-or-nothing-permissions",
+      "quote": "Most agent frameworks treat permissions as an all-or-nothing setting.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-5",
+      "from": "agent-placement",
+      "to": "agent-sandbox-isolation",
+      "quote": "Once isolation is a given, the next design choice is where the agent should live relative to the environment where code actually executes",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    },
+    {
+      "id": "E-6",
+      "from": "agent-placement",
+      "to": "agentic-workload",
+      "quote": "agent placement is a performance decision as much as a security one",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    },
+    {
+      "id": "E-7",
+      "from": "agent-sandbox-isolation",
+      "to": "control-plane-pattern",
+      "quote": "Isolate the agent. The entire agent runs in a sandbox with zero secrets. It talks to the outside world through a control plane that holds all the credentials",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-8",
+      "from": "agent-sandbox-isolation",
+      "to": "input-hardening",
+      "quote": "Always assume inputs can be adversarial.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-9",
+      "from": "agent-sandbox-isolation",
+      "to": "control-plane-pattern",
+      "quote": "A common answer is to give the sandbox only a short-lived session token and route privileged operations through a proxy or control plane",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-10",
+      "from": "agent-sandbox-isolation",
+      "to": "agentic-workload",
+      "quote": "Agents introduce a new set of deployment needs and constraints",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-11",
+      "from": "agentic-workload",
+      "to": "sandbox-lifecycle-patterns",
+      "quote": "Beyond securing the isolated environment and deciding where to place the agent, there is still the question of how that environment should live over time",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    },
+    {
+      "id": "E-12",
+      "from": "aggregators",
+      "to": "economic-concentration",
+      "quote": "Companies like Google, Meta, and Apple control the distribution that all of these new businesses need in order to grow, and as a result, command much of the newly generated economic value.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-13",
+      "from": "ai-adoption",
+      "to": "code-review",
+      "quote": "Teams with high AI adoption complete 21% more tasks and merge 98% more pull requests, but PR review time increases 91%, based on [data](https://www.faros.ai/blog/ai-software-engineering) from over 10,000 developers across 1,255 teams.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-14",
+      "from": "ai-adoption",
+      "to": "economic-concentration",
+      "quote": "AI will drive greater concentration of value into fewer companies and create the biggest businesses of all time.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-15",
+      "from": "ai-adoption",
+      "to": "internal-coordination-costs",
+      "quote": "AI will do this much more powerfully than legacy software, because it won’t just give humans tools to manage more efficiently, it will do a lot of the work itself.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-16",
+      "from": "ai-adoption",
+      "to": "automated-services-companies",
+      "quote": "Automated services companies will get massive, and in doing so, begin to consolidate the fragmented services landscape we see today.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-17",
+      "from": "ai-assisted-large-scale-development",
+      "to": "code-review",
+      "quote": "I didn't write a single line of code. I reviewed it all though and consistently nudged the AI in the right direction",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-18",
+      "from": "ai-generated-code",
+      "to": "code-review",
+      "quote": "developers keep saying that reviewing AI-generated code requires more effort than reviewing code written by their colleagues.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-19",
+      "from": "ai-generated-code",
+      "to": "code-review",
+      "quote": "the defenses we relied on (code review, testing, manual inspection) are the same ones that missed Heartbleed for two years",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-20",
+      "from": "ankit-jain",
+      "to": "aviator",
+      "quote": "_[Ankit Jain](https://www.linkedin.com/in/ankitjaindce/) is the founder and CEO of [Aviator](https://www.aviator.co/), where he’s building the infrastructure for AI-native engineering teams.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-21",
+      "from": "audemars-piguet",
+      "to": "g-rald-genta",
+      "quote": "Audemars Piguet, who in 1970 commissioned the renowned designer Gérald Genta to design their own iconic watch",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-22",
+      "from": "audemars-piguet",
+      "to": "royal-oak",
+      "quote": "The result, launched in 1972, was the Royal Oak.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-23",
+      "from": "automated-services-companies",
+      "to": "economic-concentration",
+      "quote": "Automated services companies will get massive, and in doing so, begin to consolidate the fragmented services landscape we see today.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-24",
+      "from": "aviator",
+      "to": "ai-adoption",
+      "quote": "Aviator’s platform helps modern organizations improve AI adoption while maintaining high engineering standards.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-25",
+      "from": "behavior-driven-development",
+      "to": "specification",
+      "quote": "BDD was always a good idea—write specifications in natural language that describe expected behavior, then automate those specs as tests.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-26",
+      "from": "bitter-lesson-scale",
+      "to": "neural-language-model",
+      "quote": "religiously following this bet is how companies like OpenAI and Anthropic have exploded in valuation since",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-27",
+      "from": "bitter-lesson-scale",
+      "to": "evaluation-crisis",
+      "quote": "the obsession over 'raw model capability' has ironically led to our evaluation metrics being completely off",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-28",
+      "from": "boredom",
+      "to": "intentionality",
+      "quote": "It's where our best ideas — like starting this blog! — come from. It's where you actually process what you've learned, make connections, have original thoughts.",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/",
+      "createdAt": 1772521918192
+    },
+    {
+      "id": "E-29",
+      "from": "brand",
+      "to": "mechanical-watches",
+      "quote": "what the buyer gets in return is an expensive status symbol.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-30",
+      "from": "brand",
+      "to": "design",
+      "quote": "Branding isn't merely orthogonal to good design, but opposed to it.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-31",
+      "from": "browser-use",
+      "to": "aws-lambda",
+      "quote": "We started with browser-only agents on AWS Lambda, where each invocation is isolated, scaling is instant, and there are no secrets to worry about",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-32",
+      "from": "browser-use",
+      "to": "unikraft",
+      "quote": "Each agent gets its own Unikraft micro-VM, booting in under a second. We provision them via Unikraft Cloud's REST API on dedicated bare metal machines in AWS",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-33",
+      "from": "browser-use",
+      "to": "control-plane-pattern",
+      "quote": "We started with Pattern 1 and moved to Pattern 2",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-34",
+      "from": "capability-scoped-sandbox",
+      "to": "user-specific-software",
+      "quote": "once users have access to systems that can generate code on their behalf, the next important question is not just how smart the model is. it is whether our software platforms are prepared to host user-specific code safely, quickly, and with tight control",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-35",
+      "from": "capability-scoped-sandbox",
+      "to": "all-or-nothing-permissions",
+      "quote": "instead of beginning with a miniature server and then trying to constrain it, you begin with an isolate that has almost no ambient authority and then explicitly hand it the capabilities it should have",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-36",
+      "from": "code-mode",
+      "to": "model-inhabiting-state",
+      "quote": "the model stops trying to generate the program and starts inhabiting the state machine",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-37",
+      "from": "code-mode",
+      "to": "mcp",
+      "quote": "the Cloudflare API MCP server exposes access to the entire API using essentially two tools, search() and execute(), while consuming around 1,000 tokens",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-38",
+      "from": "context-window-discipline",
+      "to": "field-masks",
+      "quote": "Field masks limit what the API returns",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-39",
+      "from": "context-window-discipline",
+      "to": "ndjson",
+      "quote": "NDJSON pagination (`--page-all`) emits one JSON object per page, stream-processable without buffering a top-level array.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-40",
+      "from": "control-plane-pattern",
+      "to": "agentgateway-protocol",
+      "quote": "In production, ControlPlaneGateway sends HTTP requests to the control plane. For local development and evals, DirectGateway calls the LLM directly and keeps history in memory. The agent code doesn't know which one it's using",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-41",
+      "from": "data-effects",
+      "to": "economic-concentration",
+      "quote": "For the application layer of AI, the change will come in the form of strengthening data effects, where the larger and more proprietary the dataset, the more value a product can deliver.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-42",
+      "from": "data-effects",
+      "to": "automated-services-companies",
+      "quote": "It’s a race to aggregate as much data and as many completed jobs as possible to enable a product that can do more work at higher accuracy and lower cost.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-43",
+      "from": "distribution-bottleneck",
+      "to": "aggregators",
+      "quote": "it will not make it easier to get distribution, and that will become the bottleneck, allowing aggregators to extract most of the value.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-44",
+      "from": "ephemeral-software",
+      "to": "vibe-coded-automation",
+      "quote": "he used an agent to vibe-code a piece of software to talk to the torque wrenches via Bluetooth and record the data in the spreadsheet he uses",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-45",
+      "from": "ephemeral-software",
+      "to": "ai-generated-code",
+      "quote": "ChatGPT writes tens or hundreds of lines of Python to resize images, create a PDF, or extract data from a CSV —and then throws it away, without anyone even having seen the code",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-46",
+      "from": "fast-vs-smart-model-tradeoff",
+      "to": "ai-generated-code",
+      "quote": "With 3x faster responses, I could add an extra cycle: 'critique the plan and address the critiques.' In the time the hare was still thinking, the tortoise ran another lap",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-47",
+      "from": "fomo",
+      "to": "1x-speed-consumption",
+      "quote": "why do we want to consume things faster? The answer, if we're being honest, usually comes down to FOMO or anxiety (or a mix of both)",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/",
+      "createdAt": 1772521918192
+    },
+    {
+      "id": "E-48",
+      "from": "formal-verification",
+      "to": "ai-generated-code",
+      "quote": "AI is changing the scale and speed of software production faster than our ability to verify it",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html",
+      "createdAt": 1772604380714
+    },
+    {
+      "id": "E-49",
+      "from": "formal-verification",
+      "to": "spec-driven-development",
+      "quote": "As AI takes over implementation, specification becomes the core engineering discipline",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html",
+      "createdAt": 1772604380714
+    },
+    {
+      "id": "E-50",
+      "from": "friction-as-feature",
+      "to": "ai-adoption",
+      "quote": "There's a feeling that all the things that create friction in your life should be automated away. That human involvement should be replaced by AI-based decision-making. Because it is the friction of the process that is the problem. When in fact many times the friction, or that things just take time, is precisely the point",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-51",
+      "from": "golden-ellipse",
+      "to": "brand",
+      "quote": "Because it turned the entire watch into an expression of brand.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-52",
+      "from": "google-workspace-cli",
+      "to": "agent-dx",
+      "quote": "I built a CLI for Google Workspace — agents first.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-53",
+      "from": "google-workspace-cli",
+      "to": "machine-readable-output",
+      "quote": "Agents don’t need GUIs. They need deterministic, machine-readable output",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-54",
+      "from": "google-workspace-cli",
+      "to": "schema-introspection",
+      "quote": "The better pattern: make the CLI itself the documentation, queryable at runtime.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-55",
+      "from": "google-workspace-cli",
+      "to": "input-hardening",
+      "quote": "Input Hardening Against Hallucinations",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-56",
+      "from": "google-workspace-cli",
+      "to": "context-window-discipline",
+      "quote": "Context Window Discipline",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-57",
+      "from": "google-workspace-cli",
+      "to": "skill-md-files",
+      "quote": "`gws` ships 100+ `SKILL.md` files",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-58",
+      "from": "google-workspace-cli",
+      "to": "mcp",
+      "quote": "MCP (Model Context Protocol): `gws mcp --services drive,gmail` exposes all commands as JSON-RPC tools over stdio.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-59",
+      "from": "google-workspace-cli",
+      "to": "gemini-cli-extension",
+      "quote": "Gemini CLI Extension: `gemini extensions install https://github.com/googleworkspace/cli` installs the binary as a native capability of the agent.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-60",
+      "from": "google-workspace-cli",
+      "to": "environment-variable-auth",
+      "quote": "`GOOGLE_WORKSPACE_CLI_TOKEN` and `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` enable credential injection via environment",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-61",
+      "from": "google-workspace-cli",
+      "to": "dry-run",
+      "quote": "`--dry-run` validates the request locally without hitting the API.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-62",
+      "from": "google-workspace-cli",
+      "to": "response-sanitization",
+      "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor before returning them to the agent.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-63",
+      "from": "input-hardening",
+      "to": "defense-in-depth",
+      "quote": "The CLI must be the last line of defense.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-64",
+      "from": "intentionality",
+      "to": "fomo",
+      "quote": "It's about asking what you're trying to get out of all this consumption in the first place. If the answer is just \"more,\" maybe that's worth examining.",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/",
+      "createdAt": 1772521918192
+    },
+    {
+      "id": "E-65",
+      "from": "internal-coordination-costs",
+      "to": "economic-concentration",
+      "quote": "AI means many fewer people will be required to produce a unit of output. This will lower headcount, lower complexity, and cause internal coordination costs to plummet.",
+      "source": "https://x.com/danhockenmaier/status/2034698196098978012",
+      "createdAt": 1773985444665
+    },
+    {
+      "id": "E-66",
+      "from": "language-model-definition",
+      "to": "scaffold",
+      "quote": "the line between a language model and a scaffold is blurring, and the field is once again open to novel ideas on what these scaffolds should look like",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-67",
+      "from": "larsen-cundric",
+      "to": "browser-use",
+      "quote": "We run millions of web agents at Browser Use",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-68",
+      "from": "lean",
+      "to": "formal-verification",
+      "quote": "The platform must be both a programming language and a theorem prover, with code and proofs in one system, with no translation gap",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html",
+      "createdAt": 1772604380714
+    },
+    {
+      "id": "E-69",
+      "from": "leonardo-de-moura",
+      "to": "lean",
+      "quote": "Lean is the result of over twelve years of continuous development. We designed and built every layer from scratch",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html",
+      "createdAt": 1772604380714
+    },
+    {
+      "id": "E-70",
+      "from": "mcp",
+      "to": "discovery-document",
+      "quote": "Under the hood, the MCP server dynamically builds its tool list from the same Discovery Document used for CLI commands.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-71",
+      "from": "model-inhabiting-state",
+      "to": "user-specific-software",
+      "quote": "the intelligence was not in scaffolding a fresh app. it was in understanding an existing stateful environment and using code as the mechanism of interaction with it",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-72",
+      "from": "neural-language-model",
+      "to": "scaffold",
+      "quote": "the language models we interact with in the (near) future will be what we call scaffolds today",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-73",
+      "from": "neural-language-model",
+      "to": "evaluation-crisis",
+      "quote": "How do you begin to evaluate between scaffolds like Claude Code, Codex, Cursor, and Antigravity with anything other than 'vibes'?",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-74",
+      "from": "omega",
+      "to": "quartz-crisis",
+      "quote": "By 1981 they were insolvent and were taken over by their creditors.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-75",
+      "from": "opencomputer",
+      "to": "sandbox-lifecycle-patterns",
+      "quote": "OpenComputer takes a middle path between long-lived and hybrid designs. Where possible, environments are paused and resumed on the same host so they can preserve local state and avoid unnecessary cold starts",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    },
+    {
+      "id": "E-76",
+      "from": "opencomputer",
+      "to": "agent-placement",
+      "quote": "we favor placing the agent inside the isolated compute environment where it will actually execute code. It is usually the fastest and simplest approach",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    },
+    {
+      "id": "E-77",
+      "from": "patek-philippe",
+      "to": "golden-ellipse",
+      "quote": "In 1968 (that year again) Patek Philippe launched a new watch that shifted the center of gravity of case design... The result was a striking new model called the Golden Ellipse.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-78",
+      "from": "patek-philippe",
+      "to": "brand-advertising",
+      "quote": "To encourage them, Patek did something that none of the holy trinity had done much of before: brand advertising.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-79",
+      "from": "patek-philippe",
+      "to": "g-rald-genta",
+      "quote": "Encouraged by the success of the Royal Oak, Patek Philippe commissioned Gérald Genta in 1974 to design a similar watch for them.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-80",
+      "from": "patek-philippe",
+      "to": "nautilus",
+      "quote": "It was called the Nautilus, and it launched at the Basel Watch Fair in 1976.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-81",
+      "from": "procedural-expressibility",
+      "to": "capability-scoped-sandbox",
+      "quote": "if models can write code on behalf of users, where does that code run? ... THAT requires a different kind of runtime primitive",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-82",
+      "from": "quartz-crisis",
+      "to": "swiss-watch-industry",
+      "quote": "In the early 1970s disaster struck the Swiss watch industry. Now people call it the quartz crisis",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-83",
+      "from": "quartz-movements",
+      "to": "mechanical-watches",
+      "quote": "Quartz movements were not only more accurate than any mechanical movement, but thinner too.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-84",
+      "from": "recursive-language-models",
+      "to": "scaffold",
+      "quote": "The argument presented in that paper is a formalized implementation of the theme of this essay",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-85",
+      "from": "red-queen-hypothesis-startups",
+      "to": "ai-adoption",
+      "quote": "when new startup methods are quickly adopted by everyone, no one gains a relative advantage, and success rates stay flat",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-86",
+      "from": "ren-bittel",
+      "to": "patek-philippe",
+      "quote": "in 1984 Bittel told Patek president Philippe Stern, in effect: make this your standard design, and I'll create an ad campaign to identify it in people's heads with your brand.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-87",
+      "from": "response-sanitization",
+      "to": "google-cloud-model-armor",
+      "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-88",
+      "from": "response-sanitization",
+      "to": "prompt-injection",
+      "quote": "This defends against a threat most developers haven’t considered: prompt injection embedded in the data the agent reads.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-89",
+      "from": "scaffold",
+      "to": "neural-language-model",
+      "quote": "a powerful class of language models with near-infinite input, output, and reasoning context are scaffolds around neural language models that can call themselves recursively inside of a REPL",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-90",
+      "from": "schema-introspection",
+      "to": "discovery-document",
+      "quote": "Under the hood, this uses Google’s Discovery Document with dynamic $ref resolution.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-91",
+      "from": "skill-md-files",
+      "to": "ephemeral-software",
+      "quote": "A file as a distillation of one's own preferences and taste and judgement and experiences, fed to a neural network trained to help you get your work done",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-92",
+      "from": "spec-driven-development",
+      "to": "specification",
+      "quote": "In this new paradigm, **Specs become the source of truth**.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-93",
+      "from": "spec-driven-development",
+      "to": "acceptance-criteria",
+      "quote": "Humans should review specs, plans, constraints, and acceptance criteria—not 500-line diffs.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-94",
+      "from": "spec-driven-development",
+      "to": "ephemeral-software",
+      "quote": "it also feels like you can specify what software is supposed to do without being 100% precise and, as long as the person (thing) implementing it and you have some shared understanding about what's left out of the spec, things will be fine",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-95",
+      "from": "specification",
+      "to": "code-review",
+      "quote": "You don’t need to review the code. You review the steps.",
+      "source": "https://www.latent.space/p/reviews-dead",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-96",
+      "from": "swiss-watch-industry",
+      "to": "brand",
+      "quote": "the way they did it was by transforming themselves from precision instrument makers into luxury brands.",
+      "source": "https://paulgraham.com/brandage.html",
+      "createdAt": 1772766032016
+    },
+    {
+      "id": "E-97",
+      "from": "unikraft",
+      "to": "agent-sandbox-isolation",
+      "quote": "Unikraft gives us scale-to-zero out of the box. When a sandbox is idle, the VM suspends. When the next request comes in, it resumes",
+      "source": "https://x.com/larsencc/status/2027225210412470668",
+      "createdAt": 1772522057379
+    },
+    {
+      "id": "E-98",
+      "from": "wimp-model",
+      "to": "procedural-expressibility",
+      "quote": "the successor to WIMP is probably not \"chat,\" at least not in the simplistic sense people sometimes mean... fixed graphical interfaces stop being the only sensible contract between user and machine once the user can increasingly express procedures through a model",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-99",
+      "from": "wimp-model",
+      "to": "user-specific-software",
+      "quote": "not the end of interfaces, but the end of the assumption that interfaces must be fully fixed in advance because users cannot program the machine",
+      "source": "https://sunilpai.dev/posts/after-wimp/",
+      "createdAt": 1773649285547
+    },
+    {
+      "id": "E-100",
+      "from": "zero-secret-sandbox",
+      "to": "control-plane-pattern",
+      "quote": "the agent inside the sandbox holds no credentials at all, and every privileged operation, including model inference, is routed through an external control plane that owns the secrets on the agent's behalf",
+      "source": "https://opencomputer.dev/blog/where-should-the-agent-live",
+      "createdAt": 1774400936164
+    }
+  ]
+}

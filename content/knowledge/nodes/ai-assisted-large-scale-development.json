@@ -1,0 +1,18 @@
+{
+  "id": "ai-assisted-large-scale-development",
+  "name": "AI-assisted Large-scale Development",
+  "type": "concept",
+  "description": "Using AI coding tools (like Claude Code) to accomplish massive implementation work (e.g., 14,000-line PRs) that would otherwise take months, while humans focus on architecture, API design, and review. Exemplified by Matteo Collina's Node.js virtual file system PR.",
+  "sources": [
+    "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+  ],
+  "createdAt": 1774243074123,
+  "updatedAt": 1774243074123,
+  "edges": [
+    {
+      "to": "code-review",
+      "quote": "I didn't write a single line of code. I reviewed it all though and consistently nudged the AI in the right direction",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+    }
+  ]
+}

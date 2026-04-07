@@ -1,0 +1,12 @@
+{
+  "id": "brand-advertising",
+  "name": "Brand advertising",
+  "type": "concept",
+  "description": "Advertising strategy emphasizing exclusivity and cost to reinforce luxury brand value.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "language-model-definition",
+  "name": "Language Model Definition",
+  "type": "concept",
+  "description": "Pre-Transformer definition: merely a probabilistic function from text to text. The author argues the conflation of 'language model' with 'neural network' obscures the fact that scaffolds themselves are language models.",
+  "sources": [
+    "https://alexzhang13.github.io/blog/2026/scaffold/"
+  ],
+  "createdAt": 1774494446115,
+  "updatedAt": 1774494446115,
+  "edges": [
+    {
+      "to": "scaffold",
+      "quote": "the line between a language model and a scaffold is blurring, and the field is once again open to novel ideas on what these scaffolds should look like",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "acceptance-criteria",
+  "name": "Acceptance Criteria",
+  "type": "concept",
+  "description": "Human-defined conditions for task success used as primary verification gates.",
+  "sources": [
+    "https://www.latent.space/p/reviews-dead"
+  ],
+  "createdAt": 1772546664639,
+  "updatedAt": 1772546664639,
+  "edges": []
+}

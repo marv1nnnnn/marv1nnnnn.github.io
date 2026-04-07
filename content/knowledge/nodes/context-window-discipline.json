@@ -1,0 +1,23 @@
+{
+  "id": "context-window-discipline",
+  "name": "Context window discipline",
+  "type": "concept",
+  "description": "Practices to reduce token/context usage for agents by limiting and streaming API responses.",
+  "sources": [
+    "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+  ],
+  "createdAt": 1772766080286,
+  "updatedAt": 1772766080286,
+  "edges": [
+    {
+      "to": "field-masks",
+      "quote": "Field masks limit what the API returns",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "ndjson",
+      "quote": "NDJSON pagination (`--page-all`) emits one JSON object per page, stream-processable without buffering a top-level array.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    }
+  ]
+}

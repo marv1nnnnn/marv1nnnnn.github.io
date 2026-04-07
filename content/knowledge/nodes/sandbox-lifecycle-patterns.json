@@ -1,0 +1,12 @@
+{
+  "id": "sandbox-lifecycle-patterns",
+  "name": "Sandbox Lifecycle Patterns",
+  "type": "concept",
+  "description": "How agent compute environments live over time: ephemeral (created and destroyed per task), long-running (persistent across interactions), hybrid (paused/resumed with preserved state), or shared containers (multi-agent co-tenancy).",
+  "sources": [
+    "https://opencomputer.dev/blog/where-should-the-agent-live"
+  ],
+  "createdAt": 1774400936164,
+  "updatedAt": 1774400936164,
+  "edges": []
+}

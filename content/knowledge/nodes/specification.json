@@ -1,0 +1,18 @@
+{
+  "id": "specification",
+  "name": "Specification",
+  "type": "concept",
+  "description": "The source-of-truth artifact defining behavior, constraints, and verification expectations.",
+  "sources": [
+    "https://www.latent.space/p/reviews-dead"
+  ],
+  "createdAt": 1772546664639,
+  "updatedAt": 1772546664639,
+  "edges": [
+    {
+      "to": "code-review",
+      "quote": "You don’t need to review the code. You review the steps.",
+      "source": "https://www.latent.space/p/reviews-dead"
+    }
+  ]
+}

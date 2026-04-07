@@ -1,0 +1,12 @@
+{
+  "id": "g-rald-genta",
+  "name": "Gérald Genta",
+  "type": "person",
+  "description": "Renowned designer commissioned by Audemars Piguet and Patek Philippe for iconic sports-luxury watch designs.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": []
+}

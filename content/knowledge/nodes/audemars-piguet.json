@@ -1,0 +1,23 @@
+{
+  "id": "audemars-piguet",
+  "name": "Audemars Piguet",
+  "type": "company",
+  "description": "Swiss luxury watchmaker in the holy trinity that advanced branded design through iconic models.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "g-rald-genta",
+      "quote": "Audemars Piguet, who in 1970 commissioned the renowned designer Gérald Genta to design their own iconic watch",
+      "source": "https://paulgraham.com/brandage.html"
+    },
+    {
+      "to": "royal-oak",
+      "quote": "The result, launched in 1972, was the Royal Oak.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

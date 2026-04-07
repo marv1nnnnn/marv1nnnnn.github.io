@@ -1,0 +1,18 @@
+{
+  "id": "golden-ellipse",
+  "name": "Golden Ellipse",
+  "type": "product",
+  "description": "Patek Philippe model introduced in 1968, notable for distinctive case design as brand expression.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "brand",
+      "quote": "Because it turned the entire watch into an expression of brand.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

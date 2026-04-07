@@ -1,0 +1,12 @@
+{
+  "id": "agentgateway-protocol",
+  "name": "AgentGateway Protocol",
+  "type": "concept",
+  "description": "Interface abstraction allowing agents to use either a control plane HTTP backend or direct local calls without code changes",
+  "sources": [
+    "https://x.com/larsencc/status/2027225210412470668"
+  ],
+  "createdAt": 1772522057379,
+  "updatedAt": 1772522057379,
+  "edges": []
+}

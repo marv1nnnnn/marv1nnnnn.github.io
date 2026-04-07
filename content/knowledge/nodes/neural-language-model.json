@@ -1,0 +1,23 @@
+{
+  "id": "neural-language-model",
+  "name": "Neural Language Model",
+  "type": "concept",
+  "description": "End-to-end neural network models (e.g., Opus 4.6, Qwen3-8B) that map text to text. Traditionally the exclusive focus of scaling efforts, but the author argues they are severely underutilized without scaffolding.",
+  "sources": [
+    "https://alexzhang13.github.io/blog/2026/scaffold/"
+  ],
+  "createdAt": 1774494446115,
+  "updatedAt": 1774494446115,
+  "edges": [
+    {
+      "to": "scaffold",
+      "quote": "the language models we interact with in the (near) future will be what we call scaffolds today",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/"
+    },
+    {
+      "to": "evaluation-crisis",
+      "quote": "How do you begin to evaluate between scaffolds like Claude Code, Codex, Cursor, and Antigravity with anything other than 'vibes'?",
+      "source": "https://alexzhang13.github.io/blog/2026/scaffold/"
+    }
+  ]
+}

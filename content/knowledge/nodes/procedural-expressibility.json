@@ -1,0 +1,18 @@
+{
+  "id": "procedural-expressibility",
+  "name": "Procedural expressibility",
+  "type": "concept",
+  "description": "The emerging ability of non-programmers to describe procedures via natural language that LLMs can compile into runnable code, weakening the decades-old divide between programmers and interface consumers",
+  "sources": [
+    "https://sunilpai.dev/posts/after-wimp/"
+  ],
+  "createdAt": 1773649285547,
+  "updatedAt": 1773649285547,
+  "edges": [
+    {
+      "to": "capability-scoped-sandbox",
+      "quote": "if models can write code on behalf of users, where does that code run? ... THAT requires a different kind of runtime primitive",
+      "source": "https://sunilpai.dev/posts/after-wimp/"
+    }
+  ]
+}

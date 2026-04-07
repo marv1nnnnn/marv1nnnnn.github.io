@@ -116,6 +116,15 @@
       "medium": "anime",
       "personalNote": "A person like me must love lain right? The aesthetics here is truly something else.",
       "image_url": "/images/influences-serial-experiments-lain.jpg"
+    },
+    {
+      "id": "zato",
+      "artist": "ferry",
+      "title": "Z.A.T.O",
+      "year": 2025,
+      "medium": "game",
+      "personalNote": "I love the world and everything in it.",
+      "image_url": "https://img.itch.zone/aW1nLzIzODQxNzMyLnBuZw==/original/dIj7MG.png"
     }
   ]
 }

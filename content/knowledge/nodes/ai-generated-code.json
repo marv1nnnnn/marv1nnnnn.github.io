@@ -1,0 +1,23 @@
+{
+  "id": "ai-generated-code",
+  "name": "AI-generated code",
+  "type": "concept",
+  "description": "Code produced by AI systems, described as often requiring significant review effort.",
+  "sources": [
+    "https://www.latent.space/p/reviews-dead"
+  ],
+  "createdAt": 1772546664639,
+  "updatedAt": 1772546664639,
+  "edges": [
+    {
+      "to": "code-review",
+      "quote": "developers keep saying that reviewing AI-generated code requires more effort than reviewing code written by their colleagues.",
+      "source": "https://www.latent.space/p/reviews-dead"
+    },
+    {
+      "to": "code-review",
+      "quote": "the defenses we relied on (code review, testing, manual inspection) are the same ones that missed Heartbleed for two years",
+      "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+    }
+  ]
+}

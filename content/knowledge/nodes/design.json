@@ -1,0 +1,12 @@
+{
+  "id": "design",
+  "name": "Design",
+  "type": "concept",
+  "description": "In the essay, pursuit of optimal solutions that tends to converge, contrasted with branding’s need for distinctiveness.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": []
+}

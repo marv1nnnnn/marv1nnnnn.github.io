@@ -1,0 +1,19 @@
+{
+  "id": "control-plane-pattern",
+  "name": "Control Plane Pattern",
+  "type": "concept",
+  "description": "Architectural pattern where a privileged external service manages credentials, routes privileged operations, and mediates access between the untrusted sandbox and external services.",
+  "sources": [
+    "https://x.com/larsencc/status/2027225210412470668",
+    "https://opencomputer.dev/blog/where-should-the-agent-live"
+  ],
+  "createdAt": 1772522057379,
+  "updatedAt": 1774400936164,
+  "edges": [
+    {
+      "to": "agentgateway-protocol",
+      "quote": "In production, ControlPlaneGateway sends HTTP requests to the control plane. For local development and evals, DirectGateway calls the LLM directly and keeps history in memory. The agent code doesn't know which one it's using",
+      "source": "https://x.com/larsencc/status/2027225210412470668"
+    }
+  ]
+}

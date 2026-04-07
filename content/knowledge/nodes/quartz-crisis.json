@@ -1,0 +1,18 @@
+{
+  "id": "quartz-crisis",
+  "name": "Quartz crisis",
+  "type": "concept",
+  "description": "The multi-factor disruption of the Swiss watch industry in the 1970s, including Japanese competition, currency shock, and quartz movements.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "swiss-watch-industry",
+      "quote": "In the early 1970s disaster struck the Swiss watch industry. Now people call it the quartz crisis",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

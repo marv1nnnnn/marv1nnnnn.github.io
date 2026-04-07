@@ -1,0 +1,18 @@
+{
+  "id": "swiss-watch-industry",
+  "name": "Swiss watch industry",
+  "type": "concept",
+  "description": "Industry that underwent a major transformation during and after the quartz crisis, shifting from precision performance to luxury branding.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "brand",
+      "quote": "the way they did it was by transforming themselves from precision instrument makers into luxury brands.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

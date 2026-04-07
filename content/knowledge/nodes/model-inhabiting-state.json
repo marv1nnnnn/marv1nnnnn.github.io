@@ -1,0 +1,18 @@
+{
+  "id": "model-inhabiting-state",
+  "name": "Model inhabiting state",
+  "type": "concept",
+  "description": "Pattern where instead of generating a new application, an LLM analyzes an existing stateful environment and uses code as the mechanism of interaction—reading and mutating state rather than scaffolding fresh programs",
+  "sources": [
+    "https://sunilpai.dev/posts/after-wimp/"
+  ],
+  "createdAt": 1773649285547,
+  "updatedAt": 1773649285547,
+  "edges": [
+    {
+      "to": "user-specific-software",
+      "quote": "the intelligence was not in scaffolding a fresh app. it was in understanding an existing stateful environment and using code as the mechanism of interaction with it",
+      "source": "https://sunilpai.dev/posts/after-wimp/"
+    }
+  ]
+}

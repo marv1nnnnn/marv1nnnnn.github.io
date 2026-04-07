@@ -1,0 +1,23 @@
+{
+  "id": "brand",
+  "name": "Brand",
+  "type": "concept",
+  "description": "Central force in the essay: value that remains when substantive product differences diminish.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "mechanical-watches",
+      "quote": "what the buyer gets in return is an expensive status symbol.",
+      "source": "https://paulgraham.com/brandage.html"
+    },
+    {
+      "to": "design",
+      "quote": "Branding isn't merely orthogonal to good design, but opposed to it.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

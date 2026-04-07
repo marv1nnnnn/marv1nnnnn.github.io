@@ -1,0 +1,23 @@
+{
+  "id": "1x-speed-consumption",
+  "name": "1x Speed Consumption",
+  "type": "concept",
+  "description": "Philosophy of consuming all content (podcasts, videos, audiobooks) at normal speed as a quality filter for what deserves attention",
+  "sources": [
+    "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+  ],
+  "createdAt": 1772521918192,
+  "updatedAt": 1772521918192,
+  "edges": [
+    {
+      "to": "boredom",
+      "quote": "Your brain needs empty space too. This is the part we've collectively forgotten. Boredom is a feature, not a bug.",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+    },
+    {
+      "to": "intentionality",
+      "quote": "if something isn't worth consuming at 1x, it's not worth consuming at all",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+    }
+  ]
+}

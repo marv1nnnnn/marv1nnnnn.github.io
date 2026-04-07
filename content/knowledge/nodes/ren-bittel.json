@@ -1,0 +1,18 @@
+{
+  "id": "ren-bittel",
+  "name": "René Bittel",
+  "type": "person",
+  "description": "Head of Patek Philippe's ad agency, credited with positioning the hobnail Calatrava as a brand signature.",
+  "sources": [
+    "https://paulgraham.com/brandage.html"
+  ],
+  "createdAt": 1772766032016,
+  "updatedAt": 1772766032016,
+  "edges": [
+    {
+      "to": "patek-philippe",
+      "quote": "in 1984 Bittel told Patek president Philippe Stern, in effect: make this your standard design, and I'll create an ad campaign to identify it in people's heads with your brand.",
+      "source": "https://paulgraham.com/brandage.html"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "boredom",
+  "name": "Boredom",
+  "type": "concept",
+  "description": "Mental empty space that enables idea generation, processing, and original thought",
+  "sources": [
+    "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+  ],
+  "createdAt": 1772521918192,
+  "updatedAt": 1772521918192,
+  "edges": [
+    {
+      "to": "intentionality",
+      "quote": "It's where our best ideas — like starting this blog! — come from. It's where you actually process what you've learned, make connections, have original thoughts.",
+      "source": "https://terriblesoftware.org/2026/01/08/life-happens-at-1x-speed/"
+    }
+  ]
+}

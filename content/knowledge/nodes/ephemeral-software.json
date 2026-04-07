@@ -1,0 +1,23 @@
+{
+  "id": "ephemeral-software",
+  "name": "Ephemeral Software",
+  "type": "concept",
+  "description": "Software that is generated on-demand by AI agents, performs its task, and then disappears — never stored, versioned, or named. Described as software turning into a liquid that 'drips into every nook and cranny and then evaporates.'",
+  "sources": [
+    "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+  ],
+  "createdAt": 1774243074123,
+  "updatedAt": 1774243074123,
+  "edges": [
+    {
+      "to": "vibe-coded-automation",
+      "quote": "he used an agent to vibe-code a piece of software to talk to the torque wrenches via Bluetooth and record the data in the spreadsheet he uses",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+    },
+    {
+      "to": "ai-generated-code",
+      "quote": "ChatGPT writes tens or hundreds of lines of Python to resize images, create a PDF, or extract data from a CSV —and then throws it away, without anyone even having seen the code",
+      "source": "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+    }
+  ]
+}

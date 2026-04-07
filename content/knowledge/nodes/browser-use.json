@@ -1,0 +1,28 @@
+{
+  "id": "browser-use",
+  "name": "Browser Use",
+  "type": "company",
+  "description": "Company running millions of web agents, evolved from AWS Lambda to Unikraft micro-VM sandbox architecture",
+  "sources": [
+    "https://x.com/larsencc/status/2027225210412470668"
+  ],
+  "createdAt": 1772522057379,
+  "updatedAt": 1772522057379,
+  "edges": [
+    {
+      "to": "aws-lambda",
+      "quote": "We started with browser-only agents on AWS Lambda, where each invocation is isolated, scaling is instant, and there are no secrets to worry about",
+      "source": "https://x.com/larsencc/status/2027225210412470668"
+    },
+    {
+      "to": "unikraft",
+      "quote": "Each agent gets its own Unikraft micro-VM, booting in under a second. We provision them via Unikraft Cloud's REST API on dedicated bare metal machines in AWS",
+      "source": "https://x.com/larsencc/status/2027225210412470668"
+    },
+    {
+      "to": "control-plane-pattern",
+      "quote": "We started with Pattern 1 and moved to Pattern 2",
+      "source": "https://x.com/larsencc/status/2027225210412470668"
+    }
+  ]
+}

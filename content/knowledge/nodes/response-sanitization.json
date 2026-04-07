@@ -1,0 +1,23 @@
+{
+  "id": "response-sanitization",
+  "name": "Response sanitization",
+  "type": "concept",
+  "description": "Filtering API responses before agent consumption to mitigate malicious prompt content.",
+  "sources": [
+    "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+  ],
+  "createdAt": 1772766080286,
+  "updatedAt": 1772766080286,
+  "edges": [
+    {
+      "to": "google-cloud-model-armor",
+      "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    },
+    {
+      "to": "prompt-injection",
+      "quote": "This defends against a threat most developers haven’t considered: prompt injection embedded in the data the agent reads.",
+      "source": "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+    }
+  ]
+}
