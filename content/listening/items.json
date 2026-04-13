@@ -502,5 +502,12 @@
     "type": "music",
     "date": "2026-04-09",
     "url": "https://open.spotify.com/album/7hQN3wxwQVYZxa4vwt6nSC?si=0k9uayBASCSqDWec_ZbDZA"
+  },
+  {
+    "title": "The Drama",
+    "creator": "Kristoffer Borgli",
+    "type": "video",
+    "date": "2026-04-12",
+    "url": "https://www.imdb.com/title/tt33071426/"
   }
 ]
