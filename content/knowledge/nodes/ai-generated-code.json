@@ -2,12 +2,13 @@
   "id": "ai-generated-code",
   "name": "AI-generated code",
   "type": "concept",
-  "description": "Code produced by AI systems, described as often requiring significant review effort.",
+  "description": "Code produced by the agent that is fast and useful for obvious or routine tasks, but prone to fragility, standardization, and architectural drift without strong oversight.",
   "sources": [
-    "https://www.latent.space/p/reviews-dead"
+    "https://www.latent.space/p/reviews-dead",
+    "https://lalitm.com/post/building-syntaqlite-ai/"
   ],
   "createdAt": 1772546664639,
-  "updatedAt": 1772546664639,
+  "updatedAt": 1776059738925,
   "edges": [
     {
       "to": "code-review",
@@ -18,6 +19,21 @@
       "to": "code-review",
       "quote": "the defenses we relied on (code review, testing, manual inspection) are the same ones that missed Heartbleed for two years",
       "source": "https://leodemoura.github.io/blog/2026/02/28/when-ai-writes-the-worlds-software.html"
+    },
+    {
+      "to": "specification",
+      "quote": "AI’s instinct to normalize was actively harmful there, and those were the parts I had to design in depth and often resorted to just writing myself",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/"
+    },
+    {
+      "to": "agent-dx",
+      "quote": "Several times during the project, I lost my mental model of the codebase",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/"
+    },
+    {
+      "to": "syntaqlite",
+      "quote": "AI didn’t just make the same project faster. It changed what the project was",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/"
     }
   ]
 }

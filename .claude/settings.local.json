@@ -41,7 +41,8 @@
       "Bash(pnpm install:*)",
       "Bash(npx create-next-app:*)",
       "Bash(pnpm dev:*)",
-      "Bash(pnpm generate:*)"
+      "Bash(pnpm generate:*)",
+      "WebFetch(domain:sparkjs.dev)"
     ],
     "deny": []
   }

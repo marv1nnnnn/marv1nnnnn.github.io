@@ -27,12 +27,13 @@
       "id": "agent-dx",
       "name": "Agent DX",
       "type": "concept",
-      "description": "Developer experience for AI agents emphasizing predictability, machine-readability, and defense-in-depth.",
+      "description": "The quality of interaction with the coding agent, which depends on the developer maintaining a strong mental model and being able to communicate precise changes.",
       "sources": [
-        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/"
+        "https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/",
+        "https://lalitm.com/post/building-syntaqlite-ai/"
       ],
       "createdAt": 1772766080286,
-      "updatedAt": 1772766080286
+      "updatedAt": 1776059738922
     },
     {
       "id": "agent-frameworks",
@@ -119,21 +120,23 @@
       "type": "concept",
       "description": "Using AI coding tools (like Claude Code) to accomplish massive implementation work (e.g., 14,000-line PRs) that would otherwise take months, while humans focus on architecture, API design, and review. Exemplified by Matteo Collina's Node.js virtual file system PR.",
       "sources": [
-        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79"
+        "https://registerspill.thorstenball.com/p/joy-and-curiosity-79",
+        "https://lalitm.com/post/building-syntaqlite-ai/"
       ],
       "createdAt": 1774243074123,
-      "updatedAt": 1774243074123
+      "updatedAt": 1776059738915
     },
     {
       "id": "ai-generated-code",
       "name": "AI-generated code",
       "type": "concept",
-      "description": "Code produced by AI systems, described as often requiring significant review effort.",
+      "description": "Code produced by the agent that is fast and useful for obvious or routine tasks, but prone to fragility, standardization, and architectural drift without strong oversight.",
       "sources": [
-        "https://www.latent.space/p/reviews-dead"
+        "https://www.latent.space/p/reviews-dead",
+        "https://lalitm.com/post/building-syntaqlite-ai/"
       ],
       "createdAt": 1772546664639,
-      "updatedAt": 1772546664639
+      "updatedAt": 1776059738925
     },
     {
       "id": "all-or-nothing-permissions",
@@ -869,10 +872,11 @@
       "type": "concept",
       "description": "A system built around a neural language model that extends its capabilities (e.g., recursive self-calls, REPL interaction, infinite context). The author argues scaffolds ARE the future form of language models, not mere wrappers.",
       "sources": [
-        "https://alexzhang13.github.io/blog/2026/scaffold/"
+        "https://alexzhang13.github.io/blog/2026/scaffold/",
+        "https://lalitm.com/post/building-syntaqlite-ai/"
       ],
       "createdAt": 1774494446115,
-      "updatedAt": 1774494446115
+      "updatedAt": 1776059738919
     },
     {
       "id": "schema-introspection",
@@ -913,12 +917,13 @@
       "id": "specification",
       "name": "Specification",
       "type": "concept",
-      "description": "The source-of-truth artifact defining behavior, constraints, and verification expectations.",
+      "description": "Clear human-owned architectural decisions and design intent, especially for the novel, high-value parts of a project where AI defaults are harmful.",
       "sources": [
-        "https://www.latent.space/p/reviews-dead"
+        "https://www.latent.space/p/reviews-dead",
+        "https://lalitm.com/post/building-syntaqlite-ai/"
       ],
       "createdAt": 1772546664639,
-      "updatedAt": 1772546664639
+      "updatedAt": 1776059738921
     },
     {
       "id": "swiss-watch-industry",
@@ -930,6 +935,17 @@
       ],
       "createdAt": 1772766032016,
       "updatedAt": 1772766032016
+    },
+    {
+      "id": "syntaqlite",
+      "name": "syntaqlite",
+      "type": "product",
+      "description": "A SQLite devtools project whose eventual release is presented as enabled by AI coding agents, while also illustrating their risks and necessary workflow changes.",
+      "sources": [
+        "https://lalitm.com/post/building-syntaqlite-ai/"
+      ],
+      "createdAt": 1776059738912,
+      "updatedAt": 1776059738912
     },
     {
       "id": "unikraft",
@@ -1014,6 +1030,14 @@
     },
     {
       "id": "E-4",
+      "from": "agent-dx",
+      "to": "ai-assisted-large-scale-development",
+      "quote": "When you don’t have the mental thread of what’s going on, it becomes impossible to communicate meaningfully with the agent",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1772766080286
+    },
+    {
+      "id": "E-5",
       "from": "agent-frameworks",
       "to": "all-or-nothing-permissions",
       "quote": "Most agent frameworks treat permissions as an all-or-nothing setting.",
@@ -1021,7 +1045,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-5",
+      "id": "E-6",
       "from": "agent-placement",
       "to": "agent-sandbox-isolation",
       "quote": "Once isolation is a given, the next design choice is where the agent should live relative to the environment where code actually executes",
@@ -1029,7 +1053,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-6",
+      "id": "E-7",
       "from": "agent-placement",
       "to": "agentic-workload",
       "quote": "agent placement is a performance decision as much as a security one",
@@ -1037,7 +1061,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-7",
+      "id": "E-8",
       "from": "agent-sandbox-isolation",
       "to": "control-plane-pattern",
       "quote": "Isolate the agent. The entire agent runs in a sandbox with zero secrets. It talks to the outside world through a control plane that holds all the credentials",
@@ -1045,7 +1069,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-8",
+      "id": "E-9",
       "from": "agent-sandbox-isolation",
       "to": "input-hardening",
       "quote": "Always assume inputs can be adversarial.",
@@ -1053,7 +1077,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-9",
+      "id": "E-10",
       "from": "agent-sandbox-isolation",
       "to": "control-plane-pattern",
       "quote": "A common answer is to give the sandbox only a short-lived session token and route privileged operations through a proxy or control plane",
@@ -1061,7 +1085,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-10",
+      "id": "E-11",
       "from": "agent-sandbox-isolation",
       "to": "agentic-workload",
       "quote": "Agents introduce a new set of deployment needs and constraints",
@@ -1069,7 +1093,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-11",
+      "id": "E-12",
       "from": "agentic-workload",
       "to": "sandbox-lifecycle-patterns",
       "quote": "Beyond securing the isolated environment and deciding where to place the agent, there is still the question of how that environment should live over time",
@@ -1077,7 +1101,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-12",
+      "id": "E-13",
       "from": "aggregators",
       "to": "economic-concentration",
       "quote": "Companies like Google, Meta, and Apple control the distribution that all of these new businesses need in order to grow, and as a result, command much of the newly generated economic value.",
@@ -1085,7 +1109,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-13",
+      "id": "E-14",
       "from": "ai-adoption",
       "to": "code-review",
       "quote": "Teams with high AI adoption complete 21% more tasks and merge 98% more pull requests, but PR review time increases 91%, based on [data](https://www.faros.ai/blog/ai-software-engineering) from over 10,000 developers across 1,255 teams.",
@@ -1093,7 +1117,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-14",
+      "id": "E-15",
       "from": "ai-adoption",
       "to": "economic-concentration",
       "quote": "AI will drive greater concentration of value into fewer companies and create the biggest businesses of all time.",
@@ -1101,7 +1125,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-15",
+      "id": "E-16",
       "from": "ai-adoption",
       "to": "internal-coordination-costs",
       "quote": "AI will do this much more powerfully than legacy software, because it won’t just give humans tools to manage more efficiently, it will do a lot of the work itself.",
@@ -1109,7 +1133,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-16",
+      "id": "E-17",
       "from": "ai-adoption",
       "to": "automated-services-companies",
       "quote": "Automated services companies will get massive, and in doing so, begin to consolidate the fragmented services landscape we see today.",
@@ -1117,7 +1141,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-17",
+      "id": "E-18",
       "from": "ai-assisted-large-scale-development",
       "to": "code-review",
       "quote": "I didn't write a single line of code. I reviewed it all though and consistently nudged the AI in the right direction",
@@ -1125,7 +1149,23 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-18",
+      "id": "E-19",
+      "from": "ai-assisted-large-scale-development",
+      "to": "syntaqlite",
+      "quote": "I believe the main reason this happened was because of AI coding agents",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-20",
+      "from": "ai-assisted-large-scale-development",
+      "to": "ai-generated-code",
+      "quote": "AI turned out to be better than me at the act of writing code itself, assuming that code is obvious",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1774243074123
+    },
+    {
+      "id": "E-21",
       "from": "ai-generated-code",
       "to": "code-review",
       "quote": "developers keep saying that reviewing AI-generated code requires more effort than reviewing code written by their colleagues.",
@@ -1133,7 +1173,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-19",
+      "id": "E-22",
       "from": "ai-generated-code",
       "to": "code-review",
       "quote": "the defenses we relied on (code review, testing, manual inspection) are the same ones that missed Heartbleed for two years",
@@ -1141,7 +1181,31 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-20",
+      "id": "E-23",
+      "from": "ai-generated-code",
+      "to": "specification",
+      "quote": "AI’s instinct to normalize was actively harmful there, and those were the parts I had to design in depth and often resorted to just writing myself",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-24",
+      "from": "ai-generated-code",
+      "to": "agent-dx",
+      "quote": "Several times during the project, I lost my mental model of the codebase",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-25",
+      "from": "ai-generated-code",
+      "to": "syntaqlite",
+      "quote": "AI didn’t just make the same project faster. It changed what the project was",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-26",
       "from": "ankit-jain",
       "to": "aviator",
       "quote": "_[Ankit Jain](https://www.linkedin.com/in/ankitjaindce/) is the founder and CEO of [Aviator](https://www.aviator.co/), where he’s building the infrastructure for AI-native engineering teams.",
@@ -1149,7 +1213,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-21",
+      "id": "E-27",
       "from": "audemars-piguet",
       "to": "g-rald-genta",
       "quote": "Audemars Piguet, who in 1970 commissioned the renowned designer Gérald Genta to design their own iconic watch",
@@ -1157,7 +1221,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-22",
+      "id": "E-28",
       "from": "audemars-piguet",
       "to": "royal-oak",
       "quote": "The result, launched in 1972, was the Royal Oak.",
@@ -1165,7 +1229,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-23",
+      "id": "E-29",
       "from": "automated-services-companies",
       "to": "economic-concentration",
       "quote": "Automated services companies will get massive, and in doing so, begin to consolidate the fragmented services landscape we see today.",
@@ -1173,7 +1237,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-24",
+      "id": "E-30",
       "from": "aviator",
       "to": "ai-adoption",
       "quote": "Aviator’s platform helps modern organizations improve AI adoption while maintaining high engineering standards.",
@@ -1181,7 +1245,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-25",
+      "id": "E-31",
       "from": "behavior-driven-development",
       "to": "specification",
       "quote": "BDD was always a good idea—write specifications in natural language that describe expected behavior, then automate those specs as tests.",
@@ -1189,7 +1253,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-26",
+      "id": "E-32",
       "from": "bitter-lesson-scale",
       "to": "neural-language-model",
       "quote": "religiously following this bet is how companies like OpenAI and Anthropic have exploded in valuation since",
@@ -1197,7 +1261,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-27",
+      "id": "E-33",
       "from": "bitter-lesson-scale",
       "to": "evaluation-crisis",
       "quote": "the obsession over 'raw model capability' has ironically led to our evaluation metrics being completely off",
@@ -1205,7 +1269,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-28",
+      "id": "E-34",
       "from": "boredom",
       "to": "intentionality",
       "quote": "It's where our best ideas — like starting this blog! — come from. It's where you actually process what you've learned, make connections, have original thoughts.",
@@ -1213,7 +1277,7 @@
       "createdAt": 1772521918192
     },
     {
-      "id": "E-29",
+      "id": "E-35",
       "from": "brand",
       "to": "mechanical-watches",
       "quote": "what the buyer gets in return is an expensive status symbol.",
@@ -1221,7 +1285,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-30",
+      "id": "E-36",
       "from": "brand",
       "to": "design",
       "quote": "Branding isn't merely orthogonal to good design, but opposed to it.",
@@ -1229,7 +1293,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-31",
+      "id": "E-37",
       "from": "browser-use",
       "to": "aws-lambda",
       "quote": "We started with browser-only agents on AWS Lambda, where each invocation is isolated, scaling is instant, and there are no secrets to worry about",
@@ -1237,7 +1301,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-32",
+      "id": "E-38",
       "from": "browser-use",
       "to": "unikraft",
       "quote": "Each agent gets its own Unikraft micro-VM, booting in under a second. We provision them via Unikraft Cloud's REST API on dedicated bare metal machines in AWS",
@@ -1245,7 +1309,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-33",
+      "id": "E-39",
       "from": "browser-use",
       "to": "control-plane-pattern",
       "quote": "We started with Pattern 1 and moved to Pattern 2",
@@ -1253,7 +1317,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-34",
+      "id": "E-40",
       "from": "capability-scoped-sandbox",
       "to": "user-specific-software",
       "quote": "once users have access to systems that can generate code on their behalf, the next important question is not just how smart the model is. it is whether our software platforms are prepared to host user-specific code safely, quickly, and with tight control",
@@ -1261,7 +1325,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-35",
+      "id": "E-41",
       "from": "capability-scoped-sandbox",
       "to": "all-or-nothing-permissions",
       "quote": "instead of beginning with a miniature server and then trying to constrain it, you begin with an isolate that has almost no ambient authority and then explicitly hand it the capabilities it should have",
@@ -1269,7 +1333,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-36",
+      "id": "E-42",
       "from": "code-mode",
       "to": "model-inhabiting-state",
       "quote": "the model stops trying to generate the program and starts inhabiting the state machine",
@@ -1277,7 +1341,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-37",
+      "id": "E-43",
       "from": "code-mode",
       "to": "mcp",
       "quote": "the Cloudflare API MCP server exposes access to the entire API using essentially two tools, search() and execute(), while consuming around 1,000 tokens",
@@ -1285,7 +1349,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-38",
+      "id": "E-44",
       "from": "context-window-discipline",
       "to": "field-masks",
       "quote": "Field masks limit what the API returns",
@@ -1293,7 +1357,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-39",
+      "id": "E-45",
       "from": "context-window-discipline",
       "to": "ndjson",
       "quote": "NDJSON pagination (`--page-all`) emits one JSON object per page, stream-processable without buffering a top-level array.",
@@ -1301,7 +1365,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-40",
+      "id": "E-46",
       "from": "control-plane-pattern",
       "to": "agentgateway-protocol",
       "quote": "In production, ControlPlaneGateway sends HTTP requests to the control plane. For local development and evals, DirectGateway calls the LLM directly and keeps history in memory. The agent code doesn't know which one it's using",
@@ -1309,7 +1373,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-41",
+      "id": "E-47",
       "from": "data-effects",
       "to": "economic-concentration",
       "quote": "For the application layer of AI, the change will come in the form of strengthening data effects, where the larger and more proprietary the dataset, the more value a product can deliver.",
@@ -1317,7 +1381,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-42",
+      "id": "E-48",
       "from": "data-effects",
       "to": "automated-services-companies",
       "quote": "It’s a race to aggregate as much data and as many completed jobs as possible to enable a product that can do more work at higher accuracy and lower cost.",
@@ -1325,7 +1389,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-43",
+      "id": "E-49",
       "from": "distribution-bottleneck",
       "to": "aggregators",
       "quote": "it will not make it easier to get distribution, and that will become the bottleneck, allowing aggregators to extract most of the value.",
@@ -1333,7 +1397,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-44",
+      "id": "E-50",
       "from": "ephemeral-software",
       "to": "vibe-coded-automation",
       "quote": "he used an agent to vibe-code a piece of software to talk to the torque wrenches via Bluetooth and record the data in the spreadsheet he uses",
@@ -1341,7 +1405,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-45",
+      "id": "E-51",
       "from": "ephemeral-software",
       "to": "ai-generated-code",
       "quote": "ChatGPT writes tens or hundreds of lines of Python to resize images, create a PDF, or extract data from a CSV —and then throws it away, without anyone even having seen the code",
@@ -1349,7 +1413,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-46",
+      "id": "E-52",
       "from": "fast-vs-smart-model-tradeoff",
       "to": "ai-generated-code",
       "quote": "With 3x faster responses, I could add an extra cycle: 'critique the plan and address the critiques.' In the time the hare was still thinking, the tortoise ran another lap",
@@ -1357,7 +1421,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-47",
+      "id": "E-53",
       "from": "fomo",
       "to": "1x-speed-consumption",
       "quote": "why do we want to consume things faster? The answer, if we're being honest, usually comes down to FOMO or anxiety (or a mix of both)",
@@ -1365,7 +1429,7 @@
       "createdAt": 1772521918192
     },
     {
-      "id": "E-48",
+      "id": "E-54",
       "from": "formal-verification",
       "to": "ai-generated-code",
       "quote": "AI is changing the scale and speed of software production faster than our ability to verify it",
@@ -1373,7 +1437,7 @@
       "createdAt": 1772604380714
     },
     {
-      "id": "E-49",
+      "id": "E-55",
       "from": "formal-verification",
       "to": "spec-driven-development",
       "quote": "As AI takes over implementation, specification becomes the core engineering discipline",
@@ -1381,7 +1445,7 @@
       "createdAt": 1772604380714
     },
     {
-      "id": "E-50",
+      "id": "E-56",
       "from": "friction-as-feature",
       "to": "ai-adoption",
       "quote": "There's a feeling that all the things that create friction in your life should be automated away. That human involvement should be replaced by AI-based decision-making. Because it is the friction of the process that is the problem. When in fact many times the friction, or that things just take time, is precisely the point",
@@ -1389,7 +1453,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-51",
+      "id": "E-57",
       "from": "golden-ellipse",
       "to": "brand",
       "quote": "Because it turned the entire watch into an expression of brand.",
@@ -1397,7 +1461,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-52",
+      "id": "E-58",
       "from": "google-workspace-cli",
       "to": "agent-dx",
       "quote": "I built a CLI for Google Workspace — agents first.",
@@ -1405,7 +1469,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-53",
+      "id": "E-59",
       "from": "google-workspace-cli",
       "to": "machine-readable-output",
       "quote": "Agents don’t need GUIs. They need deterministic, machine-readable output",
@@ -1413,7 +1477,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-54",
+      "id": "E-60",
       "from": "google-workspace-cli",
       "to": "schema-introspection",
       "quote": "The better pattern: make the CLI itself the documentation, queryable at runtime.",
@@ -1421,7 +1485,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-55",
+      "id": "E-61",
       "from": "google-workspace-cli",
       "to": "input-hardening",
       "quote": "Input Hardening Against Hallucinations",
@@ -1429,7 +1493,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-56",
+      "id": "E-62",
       "from": "google-workspace-cli",
       "to": "context-window-discipline",
       "quote": "Context Window Discipline",
@@ -1437,7 +1501,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-57",
+      "id": "E-63",
       "from": "google-workspace-cli",
       "to": "skill-md-files",
       "quote": "`gws` ships 100+ `SKILL.md` files",
@@ -1445,7 +1509,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-58",
+      "id": "E-64",
       "from": "google-workspace-cli",
       "to": "mcp",
       "quote": "MCP (Model Context Protocol): `gws mcp --services drive,gmail` exposes all commands as JSON-RPC tools over stdio.",
@@ -1453,7 +1517,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-59",
+      "id": "E-65",
       "from": "google-workspace-cli",
       "to": "gemini-cli-extension",
       "quote": "Gemini CLI Extension: `gemini extensions install https://github.com/googleworkspace/cli` installs the binary as a native capability of the agent.",
@@ -1461,7 +1525,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-60",
+      "id": "E-66",
       "from": "google-workspace-cli",
       "to": "environment-variable-auth",
       "quote": "`GOOGLE_WORKSPACE_CLI_TOKEN` and `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` enable credential injection via environment",
@@ -1469,7 +1533,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-61",
+      "id": "E-67",
       "from": "google-workspace-cli",
       "to": "dry-run",
       "quote": "`--dry-run` validates the request locally without hitting the API.",
@@ -1477,7 +1541,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-62",
+      "id": "E-68",
       "from": "google-workspace-cli",
       "to": "response-sanitization",
       "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor before returning them to the agent.",
@@ -1485,7 +1549,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-63",
+      "id": "E-69",
       "from": "input-hardening",
       "to": "defense-in-depth",
       "quote": "The CLI must be the last line of defense.",
@@ -1493,7 +1557,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-64",
+      "id": "E-70",
       "from": "intentionality",
       "to": "fomo",
       "quote": "It's about asking what you're trying to get out of all this consumption in the first place. If the answer is just \"more,\" maybe that's worth examining.",
@@ -1501,7 +1565,7 @@
       "createdAt": 1772521918192
     },
     {
-      "id": "E-65",
+      "id": "E-71",
       "from": "internal-coordination-costs",
       "to": "economic-concentration",
       "quote": "AI means many fewer people will be required to produce a unit of output. This will lower headcount, lower complexity, and cause internal coordination costs to plummet.",
@@ -1509,7 +1573,7 @@
       "createdAt": 1773985444665
     },
     {
-      "id": "E-66",
+      "id": "E-72",
       "from": "language-model-definition",
       "to": "scaffold",
       "quote": "the line between a language model and a scaffold is blurring, and the field is once again open to novel ideas on what these scaffolds should look like",
@@ -1517,7 +1581,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-67",
+      "id": "E-73",
       "from": "larsen-cundric",
       "to": "browser-use",
       "quote": "We run millions of web agents at Browser Use",
@@ -1525,7 +1589,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-68",
+      "id": "E-74",
       "from": "lean",
       "to": "formal-verification",
       "quote": "The platform must be both a programming language and a theorem prover, with code and proofs in one system, with no translation gap",
@@ -1533,7 +1597,7 @@
       "createdAt": 1772604380714
     },
     {
-      "id": "E-69",
+      "id": "E-75",
       "from": "leonardo-de-moura",
       "to": "lean",
       "quote": "Lean is the result of over twelve years of continuous development. We designed and built every layer from scratch",
@@ -1541,7 +1605,7 @@
       "createdAt": 1772604380714
     },
     {
-      "id": "E-70",
+      "id": "E-76",
       "from": "mcp",
       "to": "discovery-document",
       "quote": "Under the hood, the MCP server dynamically builds its tool list from the same Discovery Document used for CLI commands.",
@@ -1549,7 +1613,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-71",
+      "id": "E-77",
       "from": "model-inhabiting-state",
       "to": "user-specific-software",
       "quote": "the intelligence was not in scaffolding a fresh app. it was in understanding an existing stateful environment and using code as the mechanism of interaction with it",
@@ -1557,7 +1621,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-72",
+      "id": "E-78",
       "from": "neural-language-model",
       "to": "scaffold",
       "quote": "the language models we interact with in the (near) future will be what we call scaffolds today",
@@ -1565,7 +1629,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-73",
+      "id": "E-79",
       "from": "neural-language-model",
       "to": "evaluation-crisis",
       "quote": "How do you begin to evaluate between scaffolds like Claude Code, Codex, Cursor, and Antigravity with anything other than 'vibes'?",
@@ -1573,7 +1637,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-74",
+      "id": "E-80",
       "from": "omega",
       "to": "quartz-crisis",
       "quote": "By 1981 they were insolvent and were taken over by their creditors.",
@@ -1581,7 +1645,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-75",
+      "id": "E-81",
       "from": "opencomputer",
       "to": "sandbox-lifecycle-patterns",
       "quote": "OpenComputer takes a middle path between long-lived and hybrid designs. Where possible, environments are paused and resumed on the same host so they can preserve local state and avoid unnecessary cold starts",
@@ -1589,7 +1653,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-76",
+      "id": "E-82",
       "from": "opencomputer",
       "to": "agent-placement",
       "quote": "we favor placing the agent inside the isolated compute environment where it will actually execute code. It is usually the fastest and simplest approach",
@@ -1597,7 +1661,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-77",
+      "id": "E-83",
       "from": "patek-philippe",
       "to": "golden-ellipse",
       "quote": "In 1968 (that year again) Patek Philippe launched a new watch that shifted the center of gravity of case design... The result was a striking new model called the Golden Ellipse.",
@@ -1605,7 +1669,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-78",
+      "id": "E-84",
       "from": "patek-philippe",
       "to": "brand-advertising",
       "quote": "To encourage them, Patek did something that none of the holy trinity had done much of before: brand advertising.",
@@ -1613,7 +1677,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-79",
+      "id": "E-85",
       "from": "patek-philippe",
       "to": "g-rald-genta",
       "quote": "Encouraged by the success of the Royal Oak, Patek Philippe commissioned Gérald Genta in 1974 to design a similar watch for them.",
@@ -1621,7 +1685,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-80",
+      "id": "E-86",
       "from": "patek-philippe",
       "to": "nautilus",
       "quote": "It was called the Nautilus, and it launched at the Basel Watch Fair in 1976.",
@@ -1629,7 +1693,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-81",
+      "id": "E-87",
       "from": "procedural-expressibility",
       "to": "capability-scoped-sandbox",
       "quote": "if models can write code on behalf of users, where does that code run? ... THAT requires a different kind of runtime primitive",
@@ -1637,7 +1701,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-82",
+      "id": "E-88",
       "from": "quartz-crisis",
       "to": "swiss-watch-industry",
       "quote": "In the early 1970s disaster struck the Swiss watch industry. Now people call it the quartz crisis",
@@ -1645,7 +1709,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-83",
+      "id": "E-89",
       "from": "quartz-movements",
       "to": "mechanical-watches",
       "quote": "Quartz movements were not only more accurate than any mechanical movement, but thinner too.",
@@ -1653,7 +1717,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-84",
+      "id": "E-90",
       "from": "recursive-language-models",
       "to": "scaffold",
       "quote": "The argument presented in that paper is a formalized implementation of the theme of this essay",
@@ -1661,7 +1725,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-85",
+      "id": "E-91",
       "from": "red-queen-hypothesis-startups",
       "to": "ai-adoption",
       "quote": "when new startup methods are quickly adopted by everyone, no one gains a relative advantage, and success rates stay flat",
@@ -1669,7 +1733,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-86",
+      "id": "E-92",
       "from": "ren-bittel",
       "to": "patek-philippe",
       "quote": "in 1984 Bittel told Patek president Philippe Stern, in effect: make this your standard design, and I'll create an ad campaign to identify it in people's heads with your brand.",
@@ -1677,7 +1741,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-87",
+      "id": "E-93",
       "from": "response-sanitization",
       "to": "google-cloud-model-armor",
       "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor",
@@ -1685,7 +1749,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-88",
+      "id": "E-94",
       "from": "response-sanitization",
       "to": "prompt-injection",
       "quote": "This defends against a threat most developers haven’t considered: prompt injection embedded in the data the agent reads.",
@@ -1693,7 +1757,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-89",
+      "id": "E-95",
       "from": "scaffold",
       "to": "neural-language-model",
       "quote": "a powerful class of language models with near-infinite input, output, and reasoning context are scaffolds around neural language models that can call themselves recursively inside of a REPL",
@@ -1701,7 +1765,15 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-90",
+      "id": "E-96",
+      "from": "scaffold",
+      "to": "ai-generated-code",
+      "quote": "investing in scaffolding (like linting, validation, and non-trivial testing) to check AI output automatically",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1774494446115
+    },
+    {
+      "id": "E-97",
       "from": "schema-introspection",
       "to": "discovery-document",
       "quote": "Under the hood, this uses Google’s Discovery Document with dynamic $ref resolution.",
@@ -1709,7 +1781,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-91",
+      "id": "E-98",
       "from": "skill-md-files",
       "to": "ephemeral-software",
       "quote": "A file as a distillation of one's own preferences and taste and judgement and experiences, fed to a neural network trained to help you get your work done",
@@ -1717,7 +1789,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-92",
+      "id": "E-99",
       "from": "spec-driven-development",
       "to": "specification",
       "quote": "In this new paradigm, **Specs become the source of truth**.",
@@ -1725,7 +1797,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-93",
+      "id": "E-100",
       "from": "spec-driven-development",
       "to": "acceptance-criteria",
       "quote": "Humans should review specs, plans, constraints, and acceptance criteria—not 500-line diffs.",
@@ -1733,7 +1805,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-94",
+      "id": "E-101",
       "from": "spec-driven-development",
       "to": "ephemeral-software",
       "quote": "it also feels like you can specify what software is supposed to do without being 100% precise and, as long as the person (thing) implementing it and you have some shared understanding about what's left out of the spec, things will be fine",
@@ -1741,7 +1813,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-95",
+      "id": "E-102",
       "from": "specification",
       "to": "code-review",
       "quote": "You don’t need to review the code. You review the steps.",
@@ -1749,7 +1821,15 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-96",
+      "id": "E-103",
+      "from": "specification",
+      "to": "scaffold",
+      "quote": "I took ownership of all decisions and used it more as “autocomplete on steroids” inside a much tighter process: opinionated design upfront, reviewing every change thoroughly, fixing problems eagerly as I spotted them, and investing in scaffolding",
+      "source": "https://lalitm.com/post/building-syntaqlite-ai/",
+      "createdAt": 1772546664639
+    },
+    {
+      "id": "E-104",
       "from": "swiss-watch-industry",
       "to": "brand",
       "quote": "the way they did it was by transforming themselves from precision instrument makers into luxury brands.",
@@ -1757,7 +1837,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-97",
+      "id": "E-105",
       "from": "unikraft",
       "to": "agent-sandbox-isolation",
       "quote": "Unikraft gives us scale-to-zero out of the box. When a sandbox is idle, the VM suspends. When the next request comes in, it resumes",
@@ -1765,7 +1845,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-98",
+      "id": "E-106",
       "from": "wimp-model",
       "to": "procedural-expressibility",
       "quote": "the successor to WIMP is probably not \"chat,\" at least not in the simplistic sense people sometimes mean... fixed graphical interfaces stop being the only sensible contract between user and machine once the user can increasingly express procedures through a model",
@@ -1773,7 +1853,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-99",
+      "id": "E-107",
       "from": "wimp-model",
       "to": "user-specific-software",
       "quote": "not the end of interfaces, but the end of the assumption that interfaces must be fully fixed in advance because users cannot program the machine",
@@ -1781,7 +1861,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-100",
+      "id": "E-108",
       "from": "zero-secret-sandbox",
       "to": "control-plane-pattern",
       "quote": "the agent inside the sandbox holds no credentials at all, and every privileged operation, including model inference, is routed through an external control plane that owns the secrets on the agent's behalf",
