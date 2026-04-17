@@ -7,7 +7,9 @@
     "dev": "pnpm generate && next dev",
     "build": "pnpm generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@types/three": "^0.183.1",
@@ -23,6 +25,7 @@
     "three-spritetext": "^1.10.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^20.10.0",
     "@types/react": "^18.3.25",
     "@types/react-dom": "^18.3.7",
