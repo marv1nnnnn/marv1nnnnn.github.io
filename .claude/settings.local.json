@@ -42,7 +42,26 @@
       "Bash(npx create-next-app:*)",
       "Bash(pnpm dev:*)",
       "Bash(pnpm generate:*)",
-      "WebFetch(domain:sparkjs.dev)"
+      "WebFetch(domain:sparkjs.dev)",
+      "WebFetch(domain:soniferous.tartarie.com)",
+      "WebFetch(domain:notimportant.org)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"http://soniferous.tartarie.com/events/\" -o /tmp/soniferous.html -w \"%{http_code}\\\\n\")",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://notimportant.org/events/\" -o /tmp/notimportant.html -w \"%{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(pnpm lint *)",
+      "Bash(python3 *)",
+      "Read(//home/marvin/.claude/**)",
+      "Read(//home/marvin/.config/hypr/**)",
+      "Read(//etc/nixos/**)",
+      "Bash(hyprctl reload *)",
+      "Bash(hyprctl version *)",
+      "Bash(hyprctl permissions *)",
+      "Bash(hyprctl binds *)",
+      "Bash(nix profile *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm exec *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ],
     "deny": []
   }

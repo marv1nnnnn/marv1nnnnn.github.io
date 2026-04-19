@@ -189,7 +189,7 @@ export default function KnowledgeGraph({ page, signalId }: { page: SignalKnowled
   return (
     <>
       {/* Search Bar */}
-      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-md">
+      <div className="fixed top-[4.5rem] sm:top-8 left-1/2 -translate-x-1/2 z-[150] w-[calc(100vw-1.5rem)] sm:w-[90%] max-w-md px-0 sm:px-0">
         <div className="relative">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b89065" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
@@ -253,7 +253,7 @@ export default function KnowledgeGraph({ page, signalId }: { page: SignalKnowled
 
       {/* Background & 3D Graph Container */}
       <div className="fixed inset-0 w-full h-full z-0 bg-[#0a0908] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1714] via-[#0a0908] to-[#050404]">
-        <div className="absolute inset-0 ml-[10vw]"> {/* Offset to the right slightly to avoid title */}
+        <div className="absolute inset-0 md:ml-[10vw]"> {/* Offset to the right slightly to avoid title (desktop only) */}
           <ForceGraph3D
           ref={fgRef}
           graphData={graphData}
@@ -425,13 +425,14 @@ export default function KnowledgeGraph({ page, signalId }: { page: SignalKnowled
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-            className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-[#141414]/95 backdrop-blur-3xl border-l-2 border-[#b89065]/40 p-8 md:p-12 text-[#d4c8b8] z-[200] overflow-y-auto shadow-2xl"
+            className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-[#141414]/95 backdrop-blur-3xl border-l-2 border-[#b89065]/40 p-6 sm:p-8 md:p-12 pt-16 sm:pt-20 md:pt-12 text-[#d4c8b8] z-[200] overflow-y-auto shadow-2xl"
           >
             <button
               onClick={() => setSelectedNode(null)}
-              className="absolute top-8 right-8 text-[#b89065]/60 hover:text-[#b89065] transition-colors"
+              aria-label="Close"
+              className="absolute top-3 right-3 sm:top-8 sm:right-8 p-3 text-[#b89065] hover:text-white bg-[#b89065]/10 hover:bg-[#b89065]/20 sm:bg-transparent rounded-full transition-colors"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -444,7 +445,7 @@ export default function KnowledgeGraph({ page, signalId }: { page: SignalKnowled
             
             {/* If markdown has its own H1, we hide our H2 to avoid duplication */}
             {!nodeMarkdown.includes(`# ${selectedNode.name}`) && (
-              <h2 className="text-4xl md:text-5xl font-serif italic tracking-tight mb-8 leading-tight text-white">{selectedNode.name}</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif italic tracking-tight mb-6 sm:mb-8 leading-tight text-white break-words">{selectedNode.name}</h2>
             )}
             
             {/* Type and Sources Layout Fix */}

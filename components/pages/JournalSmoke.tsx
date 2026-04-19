@@ -13,6 +13,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
     const container = containerRef.current;
     if (!container) return;
 
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+
     let disposed = false;
     let renderer: any;
     let animationId: number;
@@ -23,6 +25,7 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
     let onResize: () => void;
     let onTouchStart: (e: TouchEvent) => void;
     let onTouchMove: (e: TouchEvent) => void;
+    let lastW = typeof window !== 'undefined' ? window.innerWidth : 0;
 
     (async () => {
       const THREE = await import('three');
@@ -32,15 +35,17 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 10;
 
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isNarrow, powerPreference: 'low-power' });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(isNarrow ? 1 : Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
       const cards = page.cards || [];
       const meshes: any[] = [];
-      
-      const geometry = new THREE.PlaneGeometry(8, 2, 64, 16);
+
+      const segsX = isNarrow ? 24 : 64;
+      const segsY = isNarrow ? 6 : 16;
+      const geometry = new THREE.PlaneGeometry(8, 2, segsX, segsY);
       
       const vertexShader = `
         varying vec2 vUv;
@@ -167,6 +172,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
 
       onTouchStart = (e: TouchEvent) => {
         touchStartY = e.touches[0].clientY;
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       onTouchMove = (e: TouchEvent) => {
@@ -174,6 +181,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
         touchStartY = e.touches[0].clientY;
         targetScrollY += deltaY * 0.02;
         targetScrollY = Math.max(0, Math.min(targetScrollY, cards.length * 3));
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       onClick = () => {
@@ -191,6 +200,8 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
       renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
+        if (window.innerWidth === lastW) return;
+        lastW = window.innerWidth;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -244,6 +255,7 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
         renderer.domElement.removeEventListener('touchstart', onTouchStart);
         renderer.domElement.removeEventListener('touchmove', onTouchMove);
         renderer.dispose();
+        renderer.forceContextLoss?.();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
@@ -254,14 +266,14 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0" />
-      
-      {/* Desktop hover card overlay */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none w-full max-w-4xl px-4 hidden md:block">
+
+      {/* Hover / tap card overlay */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none w-full max-w-4xl px-4">
         {(page.cards || []).map((card: any) => (
           <motion.div
             key={card.id}
             initial={{ opacity: 0, filter: 'blur(10px)' }}
-            animate={{ 
+            animate={{
               opacity: hoveredId === card.id ? 1 : 0,
               filter: hoveredId === card.id ? 'blur(0px)' : 'blur(10px)',
               y: hoveredId === card.id ? 0 : 20
@@ -270,38 +282,17 @@ export default function JournalSmoke({ page, signalId }: { page: any, signalId: 
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center mix-blend-difference"
             style={{ pointerEvents: hoveredId === card.id ? 'auto' : 'none' }}
           >
-            <h2 className="text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4 break-words">
               {card.title}
             </h2>
-            <p className="font-mono text-sm uppercase tracking-[0.3em] text-white/60 mb-6">
+            <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.3em] text-white/60 mb-4 sm:mb-6">
               {card.date?.replace(/-/g, '.')}
             </p>
-            <p className="font-serif text-xl italic text-white/80 max-w-2xl mx-auto">
+            <p className="font-serif text-base sm:text-xl italic text-white/80 max-w-2xl mx-auto">
               {card.summary}
             </p>
           </motion.div>
         ))}
-      </div>
-
-      {/* Mobile card list fallback */}
-      <div className="md:hidden relative z-20 pt-[60vh] pb-12 px-4">
-        <div className="flex flex-col gap-4">
-          {(page.cards || []).map((card: any) => (
-            <button
-              key={card.id}
-              onClick={() => router.push(`/signals/${signalId}/${card.id}`)}
-              className="text-left border border-white/20 p-5 bg-black/60 backdrop-blur-sm hover:bg-white/10 transition-colors"
-            >
-              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">
-                {card.date?.replace(/-/g, '.')}
-              </div>
-              <h3 className="text-xl font-serif italic font-bold mb-1">{card.title}</h3>
-              {card.summary && (
-                <p className="text-sm text-white/60 font-serif italic">{card.summary}</p>
-              )}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

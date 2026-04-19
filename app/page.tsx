@@ -72,36 +72,8 @@ export default function Home() {
         onSelect={handleSelect}
       />
 
-      {/* Mobile navigation overlay */}
-      <div className="md:hidden fixed inset-0 z-[50] flex flex-col justify-end pointer-events-none pb-12 px-5">
-        <nav className="flex flex-col gap-1 pointer-events-auto">
-          {staircaseItems.map((item, i) => (
-            <motion.button
-              key={item.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-              onClick={() => handleSelect(item.id)}
-              className="group text-left py-3 border-b border-white/10 flex items-baseline gap-3 active:opacity-70 transition-opacity"
-            >
-              <span className="font-mono text-[9px] text-white/30 tracking-[0.3em] uppercase shrink-0">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span className="text-2xl font-serif italic font-bold tracking-tight text-white/90">
-                {item.title}
-              </span>
-              {item.subtitle && (
-                <span className="font-mono text-[9px] text-white/30 tracking-[0.15em] uppercase ml-auto shrink-0">
-                  {item.subtitle}
-                </span>
-              )}
-            </motion.button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Scroll spacer — desktop only for staircase scroll */}
-      <div className="hidden md:block" style={{ height: '300vh' }} aria-hidden="true" />
+      {/* Scroll spacer for staircase scroll */}
+      <div style={{ height: '300vh' }} aria-hidden="true" />
     </>
   );
 }

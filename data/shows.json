@@ -1,0 +1,88 @@
+{
+  "intro": "Selected shows performed as Majin / Ma Jin — live coding, circuit bending, improvised electronics. Mostly around Beijing's fRUITYSPACE 水果 scene, 2016–2021.",
+  "shows": [
+    {
+      "date": "2021-05-29",
+      "title": "Robot's party",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Ju", "Majin", "Warm Little Pond"],
+      "url": "http://soniferous.tartarie.com/events/5nf215_Fruity_Robots_party/index.html"
+    },
+    {
+      "date": "2021-05-22",
+      "title": "Ink & Robots",
+      "venue": "Nuage",
+      "city": "Beijing",
+      "lineup": ["Ju", "Majin", "Einstein", "Toto", "Cybear", "Spleeny"],
+      "url": "http://soniferous.tartarie.com/events/5nf215_Nuage_Ink_robots/index.html"
+    },
+    {
+      "date": "2021-02-06",
+      "title": "Electrochemistry",
+      "venue": "Wujin 五金",
+      "city": "Beijing",
+      "lineup": ["Ju", "Majin", "Toto", "Rufus"],
+      "url": "http://soniferous.tartarie.com/events/5nf212_Wujin_Electrochemistry/index.html"
+    },
+    {
+      "date": "2020-11-19",
+      "title": "aa am mmm",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Ju", "Majin", "Cybear", "Rufus", "Toto", "Einstein"],
+      "url": "http://soniferous.tartarie.com/events/5nf20B_Fruity_Aa_am_mmm/index.html"
+    },
+    {
+      "date": "2019-08-31",
+      "title": "In a Courtyard",
+      "venue": "Xiguan 细管",
+      "city": "Beijing",
+      "lineup": ["Majin", "Splashead"],
+      "url": "http://soniferous.tartarie.com/events/5nf198_In_a_Courtyard/index.html"
+    },
+    {
+      "date": "2019-07-20",
+      "title": "Extrusion Forest",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Majin", "Joaneye", "Splashead"],
+      "url": "http://soniferous.tartarie.com/events/5nf197_Fruity_Extrusion_forest/index.html"
+    },
+    {
+      "date": "2019-05-31",
+      "title": "Tribute to Nakada",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Majin"],
+      "url": "http://soniferous.tartarie.com/events/5nf195_Fruity_Tribute_Nakada/index.html"
+    },
+    {
+      "date": "2017-12-29",
+      "title": "three duos",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Ma Jin / Wang Ziheng", "Li Song / Li Yan", "Zhu Wenbo / Bog"],
+      "note": "New concert series, duo with Wang Ziheng.",
+      "url": "https://www.facebook.com/events/171231056957582/"
+    },
+    {
+      "date": "2017-10-13",
+      "title": "PYRAMID POWER Festival",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Raw Input (Li Song / Ma Jin)"],
+      "note": "Debut performance of Raw Input.",
+      "url": "https://mp.weixin.qq.com/s?__biz=MjM5OTQ3NjYwOQ==&mid=2653633965&idx=4&sn=b97c96ad96513312067e3a0f9c047f55"
+    },
+    {
+      "date": "2016-07-06",
+      "title": "an improvised Wednesday",
+      "venue": "fRUITYSPACE 水果",
+      "city": "Beijing",
+      "lineup": ["Ma Jin", "others"],
+      "note": "Live coding set.",
+      "url": "http://mp.weixin.qq.com/s?__biz=MjM5OTQ3NjYwOQ%3D%3D&mid=2653631630&idx=1&sn=7a7e0f4dd3668c665e4d5fdbedb72057&scene=0#wechat_redirect"
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function AboutFluid({ page }: { page: any }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,12 +11,16 @@ export default function AboutFluid({ page }: { page: any }) {
     const container = containerRef.current;
     if (!container) return;
 
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+
     let disposed = false;
     let renderer: any;
     let animationId: number;
 
     let onMouseMove: (e: MouseEvent) => void;
+    let onTouchMove: (e: TouchEvent) => void;
     let onResize: () => void;
+    let lastW = typeof window !== 'undefined' ? window.innerWidth : 0;
 
     (async () => {
       const THREE = await import('three');
@@ -25,13 +30,14 @@ export default function AboutFluid({ page }: { page: any }) {
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 5;
 
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(isNarrow ? 1 : Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
-      // Blob Geometry & Material
-      const geometry = new THREE.SphereGeometry(1.5, 128, 128);
+      // Blob Geometry & Material — lower segments on narrow viewports
+      const segs = isNarrow ? 64 : 128;
+      const geometry = new THREE.SphereGeometry(1.5, segs, segs);
       
       const vertexShader = `
         varying vec2 vUv;
@@ -157,7 +163,17 @@ export default function AboutFluid({ page }: { page: any }) {
       };
       window.addEventListener('mousemove', onMouseMove);
 
+      onTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 0) return;
+        targetMouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        targetMouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+      };
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
+
       onResize = () => {
+        // ignore mobile-browser address-bar height jitters
+        if (window.innerWidth === lastW) return;
+        lastW = window.innerWidth;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -186,9 +202,11 @@ export default function AboutFluid({ page }: { page: any }) {
       disposed = true;
       cancelAnimationFrame(animationId);
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('resize', onResize);
       if (renderer) {
         renderer.dispose();
+        renderer.forceContextLoss?.();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
@@ -200,7 +218,7 @@ export default function AboutFluid({ page }: { page: any }) {
     <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" />
       
-      <div className="relative z-10 px-6 sm:px-10 lg:px-16 xl:px-24 pt-36 md:pt-44 pb-16 md:pb-24 min-h-screen flex flex-col justify-start">
+      <div className="relative z-10 px-4 sm:px-10 lg:px-16 xl:px-24 pt-28 sm:pt-36 md:pt-44 pb-16 md:pb-24 min-h-screen flex flex-col justify-start">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,10 +232,10 @@ export default function AboutFluid({ page }: { page: any }) {
                   {page.hero.eyebrow}
                 </p>
               )}
-              <h1 className="text-6xl md:text-8xl lg:text-[9rem] xl:text-[10rem] font-serif italic tracking-tighter leading-[0.92] mb-8 lg:mb-10 mix-blend-difference break-words">
+              <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-[9rem] xl:text-[10rem] font-serif italic tracking-tighter leading-[0.92] mb-6 sm:mb-8 lg:mb-10 mix-blend-difference break-words">
                 {page.hero?.title || 'About'}
               </h1>
-              <p className="text-xl md:text-2xl xl:text-3xl font-serif italic text-white/80 leading-relaxed mix-blend-difference max-w-2xl">
+              <p className="text-base sm:text-xl md:text-2xl xl:text-3xl font-serif italic text-white/80 leading-relaxed mix-blend-difference max-w-2xl">
                 {page.hero?.subtitle}
               </p>
             </div>
@@ -245,13 +263,26 @@ export default function AboutFluid({ page }: { page: any }) {
                     rel="noopener noreferrer"
                     className="group inline-flex flex-col gap-1"
                   >
-                    <span className="text-2xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1">
+                    <span className="text-xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1">
                       {page.resume.label || 'Resume'}
                     </span>
                     <span className="font-serif text-sm text-white/50 normal-case tracking-normal">
                       {page.resume.subtitle ? `${page.resume.subtitle} · PDF` : 'PDF'}
                     </span>
                   </a>
+                </div>
+              )}
+              {page.shows?.href && (
+                <div className="pl-5 border-l border-white/25">
+                  <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-white/50 mb-3">Shows</h3>
+                  <Link href={page.shows.href} className="group inline-flex flex-col gap-1">
+                    <span className="text-xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1">
+                      {page.shows.label || 'Live'}
+                    </span>
+                    <span className="font-serif text-sm text-white/50 normal-case tracking-normal">
+                      {page.shows.subtitle || 'Past performances'}
+                    </span>
+                  </Link>
                 </div>
               )}
               <div className="pl-5 border-l border-white/25 lg:min-h-0">
@@ -263,7 +294,7 @@ export default function AboutFluid({ page }: { page: any }) {
                       href={link.href || link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block break-inside-avoid mb-3 text-2xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1"
+                      className="block break-inside-avoid mb-3 text-xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1"
                     >
                       {link.label}
                     </a>

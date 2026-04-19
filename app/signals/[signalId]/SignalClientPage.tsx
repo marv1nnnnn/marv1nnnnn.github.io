@@ -89,13 +89,16 @@ export default function SignalClientPage({ signal, signalId }: { signal: Signal;
         />
       </AnimatePresence>
 
-      <div className="fixed top-8 left-8 md:top-12 md:left-12 z-[100] mix-blend-difference">
-        <Link href="/" className="group flex items-center gap-4 text-white">
-          <div className="w-6 h-[1px] bg-white opacity-50 group-hover:w-10 transition-all"></div>
+      <div className="fixed top-3 left-3 sm:top-8 sm:left-8 md:top-12 md:left-12 z-[110]">
+        <Link
+          href="/"
+          className="group flex items-center gap-2 sm:gap-4 text-white px-3 py-2 sm:p-0 sm:bg-transparent bg-black/60 backdrop-blur-sm sm:backdrop-blur-0 border border-white/15 sm:border-0 rounded-full sm:rounded-none active:bg-white/10 sm:mix-blend-difference"
+        >
+          <div className="w-4 sm:w-6 h-[1px] bg-white opacity-50 group-hover:w-10 transition-all"></div>
           <motion.span
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="font-mono text-[10px] uppercase tracking-[0.3em]"
+            className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em]"
           >
             Back
           </motion.span>
@@ -104,18 +107,18 @@ export default function SignalClientPage({ signal, signalId }: { signal: Signal;
 
       {/* Header — profile pages render their own hero in AboutFluid; skip duplicate title to avoid overlap */}
       <div
-        className={`fixed left-8 md:left-12 z-[100] mix-blend-difference pointer-events-none ${
-          page.type === 'profile' ? 'top-24 max-w-[min(90vw,22rem)]' : 'top-24'
-        }`}
+        className={`fixed left-4 sm:left-8 md:left-12 z-[100] mix-blend-difference pointer-events-none ${
+          page.type === 'profile' ? 'top-16 sm:top-24 max-w-[min(90vw,22rem)]' : 'top-16 sm:top-24'
+        } max-w-[calc(100vw-7rem)] sm:max-w-none`}
       >
         {page.type !== 'profile' && (
-          <h1 className="text-5xl md:text-7xl lg:text-[8rem] font-serif italic tracking-tighter lowercase leading-none text-white kinetic-text">
+          <h1 className="text-2xl sm:text-5xl md:text-7xl lg:text-[8rem] font-serif italic tracking-tighter lowercase leading-none text-white kinetic-text break-words">
             {signal.title}
           </h1>
         )}
         {page.type !== 'profile' && (
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 flex items-center gap-4 mt-6">
-            <div className="w-8 h-[1px] bg-white/40 shrink-0" />
+          <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/40 flex items-center gap-3 sm:gap-4 mt-2 sm:mt-6">
+            <div className="w-6 sm:w-8 h-[1px] bg-white/40 shrink-0" />
             {page.type}
           </div>
         )}

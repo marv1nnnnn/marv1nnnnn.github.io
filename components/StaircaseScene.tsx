@@ -153,20 +153,30 @@ export default function StaircaseScene({
       if (disposed) return;
 
       const scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(12, 4, 18);
-      camera.lookAt(0, -2, 0);
+      const isPortrait = window.innerWidth < 768;
+      camera = new THREE.PerspectiveCamera(isPortrait ? 70 : 45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      if (isPortrait) {
+        camera.position.set(4, 1, 13);
+        camera.lookAt(4, -2, 0);
+      } else {
+        camera.position.set(12, 4, 18);
+        camera.lookAt(0, -2, 0);
+      }
 
-      renderer = new THREE.WebGLRenderer({ 
-        antialias: true, 
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
         alpha: true,
         powerPreference: "high-performance",
         precision: "mediump"
       });
-      
+
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setClearColor(0x000000, 0);
+      renderer.localClippingEnabled = isPortrait;
+      const portraitClipPlane = isPortrait
+        ? new THREE.Plane(new THREE.Vector3(1, 0, 0), 0)
+        : null;
       
       renderer.domElement.style.opacity = '0';
       renderer.domElement.style.transition = 'opacity 0.4s ease-out';
@@ -181,6 +191,9 @@ export default function StaircaseScene({
 
       const spiralGroup = new THREE.Group();
       spiralGroup.position.set(0, 2, 0);
+      if (isPortrait) {
+        spiralGroup.scale.set(0.55, 0.55, 0.55);
+      }
       scene.add(spiralGroup);
 
       const liquidVertexShader = `
@@ -340,7 +353,8 @@ export default function StaircaseScene({
             uIndex: { value: index }
           },
           transparent: true,
-          side: THREE.DoubleSide
+          side: THREE.DoubleSide,
+          clippingPlanes: portraitClipPlane ? [portraitClipPlane] : []
         });
         materials.push(material);
 
@@ -449,9 +463,9 @@ export default function StaircaseScene({
           const maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
           const t = Math.min(smoothScroll / maxScroll, 1);
           
-          const totalHeight = (items.length - 1) * STEP_HEIGHT;
+          const totalHeight = (items.length - 1) * STEP_HEIGHT * spiralGroup.scale.y;
           const totalRot = (items.length - 1) * Math.abs(RAD_PER_STEP);
-          
+
           spiralGroup.position.y = t * totalHeight * 1.1;
           spiralGroup.rotation.y = t * totalRot * 1.1;
 
@@ -490,8 +504,18 @@ export default function StaircaseScene({
 
           mesh.getWorldPosition(worldPos);
           mesh.getWorldQuaternion(_q);
-          
-          _frontOffset.set(STEP_WIDTH / 4, 0, STEP_DEPTH / 2 + 0.2);
+
+          const groupScale = spiralGroup.scale.x;
+
+          // Hide label when the mesh is on the clipped (negative-x) side in portrait
+          if (portraitClipPlane && worldPos.x < 0.2) {
+            const label = labelElements[index];
+            label.style.opacity = '0';
+            return;
+          }
+
+          const offsetMul = groupScale < 0.6 ? 1.6 : 1;
+          _frontOffset.set((STEP_WIDTH / 4) * groupScale * offsetMul, 0, (STEP_DEPTH / 2 + 0.2) * groupScale * offsetMul);
           _frontOffset.applyQuaternion(_q);
           worldPos.add(_frontOffset);
 

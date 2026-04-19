@@ -13,6 +13,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
     const container = containerRef.current;
     if (!container) return;
 
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+
     let disposed = false;
     let renderer: any;
     let animationId: number;
@@ -23,6 +25,7 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
     let onResize: () => void;
     let onTouchStart: (e: TouchEvent) => void;
     let onTouchMove: (e: TouchEvent) => void;
+    let lastW = typeof window !== 'undefined' ? window.innerWidth : 0;
 
     (async () => {
       const THREE = await import('three');
@@ -32,15 +35,16 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 20;
 
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isNarrow, powerPreference: 'low-power' });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(isNarrow ? 1 : Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
       const cards = page.cards || [];
       const meshes: any[] = [];
-      
-      const geometry = new THREE.SphereGeometry(1, 64, 64);
+
+      const sphereSegs = isNarrow ? 32 : 64;
+      const geometry = new THREE.SphereGeometry(1, sphereSegs, sphereSegs);
       
       const vertexShader = `
         varying vec2 vUv;
@@ -137,6 +141,10 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
         }
       `;
 
+      // narrow portrait viewports clip pebbles near x=±4, so shrink amplitude
+      const xAmp = isNarrow ? 1.8 : 4;
+      const zAmp = isNarrow ? 1 : 2;
+
       cards.forEach((card: any, i: number) => {
         const material = new THREE.ShaderMaterial({
           vertexShader,
@@ -151,12 +159,12 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
         });
 
         const mesh = new THREE.Mesh(geometry, material);
-        
+
         // Distribute in a river-like flow
         const t = i / Math.max(1, cards.length - 1);
         const y = (0.5 - t) * 20;
-        const x = Math.sin(t * Math.PI * 4) * 4;
-        const z = Math.cos(t * Math.PI * 3) * 2;
+        const x = Math.sin(t * Math.PI * 4) * xAmp;
+        const z = Math.cos(t * Math.PI * 3) * zAmp;
         
         mesh.position.set(x, y, z);
         mesh.userData = { card, index: i, baseX: x, baseY: y, baseZ: z };
@@ -183,6 +191,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
 
       onTouchStart = (e: TouchEvent) => {
         touchStartY = e.touches[0].clientY;
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       onTouchMove = (e: TouchEvent) => {
@@ -190,6 +200,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
         touchStartY = e.touches[0].clientY;
         targetScrollY += deltaY * 0.03;
         targetScrollY = Math.max(-5, Math.min(targetScrollY, 20));
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       onClick = () => {
@@ -207,6 +219,8 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
       renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
+        if (window.innerWidth === lastW) return;
+        lastW = window.innerWidth;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -267,6 +281,7 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
         renderer.domElement.removeEventListener('touchstart', onTouchStart);
         renderer.domElement.removeEventListener('touchmove', onTouchMove);
         renderer.dispose();
+        renderer.forceContextLoss?.();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
@@ -277,16 +292,16 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
       <div ref={containerRef} className="fixed inset-0 z-0" />
-      
+
       <AnimatePresence>
         {hoveredCard && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mix-blend-difference w-full max-w-2xl text-center px-4 hidden md:block"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mix-blend-difference w-full max-w-2xl text-center px-4"
           >
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4 break-words">
               {hoveredCard.title}
             </h2>
             <p className="font-mono text-xs sm:text-sm uppercase tracking-[0.3em] text-white/60 mb-6">
@@ -298,34 +313,13 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <div className="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 z-10 mix-blend-difference pointer-events-none">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 flex flex-col items-end gap-2">
           <span className="hidden sm:block">Scroll to navigate river</span>
           <span className="hidden sm:block">Click pebble to inspect</span>
           <span className="sm:hidden">Drag to navigate</span>
           <span className="sm:hidden">Tap pebble to inspect</span>
-        </div>
-      </div>
-
-      {/* Mobile card list fallback */}
-      <div className="md:hidden relative z-20 pt-[60vh] pb-12 px-4">
-        <div className="flex flex-col gap-4">
-          {(page.cards || []).map((card: any) => (
-            <button
-              key={card.id}
-              onClick={() => router.push(`/signals/${signalId}/${card.id}`)}
-              className="text-left border border-white/20 p-5 bg-black/60 backdrop-blur-sm hover:bg-white/10 transition-colors"
-            >
-              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">
-                {card.date?.replace(/-/g, '.')} {card.tags?.length ? `// ${card.tags.join(', ')}` : ''}
-              </div>
-              <h3 className="text-xl font-serif italic font-bold mb-1">{card.title}</h3>
-              {card.summary && (
-                <p className="text-sm text-white/60 font-serif italic">{card.summary}</p>
-              )}
-            </button>
-          ))}
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@ export default function InfluencesVortex({ page }: { page: any }) {
     const container = containerRef.current;
     if (!container) return;
 
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+
     let disposed = false;
     let renderer: any;
     let animationId: number;
@@ -20,6 +22,7 @@ export default function InfluencesVortex({ page }: { page: any }) {
     let onMouseMove: (e: MouseEvent) => void;
     let onTouchStart: (e: TouchEvent) => void;
     let onTouchMove: (e: TouchEvent) => void;
+    let lastW = typeof window !== 'undefined' ? window.innerWidth : 0;
 
     (async () => {
       const THREE = await import('three');
@@ -32,15 +35,16 @@ export default function InfluencesVortex({ page }: { page: any }) {
       camera.position.z = 0;
       camera.position.y = 0;
 
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isNarrow, powerPreference: 'low-power' });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(isNarrow ? 1 : Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
       const records = page.records || [];
       const meshes: any[] = [];
-      
-      const geometry = new THREE.PlaneGeometry(4, 4, 32, 32);
+
+      const planeSegs = isNarrow ? 8 : 32;
+      const geometry = new THREE.PlaneGeometry(4, 4, planeSegs, planeSegs);
       
       const vertexShader = `
         varying vec2 vUv;
@@ -140,6 +144,9 @@ export default function InfluencesVortex({ page }: { page: any }) {
 
       onTouchStart = (e: TouchEvent) => {
         touchStartY = e.touches[0].clientY;
+        // feed touch position into raycaster so tapping highlights records
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       onTouchMove = (e: TouchEvent) => {
@@ -147,13 +154,17 @@ export default function InfluencesVortex({ page }: { page: any }) {
         touchStartY = e.touches[0].clientY;
         targetScrollY += deltaY * 0.02;
         targetScrollY = Math.max(0, Math.min(targetScrollY, records.length * 8));
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
       };
 
       window.addEventListener('wheel', onWheel);
-      container.addEventListener('touchstart', onTouchStart, { passive: true });
-      container.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchstart', onTouchStart, { passive: true });
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
 
       onResize = () => {
+        if (window.innerWidth === lastW) return;
+        lastW = window.innerWidth;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -209,11 +220,12 @@ export default function InfluencesVortex({ page }: { page: any }) {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('mousemove', onMouseMove);
-      container.removeEventListener('touchstart', onTouchStart);
-      container.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
       document.body.style.cursor = 'default';
       if (renderer) {
         renderer.dispose();
+        renderer.forceContextLoss?.();
         if (container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
@@ -223,51 +235,21 @@ export default function InfluencesVortex({ page }: { page: any }) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
-      <div ref={containerRef} className="fixed inset-0 z-0 md:pointer-events-none" />
+      <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" />
 
-      {/* Desktop hover info */}
+      {/* Hover / tap info */}
       {hoveredRecord && (
-        <div className="hidden md:block fixed bottom-12 right-12 z-20 max-w-md bg-black/80 backdrop-blur-md border border-white/20 p-6 pointer-events-none">
-          <div className="font-mono text-xs uppercase tracking-[0.3em] text-white/50 mb-2">
+        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:bottom-12 sm:right-12 z-20 sm:max-w-md bg-black/80 backdrop-blur-md border border-white/20 p-4 sm:p-6 pointer-events-none">
+          <div className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.3em] text-white/50 mb-2">
             {hoveredRecord.medium} // {hoveredRecord.year}
           </div>
-          <h3 className="text-2xl font-serif italic font-bold mb-1">{hoveredRecord.title}</h3>
-          <div className="text-lg font-sans mb-4">{hoveredRecord.artist}</div>
-          <p className="text-sm font-mono leading-relaxed text-white/80">
+          <h3 className="text-xl sm:text-2xl font-serif italic font-bold mb-1">{hoveredRecord.title}</h3>
+          <div className="text-base sm:text-lg font-sans mb-3 sm:mb-4">{hoveredRecord.artist}</div>
+          <p className="text-xs sm:text-sm font-mono leading-relaxed text-white/80">
             {hoveredRecord.personalNote}
           </p>
         </div>
       )}
-
-      {/* Mobile card list fallback */}
-      <div className="md:hidden relative z-20 pt-[50vh] pb-12 px-4">
-        <div className="flex flex-col gap-4">
-          {(page.records || []).map((record: any, idx: number) => (
-            <div
-              key={idx}
-              className="border border-white/20 bg-black/60 backdrop-blur-sm p-5 flex gap-4 items-start"
-            >
-              {record.image_url && (
-                <img
-                  src={record.image_url}
-                  alt={record.title}
-                  className="w-16 h-16 object-cover shrink-0"
-                />
-              )}
-              <div className="min-w-0">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 mb-1">
-                  {record.medium} // {record.year}
-                </div>
-                <h3 className="text-lg font-serif italic font-bold mb-0.5">{record.title}</h3>
-                <div className="text-sm font-sans text-white/70 mb-2">{record.artist}</div>
-                {record.personalNote && (
-                  <p className="text-xs font-mono text-white/60 leading-relaxed">{record.personalNote}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
