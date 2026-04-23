@@ -516,5 +516,12 @@
     "type": "music",
     "date": "2026-04-17",
     "url": "https://open.spotify.com/album/4X4cmhqFm50dk6LyTtLuv6"
+  },
+  {
+    "title": "Coding Models Are Doing Too Much",
+    "creator": "wh.",
+    "type": "text",
+    "date": "2026-04-23",
+    "url": "https://nrehiew.github.io/blog/minimal_editing/"
   }
 ]
