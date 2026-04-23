@@ -1,6 +1,6 @@
 # Code Review
 Type: concept
-Sources: https://www.latent.space/p/reviews-dead
+Sources: https://www.latent.space/p/reviews-dead, https://nrehiew.github.io/blog/minimal_editing/
 
 Human approval process for code changes, argued here to be increasingly unscalable in AI-era development.
 
@@ -9,4 +9,5 @@ Human approval process for code changes, argued here to be increasingly unscalab
 - ← AI-assisted Large-scale Development: "I didn't write a single line of code. I reviewed it all though and consistently nudged the AI in the right direction"
 - ← AI-generated code: "developers keep saying that reviewing AI-generated code requires more effort than reviewing code written by their colleagues."
 - ← AI-generated code: "the defenses we relied on (code review, testing, manual inspection) are the same ones that missed Heartbleed for two years"
+- ← Over-Editing: "A model that rewrites entire functions, even correctly, makes this job dramatically harder as the code is now completely unrecognizable."
 - ← Specification: "You don’t need to review the code. You review the steps."

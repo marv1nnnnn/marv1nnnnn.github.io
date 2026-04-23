@@ -4,9 +4,10 @@
   "type": "concept",
   "description": "Human approval process for code changes, argued here to be increasingly unscalable in AI-era development.",
   "sources": [
-    "https://www.latent.space/p/reviews-dead"
+    "https://www.latent.space/p/reviews-dead",
+    "https://nrehiew.github.io/blog/minimal_editing/"
   ],
   "createdAt": 1772546664639,
-  "updatedAt": 1772546664639,
+  "updatedAt": 1776913139570,
   "edges": []
 }

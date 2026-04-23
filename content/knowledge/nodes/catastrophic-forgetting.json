@@ -1,0 +1,12 @@
+{
+  "id": "catastrophic-forgetting",
+  "name": "Catastrophic Forgetting",
+  "type": "concept",
+  "description": "Loss of general coding ability after fine-tuning for minimal editing, especially when training data distribution differs strongly from the model's original distribution.",
+  "sources": [
+    "https://nrehiew.github.io/blog/minimal_editing/"
+  ],
+  "createdAt": 1776913139583,
+  "updatedAt": 1776913139583,
+  "edges": []
+}

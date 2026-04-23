@@ -293,6 +293,17 @@
       "updatedAt": 1773649285547
     },
     {
+      "id": "catastrophic-forgetting",
+      "name": "Catastrophic Forgetting",
+      "type": "concept",
+      "description": "Loss of general coding ability after fine-tuning for minimal editing, especially when training data distribution differs strongly from the model's original distribution.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139583,
+      "updatedAt": 1776913139583
+    },
+    {
       "id": "code-mode",
       "name": "Code Mode",
       "type": "concept",
@@ -309,10 +320,11 @@
       "type": "concept",
       "description": "Human approval process for code changes, argued here to be increasingly unscalable in AI-era development.",
       "sources": [
-        "https://www.latent.space/p/reviews-dead"
+        "https://www.latent.space/p/reviews-dead",
+        "https://nrehiew.github.io/blog/minimal_editing/"
       ],
       "createdAt": 1772546664639,
-      "updatedAt": 1772546664639
+      "updatedAt": 1776913139570
     },
     {
       "id": "context-window-discipline",
@@ -680,6 +692,28 @@
       "updatedAt": 1772766032016
     },
     {
+      "id": "minimal-editing-prompt",
+      "name": "minimal editing prompt",
+      "type": "strategy",
+      "description": "An explicit instruction to preserve the original code and logic as much as possible, which reduces unnecessary edits and often improves correctness.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139576,
+      "updatedAt": 1776913139590
+    },
+    {
+      "id": "minimal-editing-training",
+      "name": "minimal editing training",
+      "type": "strategy",
+      "description": "Training approaches to make models faithful editors, including SFT, rSFT, DPO, and RL using correctness plus edit-minimality signals.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139578,
+      "updatedAt": 1776913139598
+    },
+    {
       "id": "model-inhabiting-state",
       "name": "Model inhabiting state",
       "type": "concept",
@@ -746,6 +780,17 @@
       "updatedAt": 1774400936164
     },
     {
+      "id": "over-editing",
+      "name": "Over-Editing",
+      "type": "concept",
+      "description": "A brown-field coding failure mode where a model produces functionally correct fixes but rewrites more code than necessary, making review harder and degrading code quality.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139559,
+      "updatedAt": 1776913139585
+    },
+    {
       "id": "patek-philippe",
       "name": "Patek Philippe",
       "type": "company",
@@ -801,6 +846,17 @@
       "updatedAt": 1772766032016
     },
     {
+      "id": "reasoning-models",
+      "name": "Reasoning models",
+      "type": "concept",
+      "description": "Models with extended reasoning that tend by default to elaborate and 'improve' code beyond the required fix, though they can also follow minimal-edit constraints well when explicitly instructed.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139573,
+      "updatedAt": 1776913139586
+    },
+    {
       "id": "recursive-language-models",
       "name": "Recursive Language Models",
       "type": "concept",
@@ -843,6 +899,17 @@
       ],
       "createdAt": 1772766080286,
       "updatedAt": 1772766080286
+    },
+    {
+      "id": "rl",
+      "name": "RL",
+      "type": "strategy",
+      "description": "Reinforcement learning with a reward combining functional correctness and Levenshtein-based minimality; the only method reported to generalize cleanly out-of-domain without degrading broader coding ability.",
+      "sources": [
+        "https://nrehiew.github.io/blog/minimal_editing/"
+      ],
+      "createdAt": 1776913139580,
+      "updatedAt": 1776913139596
     },
     {
       "id": "royal-oak",
@@ -1614,6 +1681,38 @@
     },
     {
       "id": "E-77",
+      "from": "minimal-editing-prompt",
+      "to": "over-editing",
+      "quote": "With explicit prompting, every model improves and reduces its Levenshtein Distance",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139576
+    },
+    {
+      "id": "E-78",
+      "from": "minimal-editing-prompt",
+      "to": "reasoning-models",
+      "quote": "that same reasoning capacity also makes them better at following the constraint once it is given",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139576
+    },
+    {
+      "id": "E-79",
+      "from": "minimal-editing-training",
+      "to": "over-editing",
+      "quote": "A natural next question: can we train models to be more faithful editors?",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139578
+    },
+    {
+      "id": "E-80",
+      "from": "minimal-editing-training",
+      "to": "catastrophic-forgetting",
+      "quote": "whether fine-tuning for minimal editing degrades general coding ability",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139578
+    },
+    {
+      "id": "E-81",
       "from": "model-inhabiting-state",
       "to": "user-specific-software",
       "quote": "the intelligence was not in scaffolding a fresh app. it was in understanding an existing stateful environment and using code as the mechanism of interaction with it",
@@ -1621,7 +1720,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-78",
+      "id": "E-82",
       "from": "neural-language-model",
       "to": "scaffold",
       "quote": "the language models we interact with in the (near) future will be what we call scaffolds today",
@@ -1629,7 +1728,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-79",
+      "id": "E-83",
       "from": "neural-language-model",
       "to": "evaluation-crisis",
       "quote": "How do you begin to evaluate between scaffolds like Claude Code, Codex, Cursor, and Antigravity with anything other than 'vibes'?",
@@ -1637,7 +1736,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-80",
+      "id": "E-84",
       "from": "omega",
       "to": "quartz-crisis",
       "quote": "By 1981 they were insolvent and were taken over by their creditors.",
@@ -1645,7 +1744,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-81",
+      "id": "E-85",
       "from": "opencomputer",
       "to": "sandbox-lifecycle-patterns",
       "quote": "OpenComputer takes a middle path between long-lived and hybrid designs. Where possible, environments are paused and resumed on the same host so they can preserve local state and avoid unnecessary cold starts",
@@ -1653,7 +1752,7 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-82",
+      "id": "E-86",
       "from": "opencomputer",
       "to": "agent-placement",
       "quote": "we favor placing the agent inside the isolated compute environment where it will actually execute code. It is usually the fastest and simplest approach",
@@ -1661,7 +1760,15 @@
       "createdAt": 1774400936164
     },
     {
-      "id": "E-83",
+      "id": "E-87",
+      "from": "over-editing",
+      "to": "code-review",
+      "quote": "A model that rewrites entire functions, even correctly, makes this job dramatically harder as the code is now completely unrecognizable.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139559
+    },
+    {
+      "id": "E-88",
       "from": "patek-philippe",
       "to": "golden-ellipse",
       "quote": "In 1968 (that year again) Patek Philippe launched a new watch that shifted the center of gravity of case design... The result was a striking new model called the Golden Ellipse.",
@@ -1669,7 +1776,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-84",
+      "id": "E-89",
       "from": "patek-philippe",
       "to": "brand-advertising",
       "quote": "To encourage them, Patek did something that none of the holy trinity had done much of before: brand advertising.",
@@ -1677,7 +1784,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-85",
+      "id": "E-90",
       "from": "patek-philippe",
       "to": "g-rald-genta",
       "quote": "Encouraged by the success of the Royal Oak, Patek Philippe commissioned Gérald Genta in 1974 to design a similar watch for them.",
@@ -1685,7 +1792,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-86",
+      "id": "E-91",
       "from": "patek-philippe",
       "to": "nautilus",
       "quote": "It was called the Nautilus, and it launched at the Basel Watch Fair in 1976.",
@@ -1693,7 +1800,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-87",
+      "id": "E-92",
       "from": "procedural-expressibility",
       "to": "capability-scoped-sandbox",
       "quote": "if models can write code on behalf of users, where does that code run? ... THAT requires a different kind of runtime primitive",
@@ -1701,7 +1808,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-88",
+      "id": "E-93",
       "from": "quartz-crisis",
       "to": "swiss-watch-industry",
       "quote": "In the early 1970s disaster struck the Swiss watch industry. Now people call it the quartz crisis",
@@ -1709,7 +1816,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-89",
+      "id": "E-94",
       "from": "quartz-movements",
       "to": "mechanical-watches",
       "quote": "Quartz movements were not only more accurate than any mechanical movement, but thinner too.",
@@ -1717,7 +1824,15 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-90",
+      "id": "E-95",
+      "from": "reasoning-models",
+      "to": "over-editing",
+      "quote": "Therefore, the takeaway is that the default behavior of most reasoning models is to over-edit.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139573
+    },
+    {
+      "id": "E-96",
       "from": "recursive-language-models",
       "to": "scaffold",
       "quote": "The argument presented in that paper is a formalized implementation of the theme of this essay",
@@ -1725,7 +1840,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-91",
+      "id": "E-97",
       "from": "red-queen-hypothesis-startups",
       "to": "ai-adoption",
       "quote": "when new startup methods are quickly adopted by everyone, no one gains a relative advantage, and success rates stay flat",
@@ -1733,7 +1848,7 @@
       "createdAt": 1774243074123
     },
     {
-      "id": "E-92",
+      "id": "E-98",
       "from": "ren-bittel",
       "to": "patek-philippe",
       "quote": "in 1984 Bittel told Patek president Philippe Stern, in effect: make this your standard design, and I'll create an ad campaign to identify it in people's heads with your brand.",
@@ -1741,7 +1856,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-93",
+      "id": "E-99",
       "from": "response-sanitization",
       "to": "google-cloud-model-armor",
       "quote": "`--sanitize <TEMPLATE>` pipes API responses through Google Cloud Model Armor",
@@ -1749,7 +1864,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-94",
+      "id": "E-100",
       "from": "response-sanitization",
       "to": "prompt-injection",
       "quote": "This defends against a threat most developers haven’t considered: prompt injection embedded in the data the agent reads.",
@@ -1757,7 +1872,23 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-95",
+      "id": "E-101",
+      "from": "rl",
+      "to": "minimal-editing-training",
+      "quote": "RL is the only method that generalizes cleanly, improving on all three metrics over both baselines.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139580
+    },
+    {
+      "id": "E-102",
+      "from": "rl",
+      "to": "catastrophic-forgetting",
+      "quote": "The RL model, however, does not experience any degradation.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/",
+      "createdAt": 1776913139580
+    },
+    {
+      "id": "E-103",
       "from": "scaffold",
       "to": "neural-language-model",
       "quote": "a powerful class of language models with near-infinite input, output, and reasoning context are scaffolds around neural language models that can call themselves recursively inside of a REPL",
@@ -1765,7 +1896,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-96",
+      "id": "E-104",
       "from": "scaffold",
       "to": "ai-generated-code",
       "quote": "investing in scaffolding (like linting, validation, and non-trivial testing) to check AI output automatically",
@@ -1773,7 +1904,7 @@
       "createdAt": 1774494446115
     },
     {
-      "id": "E-97",
+      "id": "E-105",
       "from": "schema-introspection",
       "to": "discovery-document",
       "quote": "Under the hood, this uses Google’s Discovery Document with dynamic $ref resolution.",
@@ -1781,7 +1912,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-98",
+      "id": "E-106",
       "from": "skill-md-files",
       "to": "ephemeral-software",
       "quote": "A file as a distillation of one's own preferences and taste and judgement and experiences, fed to a neural network trained to help you get your work done",
@@ -1789,7 +1920,7 @@
       "createdAt": 1772766080286
     },
     {
-      "id": "E-99",
+      "id": "E-107",
       "from": "spec-driven-development",
       "to": "specification",
       "quote": "In this new paradigm, **Specs become the source of truth**.",
@@ -1797,7 +1928,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-100",
+      "id": "E-108",
       "from": "spec-driven-development",
       "to": "acceptance-criteria",
       "quote": "Humans should review specs, plans, constraints, and acceptance criteria—not 500-line diffs.",
@@ -1805,7 +1936,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-101",
+      "id": "E-109",
       "from": "spec-driven-development",
       "to": "ephemeral-software",
       "quote": "it also feels like you can specify what software is supposed to do without being 100% precise and, as long as the person (thing) implementing it and you have some shared understanding about what's left out of the spec, things will be fine",
@@ -1813,7 +1944,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-102",
+      "id": "E-110",
       "from": "specification",
       "to": "code-review",
       "quote": "You don’t need to review the code. You review the steps.",
@@ -1821,7 +1952,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-103",
+      "id": "E-111",
       "from": "specification",
       "to": "scaffold",
       "quote": "I took ownership of all decisions and used it more as “autocomplete on steroids” inside a much tighter process: opinionated design upfront, reviewing every change thoroughly, fixing problems eagerly as I spotted them, and investing in scaffolding",
@@ -1829,7 +1960,7 @@
       "createdAt": 1772546664639
     },
     {
-      "id": "E-104",
+      "id": "E-112",
       "from": "swiss-watch-industry",
       "to": "brand",
       "quote": "the way they did it was by transforming themselves from precision instrument makers into luxury brands.",
@@ -1837,7 +1968,7 @@
       "createdAt": 1772766032016
     },
     {
-      "id": "E-105",
+      "id": "E-113",
       "from": "unikraft",
       "to": "agent-sandbox-isolation",
       "quote": "Unikraft gives us scale-to-zero out of the box. When a sandbox is idle, the VM suspends. When the next request comes in, it resumes",
@@ -1845,7 +1976,7 @@
       "createdAt": 1772522057379
     },
     {
-      "id": "E-106",
+      "id": "E-114",
       "from": "wimp-model",
       "to": "procedural-expressibility",
       "quote": "the successor to WIMP is probably not \"chat,\" at least not in the simplistic sense people sometimes mean... fixed graphical interfaces stop being the only sensible contract between user and machine once the user can increasingly express procedures through a model",
@@ -1853,7 +1984,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-107",
+      "id": "E-115",
       "from": "wimp-model",
       "to": "user-specific-software",
       "quote": "not the end of interfaces, but the end of the assumption that interfaces must be fully fixed in advance because users cannot program the machine",
@@ -1861,7 +1992,7 @@
       "createdAt": 1773649285547
     },
     {
-      "id": "E-108",
+      "id": "E-116",
       "from": "zero-secret-sandbox",
       "to": "control-plane-pattern",
       "quote": "the agent inside the sandbox holds no credentials at all, and every privileged operation, including model inference, is routed through an external control plane that owns the secrets on the agent's behalf",

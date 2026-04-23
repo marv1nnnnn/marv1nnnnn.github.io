@@ -1,0 +1,23 @@
+{
+  "id": "rl",
+  "name": "RL",
+  "type": "strategy",
+  "description": "Reinforcement learning with a reward combining functional correctness and Levenshtein-based minimality; the only method reported to generalize cleanly out-of-domain without degrading broader coding ability.",
+  "sources": [
+    "https://nrehiew.github.io/blog/minimal_editing/"
+  ],
+  "createdAt": 1776913139580,
+  "updatedAt": 1776913139596,
+  "edges": [
+    {
+      "to": "minimal-editing-training",
+      "quote": "RL is the only method that generalizes cleanly, improving on all three metrics over both baselines.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/"
+    },
+    {
+      "to": "catastrophic-forgetting",
+      "quote": "The RL model, however, does not experience any degradation.",
+      "source": "https://nrehiew.github.io/blog/minimal_editing/"
+    }
+  ]
+}
