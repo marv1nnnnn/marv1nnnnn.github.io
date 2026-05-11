@@ -586,5 +586,12 @@
     "type": "video",
     "date": "2026-05-10",
     "url": "https://movie.douban.com/subject/38239563/"
+  },
+  {
+    "title": "The Wu Tapes",
+    "creator": "Jeremy Stern",
+    "type": "text",
+    "date": "2026-05-11",
+    "url": "https://colossus.com/article/scott-wu-tapes-cognition/"
   }
 ]
