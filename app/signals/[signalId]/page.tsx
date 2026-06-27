@@ -19,9 +19,27 @@ export async function generateMetadata({ params }: { params: Promise<{ signalId:
     };
   }
 
+  const title = `${signal.title} // MARV1NNNNN`;
+  const description = signal.summary ?? `Selected data fragments from ${signal.title} // Archive_v0.6`;
+  const url = `/signals/${signalId}`;
+
   return {
-    title: `${signal.title} // MARV1NNNNN`,
-    description: `Selected data fragments from ${signal.title} // Archive_v0.6`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      images: [{ url: '/images/cursor_shenzhen.png', width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/images/cursor_shenzhen.png'],
+    },
   };
 }
 

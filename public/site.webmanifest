@@ -1,0 +1,18 @@
+{
+  "name": "Marvin Ma · MARV1NNNNN",
+  "short_name": "MARV1NNNNN",
+  "description": "AI engineer, Cursor Ambassador, and creative coding portfolio of Marvin Ma.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

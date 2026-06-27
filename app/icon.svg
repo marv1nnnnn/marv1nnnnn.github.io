@@ -1,13 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Retro radio/scanner icon with cute aesthetic -->
-  <rect x="4" y="8" width="24" height="20" fill="#1a1a1a" stroke="#00ff00" stroke-width="2" rx="2"/>
-  <circle cx="16" cy="13" r="3" fill="#00ff00"/>
-  <path d="M 10 20 L 14 20 M 18 20 L 22 20" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/>
-  <!-- Antenna -->
-  <line x1="16" y1="8" x2="16" y2="3" stroke="#00ff00" stroke-width="2"/>
-  <circle cx="16" cy="2" r="1.5" fill="#00ff00"/>
-  <!-- Radio waves -->
-  <path d="M 8 13 Q 6 13 6 10" stroke="#00ff00" stroke-width="1.5" fill="none" opacity="0.6"/>
-  <path d="M 24 13 Q 26 13 26 10" stroke="#00ff00" stroke-width="1.5" fill="none" opacity="0.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MARV1NNNNN avatar">
+  <rect width="64" height="64" rx="16" fill="#050505"/>
+  <circle cx="32" cy="27" r="14" fill="#f5f5f0"/>
+  <path d="M15 58c2.7-12.1 9.2-18 17-18s14.3 5.9 17 18" fill="#f5f5f0"/>
+  <path d="M16 27c2-10.5 8-17 16.4-17C41.1 10 47 16.6 48 27c-6.8-6-17-7.5-32 0Z" fill="#111"/>
+  <path d="M20 31c2 4.6 6.3 7.6 12 7.6S42 35.6 44 31" stroke="#050505" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="24" cy="27" r="2.2" fill="#050505"/>
+  <circle cx="40" cy="27" r="2.2" fill="#050505"/>
+  <path d="M11 13 4 8M53 13l7-5M32 6V0" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/>
+  <text x="32" y="59" text-anchor="middle" font-family="monospace" font-size="8" font-weight="700" fill="#00ff88">M1N</text>
 </svg>
-

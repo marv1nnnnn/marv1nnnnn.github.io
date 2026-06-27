@@ -32,16 +32,18 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       type: 'article',
       url,
       title,
       description,
       publishedTime: card.date,
+      authors: ['Marvin Ma'],
       tags: card.tags,
       images: [
         {
-          url: '/images/og-image.png',
+          url: '/images/cursor_shenzhen.png',
           width: 1200,
           height: 630,
           alt: title,
@@ -52,7 +54,8 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
       card: 'summary_large_image',
       title,
       description,
-      images: ['/images/og-image.png'],
+      creator: '@marv1nnnnn1',
+      images: ['/images/cursor_shenzhen.png'],
     },
   };
 }
