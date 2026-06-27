@@ -11,7 +11,6 @@ import ProjectsRiver from '@/components/pages/ProjectsRiver';
 import InfluencesVortex from '@/components/pages/InfluencesVortex';
 import ListeningRipples from '@/components/pages/ListeningRipples';
 import JournalSmoke from '@/components/pages/JournalSmoke';
-import KnowledgeGraph from '@/components/pages/KnowledgeGraph';
 
 export default function SignalClientPage({ signal, signalId }: { signal: Signal; signalId: string }) {
   const [mounted, setMounted] = useState(false);
@@ -131,7 +130,6 @@ export default function SignalClientPage({ signal, signalId }: { signal: Signal;
       {page.type === 'list' && signalId === 'listening' && <ListeningRipples page={page} />}
 
       {page.type === 'cards' && signalId === 'journal' && <JournalSmoke page={page} signalId={signalId} />}
-      {page.type === 'knowledge' && <KnowledgeGraph page={page as any} signalId={signalId} />}
 
       {(page.type === 'cards' || page.type === 'list') && signalId !== 'projects' && signalId !== 'listening' && signalId !== 'journal' && (
         <>

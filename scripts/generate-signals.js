@@ -79,12 +79,6 @@ function loadInfluencesPage(signalDir) {
   };
 }
 
-function loadKnowledgePage(signalDir) {
-  return {
-    type: 'knowledge',
-  };
-}
-
 function generateSignals() {
   const signalDirs = fs.readdirSync(CONTENT_DIR).filter((dir) => {
     const fullPath = path.join(CONTENT_DIR, dir);
@@ -104,8 +98,6 @@ function generateSignals() {
       page = loadListPage(signalDir, metadata);
     } else if (metadata.pageType === 'influences') {
       page = loadInfluencesPage(signalDir);
-    } else if (metadata.pageType === 'knowledge') {
-      page = loadKnowledgePage(signalDir);
     } else {
       throw new Error(`Unknown page type: ${metadata.pageType}`);
     }

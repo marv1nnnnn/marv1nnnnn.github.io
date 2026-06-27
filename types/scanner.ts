@@ -85,11 +85,7 @@ export interface SignalInfluencesPage {
   records: VinylRecord[];
 }
 
-export interface SignalKnowledgePage {
-  type: 'knowledge';
-}
-
-export type SignalPage = SignalProfilePage | SignalCardsPage | SignalListPage | SignalInfluencesPage | SignalKnowledgePage;
+export type SignalPage = SignalProfilePage | SignalCardsPage | SignalListPage | SignalInfluencesPage;
 
 export interface Signal {
   id: string;

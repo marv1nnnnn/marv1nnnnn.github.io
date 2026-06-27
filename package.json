@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "generate": "node scripts/generate-knowledge.js && node scripts/generate-signals.js",
+    "generate": "node scripts/generate-signals.js",
     "dev": "pnpm generate && next dev",
     "build": "pnpm generate && next build",
     "start": "next start",

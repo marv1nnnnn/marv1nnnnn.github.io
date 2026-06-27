@@ -64,6 +64,9 @@ lib/signals.json
 # Raycast extension (local development tool)
 tools/
 
+# Pi agent local state
+.pi/
+
 # Playwright
 /test-results/
 /playwright-report/
