@@ -67,6 +67,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://marv1nnnnn.github.io/signals/journal/strudel-nix-setup</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://marv1nnnnn.github.io/signals/journal/harness-engineering</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
