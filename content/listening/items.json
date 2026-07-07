@@ -677,5 +677,12 @@
     "type": "video",
     "date": "2026-07-06",
     "url": "https://www.imdb.com/title/tt5433114"
+  },
+  {
+    "title": "Machine Learning Systems",
+    "creator": "Vijay Janapa Reddi ",
+    "type": "text",
+    "date": "2026-07-04",
+    "url": "mlsysbook.ai"
   }
 ]
