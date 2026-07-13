@@ -119,8 +119,9 @@ function parseDataNote(source, raw) {
   if (!tags.includes('site') || !tags.includes('website-json')) {
     throw new Error(`${source}: expected site and website-json tags`);
   }
+  if (typeof data.title !== 'string' || !data.title.trim()) throw new Error(`${source}: missing title`);
   try {
-    return JSON.parse(content);
+    return { title: data.title, value: JSON.parse(content) };
   } catch (error) {
     throw new Error(`${source}: invalid JSON (${error.message})`);
   }
@@ -137,6 +138,15 @@ function noteFiles(dir = NOTES_DIR, prefix = '') {
   });
 }
 
+function dataNotes() {
+  return noteFiles().sort().flatMap((source) => {
+    const raw = fs.readFileSync(path.join(NOTES_DIR, source), 'utf8');
+    const tags = matter(raw).data.tags;
+    if (!Array.isArray(tags) || !tags.includes('site') || !tags.includes('website-json')) return [];
+    return [{ source, ...parseDataNote(source, raw) }];
+  });
+}
+
 function publicContent() {
   const media = [];
   const journal = [];
@@ -144,13 +154,14 @@ function publicContent() {
   for (const source of noteFiles().sort()) {
     const parsed = parseNote(source, fs.readFileSync(path.join(NOTES_DIR, source), 'utf8'));
     if (parsed?.kind === 'media') media.push({ ...parsed.item, source });
-    if (parsed?.kind === 'journal') journal.push({ ...parsed.card, source, file: path.basename(source) });
-    if (parsed?.kind === 'project') projects.push({ ...parsed.card, source, file: path.basename(source) });
+    if (parsed?.kind === 'journal') journal.push({ ...parsed.card, source, file: `${parsed.card.id}.md` });
+    if (parsed?.kind === 'project') projects.push({ ...parsed.card, source, file: `${parsed.card.id}.md` });
   }
+  const notes = dataNotes();
   const data = DATA_EXPORTS.map((entry) => {
-    const file = path.join(NOTES_DIR, entry.source);
-    if (!fs.existsSync(file)) throw new Error(`Missing public website data note: ${entry.source}`);
-    return { ...entry, value: parseDataNote(entry.source, fs.readFileSync(file, 'utf8')) };
+    const matches = notes.filter((note) => note.title === entry.title);
+    if (matches.length !== 1) throw new Error(`Expected one public website data note titled "${entry.title}", found ${matches.length}`);
+    return { ...entry, value: matches[0].value };
   });
   return { media, journal, projects, data };
 }
@@ -237,9 +248,25 @@ function readCards(dir) {
 }
 
 function parsedMigrationValue(note, raw) {
-  if (note.kind === 'data') return parseDataNote(note.source, raw);
+  if (note.kind === 'data') return parseDataNote(note.source, raw).value;
   const parsed = parseNote(note.source, raw);
   return parsed?.kind === 'media' ? parsed.item : parsed?.card;
+}
+
+function contentKey(kind, value) {
+  return `${kind}:${value.id}`;
+}
+
+function existingContentSources() {
+  const sources = new Map();
+  for (const source of noteFiles()) {
+    const parsed = parseNote(source, fs.readFileSync(path.join(NOTES_DIR, source), 'utf8'));
+    if (!parsed || parsed.kind === 'media') continue;
+    const key = contentKey(parsed.kind, parsed.card);
+    if (sources.has(key)) throw new Error(`Duplicate public note identity: ${key}`);
+    sources.set(key, source);
+  }
+  return sources;
 }
 
 function migrate() {
@@ -247,6 +274,8 @@ function migrate() {
   const items = JSON.parse(fs.readFileSync(ITEMS_FILE, 'utf8'));
   const journal = readCards(JOURNAL_DIR);
   const projects = readCards(PROJECTS_DIR);
+  const existingContent = existingContentSources();
+  const existingData = new Map(dataNotes().map((note) => [note.title, note.source]));
 
   const notes = items.map((item, index) => {
     if (!item.title || !item.creator || !MEDIA_TYPES.has(item.type) || !item.date || Number.isNaN(Date.parse(item.date))) {
@@ -264,7 +293,7 @@ function migrate() {
       const file = card.file.replace(/\.md\.md$/, '.md');
       notes.push({
         kind,
-        source: path.join('site', folder, file),
+        source: existingContent.get(contentKey(kind, card.data)) || path.join('site', folder, file),
         expected: {
           id: card.data.id,
           title: card.data.title,
@@ -283,7 +312,7 @@ function migrate() {
     const value = JSON.parse(fs.readFileSync(entry.output, 'utf8'));
     notes.push({
       kind: 'data',
-      source: entry.source,
+      source: existingData.get(entry.title) || entry.source,
       expected: value,
       raw: noteText(entry.title, ['site', 'website-json'], `${JSON.stringify(value, null, 2)}\n`),
     });
@@ -370,7 +399,7 @@ function selfTest() {
   assert.deepEqual(parseNote('project.md', project).card, {
     id: 'project_1', title: 'Project', subtitle: 'Subtitle', date: '2026-07-13', summary: 'Summary', tags: ['code'], markdown: 'Body',
   });
-  assert.deepEqual(parseDataNote('data.txt', noteText('Data', ['site', 'website-json'], '{"ok":true}')), { ok: true });
+  assert.deepEqual(parseDataNote('data.txt', noteText('Data', ['site', 'website-json'], '{"ok":true}')), { title: 'Data', value: { ok: true } });
   assert.throws(() => parseDataNote('private.txt', noteText('Private', ['website-json'], '{}')));
   assert.throws(() => parseNote('bad.md', noteText('Bad', ['site', 'media'], 'Date: nope\nCreator: X')));
   console.log('Clin content parser checks passed');
