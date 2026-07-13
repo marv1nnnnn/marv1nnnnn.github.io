@@ -4,7 +4,7 @@ title: "Build Something Just for Yourself: #2"
 subtitle: "Why not make your coding agent personal?"
 date: "2026-03-16"
 summary: "Everyone's coding agent looks the same. I customized pi with themes, music, a virtual pet, a knowledge graph, and more — because the terminal is where I live, and it should feel like mine."
-tags: [pi, coding-agent, customization, extensions, open-source, personal-software]
+tags: ["pi","coding-agent","customization","extensions","open-source","personal-software"]
 ---
 
 > Everyone is using Codex and Claude Code now. Open your Twitter feed and every other screenshot looks identical — the same terminal, the same monospace font, the same pale text on dark background, the same tool call outputs scrolling by. It's like we all moved into the same apartment and nobody bothered to hang anything on the walls.

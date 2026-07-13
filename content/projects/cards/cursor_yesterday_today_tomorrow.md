@@ -4,7 +4,7 @@ title: "Cursor: Yesterday, Today, Tomorrow"
 subtitle: "First speech at Cursor Meetup Shenzhen"
 date: "2025-06-29"
 summary: "Opening talk at the inaugural Cursor Meetup in Shenzhen—the first Cursor community event in China. Reflects on the journey of Cursor, its present, and the future we’re building together."
-tags: [talk, community, cursor, china, meetup]
+tags: ["talk","community","cursor","china","meetup"]
 ---
 
 > This is the first speech delivered at Cursor Meetup Shenzhen, marking the very first Cursor community meetup in China.

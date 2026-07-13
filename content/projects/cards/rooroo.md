@@ -4,7 +4,7 @@ title: "rooroo (如如)"
 subtitle: "Minimalist AI Orchestration with Specialist Agents"
 date: "2025-04-24"
 summary: "A minimalist AI orchestration framework for VS Code, featuring a Navigator-led workflow and a team of specialist agents for streamlined, reliable software development."
-tags: [vibe-coding, ai, orchestration, vscode, agents, productivity]
+tags: ["vibe-coding","ai","orchestration","vscode","agents","productivity"]
 ---
 
 **Source:** [rooroo](https://github.com/marv1nnnnn/rooroo)

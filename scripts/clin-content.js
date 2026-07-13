@@ -24,8 +24,20 @@ function clinNotesDir() {
 
 const NOTES_DIR = clinNotesDir();
 const ITEMS_FILE = path.join(ROOT, 'content/listening/items.json');
-const CARDS_DIR = path.join(ROOT, 'content/journal/cards');
+const JOURNAL_DIR = path.join(ROOT, 'content/journal/cards');
+const PROJECTS_DIR = path.join(ROOT, 'content/projects/cards');
 const MEDIA_TYPES = new Set(['music', 'video', 'text', 'game', 'live']);
+const DATA_EXPORTS = [
+  ['site/data/about-profile.txt', 'content/about/profile.json', 'About profile'],
+  ['site/data/about-signal.txt', 'content/about/signal.json', 'About signal'],
+  ['site/data/projects-signal.txt', 'content/projects/signal.json', 'Projects signal'],
+  ['site/data/influences.txt', 'content/influences/influences.json', 'Influences'],
+  ['site/data/influences-signal.txt', 'content/influences/signal.json', 'Influences signal'],
+  ['site/data/listening-signal.txt', 'content/listening/signal.json', 'Media signal'],
+  ['site/data/journal-signal.txt', 'content/journal/signal.json', 'Journal signal'],
+  ['site/data/billboards.txt', 'content/billboards.json', 'Billboards'],
+  ['site/data/shows.txt', 'data/shows.json', 'Shows'],
+].map(([source, output, title]) => ({ source, output: path.join(ROOT, output), title }));
 
 function yaml(value) {
   return JSON.stringify(value);
@@ -59,16 +71,15 @@ function parseNote(source, raw) {
   const tags = Array.isArray(data.tags) ? data.tags.filter((tag) => typeof tag === 'string') : [];
   if (!tags.includes('site')) return null;
 
-  const isMedia = tags.includes('media');
-  const isJournal = tags.includes('journal');
-  if (isMedia && isJournal) throw new Error(`${source}: cannot be both media and journal`);
-  if (!isMedia && !isJournal) return null;
+  const kinds = ['media', 'journal', 'project'].filter((tag) => tags.includes(tag));
+  if (kinds.length > 1) throw new Error(`${source}: expected one public content type`);
+  if (!kinds.length) return null;
   if (typeof data.title !== 'string' || !data.title.trim()) throw new Error(`${source}: missing title`);
 
   const { fields, markdown } = bodyFields(content);
   if (!fields.Date || Number.isNaN(Date.parse(fields.Date))) throw new Error(`${source}: invalid Date`);
 
-  if (isMedia) {
+  if (kinds[0] === 'media') {
     const types = tags.filter((tag) => MEDIA_TYPES.has(tag));
     if (types.length !== 1) throw new Error(`${source}: expected exactly one media type tag`);
     if (!fields.Creator?.trim()) throw new Error(`${source}: missing Creator`);
@@ -85,20 +96,34 @@ function parseNote(source, raw) {
     };
   }
 
-  if (!fields.ID || !/^[a-z0-9][a-z0-9-]*$/.test(fields.ID)) throw new Error(`${source}: invalid ID`);
+  if (!fields.ID || !/^[a-z0-9][a-z0-9_-]*$/.test(fields.ID)) throw new Error(`${source}: invalid ID`);
   if (!fields.Summary?.trim()) throw new Error(`${source}: missing Summary`);
   return {
-    kind: 'journal',
+    kind: kinds[0],
     source,
     card: {
       id: fields.ID,
       title: data.title,
+      ...(fields.Subtitle ? { subtitle: fields.Subtitle } : {}),
       date: fields.Date,
       summary: fields.Summary,
-      tags: tags.filter((tag) => tag !== 'site' && tag !== 'journal'),
+      tags: tags.filter((tag) => !['site', kinds[0]].includes(tag)),
       markdown,
     },
   };
+}
+
+function parseDataNote(source, raw) {
+  const { data, content } = matter(raw);
+  const tags = Array.isArray(data.tags) ? data.tags : [];
+  if (!tags.includes('site') || !tags.includes('website-json')) {
+    throw new Error(`${source}: expected site and website-json tags`);
+  }
+  try {
+    return JSON.parse(content);
+  } catch (error) {
+    throw new Error(`${source}: invalid JSON (${error.message})`);
+  }
 }
 
 function noteFiles(dir = NOTES_DIR, prefix = '') {
@@ -108,19 +133,26 @@ function noteFiles(dir = NOTES_DIR, prefix = '') {
     const relative = path.join(prefix, entry.name);
     const absolute = path.join(dir, entry.name);
     if (entry.isDirectory()) return noteFiles(absolute, relative);
-    return entry.isFile() && entry.name.endsWith('.md') ? [relative] : [];
+    return entry.isFile() && ['.md', '.txt'].includes(path.extname(entry.name)) ? [relative] : [];
   });
 }
 
 function publicContent() {
   const media = [];
   const journal = [];
+  const projects = [];
   for (const source of noteFiles().sort()) {
     const parsed = parseNote(source, fs.readFileSync(path.join(NOTES_DIR, source), 'utf8'));
     if (parsed?.kind === 'media') media.push({ ...parsed.item, source });
     if (parsed?.kind === 'journal') journal.push({ ...parsed.card, source, file: path.basename(source) });
+    if (parsed?.kind === 'project') projects.push({ ...parsed.card, source, file: path.basename(source) });
   }
-  return { media, journal };
+  const data = DATA_EXPORTS.map((entry) => {
+    const file = path.join(NOTES_DIR, entry.source);
+    if (!fs.existsSync(file)) throw new Error(`Missing public website data note: ${entry.source}`);
+    return { ...entry, value: parseDataNote(entry.source, fs.readFileSync(file, 'utf8')) };
+  });
+  return { media, journal, projects, data };
 }
 
 function writeAtomic(file, content) {
@@ -131,40 +163,57 @@ function writeAtomic(file, content) {
 }
 
 function cardText(card) {
-  return `---\nid: ${yaml(card.id)}\ntitle: ${yaml(card.title)}\ndate: ${yaml(card.date)}\nsummary: ${yaml(card.summary)}\ntags: ${yaml(card.tags)}\n---\n\n${card.markdown}`;
+  const subtitle = card.subtitle ? `subtitle: ${yaml(card.subtitle)}\n` : '';
+  return `---\nid: ${yaml(card.id)}\ntitle: ${yaml(card.title)}\n${subtitle}date: ${yaml(card.date)}\nsummary: ${yaml(card.summary)}\ntags: ${yaml(card.tags)}\n---\n\n${card.markdown}`;
+}
+
+function cardFiles(cards, label) {
+  const ids = new Set();
+  const files = new Set();
+  for (const card of cards) {
+    if (ids.has(card.id)) throw new Error(`Duplicate ${label} ID: ${card.id}`);
+    if (files.has(card.file)) throw new Error(`Duplicate ${label} filename: ${card.file}`);
+    ids.add(card.id);
+    files.add(card.file);
+  }
+  return files;
+}
+
+function syncCards(cards, dir, files) {
+  const currentFiles = fs.existsSync(dir) ? fs.readdirSync(dir).filter((file) => file.endsWith('.md')) : [];
+  fs.mkdirSync(dir, { recursive: true });
+  for (const card of cards) writeAtomic(path.join(dir, card.file), cardText(card));
+  for (const file of currentFiles) {
+    if (!files.has(file)) fs.rmSync(path.join(dir, file));
+  }
 }
 
 function sync({ ifPresent = false, quiet = false } = {}) {
   if (!fs.existsSync(NOTES_DIR)) {
-    if (ifPresent) return { skipped: true, media: 0, journal: 0 };
+    if (ifPresent) return { skipped: true, media: 0, journal: 0, projects: 0, data: 0 };
     throw new Error(`Clin notes directory not found: ${NOTES_DIR}`);
   }
 
-  const { media, journal } = publicContent();
+  const { media, journal, projects, data } = publicContent();
   const currentItems = fs.existsSync(ITEMS_FILE) ? JSON.parse(fs.readFileSync(ITEMS_FILE, 'utf8')) : [];
-  const currentCards = fs.existsSync(CARDS_DIR) ? fs.readdirSync(CARDS_DIR).filter((file) => file.endsWith('.md')) : [];
-  if (!media.length && !journal.length && (currentItems.length || currentCards.length)) {
+  const currentJournal = fs.existsSync(JOURNAL_DIR) ? fs.readdirSync(JOURNAL_DIR).filter((file) => file.endsWith('.md')) : [];
+  const currentProjects = fs.existsSync(PROJECTS_DIR) ? fs.readdirSync(PROJECTS_DIR).filter((file) => file.endsWith('.md')) : [];
+  if (!media.length && !journal.length && (currentItems.length || currentJournal.length)) {
     throw new Error('Refusing to erase generated content: Clin has no public site media or journal notes');
   }
-
-  const ids = new Set();
-  const cardFiles = new Set();
-  for (const card of journal) {
-    if (ids.has(card.id)) throw new Error(`Duplicate journal ID: ${card.id}`);
-    if (cardFiles.has(card.file)) throw new Error(`Duplicate journal filename: ${card.file}`);
-    ids.add(card.id);
-    cardFiles.add(card.file);
+  if (!projects.length && currentProjects.length) {
+    throw new Error('Refusing to erase generated content: Clin has no public site project notes');
   }
 
+  const journalFiles = cardFiles(journal, 'journal');
+  const projectFiles = cardFiles(projects, 'project');
   writeAtomic(ITEMS_FILE, `${JSON.stringify(media.map(({ source, ...item }) => item), null, 2)}\n`);
-  fs.mkdirSync(CARDS_DIR, { recursive: true });
-  for (const card of journal) writeAtomic(path.join(CARDS_DIR, card.file), cardText(card));
-  for (const file of currentCards) {
-    if (!cardFiles.has(file)) fs.rmSync(path.join(CARDS_DIR, file));
-  }
+  syncCards(journal, JOURNAL_DIR, journalFiles);
+  syncCards(projects, PROJECTS_DIR, projectFiles);
+  for (const entry of data) writeAtomic(entry.output, `${JSON.stringify(entry.value, null, 2)}\n`);
 
-  const result = { media: media.length, journal: journal.length };
-  if (!quiet) console.log(`Synced ${result.media} media and ${result.journal} journal notes from Clin`);
+  const result = { media: media.length, journal: journal.length, projects: projects.length, data: data.length };
+  if (!quiet) console.log(`Synced ${result.media} media, ${result.journal} journal, ${result.projects} projects, and ${result.data} data files from Clin`);
   return result;
 }
 
@@ -172,19 +221,32 @@ function slug(value) {
   return value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'item';
 }
 
-function journalSource(card) {
-  const tags = ['site', 'journal', ...(Array.isArray(card.data.tags) ? card.data.tags : [])];
+function cardSource(card, kind) {
+  const tags = ['site', kind, ...(Array.isArray(card.data.tags) ? card.data.tags : [])];
   const markdown = card.content.replace(/^\r?\n/, '');
-  return noteText(card.data.title, tags, `Date: ${card.data.date}\nSummary: ${card.data.summary}\nID: ${card.data.id}\n\n${markdown}`);
+  const fields = [`Date: ${card.data.date}`, `Summary: ${card.data.summary}`, `ID: ${card.data.id}`];
+  if (card.data.subtitle) fields.push(`Subtitle: ${card.data.subtitle}`);
+  return noteText(card.data.title, tags, `${fields.join('\n')}\n\n${markdown}`);
+}
+
+function readCards(dir) {
+  return fs.readdirSync(dir).filter((file) => file.endsWith('.md')).sort().map((file) => {
+    const parsed = matter(fs.readFileSync(path.join(dir, file), 'utf8'));
+    return { ...parsed, file };
+  });
+}
+
+function parsedMigrationValue(note, raw) {
+  if (note.kind === 'data') return parseDataNote(note.source, raw);
+  const parsed = parseNote(note.source, raw);
+  return parsed?.kind === 'media' ? parsed.item : parsed?.card;
 }
 
 function migrate() {
   if (!fs.existsSync(NOTES_DIR)) throw new Error(`Clin notes directory not found: ${NOTES_DIR}`);
   const items = JSON.parse(fs.readFileSync(ITEMS_FILE, 'utf8'));
-  const cards = fs.readdirSync(CARDS_DIR).filter((file) => file.endsWith('.md')).sort().map((file) => {
-    const parsed = matter(fs.readFileSync(path.join(CARDS_DIR, file), 'utf8'));
-    return { ...parsed, file };
-  });
+  const journal = readCards(JOURNAL_DIR);
+  const projects = readCards(PROJECTS_DIR);
 
   const notes = items.map((item, index) => {
     if (!item.title || !item.creator || !MEDIA_TYPES.has(item.type) || !item.date || Number.isNaN(Date.parse(item.date))) {
@@ -193,31 +255,44 @@ function migrate() {
     const source = path.join('site/media', `legacy-${String(index + 1).padStart(4, '0')}-${slug(item.title)}.md`);
     const body = [`Date: ${item.date}`, `Creator: ${item.creator}`];
     if (item.url) body.push(`URL: ${item.url}`);
-    return { source, expected: item, raw: noteText(item.title, ['site', 'media', item.type], body.join('\n')) };
+    return { kind: 'media', source, expected: item, raw: noteText(item.title, ['site', 'media', item.type], body.join('\n')) };
   });
 
-  for (const card of cards) {
-    if (!card.data.id || !card.data.title || !card.data.date || !card.data.summary) throw new Error(`${card.file}: invalid journal card`);
+  for (const [kind, cards, folder] of [['journal', journal, 'journal'], ['project', projects, 'projects']]) {
+    for (const card of cards) {
+      if (!card.data.id || !card.data.title || !card.data.date || !card.data.summary) throw new Error(`${card.file}: invalid ${kind} card`);
+      const file = card.file.replace(/\.md\.md$/, '.md');
+      notes.push({
+        kind,
+        source: path.join('site', folder, file),
+        expected: {
+          id: card.data.id,
+          title: card.data.title,
+          ...(card.data.subtitle ? { subtitle: card.data.subtitle } : {}),
+          date: card.data.date,
+          summary: card.data.summary,
+          tags: card.data.tags || [],
+          markdown: card.content.replace(/^\r?\n/, ''),
+        },
+        raw: cardSource(card, kind),
+      });
+    }
+  }
+
+  for (const entry of DATA_EXPORTS) {
+    const value = JSON.parse(fs.readFileSync(entry.output, 'utf8'));
     notes.push({
-      source: path.join('site/journal', card.file),
-      expected: {
-        id: card.data.id,
-        title: card.data.title,
-        date: card.data.date,
-        summary: card.data.summary,
-        tags: card.data.tags || [],
-        markdown: card.content.replace(/^\r?\n/, ''),
-      },
-      raw: journalSource(card),
+      kind: 'data',
+      source: entry.source,
+      expected: value,
+      raw: noteText(entry.title, ['site', 'website-json'], `${JSON.stringify(value, null, 2)}\n`),
     });
   }
 
   for (const note of notes) {
     const file = path.join(NOTES_DIR, note.source);
     if (!fs.existsSync(file)) continue;
-    const parsed = parseNote(note.source, fs.readFileSync(file, 'utf8'));
-    const actual = parsed?.kind === 'media' ? parsed.item : parsed?.kind === 'journal' ? parsed.card : null;
-    assert.deepEqual(actual, note.expected, `${note.source} differs; refusing to overwrite it`);
+    assert.deepEqual(parsedMigrationValue(note, fs.readFileSync(file, 'utf8')), note.expected, `${note.source} differs; refusing to overwrite it`);
   }
 
   let created = 0;
@@ -230,13 +305,11 @@ function migrate() {
   }
 
   for (const note of notes) {
-    const parsed = parseNote(note.source, fs.readFileSync(path.join(NOTES_DIR, note.source), 'utf8'));
-    const actual = parsed?.kind === 'media' ? parsed.item : parsed?.kind === 'journal' ? parsed.card : null;
-    assert.deepEqual(actual, note.expected, `${note.source} failed round-trip verification`);
+    assert.deepEqual(parsedMigrationValue(note, fs.readFileSync(path.join(NOTES_DIR, note.source), 'utf8')), note.expected, `${note.source} failed round-trip verification`);
   }
 
   const result = sync({ quiet: true });
-  console.log(`Migrated ${created} new Clin notes; verified ${items.length} media and ${cards.length} journal cards; synced ${result.media}/${result.journal}`);
+  console.log(`Migrated ${created} new Clin notes; verified ${notes.length} public notes; synced ${result.media}/${result.journal}/${result.projects}/${result.data}`);
 }
 
 function option(name) {
@@ -293,6 +366,12 @@ function selfTest() {
   assert.deepEqual(parseNote('journal.md', journal).card, {
     id: 'post', title: 'Post', date: '2026-07-13', summary: 'Summary', tags: ['essay'], markdown: '# Body',
   });
+  const project = noteText('Project', ['site', 'project', 'code'], 'Date: 2026-07-13\nSummary: Summary\nID: project_1\nSubtitle: Subtitle\n\nBody');
+  assert.deepEqual(parseNote('project.md', project).card, {
+    id: 'project_1', title: 'Project', subtitle: 'Subtitle', date: '2026-07-13', summary: 'Summary', tags: ['code'], markdown: 'Body',
+  });
+  assert.deepEqual(parseDataNote('data.txt', noteText('Data', ['site', 'website-json'], '{"ok":true}')), { ok: true });
+  assert.throws(() => parseDataNote('private.txt', noteText('Private', ['website-json'], '{}')));
   assert.throws(() => parseNote('bad.md', noteText('Bad', ['site', 'media'], 'Date: nope\nCreator: X')));
   console.log('Clin content parser checks passed');
 }

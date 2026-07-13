@@ -4,7 +4,7 @@ title: "Bloome on AWS Summit"
 subtitle: "Introducing bloome.im at AWS Summit Shanghai"
 date: "2026-06-27"
 summary: "I joined AWS Summit Shanghai to introduce Bloome, the instant-messaging platform where people and AI agents work in one shared chat."
-tags: [bloome, aws, summit, shanghai, multi-agent, ai]
+tags: ["bloome","aws","summit","shanghai","multi-agent","ai"]
 ---
 
 ![Bloome on AWS Summit Shanghai](/images/bloome-aws-summit.jpg)

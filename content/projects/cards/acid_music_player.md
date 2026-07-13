@@ -4,7 +4,7 @@ title: "Acid Music Player"
 subtitle: "A Mixcloud player built purely for myself"
 date: "2026-01-24"
 summary: "A macOS Mixcloud player with Showa-era Ultraman aesthetics and evolving shader visuals—built not for growth or monetization, but simply because I wanted it to exist."
-tags: [macos, music, mixcloud, shaders, claude-code, personal-project]
+tags: ["macos","music","mixcloud","shaders","claude-code","personal-project"]
 ---
 
 > The fastest way to build something meaningful for everyone might be to begin by building for yourself.

@@ -4,7 +4,7 @@ title: "Build for Yourself"
 subtitle: "A talk on mindset at YouWare Hackathon"
 date: "2026-01-31"
 summary: "The fastest way to build something meaningful for everyone might be to begin by building for yourself. A sharing on mindset at YouWare's first in-person hackathon."
-tags: [talk, philosophy, vibe-coding, youware, personal-project]
+tags: ["talk","philosophy","vibe-coding","youware","personal-project"]
 ---
 
 > The fastest way to build something meaningful for everyone might be to begin by building for yourself.

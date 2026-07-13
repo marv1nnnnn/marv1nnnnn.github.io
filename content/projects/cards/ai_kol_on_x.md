@@ -4,7 +4,7 @@ title: "AI KOL Network Analysis"
 subtitle: "Mapping information flow through AI Twitter's opinion leaders"
 date: "2026-01-11"
 summary: "An interactive visualization tool that maps how information flows between AI Key Opinion Leaders on X/Twitter—revealing hidden clusters, bridge influencers, and the structure of AI discourse."
-tags: [visualization, data, network-analysis, d3js, python, nextjs]
+tags: ["visualization","data","network-analysis","d3js","python","nextjs"]
 ---
 
 > Who influences the AI conversation? And how does information really flow between communities?

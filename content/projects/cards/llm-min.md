@@ -4,7 +4,7 @@ title: "llm-min.txt: Min.js Style Compression of Tech Docs for LLM Context"
 subtitle: "Ultra-compact, AI-optimized documentation for modern code assistants"
 date: "2025-05-15"
 summary: "llm-min.txt distills technical documentation into a highly structured, minified format (SKF) for efficient LLM consumption—enabling up-to-date, context-rich code generation even for large or rapidly evolving libraries."
-tags: [ai, docs, compression, llm, gemini]
+tags: ["ai","docs","compression","llm","gemini"]
 ---
 
 **Source:** [rooroo](https://github.com/marv1nnnnn/llm-min.txt)
