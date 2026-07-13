@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const { randomUUID } = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -8,7 +9,20 @@ const path = require('node:path');
 const matter = require('gray-matter');
 
 const ROOT = path.resolve(__dirname, '..');
-const NOTES_DIR = process.env.CLIN_NOTES_DIR || path.join(os.homedir(), 'Library/Application Support/com.clin.clin/notes');
+
+function clinNotesDir() {
+  if (process.env.CLIN_NOTES_DIR) return process.env.CLIN_NOTES_DIR;
+  try {
+    const output = execFileSync('clin', ['storage', 'show'], { encoding: 'utf8' });
+    const storage = output.match(/^Storage path:\s*(.+)$/m)?.[1]?.trim();
+    if (storage) return output.includes('(default path)') ? path.join(storage, 'notes') : storage;
+  } catch {}
+  return process.platform === 'darwin'
+    ? path.join(os.homedir(), 'Library/Application Support/com.clin.clin/notes')
+    : path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local/share'), 'clin/notes');
+}
+
+const NOTES_DIR = clinNotesDir();
 const ITEMS_FILE = path.join(ROOT, 'content/listening/items.json');
 const CARDS_DIR = path.join(ROOT, 'content/journal/cards');
 const MEDIA_TYPES = new Set(['music', 'video', 'text', 'game', 'live']);
