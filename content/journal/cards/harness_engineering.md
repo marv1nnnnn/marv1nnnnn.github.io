@@ -3,7 +3,7 @@ id: "harness-engineering"
 title: "Harness Engineering: Same Old Story"
 date: "2026-03-18"
 summary: "Code is mass-producible now. The industry is pouring energy into making code production 10% better — but the useful parts aren't new, the new parts don't last, and the economics have never made sense."
-tags: [ai, coding-agents, harness-engineering, opinion, essay]
+tags: ["ai","coding-agents","harness-engineering","opinion","essay"]
 ---
 
 **Original post:** [x.com/marv1nnnnn1](https://x.com/marv1nnnnn1/status/2034262240422134053)

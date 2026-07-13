@@ -1,6 +1,6 @@
 # Content directory
 
-Site copy lives here and is compiled into `lib/signals.json` by `pnpm generate` (also run by `pnpm dev` / `pnpm build`).
+Site copy lives here and is compiled into `lib/signals.json` by `pnpm generate` (also run by `pnpm dev` / `pnpm build`). Public Media and Journal files are generated from Clin; edit their `site`-tagged notes instead of editing the generated files directly.
 
 ## Signals (folders)
 
@@ -9,8 +9,8 @@ Site copy lives here and is compiled into `lib/signals.json` by `pnpm generate` 
 | `about/` | `profile` | `profile.json`: hero, sections, contact, optional `resume` `{ href, label?, subtitle? }` |
 | `projects/` | `cards` | `cards/*.md` with frontmatter; optional `renderMode` in `signal.json` |
 | `influences/` | `influences` | `influences.json` — vinyl-style records list |
-| `listening/` | `list` | `items.json` — media list with optional URLs |
-| `journal/` | `cards` | Same card pattern as projects |
+| `listening/` | `list` | Generated `items.json` from public Clin media notes |
+| `journal/` | `cards` | Generated cards from public Clin journal notes |
 
 Each signal needs **`signal.json`** (metadata). Example:
 
@@ -68,8 +68,14 @@ Use `influences.json` (see `content/influences/` for the expected record shape).
 
 ## Editing workflow
 
-1. Edit files under `content/`.
-2. Run `pnpm generate` or `pnpm dev`.
+For most signals, edit files under `content/`, then run `pnpm generate` or `pnpm dev`.
+
+For Media and Journal, Clin is the source of truth. Only notes tagged `site` are exported:
+
+- Media tags: `site`, `media`, and one of `music`, `video`, `text`, `game`, `live`. Start the body with `Date:`, `Creator:`, and optional `URL:` lines.
+- Journal tags: `site`, `journal`, plus public article tags. Start the body with `Date:`, `Summary:`, and `ID:` lines, then a blank line and Markdown.
+
+Run `pnpm sync:clin` to refresh generated files. `/media sync` also refreshes and publishes them. The one-time, idempotent import is `pnpm migrate:clin`.
 
 ## Markdown
 

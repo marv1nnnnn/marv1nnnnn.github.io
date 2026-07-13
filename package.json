@@ -4,7 +4,10 @@
   "private": true,
   "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "generate": "node scripts/generate-signals.js",
+    "sync:clin": "node scripts/clin-content.js sync",
+    "migrate:clin": "node scripts/clin-content.js migrate",
+    "test:clin": "node scripts/clin-content.js test",
+    "generate": "node scripts/clin-content.js sync --if-present && node scripts/generate-signals.js",
     "dev": "pnpm generate && next dev",
     "build": "pnpm generate && next build",
     "start": "next start",
