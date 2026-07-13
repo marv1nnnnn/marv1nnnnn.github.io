@@ -4,6 +4,7 @@ import { SIGNALS } from '@/lib/signals';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import StaircaseScene from '@/components/StaircaseScene';
 
 export default function Home() {
@@ -65,15 +66,41 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Three.js Spiral Staircase */}
-      <StaircaseScene
-        items={staircaseItems}
-        onHover={setHoveredId}
-        onSelect={handleSelect}
-      />
+      {/* Native navigation is faster and easier to use than raycasting on touch screens. */}
+      <nav className="relative z-20 min-h-[100svh] px-4 pt-32 pb-[calc(2rem+env(safe-area-inset-bottom))] md:hidden" aria-label="Main navigation">
+        <ul className="border-t border-white/20">
+          {staircaseItems.map((item, index) => (
+            <li key={item.id} className="border-b border-white/20">
+              <Link
+                href={`/signals/${item.id}`}
+                className="group grid min-h-20 grid-cols-[2rem_1fr_auto] items-center gap-3 py-4 active:bg-white/10"
+              >
+                <span className="font-mono text-[10px] tracking-[0.25em] text-white/40">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span>
+                  <span className="block font-serif text-2xl font-black italic uppercase leading-none tracking-tight">
+                    {item.title}
+                  </span>
+                  <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                    // {item.subtitle}
+                  </span>
+                </span>
+                <span className="font-mono text-lg text-white/50" aria-hidden="true">↗</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-      {/* Scroll spacer for staircase scroll */}
-      <div style={{ height: '300vh' }} aria-hidden="true" />
+      <div className="hidden md:block">
+        <StaircaseScene
+          items={staircaseItems}
+          onHover={setHoveredId}
+          onSelect={handleSelect}
+        />
+        <div style={{ height: '300vh' }} aria-hidden="true" />
+      </div>
     </>
   );
 }

@@ -91,7 +91,7 @@ export default function SignalClientPage({ signal, signalId }: { signal: Signal;
       <div className="fixed top-3 left-3 sm:top-8 sm:left-8 md:top-12 md:left-12 z-[110]">
         <Link
           href="/"
-          className="group flex items-center gap-2 sm:gap-4 text-white px-3 py-2 sm:p-0 sm:bg-transparent bg-black/60 backdrop-blur-sm sm:backdrop-blur-0 border border-white/15 sm:border-0 rounded-full sm:rounded-none active:bg-white/10 sm:mix-blend-difference"
+          className="group flex min-h-11 items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-2 text-white backdrop-blur-sm active:bg-white/10 sm:min-h-0 sm:gap-4 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-0 sm:mix-blend-difference"
         >
           <div className="w-4 sm:w-6 h-[1px] bg-white opacity-50 group-hover:w-10 transition-all"></div>
           <motion.span

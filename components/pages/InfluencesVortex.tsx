@@ -9,9 +9,9 @@ export default function InfluencesVortex({ page }: { page: any }) {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || window.matchMedia('(max-width: 767px)').matches) return;
 
-    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+    const isNarrow = window.innerWidth < 768;
 
     let disposed = false;
     let renderer: any;
@@ -234,12 +234,41 @@ export default function InfluencesVortex({ page }: { page: any }) {
   }, [page]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
-      <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" />
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-transparent text-white">
+      <div className="relative z-10 px-4 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-32 md:hidden">
+        <ol className="border-t border-white/20">
+          {(page.records || []).map((record: any, index: number) => (
+            <li key={record.id} className="grid grid-cols-[5.5rem_1fr] gap-4 border-b border-white/20 py-5">
+              {record.image_url ? (
+                <img
+                  src={record.image_url}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="aspect-square w-full bg-white/5 object-cover"
+                />
+              ) : (
+                <div className="aspect-square bg-white/5" aria-hidden="true" />
+              )}
+              <div className="min-w-0">
+                <div className="mb-2 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-white/45">
+                  <span>{String(index + 1).padStart(2, '0')} / {record.medium}</span>
+                  <span>{record.year}</span>
+                </div>
+                <h2 className="font-serif text-xl font-bold italic leading-tight">{record.title}</h2>
+                <p className="mt-1 font-sans text-xs text-white/65">{record.artist}</p>
+                {record.personalNote && <p className="mt-3 font-serif text-sm italic leading-snug text-white/55">{record.personalNote}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
 
-      {/* Hover / tap info */}
+      <div ref={containerRef} className="fixed inset-0 z-0 hidden pointer-events-none md:block" />
+
+      {/* Hover info */}
       {hoveredRecord && (
-        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:bottom-12 sm:right-12 z-20 sm:max-w-md bg-black/80 backdrop-blur-md border border-white/20 p-4 sm:p-6 pointer-events-none">
+        <div className="fixed bottom-12 right-12 z-20 hidden max-w-md border border-white/20 bg-black/80 p-6 pointer-events-none backdrop-blur-md md:block">
           <div className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.3em] text-white/50 mb-2">
             {hoveredRecord.medium} // {hoveredRecord.year}
           </div>

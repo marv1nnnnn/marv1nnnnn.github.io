@@ -294,7 +294,7 @@ export default function AboutFluid({ page }: { page: any }) {
                       href={link.href || link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block break-inside-avoid mb-3 text-xl sm:text-3xl xl:text-4xl font-serif font-bold uppercase tracking-tight hover:italic transition-all hover:translate-x-1"
+                      className="mb-1 flex min-h-11 break-inside-avoid items-center font-serif text-xl font-bold uppercase tracking-tight transition-all hover:translate-x-1 hover:italic sm:mb-3 sm:text-3xl xl:text-4xl"
                     >
                       {link.label}
                     </a>

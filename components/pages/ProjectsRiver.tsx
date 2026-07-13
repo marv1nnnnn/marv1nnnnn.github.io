@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ProjectsRiver({ page, signalId }: { page: any, signalId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -11,9 +12,9 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || window.matchMedia('(max-width: 767px)').matches) return;
 
-    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768;
+    const isNarrow = window.innerWidth < 768;
 
     let disposed = false;
     let renderer: any;
@@ -290,8 +291,32 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
   }, [page, signalId, router]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-transparent text-white">
-      <div ref={containerRef} className="fixed inset-0 z-0" />
+    <div className="relative min-h-[100svh] w-full overflow-hidden bg-transparent text-white">
+      <div className="relative z-10 px-4 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-32 md:hidden">
+        <ol className="border-t border-white/20">
+          {(page.cards || []).map((card: any, index: number) => (
+            <li key={card.id} className="border-b border-white/20">
+              <Link href={`/signals/${signalId}/${card.id}`} className="block py-6 active:bg-white/10">
+                <div className="mb-3 flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <span>{card.date?.replace(/-/g, '.')}</span>
+                </div>
+                <h2 className="font-serif text-2xl font-black italic uppercase leading-tight tracking-tight">
+                  {card.title}
+                </h2>
+                {card.summary && <p className="mt-3 font-serif text-sm leading-relaxed text-white/65">{card.summary}</p>}
+                {card.tags?.length > 0 && (
+                  <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.15em] text-white/40">
+                    {card.tags.join(' / ')}
+                  </p>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div ref={containerRef} className="fixed inset-0 z-0 hidden md:block" />
 
       <AnimatePresence>
         {hoveredCard && (
@@ -299,7 +324,7 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mix-blend-difference w-full max-w-2xl text-center px-4"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 hidden pointer-events-none w-full max-w-2xl px-4 text-center mix-blend-difference md:block"
           >
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-serif font-black italic tracking-tighter uppercase mb-4 break-words">
               {hoveredCard.title}
@@ -314,12 +339,10 @@ export default function ProjectsRiver({ page, signalId }: { page: any, signalId:
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 z-10 mix-blend-difference pointer-events-none">
+      <div className="fixed bottom-12 right-12 z-10 hidden mix-blend-difference pointer-events-none md:block">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 flex flex-col items-end gap-2">
-          <span className="hidden sm:block">Scroll to navigate river</span>
-          <span className="hidden sm:block">Click pebble to inspect</span>
-          <span className="sm:hidden">Drag to navigate</span>
-          <span className="sm:hidden">Tap pebble to inspect</span>
+          <span>Scroll to navigate river</span>
+          <span>Click pebble to inspect</span>
         </div>
       </div>
     </div>

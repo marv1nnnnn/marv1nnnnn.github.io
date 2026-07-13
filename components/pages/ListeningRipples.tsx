@@ -169,7 +169,7 @@ export default function ListeningRipples({ page }: { page: any }) {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block group/link active:text-[#FFE500]"
+                      className="group/link flex min-h-11 items-center active:text-[#FFE500]"
                     >
                       <h3 className="text-lg font-serif italic leading-snug group-hover/link:text-[#FFE500] transition-colors break-words">
                         {item.title}

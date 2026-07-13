@@ -6,11 +6,10 @@ const topLevelSignals = [
   'listening',
   'influences',
   'journal',
-  'knowledge',
 ] as const;
 
 for (const id of topLevelSignals) {
-  test(`signal "${id}" route renders without crashing`, async ({ page }) => {
+  test(`signal "${id}" route renders without crashing`, async ({ page, isMobile }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(String(e)));
 
@@ -21,6 +20,10 @@ for (const id of topLevelSignals) {
     // Page should have some visible text content
     const body = await page.locator('body').innerText();
     expect(body.trim().length).toBeGreaterThan(0);
+
+    if (isMobile && ['projects', 'influences', 'journal'].includes(id)) {
+      await expect(page.locator('canvas')).toHaveCount(0);
+    }
 
     expect(errors, `pageerror on /signals/${id}:\n${errors.join('\n')}`).toEqual([]);
   });

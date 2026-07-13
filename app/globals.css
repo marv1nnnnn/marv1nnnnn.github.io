@@ -18,6 +18,7 @@
 
 html {
   background-color: #050505;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -27,6 +28,13 @@ body {
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
   min-height: 100vh;
+  min-height: 100dvh;
+  overscroll-behavior-x: none;
+}
+
+a,
+button {
+  touch-action: manipulation;
 }
 
 @media (pointer: fine) {
@@ -122,6 +130,7 @@ body.theme-journal { background-color: #050505; color: #fff; }
   color: #fff;
   max-width: 800px;
   margin: 0 auto;
+  overflow-wrap: anywhere;
 }
 
 .markdown-body > * {
@@ -206,6 +215,11 @@ body.theme-journal { background-color: #050505; color: #fff; }
   transition: all 0.2s ease;
 }
 
+.markdown-body pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 /* =========================================
    Cinematic Background Effects
    ========================================= */
@@ -257,9 +271,22 @@ body.theme-journal { background-color: #050505; color: #fff; }
    ========================================= */
 
 @media (max-width: 768px) {
+  .kinetic-text,
+  .grain-overlay,
+  .fluid-texture {
+    animation: none !important;
+  }
+
+  .grain-overlay {
+    opacity: 0.02;
+  }
+
   .markdown-body {
     font-size: 1rem;
-    padding: 0 1rem;
+  }
+
+  .markdown-body img {
+    margin: 2rem 0;
   }
 
   .markdown-body h1 { font-size: 2rem; }
@@ -288,6 +315,17 @@ body.theme-journal { background-color: #050505; color: #fff; }
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

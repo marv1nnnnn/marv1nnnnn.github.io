@@ -22,7 +22,7 @@ export default function ShowsPage() {
       <div className="noise-overlay" />
 
       <div className="fixed top-4 left-4 sm:top-8 sm:left-8 md:top-12 md:left-12 z-[100] mix-blend-difference">
-        <Link href="/signals/about" className="group flex items-center gap-3 sm:gap-4 text-white">
+        <Link href="/signals/about" className="group flex min-h-11 items-center gap-3 rounded-full border border-white/15 bg-black/60 px-3 text-white backdrop-blur-sm sm:min-h-0 sm:gap-4 sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-0">
           <div className="w-4 sm:w-6 h-[1px] bg-white opacity-50 group-hover:w-10 transition-all" />
           <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em]">
             Back to About

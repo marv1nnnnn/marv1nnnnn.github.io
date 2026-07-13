@@ -38,7 +38,7 @@ export default function StaircaseScene({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || window.matchMedia('(max-width: 767px)').matches) return;
 
     // Clear container completely on mount to prevent any lingering DOM elements from previous renders
     container.innerHTML = '';

@@ -7,19 +7,19 @@ test.describe('home /', () => {
     await expect(page.getByText('INDEX')).toBeVisible();
   });
 
-  test('mobile nav lists all top-level signals and navigates', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'mobile-only overlay');
+  test('mobile nav lists all top-level signals and navigates without WebGL', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'mobile-only navigation');
     await page.goto('/');
 
-    const nav = page.locator('nav').first();
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
     await expect(nav).toBeVisible();
-    // At least the known top-level signals should appear in the mobile nav text.
     const navText = (await nav.innerText()).toLowerCase();
-    for (const label of ['about', 'projects', 'influences', 'journal', 'knowledge']) {
+    for (const label of ['about', 'projects', 'influences', 'media', 'journal']) {
       expect(navText, `mobile nav missing "${label}"`).toContain(label);
     }
+    await expect(page.locator('canvas')).toHaveCount(0);
 
-    await nav.getByRole('button', { name: /About/i }).click();
+    await nav.getByRole('link', { name: /About/i }).click();
     await expect(page).toHaveURL(/\/signals\/about\/?$/);
   });
 
