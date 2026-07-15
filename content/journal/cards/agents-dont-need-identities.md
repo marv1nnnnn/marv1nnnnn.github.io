@@ -1,6 +1,6 @@
 ---
 id: "agents-dont-need-identities"
-title: "Agents Don’t Need Identities. They Need a Shell."
+title: "Agents Need Shells, Not Selves"
 subtitle: "Hauntology, machinic intelligence, and the command line"
 date: "2026-07-15"
 summary: "Agent design is haunted by human ideas of memory and identity. Pi and Herdr point toward temporary agency assembled through an open command line."
@@ -20,6 +20,8 @@ This article is about another possibility: a ghost without a soul. By that I do 
 Mark Fisher used hauntology to describe a culture unable to escape forms inherited from the past. In *Ghosts of My Life*, he writes about the [slow cancellation of the future](https://www.opendemocracy.net/en/mark-fisher-ghosts-retromania/): new technology continues to arrive, but our sense of how life might be organized around it becomes less adventurous. The future looks increasingly like the present with upgraded equipment.
 
 Agent products often feel like a small example of this problem. The models are new, but the structures around them are familiar. An agent is presented as an employee. Specialized invocations become teammates. A queue becomes an inbox, a set of permissions becomes a role, and a collection of workers becomes a company. These metaphors help people understand the product, but they also decide what the product is allowed to become.
+
+In his recent Atlantic essay [“No, Artificial Intelligence Is Not Conscious”](https://www.theatlantic.com/philosophy/2026/06/no-artificial-intelligence-is-not-conscious/687378/), Ted Chiang objects to the way AI companies encourage users to treat a chatbot persona as evidence of an entity behind the conversation. A model prompted to act as a helpful assistant is producing a character in text, not revealing a continuing self. Chiang is writing about consciousness, but the same confusion appears in agent architecture: a configured invocation becomes a named actor, and that fictional continuity starts to determine where memory, permissions, and responsibility live.
 
 Memory is the most revealing example. Human memory is closely tied to identity: my memories are part of what makes me the person I am. Agent “memory” is usually something more ordinary. It may be a conversation log, a summary, a file, a database record, or a retrieval system that selects information for the next context window. None of this has to belong to a continuing self. The state could belong to a project or task and be available to whichever invocation needs it next.
 
