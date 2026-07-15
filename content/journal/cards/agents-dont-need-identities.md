@@ -1,65 +1,45 @@
 ---
 id: "agents-dont-need-identities"
 title: "Agents Don’t Need Identities. They Need a Shell."
-subtitle: "On self, ghost, and shell in agent systems"
+subtitle: "On self, ghost, and terminal-native agents"
 date: "2026-07-15"
-summary: "AI agents may not need persistent identities or fixed workflows. Pi and Herdr point toward a process-native architecture that assembles harnesses just in time and persists only their artifacts."
+summary: "Pi and Herdr suggest a terminal-native agent architecture: assemble each agent as a batch, persist its artifacts, and let the worker disappear."
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
-I’ve been thinking about the word *shell* lately.
+I’ve been thinking about the word *shell*.
 
-Partly because *Ghost in the Shell* is back in public view, between recent anniversary screenings of Mamoru Oshii’s 1995 film and [the new Science Saru adaptation](https://www.theghostintheshell-anime.jp/en/). But also because the title now feels like a useful way to think about AI agents.
+Partly because *Ghost in the Shell* is back in public view, between anniversary screenings of Mamoru Oshii’s 1995 film and [the new Science Saru adaptation](https://www.theghostintheshell-anime.jp/en/). But the title also offers a useful model for AI agents.
 
-In *Ghost in the Shell*, the shell is replaceable. The ghost is what might remain: consciousness, continuity, a self that can move from one body to another.
+In *Ghost in the Shell*, the shell is replaceable. The ghost is what might remain: continuity, consciousness, a self.
 
-Agent systems quietly assume something similar. The model or container may change, but somewhere inside the product there is supposed to be a persistent agent—a stable “someone” with a name, a role, a memory, and a history.
+Agent products often assume the same thing. Models and containers may change, but somewhere inside there is supposed to be a stable someone with a name, role, memory, and history.
 
-Pi and Herdr have made me wonder if this gets the relationship backward.
-
-Maybe an agent needs a shell and can produce something ghost-like while it runs. But it does not follow that the ghost is a self, or that anything inside the process must persist when the work is done.
+Pi and Herdr suggest the relationship may be backward. An agent needs a shell and can produce something ghost-like while it runs. It does not follow that the ghost must persist.
 
 ## The self
 
-We like giving agents selves.
+We like giving agents selves because selves are easy to understand. The agent becomes an assistant, employee, reviewer, or manager. Conversations become memories. A workspace becomes a desk. Repeated invocations become one continuous life.
 
-A self makes the technology easier to understand. The agent becomes an assistant, employee, reviewer, researcher, or manager. It gets a name and a biography. Its conversations become memories. Its workspace becomes a desk. Its repeated invocations become one continuous life.
+The metaphor helps the interface. The problem begins when it becomes the architecture. Persistent selves require identity, private memory, durable roles, ownership, and an organization chart.
 
-This is a familiar human move. When a technology is strange, we explain it with metaphors we already know. Computers got desktops, folders, windows, and trash cans. Voice assistants got human voices and names. Agents get personalities and careers.
+Mark Fisher gives us language for this mistake. In *Ghosts of My Life*, hauntology describes a present occupied by futures that failed to arrive while familiar forms keep returning. Fisher, following Franco “Bifo” Berardi, called this the [slow cancellation of the future](https://www.opendemocracy.net/en/mark-fisher-ghosts-retromania/): the fading expectation that the future could be structurally different.
 
-The metaphor may help the interface. The problem begins when it becomes the architecture.
+The “digital employee” is hauntological in exactly this sense. The model is new; the institution around it is an office. Profiles, managers, teams, inboxes, and company memory force a new computational medium back into twentieth-century labor organization.
 
-A system built around persistent selves needs to preserve identity, synchronize memory, assign durable roles, and decide which agent owns which work. Before long, a new computational medium is reenacting an old organization chart.
+Once that metaphor hardens into architecture, it limits what we can imagine. An agent company may look futuristic while revealing an inability to imagine a future beyond the company. It can also weaken accountability: [experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee reduces human oversight.
 
-Mark Fisher gives us language for this mistake. In *Ghosts of My Life*, hauntology is not simple nostalgia. It describes a present occupied by futures that failed to arrive, while culture keeps recycling recognizable forms. Fisher, following Franco “Bifo” Berardi, called this the [slow cancellation of the future](https://www.opendemocracy.net/en/mark-fisher-ghosts-retromania/): not the end of time, but the fading expectation that the future could be structurally different.
-
-The “digital employee” is hauntological in exactly this sense. The model is new; the institution around it is an office. Profiles, managers, teams, inboxes, careers, and company memory make a genuinely new computational medium legible by forcing it back into the organization of twentieth-century work.
-
-The danger is not only aesthetic. Once the metaphor hardens into architecture, it narrows what we can build. An agent company may look futuristic while revealing an inability to imagine a future beyond the company.
-
-That framing is not neutral. [Recent experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee can weaken human oversight and shift accountability away from the people using it.
-
-But an agent is not a human worker with biology removed.
-
-A human self cannot be reconstructed from a prompt, a directory, and a list of tools. An agent’s operating conditions can, even if its exact output remains nondeterministic.
-
-What we experience as continuity may come entirely from the state we keep feeding back into each invocation. The name is stable. The files are stable. The session history is stable. So we project a stable someone behind them.
-
-The self may be an effect of the interface rather than a property of the process.
+The stable self may be only an interface effect. Keep feeding a model the same name, files, and history, and it appears to be the same someone. The continuity may belong entirely to the inputs.
 
 ## The ghost
 
 A ghost is not necessarily a self.
 
-In Derrida’s broader hauntological sense, a ghost is made of traces. It is present without being fully present. It acts, but it is not a normal object that sits continuously in one place.
+In Derrida’s hauntology, a ghost is made of traces. It acts without existing as a normal object continuously present in one place.
 
-That feels closer to an agent.
+Gilbert Simondon offers a more precise formulation. In his philosophy of [individuation](https://www.upress.umn.edu/9780816680023/individuation-in-light-of-notions-of-form-and-information/), the individual is not the starting point. It is produced by a process together with its associated milieu.
 
-Gilbert Simondon offers a more precise way to state it. In his philosophy of [individuation](https://www.upress.umn.edu/9780816680023/individuation-in-light-of-notions-of-form-and-information/), the individual is not the starting point that later enters into relations. It is a phase produced by a process, emerging together with its associated milieu.
-
-An agent can be understood the same way. It is not a pre-existing individual to which a harness is attached. It is individuated when a model, task, context, tools, permissions, and environment are brought into relation. Change the milieu and a different form of agency appears.
-
-An agent appears when those elements are assembled. It reads, reasons, acts, and leaves effects behind. Then the invocation ends.
+An agent can be understood the same way:
 
 ```text
 agent = model
@@ -70,60 +50,39 @@ agent = model
       + environment
 ```
 
-Invoke the same model tomorrow and there is no obvious reason to call the resulting process the same individual, except that we choose to present it that way.
+The agent is not a pre-existing individual to which a harness is attached. It appears when those elements are assembled, acts, leaves effects, and ends. Change the milieu and a different form of agency appears.
 
-The model weights are not a sleeping person. The prompt is not a soul. The conversation log is not proof of an inner life continuing between calls.
+The model weights are not a sleeping person. The prompt is not a soul. The conversation log is not proof of a continuing inner life.
 
 The agent is an event.
 
-It is real in what it does. A temporary process can still find a bug, edit a repository, make a decision, or launch another process. Agency does not require a permanent self any more than computation requires a permanent Unix process.
-
-Perhaps “ghost” is useful precisely because it lets us talk about agency without pretending there is a little human inside the machine.
-
 ## The shell
 
-If the agent is an event, the shell is what makes the event possible.
+If the agent is an event, the shell makes the event possible.
 
-The shell is the harness: the model, tools, files, permissions, working directory, prompt, and runtime. It determines what kind of ghost can appear and what that ghost can do.
+By shell I mean something literal: agent work should execute through a terminal as a batch. The batch has a command, working directory, environment, input, capabilities, output, and exit status. Typed tools can make submission safer, but the work should still reduce to a visible terminal job that can be started, observed, interrupted, and allowed to disappear.
 
-By shell I do not mean that every agent must speak Bash. Bash is syntax. I mean the broader Unix process contract: arguments and environment on the way in; files and streams across the boundary; permissions around the work; output, signals, and an exit status on the way out. Typed tools and supervisors are useful when they remain transparent translations of those primitives.
-
-This is why the Unix command line feels like a better model for agents than the employee.
-
-A Unix process has state while it runs. It has memory, open files, environment variables, and permissions. But the process is disposable. It reads files and stdin, produces files and stdout, returns an exit status, and disappears.
-
-Nobody worries about preserving the identity of a particular `grep` process. If its work matters, the result is written somewhere durable.
-
-An agent can follow the same contract:
+The terminal is the execution plane. The batch is the unit of agency.
 
 ```text
-files + task + shell
-         ↓
-   temporary ghost
-         ↓
-files + output + exit status
+files + task + terminal batch
+              ↓
+        temporary ghost
+              ↓
+   files + output + exit status
 ```
 
-The shell can be assembled differently for every task. A review shell can be read-only. A refactoring shell can have edit access and an isolated worktree. A deployment shell can expose a narrow set of commands. A simple task may need no separate agent at all.
+A review batch can be read-only. A refactoring batch can use an isolated worktree. A deployment batch can expose only the commands it needs. A simple task may need no separate agent at all.
 
 The shell is specific. The ghost is temporary. The self is optional.
 
-## A process-native agent architecture
+## A terminal-native architecture
 
-Pi and Herdr may point toward a different architecture for agents.
+Pi and Herdr may point toward a new agent architecture.
 
-Pi makes the harness addressable from the shell. Herdr makes the process tree addressable to the model. Together they let an agent construct not only its next action, but the temporary system that will perform it.
+Pi makes a harness serializable as a command. Herdr lets the model execute and supervise that command in a terminal. Together they allow an agent to construct the temporary batch system that will perform its work.
 
-```text
-files and Git    → durable state
-Pi               → just-in-time harness construction
-Herdr            → process creation and supervision
-model            → runtime composition
-```
-
-Pi describes itself as a minimal terminal coding harness. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) intentionally leaves sub-agents and background shell jobs out of the core. Extensions can add or replace tools and behavior; skills and prompts define procedures; invocation flags choose the model, thinking level, tools, extensions, context, and session policy.
-
-A task-specific agent is therefore an ordinary command:
+Pi describes itself as a minimal terminal coding harness. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) leaves sub-agents and background shell jobs out of the core. Models, prompts, tools, skills, extensions, context, and session policy can all be selected per invocation:
 
 ```bash
 git diff | pi --no-session \
@@ -133,49 +92,35 @@ git diff | pi --no-session \
   -p "Review this diff. Do not edit files."
 ```
 
-That invocation is both a harness definition and a complete agent lifecycle. Pi does not merely put a shell tool inside the harness. It makes the harness itself addressable from the shell.
+That command is both a harness definition and a complete agent lifecycle.
 
-Herdr supplies the lower layer. Through one typed Pi extension, the model can start a process in a particular project, observe its output, send input, wait for it, and clean it up. The types make the interface safer; they do not introduce a new agent ontology. A pane handle names a temporary process resource, not a persistent self.
+Herdr supplies the execution plane. Through one typed Pi extension, the model can submit work in a particular project, observe terminal output, send input, wait, interrupt, and clean up. A pane handle names a temporary terminal job, not a persistent worker.
 
-This creates a recursive capability. A running Pi process can use Herdr to launch another Pi with a different model, prompt, tool set, extension set, working directory, permission boundary, and lifetime. The child does not have to match a predefined agent type. Its harness is assembled from the needs of the task.
+The combination is recursive. One Pi batch can use Herdr to launch another Pi batch with a different model, prompt, tool set, working directory, permission boundary, and lifetime. The child does not need a predefined agent type. Its harness is assembled from the task and serialized into a command.
 
-```text
-task
-  ↓
-model chooses a topology
-  ↓
-Pi assembles task-specific harnesses
-  ↓
-Herdr materializes a temporary process tree
-  ↓
-files + output + exit status
-```
+With GPT-5.6, this already works without a delegation graph. A process can launch a fresh Pi for an independent review, run tests in another terminal, continue its own work, collect the results, and remove the temporary panes. On another task it can use a plain command or decide not to delegate.
 
-With GPT-5.6, this already works without a predefined delegation graph. One process can launch a fresh Pi for an independent review, run tests elsewhere, continue its own work, collect the results, and remove the temporary panes. On another task it can use a plain command or decide that no delegation is needed.
+The important part is not that one agent can call another. It is that the batch plan does not exist until the model needs it.
 
-The important part is not that one agent can call another. It is that the workflow does not exist until the model needs it.
+Traditional frameworks ask humans to design a workflow and place the model inside it. A terminal-native architecture exposes legible commands and lets the model compile the workflow into batches at runtime. The agent graph becomes an ephemeral batch plan materialized as a Unix process tree.
 
-Traditional agent frameworks ask humans to design the workflow and then place the model inside it. A process-native architecture asks humans to expose legible capabilities and lets the model compile the workflow at runtime. The agent graph becomes an ephemeral artifact, like a Unix process tree.
-
-This is the possible new paradigm: stable infrastructure below, temporary organization above. Do not design a permanent agent organization. Design the primitives from which the model can instantiate one just in time.
+Stable terminal infrastructure below. Temporary organization above.
 
 ## Rich is not open
 
-Modern coding harnesses are becoming very rich. [Claude Code](https://code.claude.com/docs/en/features-overview) has custom sub-agents, agent teams, hooks, skills, plugins, and worktrees. [Codex](https://developers.openai.com/codex/subagents) has sub-agents, skills, plugins, threads, automations, and worktree isolation.
+[Claude Code](https://code.claude.com/docs/en/features-overview) and [Codex](https://developers.openai.com/codex/subagents) are rich harnesses. They offer sub-agents, teams or threads, skills, plugins, hooks, and worktree isolation.
 
-But richness is not the same as openness.
+But richness is not openness.
 
 A rich harness gives the model a larger menu. An open harness lets the model assemble the menu.
 
-Most built-in multi-agent systems freeze their ontology early. Work is expected to fit a sub-agent, teammate, thread, automation, or plugin. The model may decide when to use those objects, but the product has already decided what kinds of objects may organize the work. The agent orchestrates inside the harness rather than constructing the harness itself.
+Claude Code and Codex are not sealed boxes; both expose shells and extension points. The difference is where the architecture pulls: toward product-defined forms, or toward terminal batches composed at runtime.
 
-This is a difference of degree, not a claim that Claude Code or Codex are sealed boxes. Both expose shells, configuration, extension points, and programmatic interfaces. A determined user can make either one launch another configured process. The difference is where the architecture pulls: toward product-defined forms, or toward temporary compositions of lower-level capabilities.
+[Multica](https://www.multica.ai/) and [Raft](https://raft.build/) pull further toward durable organization. Profiles, squads, named teammates, inboxes, and private memories turn runtime configurations into continuing actors. Their queues, logs, and process supervision may be useful. Binding them to persistent selves is not. A queue needs a claimant; it does not need a colleague.
 
-Platforms such as [Multica](https://www.multica.ai/) and [Raft](https://raft.build/) pull further toward durable organization. Profiles, squads, named teammates, inboxes, and private memories turn runtime configurations into continuing actors. Their process supervision, queues, messages, and logs may be useful. Binding those facilities to persistent selves is the unnecessary part. A queue needs a claimant; it does not need a colleague.
+Fixed workflows can compensate for weak models and become ceilings for stronger ones. LangChain’s [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) points toward just-in-time assembly of tools and context, with harnesses behaving more like compilers.
 
-This distinction matters more as models improve. A fixed workflow can compensate for a weak model and become a ceiling for a stronger one. LangChain’s [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) points toward just-in-time assembly of tools and context, with harnesses behaving more like compilers.
-
-The test is simple: can the running model construct a harness its author did not anticipate? Can every worker disappear while another process resumes from inspectable artifacts? If so, the system preserves the work without preserving a fictional worker.
+The test is simple: can every unit of work become a terminal batch? Can the model compose a batch its author did not anticipate? Can every worker disappear while another batch resumes from inspectable artifacts?
 
 ## The traces
 
@@ -183,51 +128,43 @@ If agents disappear, what carries the work forward?
 
 Files.
 
-Plans, code, prompts, skills, policies, logs, and session traces can all be files. Git turns them into history. If an agent learns something worth keeping, it can leave that knowledge where the next process can read it.
+Plans, code, prompts, skills, policies, and logs can all be files. Git turns them into history. The filesystem becomes both memory and protocol.
 
-The filesystem is therefore both memory and protocol. Unlike hidden agent memory, artifacts can be searched, diffed, edited, versioned, branched, permissioned, and deleted. Humans and agents can inspect the same state.
+Artifacts are better than hidden agent memory because humans and agents can inspect, search, diff, edit, version, branch, restrict, and delete them.
 
-Derek Parfit’s reductionism about [personal identity](https://plato.stanford.edu/entries/identity-personal/) is useful here—not because agents are persons, but because it separates continuity from numerical identity. In his branching thought experiments, one enduring identity can fail even when the relations that matter survive. Agent systems make the separation literal: continuity of work can pass through artifacts without continuity of the worker.
+Derek Parfit’s reductionism about [personal identity](https://plato.stanford.edu/entries/identity-personal/) is useful here—not because agents are persons, but because it separates continuity from numerical identity. Agent systems make that separation literal: work can continue through artifacts without continuity of the worker.
 
-If the next agent needs context, give it the relevant files. If the work cannot be reconstructed from durable artifacts, the system is carrying hidden state.
-
-The ghost does not persist. Its traces do. Another ghost can read them and continue without pretending to be the same person.
+If another batch cannot resume from durable artifacts, the system is carrying hidden state.
 
 Persist the inputs and outputs, not the process.
 
-A persistent agent is often just a process whose traces were never separated from its identity.
-
 ## No self to save
 
-A lot of agent infrastructure asks how to preserve the agent: its memory, personality, role, and relationship to the user.
+A lot of agent infrastructure asks how to preserve the agent. The better question is how little of it needs to survive.
 
-I think the better question is how little of the agent needs to survive.
+Keep the files, capabilities, and rules for assembling a safe shell. Then create the next batch when there is work to do.
 
-Keep the files. Keep the capabilities. Keep the rules for assembling a safe shell. Keep the outputs that matter. Then create the next agent when there is work to do.
-
-As models improve, this becomes easier. Weak models need more workflow encoded around them. Stronger models can look at available primitives and construct not only the workflow but the harness that will execute it. Scaffolding that once supplied missing judgment can later obstruct it. The architecture itself can become temporary.
-
-That may be the deeper meaning of Pi and Herdr. The model does not become a better permanent employee. It becomes better at summoning and releasing processes.
+Weak models need more workflow encoded around them. Stronger models can construct the harness that will execute the workflow. Scaffolding that once supplied missing judgment can later obstruct it.
 
 *Ghost in the Shell* asks whether a self can survive when the shell is replaceable.
 
-Agents suggest another possibility: perhaps useful agency does not need a continuous self in the first place.
-
-The ghost is the temporary pattern. The shell is the harness. The filesystem holds the traces.
+Agents suggest another possibility: useful agency may not need a continuous self at all.
 
 Persist the files.
 
 Assemble the shell just in time.
 
-Summon the ghost when needed.
+Run the batch.
+
+Let the ghost disappear.
 
 ## Further reading
 
-- Thorsten Ball, [“How to Build an Agent”](https://ampcode.com/notes/how-to-build-an-agent)
-- Vivek Trivedy, [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness)
-- Birgitta Böckeler, [“Harness engineering for coding agent users”](https://martinfowler.com/articles/harness-engineering.html)
-- Mario Zechner, [“What I learned building an opinionated and minimal coding agent”](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
 - Mark Fisher, *Ghosts of My Life: Writings on Depression, Hauntology and Lost Futures*
 - Jacques Derrida, *Specters of Marx*
 - Gilbert Simondon, *Individuation in Light of Notions of Form and Information*
 - Derek Parfit, *Reasons and Persons*
+- Thorsten Ball, [“How to Build an Agent”](https://ampcode.com/notes/how-to-build-an-agent)
+- Vivek Trivedy, [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness)
+- Birgitta Böckeler, [“Harness engineering for coding agent users”](https://martinfowler.com/articles/harness-engineering.html)
+- Mario Zechner, [“What I learned building an opinionated and minimal coding agent”](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
