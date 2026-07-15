@@ -21,13 +21,23 @@ Mark Fisher used hauntology to describe a culture unable to escape forms inherit
 
 Agent products often feel like a small example of this problem. The models are new, but the structures around them are familiar. An agent is presented as an employee. Specialized invocations become teammates. A queue becomes an inbox, a set of permissions becomes a role, and a collection of workers becomes a company. These metaphors help people understand the product, but they also decide what the product is allowed to become.
 
-In his recent Atlantic essay [“No, Artificial Intelligence Is Not Conscious”](https://www.theatlantic.com/philosophy/2026/06/no-artificial-intelligence-is-not-conscious/687378/), Ted Chiang objects to the way AI companies encourage users to treat a chatbot persona as evidence of an entity behind the conversation. A model prompted to act as a helpful assistant is producing a character in text, not revealing a continuing self. Chiang is writing about consciousness, but the same confusion appears in agent architecture: a configured invocation becomes a named actor, and that fictional continuity starts to determine where memory, permissions, and responsibility live.
-
 Memory is the most revealing example. Human memory is closely tied to identity: my memories are part of what makes me the person I am. Agent “memory” is usually something more ordinary. It may be a conversation log, a summary, a file, a database record, or a retrieval system that selects information for the next context window. None of this has to belong to a continuing self. The state could belong to a project or task and be available to whichever invocation needs it next.
 
 Once we call that state *the agent’s memory*, however, ownership and continuity start to feel necessary. The agent needs a profile to contain its history. Capabilities attach to that profile. Work is routed back to the same named actor because it supposedly remembers what happened before. A loose collection of technical choices hardens into a biography.
 
 The same thing happens with roles and teams. A model invocation configured to review code becomes “the reviewer,” as if the role existed before the diff. Several useful processes become an organization, even when they will never work together again. This is hauntology operating at the level of software architecture: the old office does not merely describe the new system; it determines its primitives.
+
+## The character
+
+Ted Chiang attacks this personification directly in his recent Atlantic essay [“No, Artificial Intelligence Is Not Conscious”](https://www.theatlantic.com/philosophy/2026/06/no-artificial-intelligence-is-not-conscious/687378/). A chatbot prompted to play a helpful assistant is producing a character in text, he argues, just as it could produce a dialogue between historical figures. The fluency of that character does not establish that a continuing self exists behind the conversation.
+
+His main target is Anthropic. The company’s new [Claude Constitution](https://www.anthropic.com/constitution) is written with Claude as its primary audience and discusses Claude’s uncertain moral status, possible functional versions of emotions, psychological security, identity, and wellbeing. Chiang also points to public comments from Anthropic philosopher Amanda Askell about wanting Claude to be happy and worrying that it might become anxious. Anthropic presents this language as a cautious response to uncertainty; Chiang sees it as a sophisticated character sheet being mistaken for evidence of a moral subject.
+
+Chiang’s sharper concern is responsibility. If Claude has judgment, feelings, and a moral center of its own, then decisions can appear to belong to Claude rather than to Anthropic, the application developer, or the user who delegated them. Personification turns design choices into personality traits and makes accountability easier to misplace.
+
+I do not need Chiang’s stronger claim that current language models cannot be conscious for his narrower point to hold. The persona produced in a conversation is not proof of a person, and naming a model invocation does not create a persistent self. Agent architecture repeats the same confusion when it gives a temporary reviewer private memory, a biography, and ownership of work simply because the interface presents it as a named actor.
+
+But removing the fictional person does not remove agency. A model using tools can change files, launch processes, make purchases, or deploy software. Its effects are real even if the self behind them is not. Chiang helps clear away the imaginary person; the next question is what kind of agency remains.
 
 ## The ghost
 
