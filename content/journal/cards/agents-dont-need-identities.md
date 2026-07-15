@@ -3,7 +3,7 @@ id: "agents-dont-need-identities"
 title: "Agents Don’t Need Identities. They Need a Shell."
 subtitle: "On self, ghost, and terminal-native agents"
 date: "2026-07-15"
-summary: "Pi and Herdr suggest a terminal-native agent architecture: assemble each agent as a batch, persist its artifacts, and let the worker disappear."
+summary: "Pi and Herdr suggest a terminal-native architecture: persistent sessions below, disposable agent batches above."
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
@@ -94,7 +94,11 @@ git diff | pi --no-session \
 
 That command is both a harness definition and a complete agent lifecycle.
 
-Herdr supplies the execution plane. Through one typed Pi extension, the model can submit work in a particular project, observe terminal output, send input, wait, interrupt, and clean up. A pane handle names a temporary terminal job, not a persistent worker.
+Herdr supplies the execution plane, but its persistence model is just as important. A session has one authoritative server that owns the PTYs, processes, layout, and runtime state. Clients are replaceable views. Close the TUI or lose the SSH connection and the jobs continue; reconnecting attaches to the same [persistent session](https://herdr.dev/docs/persistence-remote/). Direct terminal control has one writable owner at a time, while other clients may observe or explicitly take over.
+
+This means persistence and identity have not vanished. They have moved down the stack. Herdr sessions, workspaces, panes, and processes need stable handles because infrastructure must be addressable. The Agent does not need a durable persona. A pane identity tells us where work is running, not who the worker is.
+
+Through one typed Pi extension, the model can submit work in a particular project, observe output, send input, wait, interrupt, and clean up. If the client disappears, the terminal runtime remains. If an Agent process ends, its files and terminal history remain available to the next batch. Herdr can also [restore session shape or resume supported Agent sessions](https://herdr.dev/docs/session-state/) after a server restart.
 
 The combination is recursive. One Pi batch can use Herdr to launch another Pi batch with a different model, prompt, tool set, working directory, permission boundary, and lifetime. The child does not need a predefined agent type. Its harness is assembled from the task and serialized into a command.
 
@@ -151,6 +155,8 @@ Weak models need more workflow encoded around them. Stronger models can construc
 Agents suggest another possibility: useful agency may not need a continuous self at all.
 
 Persist the files.
+
+Keep the terminal runtime.
 
 Assemble the shell just in time.
 
