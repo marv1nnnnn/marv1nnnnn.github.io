@@ -1,45 +1,69 @@
 ---
 id: "agents-dont-need-identities"
 title: "Agents Don’t Need Identities. They Need a Shell."
-subtitle: "What Pi and Herdr taught me about disposable agents"
+subtitle: "The office haunting agent design"
 date: "2026-07-15"
-summary: "For terminal-native coding agents, persist the runtime and artifacts, then create workers as each task needs them."
+summary: "Persistent, extensible runtimes should let agents assemble their own harnesses just in time instead of inheriting fixed roles and organizations."
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
-I didn’t set out to build a multi-agent system. I wanted one model to review a diff while another terminal ran the tests.
+I’ve been thinking about the word *shell*.
 
-In my current setup, the Pi session I’m working with can open two Herdr panes, start a fresh Pi in one, run the test suite in the other, collect both results, and close the temporary panes. The second Pi has no name, profile, inbox, or private memory. It has a task, a working directory, a limited set of tools, and an exit condition.
+Partly because *Ghost in the Shell* is back in public view, between anniversary screenings of Mamoru Oshii’s 1995 film and [the new Science Saru adaptation](https://www.theghostintheshell-anime.jp/en/). But the title also describes a tension in how we build AI agents.
 
-That has been enough.
+In the film, the shell is the machinery. The ghost is the possible self inside it. Agent products increasingly treat the ghost as infrastructure: give every agent a name, role, memory, inbox, and history, then preserve that character as work moves around it.
 
-I borrowed the title of this article from *Ghost in the Shell*, but this isn’t an argument about machine consciousness. It is a much narrower software question: when an agent does a piece of work, where should its state live?
+My experience with Pi and Herdr has pushed me in the opposite direction. Put the persistence and flexibility in the shell. Let the workers appear when the work requires them and disappear when it does not.
 
-A lot of agent products answer by creating a persistent character. Pi and Herdr have pushed me toward a different default: keep the environment running, keep the artifacts, and create the worker only when there is work to do.
+I have watched a Pi process decide that it needs an independent review, open a new Herdr pane, launch a fresh Pi with a different prompt and tool set, continue its own work, collect the review, and remove the temporary pane. On another task it made a different arrangement. There was no reviewer waiting in an organization chart. The role existed for one job.
 
-## What I mean by identity
+Most agent products would call this delegation or multi-agent orchestration. From the runtime, it looked more like creating a process.
 
-“Agent identity” can refer to several different things, and they shouldn’t be mixed together.
+That difference matters.
 
-A running process needs a handle. A pane, session, task, and model invocation need IDs so that we can find, monitor, interrupt, and audit them. An agent may also need a security principal so that permissions and actions can be attributed correctly. None of this is optional.
+## The office
 
-The identity I’m questioning is the product-level persona: a named actor with a role, private memory, history, inbox, and an expectation that it will still be the same actor tomorrow.
+We like giving agents selves because selves make the interface easy to understand. The agent becomes an assistant, employee, reviewer, manager, or teammate. A workspace becomes a desk. A message queue becomes an inbox. Repeated invocations become one continuous life.
 
-That model is appealing because it is familiar. The agent becomes an employee, reviewer, manager, or teammate. The interface is easy to explain, and for some products the ongoing relationship may be the point.
+The metaphor is not harmless once it becomes architecture. A persistent employee needs a profile, private memory, durable role, ownership, and a place in the organization. Those choices arrive before the agent has done any work.
 
-The trouble starts when the metaphor becomes the default architecture. Before the agent has done anything, the system already needs profiles, roles, memory boundaries, ownership rules, and an organization chart. A new computational tool ends up looking a lot like an office.
+Mark Fisher’s writing on hauntology is useful here. In *Ghosts of My Life*, he describes a present occupied by old forms and by futures that failed to arrive. Fisher, following Franco “Bifo” Berardi, called it the [slow cancellation of the future](https://www.opendemocracy.net/en/mark-fisher-ghosts-retromania/): the loss of an expectation that the future might be structurally different from the present.
 
-There is also a human-factors cost. [Experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee can reduce human oversight. The language of colleagues and delegation can make responsibility less clear just when the system needs more scrutiny.
+The digital employee is hauntological in exactly this sense. The model is new. The institution around it is an office. Profiles, managers, teams, inboxes, and company memory force a new computational medium back into twentieth-century labor organization.
 
-A familiar name and a long conversation can create a convincing sense of continuity. Technically, though, much of that continuity may simply be reconstructed from the same prompt, files, and history on every invocation. If the work can continue without preserving the worker, I’m not sure the worker needs to become a permanent object in the system.
+This can even blur responsibility. [Experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee reduces human oversight. The language of colleagues and delegation makes it easier to forget that responsibility has not actually moved to a machine.
 
-## Start with a job
+By identity, I do not mean a process ID, security principal, or audit record. Systems need stable handles and attribution. I mean the durable product persona: the assumption that a worker should exist as the same named actor before, during, and after its tasks.
 
-For coding work, I have found a terminal job to be a more useful starting point than a digital employee.
+Making that persona the basic unit shapes the whole system. Capabilities belong to an actor. Context accumulates in its private memory. Work reaches it through an inbox. Coordination happens through predefined roles. The organization becomes difficult to change because every piece of state assumes the organization already exists.
 
-The job has a command, working directory, environment, inputs, available tools, permissions, output, and exit status. It can be started, observed, interrupted, retried, and removed with machinery we already understand.
+The problem is not that agents act too little like people. It is that we decide what kind of people they are before they encounter the task.
 
-For example, Pi can describe a complete review worker in one invocation:
+## The shell
+
+A shell is a better primitive.
+
+I do not mean that every agent must run in a terminal. A terminal is one useful implementation, and it is the one Pi and Herdr make unusually visible. The broader shell is the runtime around the agent: the place where work executes, state can be inspected, resources are reached, and new harnesses can be assembled.
+
+A shell might expose terminal processes, containers, virtual machines, browser sandboxes, remote services, or interfaces we have not built yet. It can be long-lived. In fact, it is often more useful when it is. The runtime remains available while workers start, stop, and change shape inside it.
+
+Humans and platforms still set the outside boundary: security policy, resource limits, available models, credentials, and which capabilities may be granted. Inside that boundary, the agent should have room to decide how a task is performed. It can choose the context, tools, model, permissions, working directory, and lifetime required for a worker. It can create one worker, several, or none. It can keep a useful process around or destroy it when the task ends.
+
+The harness is assembled just in time because the task supplies information its author did not have. A fixed harness encodes one person’s guess about what future work will require. An extensible shell gives the agent primitives and lets it make the local decision.
+
+This is not the same as adding more agent types to a framework. A larger catalog is still a catalog. The important question is whether the agent can compose a harness its platform author did not anticipate.
+
+## A runtime that stays
+
+Herdr is a concrete example of what I mean by a persistent shell.
+
+A Herdr session has one authoritative server that owns the PTYs, processes, workspace layout, and runtime state. Clients are replaceable views. Close the TUI or lose the SSH connection and the jobs continue; reconnecting attaches to the same [persistent session](https://herdr.dev/docs/persistence-remote/).
+
+The persistence belongs to the runtime. Workspaces and panes have stable handles because they must be addressable. Processes can outlive the agent that started them. Files and terminal history remain available to the next process. Herdr can also [restore session shape or resume supported agent sessions](https://herdr.dev/docs/session-state/) after a server restart.
+
+Pi complements this by making the agent harness small and serializable. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) leaves sub-agents and background jobs out of the core. Models, prompts, tools, skills, extensions, context, and session policy can be selected for each invocation.
+
+A review worker can be created as a command:
 
 ```bash
 git diff | pi --no-session \
@@ -49,76 +73,69 @@ git diff | pi --no-session \
   -p "Review this diff. Do not edit files."
 ```
 
-There is no predefined “reviewer” waiting inside the system. The command supplies the model, instructions, tools, input, and lifetime needed for this review. When it exits, the review remains and the worker does not.
+There is no permanent reviewer behind that command. The current agent decides that a review would help, gives the new invocation only what it needs, observes the result, and lets it end.
 
-This doesn’t mean the control interface has to be an untyped shell string. A typed tool can validate the model, project, permissions, and command before anything runs. The important part is that the work still becomes a visible terminal job rather than disappearing into a private agent runtime.
+Through a typed Herdr extension, Pi can start work in a particular project, watch output, send input, wait, interrupt, and clean up. The typed boundary matters: the runtime can enforce what is allowed without prescribing the organization that must form inside it.
 
-The batch is useful because its boundaries are concrete. I can see what entered it, what it was allowed to touch, what it produced, and whether it finished. For a small task, I may decide that a plain command is enough and skip the extra model invocation entirely.
+I use this pattern repeatedly. One Pi launches another for an independent opinion while tests run in a separate pane. Sometimes the child gets a different model or read-only tools. Sometimes a plain shell command is enough. Sometimes no delegation is needed. The arrangement is decided after the task is understood, not when the product is designed.
 
-## Put persistence underneath the agent
+Herdr survives these arrangements. The temporary workers do not have to. That is the architectural separation: a resident shell runtime below, just-in-time harnesses above.
 
-Herdr is the part that changed how I think about persistence.
+Nothing about this idea requires a terminal. The terminal simply makes the lifecycle legible. The same separation could exist in a container platform, a browser runtime, or a service built around typed jobs. Pi and Herdr are evidence that the pattern works, not a limit on where it can work.
 
-A Herdr session has one authoritative server that owns the PTYs, processes, workspace layout, and runtime state. Clients are replaceable views. If I close the TUI or lose an SSH connection, the jobs keep running; reconnecting attaches to the same [persistent session](https://herdr.dev/docs/persistence-remote/).
+## Two almost-right answers
 
-This infrastructure needs stable identities. A workspace or pane must remain addressable, and direct terminal control needs a clear owner. But a pane ID answers “where is this running?”, not “who is this worker?”
+Current agent products approach this problem from two directions.
 
-That distinction lets the durable and temporary parts sit at different levels.
+[Claude Code](https://code.claude.com/docs/en/features-overview) and [Codex](https://developers.openai.com/codex/subagents) get many of the execution primitives right. They offer sub-agents or threads, skills, plugins, hooks, worktree isolation, and shell access. These are capable harnesses, and their built-in choices solve real problems.
 
-Herdr keeps the terminals and processes alive. The repository keeps the code. Git keeps the history. Files can hold plans, prompts, policies, skills, test output, and handoff notes. A fresh Pi process can inspect those artifacts and continue the work without pretending to be the process that came before it.
+But most of the architectural choices still come from the product. The model selects from a menu whose important categories, lifecycles, and extension points were designed in advance. Shell access makes the boundary less rigid, but the center of gravity remains a vertically integrated harness controlled by a large vendor.
 
-Herdr can also [restore session shape or resume supported agent sessions](https://herdr.dev/docs/session-state/) after a server restart. Again, what survives is explicit: processes where possible, terminal history, layout, files, and session records. A fictional biography is not required.
+That concentration matters. As these products become the environment in which agents work, a small number of companies get to decide what an agent can compose, which parts of the harness are replaceable, and which forms of delegation count as supported. A rich menu can still be a closed future.
 
-## Compose the work when it is needed
+[Multica](https://www.multica.ai/) and [Raft](https://raft.build/) move in a more open direction. They let users define profiles, squads, teammates, memories, inboxes, and longer-running organizations. The system is more configurable, and its coordination machinery is visible.
 
-Pi describes itself as a minimal terminal coding harness. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) deliberately leaves sub-agents and background shell jobs out of the core. Models, prompts, tools, skills, extensions, context, and session policy can be selected for each invocation.
+But the available freedom is organized around human assumptions. The user designs a company, then places agents inside it. A reviewer is a teammate. Coordination is messaging. Persistence is personal memory. Work is owned by named actors. The organization can be customized, but the idea of organization has already been chosen.
 
-Herdr supplies the terminal control around it. Through one typed Pi extension, a model can start work in a project, watch the output, send input, wait, interrupt, and clean up.
+The choice should not be between a vendor-defined harness and a user-configured office.
 
-The combination is simple but flexible. A Pi process can launch a fresh Pi for an independent review, run tests in another terminal, continue its own work, and collect the results later. On another task it can choose a different model and tool set, use a plain shell command, or avoid delegation altogether.
+A third option is to expose composable runtime primitives and let the agent assemble the harness required by the task. The platform defines the safe operating envelope. The agent decides the temporary form of work inside it.
 
-I don’t have to define a permanent reviewer, tester, researcher, and manager in advance. The process doing the work decides what it needs, starts those jobs, and lets them end. The temporary organization exists as a Unix process tree for as long as the task requires it.
+Openness, in this model, is not the number of roles a human can configure. It is the number of useful arrangements the agent can create that the runtime author never named.
 
-This is different from drawing a delegation graph before the work begins. Fixed workflows are useful when the task is stable or the model needs more guidance. But they can also become a ceiling: the system can only use the roles and paths its author anticipated.
+## What survives
 
-A terminal gives the model a smaller set of ordinary, inspectable primitives. The model can combine them at runtime without requiring the agent platform to know every future workflow.
+If workers come and go, the work still needs continuity.
 
-## Other harnesses make a different trade-off
+The shell can remain. Files, Git history, plans, prompts, policies, logs, task records, and outputs can remain. Active processes can remain when keeping them is useful. These are explicit artifacts: humans and later agents can inspect, search, diff, edit, restrict, and delete them.
 
-[Claude Code](https://code.claude.com/docs/en/features-overview) and [Codex](https://developers.openai.com/codex/subagents) include richer built-in structures for sub-agents, skills, plugins, hooks, threads, and worktree isolation. Those features are useful, and both products still expose shells and extension points.
+A fresh worker should be able to enter the runtime, inspect what happened, and continue from those artifacts. If it cannot, some important state is trapped inside the old agent.
 
-The difference is not “closed versus open” in an absolute sense. It is where each system puts its defaults. A product-defined sub-agent gives the model a supported menu of worker types and coordination mechanisms. A terminal-native setup starts with processes and lets a particular invocation assemble what it needs.
+That is the real test of persistence. Not whether the same character returns, but whether the work can continue without hidden continuity of the worker.
 
-[Multica](https://www.multica.ai/) and [Raft](https://raft.build/) go further toward durable organizations, with profiles, squads, named teammates, inboxes, and private memories. That can make long-running coordination easier to understand. It also couples queues, logs, and process supervision to the idea of continuing actors.
+A long-running worker is not forbidden. It may be cheaper or more effective to preserve its context. But persistence should be a runtime decision, not evidence that the worker has become a permanent member of an organization. Keep it because the task benefits, not because its profile already exists.
 
-I would rather separate those concerns. A queue needs durable ownership and status. It does not necessarily need the owner to be presented as a colleague. A task needs an audit trail. It does not necessarily need a personality.
+This is where the shell matters more than the self. The runtime carries capabilities and evidence forward. Identity is optional metadata added when a task genuinely needs it.
 
-LangChain’s [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) points in a related direction: tools and context can be assembled just in time instead of being permanently attached to one agent definition.
+## No self to save
 
-## Where persistent identity may help
+The office keeps returning because it gives us a ready-made picture of coordination. We already know what managers, specialists, teams, and inboxes look like. Agent products can appear futuristic while reproducing those forms almost unchanged.
 
-Disposable workers should be a default, not a law.
+That is the hauntological part of agent design. The ghost is not the model. It is the institution we cannot stop rebuilding around it.
 
-A personal assistant may need to maintain preferences and an ongoing relationship with one user. A customer-facing character may need a consistent voice. Some long-running operational roles need clear responsibility across days or teams. Regulated work may require durable security identities and detailed attribution.
+Agents may be able to organize work in ways that do not resemble a company: a temporary process tree, a one-off review, a tool created for one decision, a worker that exists for five minutes, or a harness assembled only after the task reveals what it needs. We should not require these arrangements to look like human employment before we consider them real organization.
 
-Even in those cases, it is worth asking what actually needs to persist. Preferences can belong to the user account. Responsibility can belong to a task record. Permissions can belong to a security principal. Conversation history can be an inspectable artifact. None of those automatically requires a private, human-like self that owns all of them.
+*Ghost in the Shell* asks whether a self can survive when the shell is replaceable.
 
-The practical test is whether a fresh process can resume the work from explicit state. Can it inspect the repository, task, logs, and policy and know what to do next? If not, what information is trapped inside the old agent, and why?
+Agent systems suggest a different design question: if the shell can preserve the work and create the next worker, why preserve the self at all?
 
-Hidden state makes systems harder to inspect and recover. Persistent personas can make that hidden state feel natural rather than making it less risky.
+Persist the shell. Leave the harness open. Let workers come and go.
 
-## What should survive
-
-My working rule is now straightforward: persist the environment and the evidence; create workers for tasks.
-
-For terminal-based coding work, that usually means keeping the repository, Git history, terminal runtime, permissions, task description, and outputs. A model process can be restarted or replaced. Another batch should be able to pick up from what the previous one left behind.
-
-Pi and Herdr haven’t proved that agents never need identities. They have shown me how much useful agent work can happen without building identities first.
-
-That is simpler to operate, easier to inspect, and easier to discard when the job is done.
+The ghost we need to exorcise is not the agent. It is the office we keep rebuilding around it.
 
 ## Further reading
 
+- Mark Fisher, *Ghosts of My Life: Writings on Depression, Hauntology and Lost Futures*
 - Thorsten Ball, [“How to Build an Agent”](https://ampcode.com/notes/how-to-build-an-agent)
 - Vivek Trivedy, [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness)
 - Birgitta Böckeler, [“Harness engineering for coding agent users”](https://martinfowler.com/articles/harness-engineering.html)
