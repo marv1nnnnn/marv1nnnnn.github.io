@@ -3,7 +3,7 @@ id: "agents-dont-need-identities"
 title: "Agents Don’t Need Identities. They Need a Shell."
 subtitle: "On self, ghost, and shell in agent systems"
 date: "2026-07-15"
-summary: "AI agents may not need persistent identities or fixed workflows: keep state in files, assemble an open harness just in time, and let each agent exit like a Unix process."
+summary: "AI agents may not need persistent identities or fixed workflows. Pi and Herdr point toward a process-native architecture that assembles harnesses just in time and persists only their artifacts."
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
@@ -15,7 +15,7 @@ In *Ghost in the Shell*, the shell is replaceable. The ghost is what might remai
 
 Agent systems quietly assume something similar. The model or container may change, but somewhere inside the product there is supposed to be a persistent agent—a stable “someone” with a name, a role, a memory, and a history.
 
-My recent experiments with Pi and Herdr have made me wonder if this gets the relationship backward.
+Pi and Herdr have made me wonder if this gets the relationship backward.
 
 Maybe an agent needs a shell and can produce something ghost-like while it runs. But it does not follow that the ghost is a self, or that anything inside the process must persist when the work is done.
 
@@ -100,43 +100,22 @@ The shell can be assembled differently for every task. A review shell can be rea
 
 The shell is specific. The ghost is temporary. The self is optional.
 
-## Rich is not open
+## A process-native agent architecture
 
-Modern coding harnesses are becoming very rich. [Claude Code](https://code.claude.com/docs/en/features-overview) has custom sub-agents, agent teams, hooks, skills, MCP servers, plugins, and worktrees. [Codex](https://developers.openai.com/codex/subagents) has sub-agents, skills, MCP, plugins, threads, automations, and worktree isolation. These are substantial customization surfaces.
+Pi and Herdr may point toward a different architecture for agents.
 
-But richness is not the same as openness.
+Pi makes the harness addressable from the shell. Herdr makes the process tree addressable to the model. Together they let an agent construct not only its next action, but the temporary system that will perform it.
 
-A rich harness gives the model a larger menu. An open harness lets the model assemble the menu.
-
-Most products freeze the ontology early. Work is expected to fit a sub-agent, teammate, thread, automation, or plugin. The model may decide when to use those objects, but the product has already decided what kinds of objects may organize the work. The agent can orchestrate inside the harness; it does not fully control the construction of the harness.
-
-This is a difference of degree, not a claim that Claude Code or Codex are sealed boxes. Claude Code supports invocation-scoped agent definitions, and both systems expose shells, configuration, extensions, and programmatic interfaces. A determined user can make either one launch another configured process.
-
-The difference is where the architecture pulls. Their built-in multi-agent features encourage the model to select from product-defined forms. A more open design treats those forms as temporary compositions of lower-level capabilities.
-
-Platforms such as [Multica](https://www.multica.ai/) and [Raft](https://raft.build/) pull harder in the other direction. Profiles, squads, named teammates, inboxes, and private memories turn runtime configurations into durable actors. Their execution layers—local processes, task queues, shared messages, and visible logs—may be useful. Binding those facilities to continuing selves is the unnecessary part. A queue needs a claimant; it does not need a colleague.
-
-That distinction matters more as models improve. A fixed workflow can compensate for a weak model. The same workflow can become a ceiling for a stronger one. The emerging literature on harness engineering is beginning to point in this direction: LangChain’s [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) describes just-in-time assembly of tools and context as a path toward harnesses that behave more like compilers.
-
-The interesting question is therefore no longer only what tools a harness contains. It is whether the agent can construct a harness that its author did not anticipate.
-
-## Why Pi fits this model
-
-Pi made this more than a metaphor because it is already very close to the Unix idea of an agent.
-
-Thorsten Ball’s [“How to Build an Agent”](https://ampcode.com/notes/how-to-build-an-agent) strips a coding agent down to an LLM, a loop, and tools. Recent [harness engineering](https://martinfowler.com/articles/harness-engineering.html) work uses the shorthand `Agent = Model + Harness`. Pi is interesting because it turns that equation into an ordinary command—and makes the parts of the equation replaceable from the command line.
-
-Pi is not primarily an agent service. It describes itself as a minimal terminal coding harness. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) intentionally leaves sub-agents and background shell jobs out of the core, expecting those workflows to be composed through extensions and terminal processes. It can be interactive, but it also has a non-interactive print mode: give it a prompt, let it use its tools, receive the output, and let the process exit.
-
-```bash
-pi --no-session -p "Review the current diff"
+```text
+files and Git    → durable state
+Pi               → just-in-time harness construction
+Herdr            → process creation and supervision
+model            → runtime composition
 ```
 
-That one command is already a complete agent lifecycle.
+Pi describes itself as a minimal terminal coding harness. Its [design](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) intentionally leaves sub-agents and background shell jobs out of the core. Extensions can add or replace tools and behavior; skills and prompts define procedures; invocation flags choose the model, thinking level, tools, extensions, context, and session policy.
 
-The durable definition of the agent can live in files. A TypeScript extension defines tools or replaces built-in behavior. A skill or prompt defines a procedure. Context files describe the project. Invocation flags choose the model, thinking level, tool access, extensions, skills, working context, and whether a session should be saved.
-
-A more specific agent is still just another invocation:
+A task-specific agent is therefore an ordinary command:
 
 ```bash
 git diff | pi --no-session \
@@ -146,31 +125,49 @@ git diff | pi --no-session \
   -p "Review this diff. Do not edit files."
 ```
 
-Pi does not merely put a shell tool inside the harness. It makes the harness itself addressable from the shell.
+That invocation is both a harness definition and a complete agent lifecycle. Pi does not merely put a shell tool inside the harness. It makes the harness itself addressable from the shell.
 
-That creates a recursive capability. A running agent can write the command line for a new Pi process and choose a different model, prompt, tool set, extension set, working directory, permission boundary, and lifetime for the child. The child does not have to match a predefined agent type. Its harness can be compiled just in time from the needs of the task.
+Herdr supplies the lower layer. Through one typed Pi extension, the model can start a process in a particular project, observe its output, send input, wait for it, and clean it up. The types make the interface safer; they do not introduce a new agent ontology. A pane handle names a temporary process resource, not a persistent self.
 
-There is nothing to provision. No identity has to be registered. No worker has to be kept warm. The persistent parts—extensions, skills, prompts, policies, and project context—are files. The agent itself is a process created from those files.
+This creates a recursive capability. A running Pi process can use Herdr to launch another Pi with a different model, prompt, tool set, extension set, working directory, permission boundary, and lifetime. The child does not have to match a predefined agent type. Its harness is assembled from the needs of the task.
 
-Pi can save a session when a trace is useful, but it does not require the process to pretend that the trace is a self. Headless mode makes the separation obvious: another process constructs the harness, the agent acts, stdout and files remain, and the process ends.
+```text
+task
+  ↓
+model chooses a topology
+  ↓
+Pi assembles task-specific harnesses
+  ↓
+Herdr materializes a temporary process tree
+  ↓
+files + output + exit status
+```
 
-## Ghosts making shells
+With GPT-5.6, this already works without a predefined delegation graph. One process can launch a fresh Pi for an independent review, run tests elsewhere, continue its own work, collect the results, and remove the temporary panes. On another task it can use a plain command or decide that no delegation is needed.
 
-Herdr adds process supervision to that model. It manages visible terminal workspaces, panes, working directories, input, output, and lifecycle.
+The important part is not that one agent can call another. It is that the workflow does not exist until the model needs it.
 
-I wrote a thin Pi extension that exposes Herdr as one typed tool. It lets Pi start work in the right project, observe it, send input, wait for results, and clean it up. A short skill describes when parallel or interactive terminal work is appropriate.
+Traditional agent frameworks ask humans to design the workflow and then place the model inside it. A process-native architecture asks humans to expose legible capabilities and lets the model compile the workflow at runtime. The agent graph becomes an ephemeral artifact, like a Unix process tree.
 
-The typed interface does not escape the process model. It is a safer control surface over working directories, input, output, process handles, and lifecycle. The extension does not define a team. There is no permanent reviewer, tester, or researcher.
+This is the possible new paradigm: stable infrastructure below, temporary organization above. Do not design a permanent agent organization. Design the primitives from which the model can instantiate one just in time.
 
-With GPT-5.6, those primitives are enough to produce useful orchestration without a task-specific delegation plan or predefined agent graph. During a normal engineering task, Pi can launch a fresh process for an independent review, run checks in another terminal, continue its main work, then collect the results. On another task it can use a plain shell command or decide not to delegate at all.
+## Rich is not open
 
-The surprising part was not that one agent could call another. The surprising part was that the workflow did not exist until the model needed it.
+Modern coding harnesses are becoming very rich. [Claude Code](https://code.claude.com/docs/en/features-overview) has custom sub-agents, agent teams, hooks, skills, plugins, and worktrees. [Codex](https://developers.openai.com/codex/subagents) has sub-agents, skills, plugins, threads, automations, and worktree isolation.
 
-A temporary ghost wrote the command line for another shell and summoned another temporary ghost.
+But richness is not the same as openness.
 
-That second agent did not need a name or a history. Its entire identity was the extension, prompt, files, and flags assembled for that task. When the review ended, the review remained and the reviewer disappeared.
+A rich harness gives the model a larger menu. An open harness lets the model assemble the menu.
 
-This felt more natural than a permanent multi-agent team. Even the organization could be temporary.
+Most built-in multi-agent systems freeze their ontology early. Work is expected to fit a sub-agent, teammate, thread, automation, or plugin. The model may decide when to use those objects, but the product has already decided what kinds of objects may organize the work. The agent orchestrates inside the harness rather than constructing the harness itself.
+
+This is a difference of degree, not a claim that Claude Code or Codex are sealed boxes. Both expose shells, configuration, extension points, and programmatic interfaces. A determined user can make either one launch another configured process. The difference is where the architecture pulls: toward product-defined forms, or toward temporary compositions of lower-level capabilities.
+
+Platforms such as [Multica](https://www.multica.ai/) and [Raft](https://raft.build/) pull further toward durable organization. Profiles, squads, named teammates, inboxes, and private memories turn runtime configurations into continuing actors. Their process supervision, queues, messages, and logs may be useful. Binding those facilities to persistent selves is the unnecessary part. A queue needs a claimant; it does not need a colleague.
+
+This distinction matters more as models improve. A fixed workflow can compensate for a weak model and become a ceiling for a stronger one. LangChain’s [“The Anatomy of an Agent Harness”](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) points toward just-in-time assembly of tools and context, with harnesses behaving more like compilers.
+
+The test is simple: can the running model construct a harness its author did not anticipate? Can every worker disappear while another process resumes from inspectable artifacts? If so, the system preserves the work without preserving a fictional worker.
 
 ## The traces
 
@@ -206,7 +203,7 @@ Keep the files. Keep the capabilities. Keep the rules for assembling a safe shel
 
 As models improve, this becomes easier. Weak models need more workflow encoded around them. Stronger models can look at available primitives and construct not only the workflow but the harness that will execute it. Scaffolding that once supplied missing judgment can later obstruct it. The architecture itself can become temporary.
 
-That may be the deeper meaning of what I saw with Pi and Herdr. The model did not become a better permanent employee. It became better at summoning and releasing processes.
+That may be the deeper meaning of Pi and Herdr. The model does not become a better permanent employee. It becomes better at summoning and releasing processes.
 
 *Ghost in the Shell* asks whether a self can survive when the shell is replaceable.
 
