@@ -31,9 +31,13 @@ The metaphor may help the interface. The problem begins when it becomes the arch
 
 A system built around persistent selves needs to preserve identity, synchronize memory, assign durable roles, and decide which agent owns which work. Before long, a new computational medium is reenacting an old organization chart.
 
-That framing is not neutral. [Recent experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee can weaken human oversight and shift accountability away from the people using it.
+Mark Fisher gives us language for this mistake. In *Ghosts of My Life*, hauntology is not simple nostalgia. It describes a present occupied by futures that failed to arrive, while culture keeps recycling recognizable forms. Fisher, following Franco “Bifo” Berardi, called this the [slow cancellation of the future](https://www.opendemocracy.net/en/mark-fisher-ghosts-retromania/): not the end of time, but the fading expectation that the future could be structurally different.
 
-Borrowing Mark Fisher’s use of hauntology loosely, the “digital employee” may be an old institutional form returning inside a genuinely new technical medium. Fisher wrote about lost futures and a culture trapped recycling familiar forms; the future of agents may look futuristic while still carrying the ghost of the twentieth-century office.
+The “digital employee” is hauntological in exactly this sense. The model is new; the institution around it is an office. Profiles, managers, teams, inboxes, careers, and company memory make a genuinely new computational medium legible by forcing it back into the organization of twentieth-century work.
+
+The danger is not only aesthetic. Once the metaphor hardens into architecture, it narrows what we can build. An agent company may look futuristic while revealing an inability to imagine a future beyond the company.
+
+That framing is not neutral. [Recent experimental research](https://hbr.org/2026/05/research-why-you-shouldnt-treat-ai-agents-like-employees) suggests that presenting AI as an employee can weaken human oversight and shift accountability away from the people using it.
 
 But an agent is not a human worker with biology removed.
 
@@ -51,7 +55,11 @@ In Derrida’s broader hauntological sense, a ghost is made of traces. It is pre
 
 That feels closer to an agent.
 
-An agent appears when a model is brought together with a task, context, tools, permissions, and an environment. It reads, reasons, acts, and leaves effects behind. Then the invocation ends.
+Gilbert Simondon offers a more precise way to state it. In his philosophy of [individuation](https://www.upress.umn.edu/9780816680023/individuation-in-light-of-notions-of-form-and-information/), the individual is not the starting point that later enters into relations. It is a phase produced by a process, emerging together with its associated milieu.
+
+An agent can be understood the same way. It is not a pre-existing individual to which a harness is attached. It is individuated when a model, task, context, tools, permissions, and environment are brought into relation. Change the milieu and a different form of agency appears.
+
+An agent appears when those elements are assembled. It reads, reasons, acts, and leaves effects behind. Then the invocation ends.
 
 ```text
 agent = model
@@ -62,7 +70,7 @@ agent = model
       + environment
 ```
 
-Change the context or tools and a different form of agency appears. Invoke the same model tomorrow and there is no obvious reason to call the resulting process the same individual, except that we choose to present it that way.
+Invoke the same model tomorrow and there is no obvious reason to call the resulting process the same individual, except that we choose to present it that way.
 
 The model weights are not a sleeping person. The prompt is not a soul. The conversation log is not proof of an inner life continuing between calls.
 
@@ -175,21 +183,17 @@ If agents disappear, what carries the work forward?
 
 Files.
 
-Plans are files. Code is files. Prompts are files. Skills and policies are files. Logs and session traces are files. Git turns files into history. If an agent learns something worth keeping, it can write that knowledge somewhere the next process can read.
+Plans, code, prompts, skills, policies, logs, and session traces can all be files. Git turns them into history. If an agent learns something worth keeping, it can leave that knowledge where the next process can read it.
 
-At the task layer, these files are the durable state I want. The operating system, Herdr, and model service may stay up, but they are infrastructure, not a persistent agent self.
+The filesystem is therefore both memory and protocol. Unlike hidden agent memory, artifacts can be searched, diffed, edited, versioned, branched, permissioned, and deleted. Humans and agents can inspect the same state.
 
-The filesystem is not only memory. It is also the protocol between agents. Agents do not need to share a self; they can communicate by leaving artifacts.
+Derek Parfit’s reductionism about [personal identity](https://plato.stanford.edu/entries/identity-personal/) is useful here—not because agents are persons, but because it separates continuity from numerical identity. In his branching thought experiments, one enduring identity can fail even when the relations that matter survive. Agent systems make the separation literal: continuity of work can pass through artifacts without continuity of the worker.
 
-Files are better than hidden agent memory because they are inspectable. They can be searched, diffed, edited, versioned, branched, permissioned, and deleted. Humans and agents can look at the same state.
+If the next agent needs context, give it the relevant files. If the work cannot be reconstructed from durable artifacts, the system is carrying hidden state.
 
-If the next agent needs context, give it the relevant files. If continuity depends on something that cannot be reconstructed from durable artifacts, the system is carrying hidden state.
+The ghost does not persist. Its traces do. Another ghost can read them and continue without pretending to be the same person.
 
-The ghost does not persist. Its traces do.
-
-Another ghost can appear later, read those traces, and continue the work. It does not have to pretend it was the same person all along.
-
-This is the part of the Unix model I find most important: persist the inputs and outputs, not the process.
+Persist the inputs and outputs, not the process.
 
 A persistent agent is often just a process whose traces were never separated from its identity.
 
@@ -224,3 +228,6 @@ Summon the ghost when needed.
 - Birgitta Böckeler, [“Harness engineering for coding agent users”](https://martinfowler.com/articles/harness-engineering.html)
 - Mario Zechner, [“What I learned building an opinionated and minimal coding agent”](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
 - Mark Fisher, *Ghosts of My Life: Writings on Depression, Hauntology and Lost Futures*
+- Jacques Derrida, *Specters of Marx*
+- Gilbert Simondon, *Individuation in Light of Notions of Form and Information*
+- Derek Parfit, *Reasons and Persons*
