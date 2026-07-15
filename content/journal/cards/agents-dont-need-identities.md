@@ -7,19 +7,17 @@ summary: "Agent harnesses should be commands that models compose at runtime, not
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
-Agent products keep trying to turn a model into someone.
+Science SARU’s [new *The Ghost in the Shell*](https://www.theghostintheshell-anime.jp/en/) began streaming in July 2026. Rather than reworking Mamoru Oshii’s film or *Stand Alone Complex*, it returns directly to Masamune Shirow’s original manga—to its color, humor, hardware, politics, and crowded ideas about minds and machines.
 
-They give it a name, a role, a memory, an inbox, sometimes even a manager.
+The title is usually read as a question about consciousness: when bodies can be replaced, what makes someone the same person? Watching the new adaptation, I kept thinking about a more mundane reading of it.
 
-Most agent work needs none of this. It needs a command line.
+Agent products keep trying to turn a model into someone. They give it a name, a role, a memory, an inbox, sometimes even a manager. They start by preserving the ghost.
 
-An agent should not be a character stored by the platform. It should be a command the model can compose.
+Most agent work needs none of this. It needs a shell.
 
 The shell in this argument is literal. It is the command line: a public interface for starting work, connecting programs, passing input, observing output, and knowing when a process has ended.
 
-*Ghost in the Shell* asks whether a self can survive when its body is replaceable. Agent products often assume the self before they have built an open shell. They preserve the ghost first.
-
-I think that is backward.
+An agent should not be a character stored by the platform. It should be a command the model can compose.
 
 ## The ghost
 
