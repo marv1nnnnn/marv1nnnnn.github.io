@@ -89,6 +89,14 @@ Most modern harnesses let one agent call another. What matters here is who desig
 
 Herdr keeps the place of work stable. Pi lets the workers be constructed just in time. Together they show how organization can emerge as a temporary process tree instead of being imposed as a permanent company.
 
+## Compaction and handoff
+
+Compaction is the usual answer when a session approaches its context limit. It keeps the same worker running by replacing earlier conversation with a shorter summary. This is useful, but its model of continuity is autobiographical: the worker remains while its past becomes a more compressed story. It is like a ghost staying in the same house while the rooms behind it are sealed off and replaced by a floor plan. The structure remains legible, but the texture of those rooms is no longer available.
+
+Handoff treats context pressure as succession instead. Once the current work has settled, the invocation writes an explicit trace, starts a fresh Pi process in Herdr, waits until it has entered the task, and then relinquishes its shell. This is closer to a stage production changing actors between scenes. The script, marked stage, props, and consequences of earlier actions carry the performance forward; nobody has to pretend that the actor who enters is the same person as the one who left.
+
+Compaction preserves the worker by making its accessible past smaller. Handoff preserves the work by making the worker replaceable. One asks how the same session can remember enough to continue. The other asks what must be made explicit so that a different invocation can continue correctly. Continuity stops being a claim about identity and becomes a protocol.
+
 ## The traces
 
 If the ghost disappears, something still has to carry the work forward. This is where files, Git history, logs, plans, test results, and other artifacts matter. They persist without belonging to a single agent, and a later invocation can inspect them before deciding what to do next.
