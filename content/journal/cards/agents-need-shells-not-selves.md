@@ -69,6 +69,10 @@ Multica and Raft move further toward openness by letting users configure agents 
 
 Pi and Herdr are interesting because together they offer a working version of that third possibility. Pi makes a coding-agent harness expressible as a command. The model, prompt, tools, skills, context, extensions, and session policy can all be selected for a particular invocation rather than attached to a permanent worker.
 
+The extensions are the decisive part. Claude Code and Codex expose hooks, skills, and sub-agents, but their agent loop and interface remain products the model inhabits. A Pi extension can add or replace tools, intercept and rewrite context or tool calls, alter compaction, register providers, persist session state, and change the terminal interface itself. The extension does not merely give the worker another item on a menu; it can change the menu and some of the machinery behind it.
+
+More importantly, Pi can write these extensions itself. When the current harness lacks a capability, the agent does not always have to wait for a vendor release or a human-designed profile. It can turn the missing capability into code, reload it, and make that code available to later invocations. The shell makes external programs composable; Pi makes parts of the harness composable too.
+
 A review agent, for example, can be created with a command like this:
 
 ```bash
