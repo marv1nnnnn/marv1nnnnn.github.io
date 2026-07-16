@@ -79,7 +79,7 @@ A review agent, for example, can be created with a command like this:
 git diff | pi --no-session \
   --model sonnet:high \
   --tools read,grep,find,ls \
-  --skill ./skills/review \
+  --extension ./extensions/review.ts \
   -p "Review this diff. Do not edit files."
 ```
 
