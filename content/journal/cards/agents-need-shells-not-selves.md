@@ -1,5 +1,5 @@
 ---
-id: "agents-dont-need-identities"
+id: "agents-need-shells-not-selves"
 title: "Agents Need Shells, Not Selves"
 subtitle: "Hauntology, machinic intelligence, and the command line"
 date: "2026-07-15"
