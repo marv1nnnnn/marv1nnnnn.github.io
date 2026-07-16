@@ -89,13 +89,13 @@ Most modern harnesses let one agent call another. What matters here is who desig
 
 Herdr keeps the place of work stable. Pi lets the workers be constructed just in time. Together they show how organization can emerge as a temporary process tree instead of being imposed as a permanent company.
 
-## Compaction and handoff
+## The succession
 
-Compaction is the usual answer when a session approaches its context limit. It keeps the same worker running by replacing earlier conversation with a shorter summary. This is useful, but its model of continuity is autobiographical: the worker remains while its past becomes a more compressed story. It is like a ghost staying in the same house while the rooms behind it are sealed off and replaced by a floor plan. The structure remains legible, but the texture of those rooms is no longer available.
+The difference between preserving a worker and preserving its work becomes clearest when a session reaches the edge of its context. The usual response is compaction: earlier conversation is condensed so that the same invocation can continue. This is useful, but it quietly preserves an autobiographical model of continuity. The worker remains while its past is rewritten into a shorter life story.
 
-Handoff treats context pressure as succession instead. Once the current work has settled, the invocation writes an explicit trace, starts a fresh Pi process in Herdr, waits until it has entered the task, and then relinquishes its shell. This is closer to a stage production changing actors between scenes. The script, marked stage, props, and consequences of earlier actions carry the performance forward; nobody has to pretend that the actor who enters is the same person as the one who left.
+Handoff begins from the opposite assumption. The current invocation does not need to survive. It leaves an account of the unfinished work—what has changed, what remains, and where the relevant state can be found—and another invocation is assembled from that situation. What passes between them is not an identity but the means to continue.
 
-Compaction preserves the worker by making its accessible past smaller. Handoff preserves the work by making the worker replaceable. One asks how the same session can remember enough to continue. The other asks what must be made explicit so that a different invocation can continue correctly. Continuity stops being a claim about identity and becomes a protocol.
+Compaction asks how much of its past one ghost must carry. Handoff asks what another ghost must be able to find when it arrives. The first prolongs a session; the second makes succession ordinary. Continuity moves out of the worker’s biography and into the world the worker has altered.
 
 ## The traces
 
