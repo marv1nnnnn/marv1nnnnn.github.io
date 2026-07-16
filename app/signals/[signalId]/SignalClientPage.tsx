@@ -1,148 +1,28 @@
 'use client';
 
-import { Signal } from '@/types/scanner';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import StaircaseScene from '@/components/StaircaseScene';
-import AboutFluid from '@/components/pages/AboutFluid';
-import ProjectsRiver from '@/components/pages/ProjectsRiver';
-import InfluencesVortex from '@/components/pages/InfluencesVortex';
-import ListeningRipples from '@/components/pages/ListeningRipples';
-import JournalSmoke from '@/components/pages/JournalSmoke';
+import { useEffect } from 'react';
+import type { Signal } from '@/types/scanner';
+import AboutArchive from '@/components/pages/AboutArchive';
+import ProjectsStage from '@/components/pages/ProjectsStage';
+import CanonField from '@/components/pages/CanonField';
+import MediaMatrix from '@/components/pages/MediaMatrix';
+import JournalIndex from '@/components/pages/JournalIndex';
 
 export default function SignalClientPage({ signal, signalId }: { signal: Signal; signalId: string }) {
-  const [mounted, setMounted] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-    document.body.className = `antialiased theme-${signalId}`;
-    return () => {
-      document.body.className = 'antialiased';
-    };
-  }, [signalId]);
-
-  const handleSelect = useCallback(
-    (id: string) => {
-      if (signal.page.type === 'cards') {
-        router.push(`/signals/${signalId}/${id}`);
-      } else if (signal.page.type === 'list') {
-        const item = signal.page.items.find((i: any) => i.title === id);
-        if (item?.url) window.open(item.url, '_blank');
-      }
-    },
-    [router, signalId, signal.page]
-  );
-
   const { page } = signal;
 
-  const staircaseItems = useMemo(() => {
-    if (page.type === 'cards') {
-      return page.cards.map((card: any) => ({
-        id: card.id,
-        title: card.title,
-        subtitle: card.summary ? card.summary.slice(0, 40) + '...' : 'Fragment',
-        meta: card.date ? card.date.replace(/-/g, '.') : '',
-      }));
-    } else if (page.type === 'list') {
-      return page.items.map((item: any) => ({
-        id: item.title,
-        title: item.title,
-        subtitle: item.type,
-        meta: item.creator,
-        onClick: () => item.url && window.open(item.url, '_blank'),
-      }));
-    }
-    return [];
-  }, [page]);
-
-  if (!mounted) return null;
+  useEffect(() => {
+    document.body.className = `antialiased theme-${signalId}`;
+    return () => { document.body.className = 'antialiased'; };
+  }, [signalId]);
 
   return (
     <>
-      <div className="noise-overlay" />
-
-      <AnimatePresence>
-        <motion.div
-          key={signalId}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.15 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 pointer-events-none z-[-1]"
-          style={{
-            backgroundImage:
-              signalId === 'about'
-                ? 'radial-gradient(circle, currentColor 2px, transparent 2px)'
-                : signalId === 'projects'
-                  ? 'linear-gradient(90deg, currentColor 1px, transparent 1px)'
-                  : signalId === 'listening'
-                    ? 'repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 1px, transparent 60px)'
-                    : signalId === 'influences'
-                      ? 'linear-gradient(135deg, currentColor 2px, transparent 2px), linear-gradient(45deg, currentColor 2px, transparent 2px)'
-                      : 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
-            backgroundSize: '40px 40px',
-            filter: 'blur(1px)',
-          }}
-        />
-      </AnimatePresence>
-
-      <div className="fixed top-3 left-3 sm:top-8 sm:left-8 md:top-12 md:left-12 z-[110]">
-        <Link
-          href="/"
-          className="group flex min-h-11 items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-2 text-white backdrop-blur-sm active:bg-white/10 sm:min-h-0 sm:gap-4 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-0 sm:mix-blend-difference"
-        >
-          <div className="w-4 sm:w-6 h-[1px] bg-white opacity-50 group-hover:w-10 transition-all"></div>
-          <motion.span
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em]"
-          >
-            Back
-          </motion.span>
-        </Link>
-      </div>
-
-      {/* Header — profile pages render their own hero in AboutFluid; skip duplicate title to avoid overlap */}
-      <div
-        className={`fixed left-4 sm:left-8 md:left-12 z-[100] mix-blend-difference pointer-events-none ${
-          page.type === 'profile' ? 'top-16 sm:top-24 max-w-[min(90vw,22rem)]' : 'top-16 sm:top-24'
-        } max-w-[calc(100vw-7rem)] sm:max-w-none`}
-      >
-        {page.type !== 'profile' && (
-          <h1 className="text-2xl sm:text-5xl md:text-7xl lg:text-[8rem] font-serif italic tracking-tighter lowercase leading-none text-white kinetic-text break-words">
-            {signal.title}
-          </h1>
-        )}
-        {page.type !== 'profile' && (
-          <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/40 flex items-center gap-3 sm:gap-4 mt-2 sm:mt-6">
-            <div className="w-6 sm:w-8 h-[1px] bg-white/40 shrink-0" />
-            {page.type}
-          </div>
-        )}
-      </div>
-
-      {/* Content Rendering */}
-      {page.type === 'profile' && <AboutFluid page={page} />}
-
-      {page.type === 'influences' && <InfluencesVortex page={page} />}
-      {page.type === 'list' && signalId === 'listening' && <ListeningRipples page={page} />}
-
-      {page.type === 'cards' && signalId === 'journal' && <JournalSmoke page={page} signalId={signalId} />}
-
-      {(page.type === 'cards' || page.type === 'list') && signalId !== 'projects' && signalId !== 'listening' && signalId !== 'journal' && (
-        <>
-          <StaircaseScene
-            items={staircaseItems}
-            onHover={() => {}}
-            onSelect={handleSelect}
-          />
-          <div style={{ height: '300vh' }} aria-hidden="true" />
-        </>
-      )}
-
-      {signalId === 'projects' && <ProjectsRiver page={page} signalId={signalId} />}
+      {page.type === 'profile' && <AboutArchive page={page} />}
+      {page.type === 'influences' && <CanonField page={page} />}
+      {page.type === 'list' && signalId === 'listening' && <MediaMatrix page={page} />}
+      {page.type === 'cards' && signalId === 'journal' && <JournalIndex page={page} signalId={signalId} />}
+      {page.type === 'cards' && signalId === 'projects' && <ProjectsStage page={page} signalId={signalId} />}
     </>
   );
 }

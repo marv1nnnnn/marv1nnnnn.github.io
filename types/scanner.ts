@@ -25,6 +25,12 @@ export interface SignalProfileResume {
   subtitle?: string;
 }
 
+export interface SignalProfileLink {
+  href: string;
+  label?: string;
+  subtitle?: string;
+}
+
 export interface SignalProfilePage {
   type: 'profile';
   hero: {
@@ -36,6 +42,7 @@ export interface SignalProfilePage {
   sections: SignalSection[];
   contact: SignalContact[];
   resume?: SignalProfileResume;
+  shows?: SignalProfileLink;
 }
 
 export interface SignalCardsPage {

@@ -16,8 +16,9 @@ pnpm lint         # ESLint
 
 ## Architecture
 
-- **Home (`app/page.tsx`)**: `StaircaseScene` reads generated signals from `lib/signals.ts`.
-- **Signals (`app/signals/[signalId]/`)**: renders the page experiences under `components/pages/`; card routes render Markdown details.
+- **Foundation**: `SiteShell` provides stable navigation; `MachineGhostScene` is the shared optional WebGL enhancement with mobile, reduced-motion, and failure fallbacks.
+- **Home (`app/page.tsx`)**: scroll-assembled Machine Ghost index backed by stable DOM navigation.
+- **Signals (`app/signals/[signalId]/`)**: renders About Archive, Projects Stage, Media Matrix, Canon Field, or Journal Index; card routes render readable Markdown details.
 - **Content export (`scripts/clin-content.js`)**: exports only positively allowlisted Clin notes tagged `site` into `content/` and `data/shows.json`.
 - **Signal build (`scripts/generate-signals.js`)**: compiles generated content into `lib/signals.json` and updates `public/sitemap.xml`.
 - **Types (`types/scanner.ts`)**: signal and page content types.
@@ -37,6 +38,7 @@ See `content/README.md` for note formats and paths.
 
 ## Manual checks
 
-- `pnpm dev` — staircase navigation and each signal route.
+- `pnpm dev` — Home assembly, global INDEX, and each signal route.
+- Check desktop/mobile plus reduced-motion and WebGL-disabled fallbacks on Home, About, Projects, and Influences.
 - Card routes: `/signals/projects/<cardId>` and `/signals/journal/<cardId>`.
 - Shows route: `/shows`.

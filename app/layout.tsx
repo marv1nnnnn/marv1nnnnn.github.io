@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
-import FluidBackground from "@/components/FluidBackground";
+import SiteShell from "@/components/SiteShell";
+import RouteTransition from "@/components/RouteTransition";
 
 const siteUrl = 'https://marv1nnnnn.github.io';
 const siteName = 'MARV1NNNNN';
@@ -131,11 +132,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <FluidBackground />
+        <div className="site-atmosphere" aria-hidden="true" />
         <CustomCursor />
-        <div className="vignette-overlay" aria-hidden="true"></div>
-        <div className="grain-overlay" aria-hidden="true"></div>
-        {children}
+        <SiteShell />
+        <RouteTransition>{children}</RouteTransition>
       </body>
     </html>
   );

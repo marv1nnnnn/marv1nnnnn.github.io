@@ -82,7 +82,7 @@ function loadInfluencesPage(signalDir) {
 function generateSignals() {
   const signalDirs = fs.readdirSync(CONTENT_DIR).filter((dir) => {
     const fullPath = path.join(CONTENT_DIR, dir);
-    return fs.statSync(fullPath).isDirectory();
+    return fs.statSync(fullPath).isDirectory() && fs.existsSync(path.join(fullPath, 'signal.json'));
   });
 
   const signals = signalDirs.map((dir) => {
