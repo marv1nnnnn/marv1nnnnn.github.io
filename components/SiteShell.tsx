@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 export default function SiteShell() {
   const pathname = usePathname();
   const [homeReady, setHomeReady] = useState(pathname !== '/');
-  const [sound, setSound] = useState(false);
 
   useEffect(() => {
     if (pathname !== '/') {
@@ -29,11 +28,7 @@ export default function SiteShell() {
       ? { href: `/signals/${segments[1]}`, label: segments[1] === 'listening' ? 'MEDIA' : segments[1].toUpperCase() }
       : null;
 
-  const toggleSound = () => {
-    const enabled = !sound;
-    setSound(enabled);
-    window.dispatchEvent(new CustomEvent('machine-ghost-sound', { detail: { enabled } }));
-  };
+  const hasShader = pathname === '/' || ['/signals/about', '/signals/projects', '/signals/influences'].includes(pathname);
 
   return (
     <header className="site-shell">
@@ -41,9 +36,11 @@ export default function SiteShell() {
         <Link href="/" className="site-shell__mark">MARV1NNNNN</Link>
         {parent && <Link href={parent.href} className="site-shell__parent">← {parent.label}</Link>}
       </div>
-      <button type="button" className="site-shell__sound" aria-pressed={sound} onClick={toggleSound}>
-        SOUND {sound ? 'ON' : 'OFF'}
-      </button>
+      {hasShader && (
+        <button type="button" className="site-shell__random" onClick={() => window.dispatchEvent(new Event('machine-ghost-random'))}>
+          RANDOM
+        </button>
+      )}
     </header>
   );
 }

@@ -206,6 +206,12 @@ export default function MachineGhostScene({
           onPointer(event);
           impulse = 1.35;
         };
+        const randomize = () => {
+          uniforms.uMode.value = Math.max(0, modeValue + (Math.random() - 0.5) * 2.4);
+          pointer.x = Math.random() - 0.5;
+          pointer.y = Math.random() - 0.5;
+          impulse = 1.8;
+        };
         const resize = () => {
           camera.aspect = innerWidth / innerHeight;
           camera.updateProjectionMatrix();
@@ -218,6 +224,7 @@ export default function MachineGhostScene({
         };
         addEventListener('pointermove', onPointer, { passive: true });
         addEventListener('pointerdown', onPointerDown, { passive: true });
+        addEventListener('machine-ghost-random', randomize);
         addEventListener('resize', resize);
         webgl.domElement.addEventListener('webglcontextlost', contextLost);
         setRenderer('webgl');
@@ -248,6 +255,7 @@ export default function MachineGhostScene({
           cancelAnimationFrame(frame);
           removeEventListener('pointermove', onPointer);
           removeEventListener('pointerdown', onPointerDown);
+          removeEventListener('machine-ghost-random', randomize);
           removeEventListener('resize', resize);
           webgl.domElement.removeEventListener('webglcontextlost', contextLost);
           geometry.dispose();

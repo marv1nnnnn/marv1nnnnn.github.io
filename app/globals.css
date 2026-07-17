@@ -515,7 +515,7 @@ body {
 
 .site-shell__mark,
 .site-shell__parent,
-.site-shell__sound {
+.site-shell__random {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -526,8 +526,8 @@ body {
 }
 
 .site-shell__parent { color: var(--muted) !important; }
-.site-shell__sound { font: inherit; letter-spacing: inherit; cursor: pointer; }
-.site-shell__sound[aria-pressed='true'] { color: #86a9ff; border-color: rgba(57, 116, 255, 0.6); }
+.site-shell__random { font: inherit; letter-spacing: inherit; cursor: pointer; }
+.site-shell__random:hover { color: #86a9ff; border-color: rgba(57, 116, 255, 0.6); }
 .site-shell__index { border-color: rgba(57, 116, 255, 0.5) !important; }
 
 .site-index,
@@ -1019,7 +1019,7 @@ body {
   .site-shell { font-size: 0.58rem; letter-spacing: 0.1em; }
   .site-shell__mark { padding-inline: 0.65rem; }
   .site-shell__parent,
-  .site-shell__sound { display: none !important; }
+  .site-shell__random { display: none !important; }
   .site-shell__controls { gap: 0; }
   .site-index nav a,
   .project-index nav a { grid-template-columns: 2.4rem minmax(0, 1fr); font-size: 1.55rem; }
