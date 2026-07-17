@@ -49,6 +49,11 @@ export default function MachineGhostScene({
           uImpulse: { value: 0 },
           uPointer: { value: new THREE.Vector2(0, 0) },
           uAspect: { value: innerWidth / innerHeight },
+          uSeed: { value: 0 },
+          uTexture: { value: new THREE.Vector3(2.15, 1.12, 2) },
+          uPrimary: { value: new THREE.Color(0xded6c7) },
+          uAccent: { value: new THREE.Color(0x1f6bff) },
+          uDark: { value: new THREE.Color(0x020303) },
         };
         const vertexShader = `
           uniform float uTime;
@@ -56,18 +61,19 @@ export default function MachineGhostScene({
           uniform float uMode;
           uniform float uImpulse;
           uniform vec2 uPointer;
+          uniform vec3 uTexture;
           varying float vDepth;
           varying vec2 vUv;
           void main() {
             vUv = uv;
             vec3 p = position;
-            float pulse = sin(p.x * (2.2 + uMode * .3) + uTime * .22) * cos(p.y * 1.7 - uTime * .17);
+            float pulse = sin(p.x * (2.2 + uMode * .3) * uTexture.z * .5 + uTime * .22) * cos(p.y * 1.7 * uTexture.z * .5 - uTime * .17);
             float scan = sin((p.x + p.y) * 4.0 + uProgress * 9.0) * .12;
             float assembled = .18 + smoothstep(0.0, .45, uProgress) * .42;
             float pointerDistance = distance(p.xy, uPointer);
             float impact = sin(pointerDistance * 8.0 - uTime * 7.0) * exp(-pointerDistance * .45) * uImpulse;
             p.z += pulse * assembled + scan + impact;
-            p.x += sin(p.y * 1.3 + uTime * .1) * (.08 + uMode * .03);
+            p.x += sin(p.y * 1.3 + uTime * .1) * (.08 + uMode * .03) * uTexture.y / 1.12;
             vDepth = p.z;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
           }
@@ -79,13 +85,13 @@ export default function MachineGhostScene({
             varying vec2 vUv;
             uniform float uProgress;
             uniform float uImpulse;
+            uniform vec3 uPrimary;
+            uniform vec3 uAccent;
             void main() {
               float edge = smoothstep(0.0, .16, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
               float trace = smoothstep(.92, 1.0, sin((vUv.x + vUv.y) * 34.0 + uProgress * 8.0) * .5 + .5);
-              vec3 bone = vec3(.86, .84, .78);
-              vec3 blue = vec3(.12, .42, 1.0);
-              vec3 color = mix(bone, blue, trace * .75 + max(vDepth, 0.0) * .22);
-              gl_FragColor = vec4(color + vec3(.08, .2, .65) * uImpulse, (.055 + abs(vDepth) * .08 + trace * .07) * edge);
+              vec3 color = mix(uPrimary, uAccent, trace * .75 + max(vDepth, 0.0) * .22);
+              gl_FragColor = vec4(color + uAccent * uImpulse * .18, (.055 + abs(vDepth) * .08 + trace * .07) * edge);
             }
           `,
           uniforms,
@@ -100,9 +106,10 @@ export default function MachineGhostScene({
             varying float vDepth;
             varying vec2 vUv;
             uniform float uImpulse;
+            uniform vec3 uAccent;
             void main() {
               float edge = smoothstep(0.0, .14, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
-              gl_FragColor = vec4(.42, .58 + uImpulse * .12, 1.0, (.065 + abs(vDepth) * .07 + uImpulse * .08) * edge);
+              gl_FragColor = vec4(uAccent + uImpulse * .08, (.065 + abs(vDepth) * .07 + uImpulse * .08) * edge);
             }
           `,
           uniforms,
@@ -127,6 +134,11 @@ export default function MachineGhostScene({
             uniform float uImpulse;
             uniform float uAspect;
             uniform vec2 uPointer;
+            uniform float uSeed;
+            uniform vec3 uTexture;
+            uniform vec3 uPrimary;
+            uniform vec3 uAccent;
+            uniform vec3 uDark;
             float hash(vec2 p) {
               return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
             }
@@ -140,22 +152,22 @@ export default function MachineGhostScene({
             void main() {
               vec2 p = vUv - .5;
               p.x *= uAspect;
-              p *= 2.15;
+              p *= uTexture.x;
               p += uPointer * .025;
               float drift = uTime * .018 + uProgress * .35;
               vec2 q = p;
               for (float i = 1.0; i < 4.0; i++) {
-                q.x -= 1.12 * noise(q * i + vec2(7.3 + drift, 2.1));
-                q.y -= 1.12 * noise(q.yx * i + vec2(3.7, 9.2 - drift));
+                q.x -= uTexture.y * noise(q * i + vec2(7.3 + drift + uSeed, 2.1 - uSeed));
+                q.y -= uTexture.y * noise(q.yx * i + vec2(3.7 - uSeed, 9.2 - drift + uSeed));
               }
-              float field = noise(q * 2.0);
+              float field = noise(q * uTexture.z + uSeed);
               float vein = pow(1.0 - smoothstep(.03, .42, abs(field - .46)), 2.2);
               float blue = pow(1.0 - smoothstep(.02, .2, abs(field - .57)), 4.0);
               float clickWave = sin(length(p - uPointer * .28) * 12.0 - uTime * 8.0) * uImpulse;
-              vec3 color = vec3(.009, .012, .012);
-              color += vein * vec3(.055, .062, .055);
-              color += blue * vec3(.018, .055, .16) * (1.0 + uProgress * .8);
-              color += max(clickWave, 0.0) * vec3(.015, .05, .18);
+              vec3 color = uDark;
+              color += vein * uPrimary * .07;
+              color += blue * uAccent * .16 * (1.0 + uProgress * .8);
+              color += max(clickWave, 0.0) * uAccent * .16;
               float vignette = 1.0 - smoothstep(.18, .92, length((vUv - .5) * vec2(1.0, .82)));
               color *= vignette;
               gl_FragColor = vec4(color, .96);
@@ -207,10 +219,13 @@ export default function MachineGhostScene({
           impulse = 1.35;
         };
         const randomize = () => {
-          uniforms.uMode.value = Math.max(0, modeValue + (Math.random() - 0.5) * 2.4);
-          pointer.x = Math.random() - 0.5;
-          pointer.y = Math.random() - 0.5;
-          impulse = 1.8;
+          const hue = Math.random();
+          uniforms.uSeed.value = Math.random() * 20;
+          uniforms.uTexture.value.set(1.4 + Math.random() * 2.2, 0.65 + Math.random(), 1.2 + Math.random() * 2.4);
+          uniforms.uPrimary.value.setHSL(hue, 0.18, 0.82);
+          uniforms.uAccent.value.setHSL((hue + 0.28 + Math.random() * 0.3) % 1, 0.78, 0.55);
+          uniforms.uDark.value.setHSL(hue, 0.35, 0.012);
+          impulse = 0;
         };
         const resize = () => {
           camera.aspect = innerWidth / innerHeight;
