@@ -28,6 +28,9 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   const title = `${card.title} · ${signal.title}`;
   const description = card.summary;
   const url = `/signals/${signalId}/${cardId}`;
+  const cover = card.markdown.match(/!\[([^\]]*)\]\(([^)\s]+)/);
+  const image = cover?.[2] ?? '/images/cursor_shenzhen.png';
+  const imageAlt = cover?.[1] || title;
 
   return {
     title,
@@ -41,21 +44,14 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
       publishedTime: card.date,
       authors: ['Marvin Ma'],
       tags: card.tags,
-      images: [
-        {
-          url: '/images/cursor_shenzhen.png',
-          width: 1200,
-          height: 630,
-          alt: title,
-        }
-      ],
+      images: [{ url: image, width: 1200, height: 630, alt: imageAlt }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       creator: '@marv1nnnnn1',
-      images: ['/images/cursor_shenzhen.png'],
+      images: [image],
     },
   };
 }

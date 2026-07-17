@@ -7,9 +7,13 @@ summary: "Agent design is haunted by human ideas of memory and identity. Pi and 
 tags: ["ai","agents","pi","herdr","unix","opinion","essay"]
 ---
 
+![Agents Need Shells, Not Selves](/images/agents-shells-cover.jpg)
+
 Science SARU’s [new *The Ghost in the Shell*](https://www.theghostintheshell-anime.jp/en/) began airing in July 2026. One of the most interesting things about it is how directly it returns to Masamune Shirow’s original manga. The color and humor are back, but so is the manga’s stranger account of identity, in which bodies are replaceable, memories are unreliable, and a mind does not always begin inside a person.
 
 The Puppet Master is the clearest example. It begins as a government program, Project 2501, but develops into something else while moving through the network. It has no original body, no childhood, and no human biography to preserve. It is not the uploaded soul of someone who once lived. Yet it can act, reflect on its own condition, and ask to be recognized as a form of life.
+
+![Project 2501 inhabits a manufactured cyborg shell in the 1995 film.](/images/agents-shells-puppet-master.jpg)
 
 Agent products have taken almost the opposite path. We start with software that can act and immediately try to turn it into someone. We give it a name, a role, a memory, an inbox, and sometimes a manager. Before asking what form of agency the technology makes possible, we design a person for it to imitate.
 
@@ -83,9 +87,13 @@ git diff | pi --no-session \
   -p "Review this diff. Do not edit files."
 ```
 
+![A temporary, read-only review invocation assembled from a shell command.](/images/agents-shells-terminal.png)
+
 There is no reviewer profile behind the command and no private memory to preserve afterward. The invocation exists because this diff needs another opinion. Its tools are read-only because that is all the task requires.
 
 Herdr supplies the persistent terminal runtime around these commands. Its server owns the PTYs, processes, workspace layout, and runtime state, while clients act as replaceable views. If the interface closes or an SSH connection drops, the jobs keep running. The runtime persists without requiring every process inside it to become a continuing character.
+
+![Herdr keeps the terminal runtime visible while Pi and other invocations come and go.](/images/agents-shells-herdr.png)
 
 In practice, I repeatedly use a version of this pattern. A Pi process working on a change can decide that it wants an independent review, open another Herdr pane, and launch a fresh Pi with a narrower prompt and tool set. At the same time, it can run tests in a separate pane while continuing its own work. It later reads both results and removes the temporary panes. On the next task it may choose a different model, use a plain command, or create no additional worker at all.
 
