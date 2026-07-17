@@ -55,6 +55,10 @@
   --bg: var(--void);
   --fg: var(--bone);
   --accent: var(--signal);
+  --ghost-hue: 220;
+  --ghost-angle: 108deg;
+  --ghost-spacing: 24px;
+  --ghost-line-alpha: 0.055;
 }
 
 * {
@@ -397,7 +401,7 @@ body.theme-journal { background-color: #050505; color: #fff; }
 /* Machine Ghost foundation */
 body {
   background:
-    radial-gradient(circle at 50% 35%, rgba(29, 34, 43, 0.4), transparent 48%),
+    radial-gradient(circle at 50% 35%, hsl(var(--ghost-hue) 35% 18% / 0.4), transparent 48%),
     var(--void);
   color: var(--bone);
   font-family: var(--body);
@@ -472,7 +476,7 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(115deg, transparent 0 47%, rgba(57, 116, 255, 0.035) 49%, transparent 51%),
+    linear-gradient(115deg, transparent 0 47%, hsl(var(--ghost-hue) 90% 60% / 0.035) 49%, transparent 51%),
     radial-gradient(circle at center, transparent 42%, rgba(0, 0, 0, 0.56) 100%);
 }
 
@@ -642,11 +646,11 @@ body {
   width: min(67vw, 760px);
   aspect-ratio: 1 / 1.08;
   translate: -50% -50%;
-  border: 1px solid rgba(176, 190, 220, 0.1);
+  border: 1px solid hsl(var(--ghost-hue) 35% 78% / 0.1);
   border-radius: 48% 52% 46% 54% / 58% 42% 58% 42%;
   background:
-    repeating-linear-gradient(108deg, transparent 0 22px, rgba(107, 143, 224, 0.055) 23px 24px),
-    radial-gradient(ellipse at 45% 40%, rgba(211, 221, 232, 0.08), transparent 58%);
+    repeating-linear-gradient(var(--ghost-angle), transparent 0 calc(var(--ghost-spacing) - 1px), hsl(var(--ghost-hue) 68% 65% / var(--ghost-line-alpha)) var(--ghost-spacing)),
+    radial-gradient(ellipse at 45% 40%, hsl(var(--ghost-hue) 35% 86% / 0.08), transparent 58%);
   filter: blur(0.2px);
   transform: rotate(-7deg);
 }
@@ -1018,8 +1022,7 @@ body {
 @media (max-width: 767px) {
   .site-shell { font-size: 0.58rem; letter-spacing: 0.1em; }
   .site-shell__mark { padding-inline: 0.65rem; }
-  .site-shell__parent,
-  .site-shell__random { display: none !important; }
+  .site-shell__parent { display: none !important; }
   .site-shell__controls { gap: 0; }
   .site-index nav a,
   .project-index nav a { grid-template-columns: 2.4rem minmax(0, 1fr); font-size: 1.55rem; }

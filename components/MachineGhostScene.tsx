@@ -218,15 +218,19 @@ export default function MachineGhostScene({
           onPointer(event);
           impulse = 1.35;
         };
-        const randomize = () => {
-          const hue = Math.random();
-          uniforms.uSeed.value = Math.random() * 20;
-          uniforms.uTexture.value.set(1.4 + Math.random() * 2.2, 0.65 + Math.random(), 1.2 + Math.random() * 2.4);
-          uniforms.uPrimary.value.setHSL(hue, 0.18, 0.82);
-          uniforms.uAccent.value.setHSL((hue + 0.28 + Math.random() * 0.3) % 1, 0.78, 0.55);
-          uniforms.uDark.value.setHSL(hue, 0.35, 0.012);
+        const applyPreset = (value: unknown) => {
+          const preset = value as { seed?: number; texture?: number[]; hue?: number; accentHue?: number } | null;
+          if (!preset || typeof preset.seed !== 'number' || typeof preset.hue !== 'number' || typeof preset.accentHue !== 'number'
+            || !Number.isFinite(preset.seed) || !Number.isFinite(preset.hue) || !Number.isFinite(preset.accentHue)
+            || !Array.isArray(preset.texture) || preset.texture.length !== 3 || !preset.texture.every(Number.isFinite)) return;
+          uniforms.uSeed.value = preset.seed;
+          uniforms.uTexture.value.fromArray(preset.texture);
+          uniforms.uPrimary.value.setHSL(preset.hue, 0.18, 0.82);
+          uniforms.uAccent.value.setHSL(preset.accentHue, 0.78, 0.55);
+          uniforms.uDark.value.setHSL(preset.hue, 0.35, 0.012);
           impulse = 0;
         };
+        const randomize = (event: Event) => applyPreset((event as CustomEvent).detail);
         const resize = () => {
           camera.aspect = innerWidth / innerHeight;
           camera.updateProjectionMatrix();
@@ -240,6 +244,7 @@ export default function MachineGhostScene({
         addEventListener('pointermove', onPointer, { passive: true });
         addEventListener('pointerdown', onPointerDown, { passive: true });
         addEventListener('machine-ghost-random', randomize);
+        try { applyPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
         addEventListener('resize', resize);
         webgl.domElement.addEventListener('webglcontextlost', contextLost);
         setRenderer('webgl');

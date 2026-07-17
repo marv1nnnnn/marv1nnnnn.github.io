@@ -4,6 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+type GhostPreset = { seed: number; texture: number[]; hue: number; accentHue: number };
+
+function applyCssPreset(value: unknown) {
+  const preset = value as GhostPreset | null;
+  if (!preset || typeof preset.accentHue !== 'number' || !Array.isArray(preset.texture)
+    || preset.texture.length !== 3 || !preset.texture.every(Number.isFinite)) return;
+  const root = document.documentElement.style;
+  root.setProperty('--ghost-hue', String(preset.accentHue * 360));
+  root.setProperty('--ghost-angle', `${Math.round(preset.texture[0] * 55)}deg`);
+  root.setProperty('--ghost-spacing', `${Math.round(preset.texture[2] * 7 + 8)}px`);
+  root.setProperty('--ghost-line-alpha', String(0.03 + preset.texture[1] * 0.025));
+}
+
 export default function SiteShell() {
   const pathname = usePathname();
   const [homeReady, setHomeReady] = useState(pathname !== '/');
@@ -19,6 +32,10 @@ export default function SiteShell() {
     return () => window.removeEventListener('scroll', reveal);
   }, [pathname]);
 
+  useEffect(() => {
+    try { applyCssPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
+  }, []);
+
   if (!homeReady) return null;
 
   const segments = pathname.split('/').filter(Boolean);
@@ -29,6 +46,18 @@ export default function SiteShell() {
       : null;
 
   const hasShader = pathname === '/' || ['/signals/about', '/signals/projects', '/signals/influences'].includes(pathname);
+  const randomizeShader = () => {
+    const hue = Math.random();
+    const preset = {
+      seed: Math.random() * 20,
+      texture: [1.4 + Math.random() * 2.2, 0.65 + Math.random(), 1.2 + Math.random() * 2.4],
+      hue,
+      accentHue: (hue + 0.28 + Math.random() * 0.3) % 1,
+    };
+    try { localStorage.setItem('machine-ghost-preset', JSON.stringify(preset)); } catch {}
+    applyCssPreset(preset);
+    window.dispatchEvent(new CustomEvent('machine-ghost-random', { detail: preset }));
+  };
 
   return (
     <header className="site-shell">
@@ -37,7 +66,7 @@ export default function SiteShell() {
         {parent && <Link href={parent.href} className="site-shell__parent">← {parent.label}</Link>}
       </div>
       {hasShader && (
-        <button type="button" className="site-shell__random" onClick={() => window.dispatchEvent(new Event('machine-ghost-random'))}>
+        <button type="button" className="site-shell__random" onClick={randomizeShader}>
           RANDOM
         </button>
       )}
