@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home /', () => {
-  test('starts name-only, then reveals the minimal shell', async ({ page }) => {
+  test('starts with the randomizer, then reveals the minimal shell', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'marv1nnnnn' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'RANDOM' })).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 80));
     await expect(page.getByRole('link', { name: 'MARV1NNNNN' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'INDEX' })).toHaveCount(0);

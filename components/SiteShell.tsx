@@ -36,8 +36,6 @@ export default function SiteShell() {
     try { applyCssPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
   }, []);
 
-  if (!homeReady) return null;
-
   const segments = pathname.split('/').filter(Boolean);
   const parent = pathname === '/shows'
     ? { href: '/signals/about', label: 'ABOUT' }
@@ -61,10 +59,12 @@ export default function SiteShell() {
 
   return (
     <header className="site-shell">
-      <div className="site-shell__left">
-        <Link href="/" className="site-shell__mark">MARV1NNNNN</Link>
-        {parent && <Link href={parent.href} className="site-shell__parent">← {parent.label}</Link>}
-      </div>
+      {homeReady && (
+        <div className="site-shell__left">
+          <Link href="/" className="site-shell__mark">MARV1NNNNN</Link>
+          {parent && <Link href={parent.href} className="site-shell__parent">← {parent.label}</Link>}
+        </div>
+      )}
       {hasShader && (
         <button type="button" className="site-shell__random" onClick={randomizeShader}>
           RANDOM
