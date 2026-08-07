@@ -1,6 +1,4 @@
-import Field from '@/components/Field';
 import showsData from '@/data/shows.json';
-import { yearsToPoints } from '@/lib/decay';
 
 type Show = {
   date: string;
@@ -14,36 +12,32 @@ type Show = {
 
 export default function ShowsPage() {
   const { intro, shows } = showsData as { intro: string; shows: Show[] };
-  const sorted = [...shows].sort((a, b) => b.date.localeCompare(a.date));
-  const dates = sorted.map((show) => show.date);
 
   return (
-    <main className="page shows">
-      <h1 className="page__title">Shows</h1>
-      <p className="page__lede">{intro}</p>
-      <Field
-        points={yearsToPoints(dates)}
-        from={dates[dates.length - 1]?.slice(0, 4) ?? ''}
-        to={dates[0]?.slice(0, 4) ?? ''}
-        count="closed"
-      />
-
+    <main className="shows-archive">
+      <header>
+        <h1>Shows</h1>
+        <blockquote>{intro}</blockquote>
+      </header>
       <ol>
-        {sorted.map((show) => {
-          const body = (
+        {shows.map((show, index) => {
+          const content = (
             <>
-              <time dateTime={show.date}>{show.date.replaceAll('-', '.')}</time>
+              <div className="shows-archive__date"><span>{String(index + 1).padStart(2, '0')}</span>{show.date}</div>
               <div>
-                <h2>{show.title}{show.url && ' ↗'}</h2>
-                <p>{show.venue} / {show.city} · w/ {show.lineup.join(', ')}</p>
+                <h2>{show.title}</h2>
+                <p className="shows-archive__venue">{show.venue} / {show.city}</p>
+                <p>w/ {show.lineup.join(', ')}</p>
+                {show.note && <blockquote>{show.note}</blockquote>}
               </div>
+              <span className="shows-archive__open">{show.url ? 'ARCHIVE LINK ↗' : 'DOCUMENTED'}</span>
             </>
           );
           return (
             <li key={`${show.date}-${show.title}`}>
               {show.url
-                ? <a href={show.url} target="_blank" rel="noreferrer">{body}</a>
-                : <div>{body}</div>}
+                ? <a href={show.url} target="_blank" rel="noreferrer">{content}</a>
+                : <div>{content}</div>}
             </li>
           );
         })}

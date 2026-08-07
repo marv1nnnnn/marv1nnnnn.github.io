@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
 import SiteShell from "@/components/SiteShell";
+import RouteTransition from "@/components/RouteTransition";
 
 const siteUrl = 'https://marv1nnnnn.github.io';
 const siteName = 'MARV1NNNNN';
@@ -13,7 +15,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#0a0908',
+  themeColor: '#050505',
 };
 
 export const metadata: Metadata = {
@@ -124,21 +126,16 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" style={{ backgroundColor: '#050505' }}>
+      <body className="antialiased" style={{ backgroundColor: '#050505', color: '#ffffff' }}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* site-wide filter defs: the bleed is used by home, projects and journal */}
-        <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0 }}>
-          <filter id="bleed" x="-20%" y="-30%" width="140%" height="160%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.021 0.009" numOctaves="3" seed="13" result="n" />
-            <feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </svg>
+        <div className="site-atmosphere" aria-hidden="true" />
+        <CustomCursor />
         <SiteShell />
-        {children}
+        <RouteTransition>{children}</RouteTransition>
       </body>
     </html>
   );

@@ -1,41 +1,45 @@
 import Link from 'next/link';
-import { decay } from '@/lib/decay';
-import type { SignalCardsPage } from '@/types/scanner';
+import type { SignalCardsPage, SignalCardContent } from '@/types/scanner';
 
-export default function JournalIndex({ page, signalId, title }: { page: SignalCardsPage; signalId: string; title: string }) {
-  const cards = [...page.cards].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
-  const [latest, ...rest] = cards;
+function translationFor(card: SignalCardContent, cards: SignalCardContent[]) {
+  return cards.find((candidate) => candidate.id !== card.id && (
+    card.markdown.includes(`/signals/journal/${candidate.id}`)
+    || candidate.markdown.includes(`/signals/journal/${card.id}`)
+  ));
+}
 
+export default function JournalIndex({ page, signalId }: { page: SignalCardsPage; signalId: string }) {
   return (
-    <main className="page">
-      <h1 className="page__title">{title}</h1>
-
-      {latest && (
-        <article className="journal__lead" style={{ marginTop: '3.5rem' }}>
-          <p className="nano">{latest.date?.replaceAll('-', '.')} · LATEST</p>
-          <Link href={`/signals/${signalId}/${latest.id}`}>
-            <h2>{latest.title}</h2>
-          </Link>
-          {latest.subtitle && <p style={{ fontStyle: 'italic' }}>{latest.subtitle}</p>}
-          <p>{latest.summary}</p>
-          <Link className="article__toggle" href={`/signals/${signalId}/${latest.id}`}>READ ↗</Link>
-        </article>
-      )}
-
-      {rest.length > 0 && (
-        <ol className="rows" style={{ marginTop: '5rem' }}>
-          {rest.map((card, index) => (
-            <li key={card.id} style={{ ...decay(card.date), '--i': index } as React.CSSProperties} className="stagger">
+    <main className="journal-index">
+      <header className="journal-index__hero">
+        <h1>Journal</h1>
+        <span>{String(page.cards.length).padStart(2, '0')} ARTICLES</span>
+      </header>
+      <ol>
+        {page.cards.map((card, index) => {
+          const translation = translationFor(card, page.cards);
+          return (
+            <li key={card.id}>
               <Link href={`/signals/${signalId}/${card.id}`}>
-                <span className="rows__n">{String(index + 2).padStart(2, '0')}</span>
+                <div className="journal-index__meta">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <time>{card.date?.replaceAll('-', '.')}</time>
+                  <span>{card.tags?.includes('zh') ? '中文' : 'EN'}</span>
+                </div>
                 <h2>{card.title}</h2>
-                <span className="rows__meta">{card.date?.replaceAll('-', '.')}</span>
-                <span className="rows__go">READ ↗</span>
+                {card.subtitle && <p className="journal-index__subtitle">{card.subtitle}</p>}
+                <p className="journal-index__summary">{card.summary}</p>
+                <span className="journal-index__open">READ ARTICLE ↗</span>
               </Link>
+              {translation && (
+                <Link className="journal-index__translation" href={`/signals/${signalId}/${translation.id}`}>
+                  ALSO AVAILABLE: {translation.tags?.includes('zh') ? 'ZH' : 'EN'}
+                </Link>
+              )}
             </li>
-          ))}
-        </ol>
-      )}
+          );
+        })}
+      </ol>
     </main>
   );
 }

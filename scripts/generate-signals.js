@@ -22,10 +22,7 @@ function loadProfilePage(signalDir) {
   };
 }
 
-// Nav order. Was signal.freq back when the site was a radio dial.
-const ORDER = ['about', 'projects', 'journal', 'listening', 'influences'];
-
-function loadCardsPage(signalDir) {
+function loadCardsPage(signalDir, metadata) {
   const cardsDir = path.join(signalDir, 'cards');
   const cardFiles = fs.readdirSync(cardsDir).filter((file) => file.endsWith('.md'));
 
@@ -51,15 +48,24 @@ function loadCardsPage(signalDir) {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  return { type: 'cards', cards };
+  return {
+    type: 'cards',
+    renderMode: metadata.renderMode,
+    intro: metadata.intro,
+    cards,
+  };
 }
 
-function loadListPage(signalDir) {
+function loadListPage(signalDir, metadata) {
   const itemsJsonPath = path.join(signalDir, 'items.json');
   const itemsJson = fs.readFileSync(itemsJsonPath, 'utf-8');
   const items = JSON.parse(itemsJson);
 
-  return { type: 'list', items };
+  return {
+    type: 'list',
+    intro: metadata.intro,
+    items,
+  };
 }
 
 function loadInfluencesPage(signalDir) {
@@ -87,9 +93,9 @@ function generateSignals() {
     if (metadata.pageType === 'profile') {
       page = loadProfilePage(signalDir);
     } else if (metadata.pageType === 'cards') {
-      page = loadCardsPage(signalDir);
+      page = loadCardsPage(signalDir, metadata);
     } else if (metadata.pageType === 'list') {
-      page = loadListPage(signalDir);
+      page = loadListPage(signalDir, metadata);
     } else if (metadata.pageType === 'influences') {
       page = loadInfluencesPage(signalDir);
     } else {
@@ -98,13 +104,22 @@ function generateSignals() {
 
     return {
       id: metadata.id,
+      freq: metadata.freq,
       title: metadata.title,
+      pages: metadata.pages,
+      audioUrl: metadata.audioUrl,
+      broadcastDate: metadata.broadcastDate,
+      location: metadata.location,
+      tags: metadata.tags,
       summary: metadata.summary,
+      accentColor: metadata.accentColor,
+      background: metadata.background,
       page,
     };
   });
 
-  signals.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
+  // Sort by frequency
+  signals.sort((a, b) => a.freq - b.freq);
 
   // Load billboards
   const billboardsJson = fs.readFileSync(BILLBOARDS_FILE, 'utf-8');
