@@ -28,8 +28,9 @@ export default function Home() {
     <div ref={root} className={`home${flooding ? ' is-flooding' : ''}`}>
       <BruiseField host={root} />
       <nav className="home__nav" aria-label="Directory">
-        {ENTRIES.map((entry) => (
-          <a key={entry.href} href={entry.href} onClick={enter(entry.href)}>{entry.label}</a>
+        {ENTRIES.map((entry, index) => (
+          <a key={entry.href} href={entry.href} onClick={enter(entry.href)}
+            style={{ '--i': index } as React.CSSProperties}>{entry.label}</a>
         ))}
       </nav>
       <p className="home__sig">MARV1NNNNN</p>
