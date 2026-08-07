@@ -27,7 +27,7 @@ export default function ProjectsStage({ page, signalId, title }: { page: SignalC
         {cards.map((card, index) => {
           const media = mediaFrom(card);
           return (
-            <li key={card.id} style={decay(card.date)}>
+            <li key={card.id} style={{ ...decay(card.date), '--i': index } as React.CSSProperties} className="stagger">
               <Link href={`/signals/${signalId}/${card.id}`}>
                 <span className="rows__n">{String(index + 1).padStart(2, '0')}</span>
                 <h2>{card.title}</h2>

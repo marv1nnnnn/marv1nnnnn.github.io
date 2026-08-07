@@ -25,7 +25,7 @@ export default function JournalIndex({ page, signalId, title }: { page: SignalCa
       {rest.length > 0 && (
         <ol className="rows" style={{ marginTop: '5rem' }}>
           {rest.map((card, index) => (
-            <li key={card.id} style={decay(card.date)}>
+            <li key={card.id} style={{ ...decay(card.date), '--i': index } as React.CSSProperties} className="stagger">
               <Link href={`/signals/${signalId}/${card.id}`}>
                 <span className="rows__n">{String(index + 2).padStart(2, '0')}</span>
                 <h2>{card.title}</h2>

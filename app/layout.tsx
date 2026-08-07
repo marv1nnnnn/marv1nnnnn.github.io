@@ -130,6 +130,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* site-wide filter defs: the bleed is used by home, projects and journal */}
+        <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0 }}>
+          <filter id="bleed" x="-20%" y="-30%" width="140%" height="160%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.021 0.009" numOctaves="3" seed="13" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
         <SiteShell />
         {children}
       </body>

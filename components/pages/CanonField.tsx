@@ -18,8 +18,8 @@ export default function CanonField({ page, title }: { page: SignalInfluencesPage
       />
 
       <ul className="canon">
-        {records.map((record) => (
-          <li key={record.id}>
+        {records.map((record, index) => (
+          <li key={record.id} data-year={record.year} style={{ '--i': index } as React.CSSProperties}>
             {record.image_url
               ? <img src={record.image_url} alt={`${record.artist} — ${record.title}`} loading="lazy" />
               : <div className="canon__fallback">{record.artist} — {record.title}</div>}

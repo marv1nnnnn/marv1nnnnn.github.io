@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import type { Signal, SignalCardContent } from '@/types/scanner';
@@ -21,13 +22,30 @@ export default function SignalCardClientPage({
   const previous = cards[index - 1];
   const next = cards[index + 1];
   const isZh = card.tags?.includes('zh');
+  const root = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const range = document.documentElement.scrollHeight - innerHeight;
+        root.current?.style.setProperty('--read', range > 0 ? String(Math.min(1, scrollY / range)) : '0');
+      });
+    };
+    update();
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    return () => { cancelAnimationFrame(frame); removeEventListener('scroll', update); removeEventListener('resize', update); };
+  }, [cardId]);
   const translation = signalId === 'journal' ? cards.find((candidate) => candidate.id !== card.id && (
     card.markdown.includes(`/signals/journal/${candidate.id}`)
     || candidate.markdown.includes(`/signals/journal/${card.id}`)
   )) : undefined;
 
   return (
-    <main className="article">
+    <main className="article" ref={root}>
+      <div className="article__progress" aria-hidden="true" />
       <article lang={isZh ? 'zh' : 'en'}>
         <p className="article__meta">
           <span>{signalId === 'journal' ? 'Journal' : 'Project'}</span>

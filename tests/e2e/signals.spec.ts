@@ -74,3 +74,22 @@ test('unknown signal id does not render a normal signal page', async ({ page }) 
     await expect(page.locator('body')).toContainText(/404|not\s*found|error/i);
   }
 });
+
+test('mastheads reveal and the canon wall features every fourth sleeve', async ({ page, isMobile }) => {
+  await page.goto('/signals/influences');
+  const title = page.locator('.page__title');
+  expect(await title.evaluate((n) => getComputedStyle(n).animationName)).toBe('mask-up');
+  test.skip(isMobile, 'the wall is a single column below 720px');
+  const first = page.locator('.canon > li').first();
+  const second = page.locator('.canon > li').nth(1);
+  expect(await first.evaluate((n) => n.getBoundingClientRect().width))
+    .toBeGreaterThan(await second.evaluate((n) => n.getBoundingClientRect().width));
+});
+
+test('articles carry a reading progress bar that tracks scroll', async ({ page }) => {
+  await page.goto('/signals/journal/harness-engineering');
+  const read = () => page.locator('.article').evaluate((n) => Number(getComputedStyle(n).getPropertyValue('--read')));
+  expect(await read()).toBeLessThan(0.1);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(read).toBeGreaterThan(0.8);
+});

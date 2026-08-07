@@ -86,13 +86,6 @@ export default function BruiseField({ host }: { host?: React.RefObject<HTMLEleme
         </svg>
       ))}
 
-      {/* the word-bleed filter: a light displacement, legibility survives it */}
-      <svg className="bruise__defs" aria-hidden="true">
-        <filter id="bleed" x="-20%" y="-30%" width="140%" height="160%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.021 0.009" numOctaves="3" seed="13" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </svg>
     </div>
   );
 }
