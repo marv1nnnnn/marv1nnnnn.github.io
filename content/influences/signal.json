@@ -1,10 +1,5 @@
 {
   "id": "influences",
-  "freq": 96.7,
-  "title": "INFLUENCES",
-  "pages": 1,
-  "audioUrl": "/audio/vinyl-static.mp3",
-  "accentColor": "#FF1493",
-  "background": "linear-gradient(135deg, #3E2723, #000)",
+  "title": "Influences",
   "pageType": "influences"
 }

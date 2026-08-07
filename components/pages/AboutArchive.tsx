@@ -1,54 +1,49 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import MachineGhostScene from '@/components/MachineGhostScene';
 import type { SignalProfilePage } from '@/types/scanner';
 
 export default function AboutArchive({ page }: { page: SignalProfilePage }) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const update = () => {
-      const range = document.documentElement.scrollHeight - innerHeight;
-      setProgress(range > 0 ? scrollY / range : 0);
-    };
-    update();
-    addEventListener('scroll', update, { passive: true });
-    return () => removeEventListener('scroll', update);
-  }, []);
-
   return (
-    <main className="about-archive">
-      <MachineGhostScene mode="about" progress={progress} />
-      <section className="about-archive__hero">
+    <main className="page">
+      <header className="about__hero">
         <h1>{page.hero.title}</h1>
-        {page.hero.subtitle && <h2>{page.hero.subtitle}</h2>}
-        {page.hero.description && <blockquote>{page.hero.description}</blockquote>}
+        {page.hero.description && <p>{page.hero.description}</p>}
+        {page.hero.subtitle && <p className="micro">{page.hero.subtitle}</p>}
+      </header>
+
+      <section className="about__blocks" aria-label="Profile">
+        {page.sections.map((section) => {
+          const lines = section.body.split('\n').map((line) => line.trim()).filter(Boolean);
+          const isList = lines.every((line) => line.startsWith('-'));
+          return (
+            <article key={section.title}>
+              <h2>{section.title}</h2>
+              {isList ? (
+                <ul>{lines.map((line) => <li key={line}>{line.replace(/^-\s*/, '')}</li>)}</ul>
+              ) : (
+                lines.map((line) => <p key={line}>{line}</p>)
+              )}
+            </article>
+          );
+        })}
       </section>
 
-      <section className="about-archive__dossier" aria-label="Profile">
-        {page.sections.map((section, index) => (
-          <article key={section.title} className="about-trace">
-            <p>{String(index + 1).padStart(2, '0')}</p>
-            <h2>{section.title}</h2>
-            <div>{section.body.split('\n').map((line) => (
-              <p key={line}>{line.replace(/^\s*-\s*/, '')}</p>
-            ))}</div>
-          </article>
+      <nav className="about__links" aria-label="Elsewhere">
+        {page.shows?.href && (
+          <Link href={page.shows.href}>
+            <span>{page.shows.label ?? 'Shows'}</span><span>{page.shows.subtitle} ↗</span>
+          </Link>
+        )}
+        {page.resume?.href && (
+          <a href={page.resume.href} target="_blank" rel="noreferrer">
+            <span>Resume</span><span>{page.resume.subtitle ?? 'PDF'} ↗</span>
+          </a>
+        )}
+        {page.contact.map((contact) => (
+          <a key={contact.label} href={contact.href} target="_blank" rel="noreferrer">
+            <span>{contact.label}</span><span>{contact.value} ↗</span>
+          </a>
         ))}
-      </section>
-
-      <section className="about-archive__access">
-        <div><h2>Links</h2></div>
-        <nav aria-label="About links">
-          {page.resume?.href && <a href={page.resume.href} target="_blank" rel="noreferrer"><span>RESUME</span>{page.resume.subtitle ?? 'PDF'} ↗</a>}
-          {page.shows?.href && <Link href={page.shows.href}><span>{page.shows.label ?? 'SHOWS'}</span>{page.shows.subtitle ?? 'Performances'} ↗</Link>}
-          {page.contact.map((contact) => (
-            <a key={contact.label} href={contact.href}><span>{contact.label}</span>{contact.value} ↗</a>
-          ))}
-        </nav>
-      </section>
+      </nav>
     </main>
   );
 }

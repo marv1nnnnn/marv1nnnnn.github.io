@@ -1,13 +1,5 @@
 {
   "id": "journal",
-  "freq": 106,
   "title": "Journal",
-  "pages": 1,
-  "audioUrl": "/audio/contact-ambient.mp3",
-  "accentColor": "#9DFF6B",
-  "background": "linear-gradient(160deg, #0A1F0D 0%, #9DFF6B 50%, #111111 100%)",
-  "pageType": "cards",
-  "intro": {
-    "title": "Recent Thoughts"
-  }
+  "pageType": "cards"
 }

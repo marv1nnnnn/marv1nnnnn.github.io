@@ -1,13 +1,5 @@
 {
   "id": "listening",
-  "freq": 101.2,
-  "title": "Media",
-  "pages": 1,
-  "audioUrl": "/audio/log-ambient.mp3",
-  "accentColor": "#FF5C8A",
-  "background": "linear-gradient(140deg, #2C002E 0%, #FF5C8A 48%, #0C0C0C 100%)",
-  "pageType": "list",
-  "intro": {
-    "title": "Recent Media"
-  }
+  "title": "Listening",
+  "pageType": "list"
 }

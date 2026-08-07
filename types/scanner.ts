@@ -47,12 +47,6 @@ export interface SignalProfilePage {
 
 export interface SignalCardsPage {
   type: 'cards';
-  renderMode?: 'single' | 'cards';
-  intro?: {
-    eyebrow?: string;
-    title: string;
-    description?: string;
-  };
   cards: SignalCardContent[];
 }
 
@@ -66,11 +60,6 @@ export interface SignalListItem {
 
 export interface SignalListPage {
   type: 'list';
-  intro?: {
-    eyebrow?: string;
-    title: string;
-    description?: string;
-  };
   items: SignalListItem[];
 }
 
@@ -80,7 +69,6 @@ export interface VinylRecord {
   title: string;
   year: number;
   medium: 'music' | 'film' | 'book' | 'anime' | 'game';
-  color?: string;  // Optional: auto-generated from medium if not provided
   image_url?: string;
   personalNote: string;
   tags?: string[];
@@ -96,16 +84,8 @@ export type SignalPage = SignalProfilePage | SignalCardsPage | SignalListPage | 
 
 export interface Signal {
   id: string;
-  freq: number;
   title: string;
-  pages: number;
-  audioUrl?: string;
-  broadcastDate?: string;
-  location?: string;
-  tags?: string[];
   summary?: string;
-  accentColor?: string;
-  background?: string;
   page: SignalPage;
 }
 
