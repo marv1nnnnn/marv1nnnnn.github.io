@@ -67,9 +67,8 @@ export default function Home() {
       </section>
       <section className="home-machine__index">
         <nav aria-label="Main navigation">
-          {SIGNALS.map((signal, index) => (
+          {SIGNALS.map((signal) => (
             <Link key={signal.id} href={`/signals/${signal.id}`}>
-              <span className="home-machine__number">{String(index + 1).padStart(2, '0')}</span>
               <span className="home-machine__label">{signal.id === 'listening' ? 'MEDIA' : signal.title.toUpperCase()}</span>
               <span className="home-machine__arrow" aria-hidden="true">↗</span>
             </Link>

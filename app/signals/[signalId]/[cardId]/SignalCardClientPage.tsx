@@ -30,7 +30,7 @@ export default function SignalCardClientPage({
       <article lang={card.tags?.includes('zh') ? 'zh' : 'en'}>
         <header className="article-page__header">
           <div className="article-page__meta">
-            <span>{signalId === 'journal' ? 'JOURNAL' : 'PROJECT FILE'}</span>
+            <span>{signalId === 'journal' ? 'JOURNAL' : 'PROJECT'}</span>
             <time>{card.date?.replaceAll('-', '.')}</time>
           </div>
           <h1>{card.title}</h1>

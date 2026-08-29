@@ -20,17 +20,17 @@ export default function ShowsPage() {
         <blockquote>{intro}</blockquote>
       </header>
       <ol>
-        {shows.map((show, index) => {
+        {shows.map((show) => {
           const content = (
             <>
-              <div className="shows-archive__date"><span>{String(index + 1).padStart(2, '0')}</span>{show.date}</div>
+              <div className="shows-archive__date">{show.date}</div>
               <div>
                 <h2>{show.title}</h2>
                 <p className="shows-archive__venue">{show.venue} / {show.city}</p>
                 <p>w/ {show.lineup.join(', ')}</p>
                 {show.note && <blockquote>{show.note}</blockquote>}
               </div>
-              <span className="shows-archive__open">{show.url ? 'ARCHIVE LINK ↗' : 'DOCUMENTED'}</span>
+              {show.url && <span className="shows-archive__open">VIEW ↗</span>}
             </>
           );
           return (

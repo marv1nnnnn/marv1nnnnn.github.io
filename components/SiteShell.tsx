@@ -12,6 +12,7 @@ function applyCssPreset(value: unknown) {
     || preset.texture.length !== 3 || !preset.texture.every(Number.isFinite)) return;
   const root = document.documentElement.style;
   root.setProperty('--ghost-hue', String(preset.accentHue * 360));
+  root.setProperty('--signal', `hsl(${preset.accentHue * 360} 78% 58%)`);
   root.setProperty('--ghost-angle', `${Math.round(preset.texture[0] * 55)}deg`);
   root.setProperty('--ghost-spacing', `${Math.round(preset.texture[2] * 7 + 8)}px`);
   root.setProperty('--ghost-line-alpha', String(0.03 + preset.texture[1] * 0.025));
@@ -43,8 +44,7 @@ export default function SiteShell() {
       ? { href: `/signals/${segments[1]}`, label: segments[1] === 'listening' ? 'MEDIA' : segments[1].toUpperCase() }
       : null;
 
-  const hasShader = pathname === '/' || ['/signals/about', '/signals/projects', '/signals/influences'].includes(pathname);
-  const randomizeShader = () => {
+  const randomizeVisual = () => {
     const hue = Math.random();
     const preset = {
       seed: Math.random() * 20,
@@ -65,11 +65,9 @@ export default function SiteShell() {
           {parent && <Link href={parent.href} className="site-shell__parent">← {parent.label}</Link>}
         </div>
       )}
-      {hasShader && (
-        <button type="button" className="site-shell__random" onClick={randomizeShader}>
-          RANDOM
-        </button>
-      )}
+      <button type="button" className="site-shell__random" onClick={randomizeVisual}>
+        CHANGE
+      </button>
     </header>
   );
 }

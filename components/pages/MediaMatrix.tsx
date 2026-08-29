@@ -13,7 +13,7 @@ export default function MediaMatrix({ page }: { page: SignalListPage }) {
     <main className="media-matrix">
       <header className="media-matrix__hero">
         <h1>Media</h1>
-        <span>{String(items.length).padStart(3, '0')} ENTRIES</span>
+        <span>{items.length} items</span>
       </header>
 
       <nav className="media-matrix__types" aria-label="Media types">
@@ -27,7 +27,7 @@ export default function MediaMatrix({ page }: { page: SignalListPage }) {
         </div>
         {items.map((item, index) => (
           <div className="media-matrix__row" key={`${item.date}-${item.title}-${index}`}>
-            <time>{item.date ?? 'UNKNOWN'}</time>
+            <time>{item.date ?? 'No date'}</time>
             {categories.map((type) => (
               <div key={type}>
                 {item.type === type && (
@@ -44,7 +44,7 @@ export default function MediaMatrix({ page }: { page: SignalListPage }) {
       <ol className="media-matrix__mobile">
         {items.map((item, index) => (
           <li key={`${item.date}-${item.title}-${index}`}>
-            <div><time>{item.date ?? 'UNKNOWN'}</time><span>{item.type}</span></div>
+            <div><time>{item.date ?? 'No date'}</time><span>{item.type}</span></div>
             {item.url ? <a href={item.url} target="_blank" rel="noreferrer"><small>{item.creator}</small>{item.title} ↗</a> : <p><small>{item.creator}</small>{item.title}</p>}
           </li>
         ))}

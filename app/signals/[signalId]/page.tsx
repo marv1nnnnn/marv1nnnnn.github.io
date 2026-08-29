@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ signalId:
 
   if (!signal) {
     return {
-      title: 'Signal Not Found',
+      title: 'Page not found',
     };
   }
 
-  const title = `${signal.title} // MARV1NNNNN`;
-  const description = signal.summary ?? `Selected data fragments from ${signal.title} // Archive_v0.6`;
+  const title = `${signal.title} · MARV1NNNNN`;
+  const description = signal.summary ?? `Selected ${signal.title.toLowerCase()} by Marvin Ma.`;
   const url = `/signals/${signalId}`;
 
   return {

@@ -4,6 +4,172 @@ import { useEffect, useRef, useState } from 'react';
 
 export type MachineGhostMode = 'home' | 'about' | 'projects' | 'influences';
 
+const VISUAL_SHADER = /* wgsl */ `
+struct Params {
+  pointer: vec2f,
+  texture: vec3f,
+  time: f32,
+  progress: f32,
+  impulse: f32,
+  mode: f32,
+  aspect: f32,
+  seed: f32,
+  quality: f32,
+  primaryHue: f32,
+  accentHue: f32,
+}
+@group(0) @binding(0) var<uniform> params: Params;
+
+fn hash21(p: vec2f) -> f32 {
+  return fract(sin(dot(p, vec2f(127.1, 311.7))) * 43758.5453123);
+}
+
+fn noise(p: vec2f) -> f32 {
+  let i = floor(p);
+  let f = fract(p);
+  let u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash21(i), hash21(i + vec2f(1.0, 0.0)), u.x),
+             mix(hash21(i + vec2f(0.0, 1.0)), hash21(i + vec2f(1.0)), u.x), u.y);
+}
+
+fn fbm(point: vec2f) -> f32 {
+  var p = point;
+  var value = 0.0;
+  var amplitude = 0.5;
+  for (var i = 0; i < 5; i++) {
+    if (f32(i) >= params.quality) { break; }
+    value += noise(p) * amplitude;
+    p = mat2x2f(1.62, 1.18, -1.18, 1.62) * p + 7.3;
+    amplitude *= 0.48;
+  }
+  return value;
+}
+
+fn rotate(p: vec2f, angle: f32) -> vec2f {
+  let c = cos(angle);
+  let s = sin(angle);
+  return mat2x2f(c, -s, s, c) * p;
+}
+
+fn sdBox(p: vec2f, bounds: vec2f) -> f32 {
+  let d = abs(p) - bounds;
+  return length(max(d, vec2f(0.0))) + min(max(d.x, d.y), 0.0);
+}
+
+fn sdSegment(p: vec2f, a: vec2f, b: vec2f) -> f32 {
+  let pa = p - a;
+  let ba = b - a;
+  let h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  return length(pa - ba * h);
+}
+
+fn hsl(h: f32, s: f32, l: f32) -> vec3f {
+  let rgb = clamp(abs(fract(h + vec3f(0.0, 0.666667, 0.333333)) * 6.0 - 3.0) - 1.0, vec3f(0.0), vec3f(1.0));
+  return l + s * (rgb - 0.5) * (1.0 - abs(2.0 * l - 1.0));
+}
+
+@fragment fn main(@location(0) uv: vec2f) -> @location(0) vec4f {
+  var p = uv - 0.5;
+  p.x *= params.aspect;
+  let mouse = vec2f(params.pointer.x * params.aspect, -params.pointer.y);
+  let primary = hsl(params.primaryHue, 0.2, 0.82);
+  let accent = hsl(params.accentHue, 0.82, 0.56);
+  let second = hsl(fract(params.accentHue + 0.19), 0.72, 0.5);
+  let dark = hsl(params.primaryHue, 0.3, 0.012);
+  var color = dark;
+
+  if (params.mode < 0.3) {
+    // HOME — a restless particle ocean.
+    let warp = (fbm(p * params.texture.x + vec2f(params.time * 0.04, params.seed)) - 0.5) * 0.12;
+    var water = 0.0;
+    for (var i = 0; i < 5; i++) {
+      let fi = f32(i);
+      let y = (fi - 2.0) * 0.115 + sin(p.x * (4.0 + fi * 1.7) + params.time * (0.16 + fi * 0.025) + fi) * (0.035 + fi * 0.006);
+      water += exp(-abs(p.y + warp - y - params.progress * (fi - 2.0) * 0.055) * (42.0 + fi * 9.0));
+    }
+    var stars = 0.0;
+    for (var layer = 0; layer < 3; layer++) {
+      let scale = 11.0 + f32(layer) * 8.0;
+      let cell = floor((p + vec2f(params.time * 0.004 * (f32(layer) + 1.0), 0.0)) * scale);
+      let local = fract((p + vec2f(params.time * 0.004 * (f32(layer) + 1.0), 0.0)) * scale) - 0.5;
+      let point = vec2f(hash21(cell), hash21(cell + 17.3)) - 0.5;
+      stars += exp(-length(local - point * 0.62) * 38.0) * smoothstep(0.72, 0.96, hash21(cell + params.seed));
+    }
+    let clickRadius = (1.0 - clamp(params.impulse / 1.35, 0.0, 1.0)) * 0.6;
+    let ripple = exp(-abs(distance(p, mouse) - clickRadius) * 42.0) * params.impulse;
+    color += accent * water * 0.34 + primary * stars * 0.45 + second * ripple * 0.4;
+    color += second * water * water * 0.1;
+    color += primary * pow(max(fbm(p * 3.0 + params.seed) - 0.52, 0.0), 2.0) * 0.24;
+  } else if (params.mode < 0.8) {
+    // ABOUT — overlapping pieces of moving color, never a dashboard.
+    color = hsl(params.primaryHue, 0.24, 0.02);
+    for (var i = 0; i < 6; i++) {
+      let fi = f32(i);
+      var center = vec2f(sin(fi * 2.1 + params.time * 0.07), cos(fi * 1.37 - params.time * 0.055)) * vec2f(0.36, 0.25);
+      center += mouse * (0.035 + fi * 0.006);
+      var q = rotate(p - center, fi * 0.61 + params.progress * 0.8);
+      q /= vec2f(0.18 + fract(fi * 0.31) * 0.18, 0.13 + fract(fi * 0.47) * 0.19);
+      let d = length(q) - 1.0 + (fbm(q * 0.9 + fi * 4.0) - 0.5) * 0.22;
+      let fill = 1.0 - smoothstep(-0.04, 0.06, d);
+      let edge = exp(-abs(d) * 48.0);
+      let paper = mix(primary, select(accent, second, i % 2 == 0), 0.55 + 0.25 * sin(fi));
+      color = mix(color, paper * (0.45 + edge * 0.65), fill * (0.32 + fi * 0.025));
+      color += paper * edge * 0.18;
+    }
+    let contour = pow(max(sin(fbm(p * 4.2 + params.seed) * 52.0 - params.time * 0.15) * 0.5 + 0.5, 0.0), 22.0);
+    color += primary * contour * 0.22;
+  } else if (params.mode < 1.5) {
+    // PROJECTS — the current image sits inside an endless feedback tunnel.
+    let center = mouse * 0.12;
+    let q = p - center;
+    var blueEcho = 0.0;
+    var redEcho = 0.0;
+    for (var i = 0; i < 10; i++) {
+      let fi = f32(i);
+      let depth = fract(fi * 0.117 + params.progress * 0.68 + params.time * 0.018);
+      let scale = mix(0.45, 4.2, depth * depth);
+      let turn = (depth - 0.5) * 0.18 + sin(params.time * 0.08 + fi) * 0.018;
+      let box = abs(sdBox(rotate(q, turn) * scale, vec2f(0.31, 0.205)));
+      let echo = exp(-box * (105.0 - depth * 35.0)) * (1.0 - depth);
+      blueEcho += echo * smoothstep(0.0, 0.45, depth);
+      redEcho += echo * smoothstep(0.72, 0.2, depth);
+    }
+    let smear = pow(max(sin((p.y + fbm(vec2f(p.x * 2.0, params.time * 0.025))) * 86.0) * 0.5 + 0.5, 0.0), 30.0);
+    let aperture = 1.0 - smoothstep(0.0, 0.5, abs(sdBox(q, vec2f(0.31, 0.205))));
+    color += accent * blueEcho * 0.32 + second * redEcho * 0.26 + primary * smear * 0.18;
+    color += mix(second, accent, aperture) * aperture * 0.12;
+    color *= 0.9 + aperture * 0.25;
+  } else {
+    // INFLUENCES — works gather into a hand-drawn constellation.
+    color = hsl(params.primaryHue, 0.3, 0.009);
+    var connections = 0.0;
+    var nodes = 0.0;
+    for (var i = 0; i < 14; i++) {
+      let fi = f32(i);
+      let angleA = fi * 2.39996 + params.seed + params.time * 0.018;
+      let angleB = (fi + 1.0) * 2.39996 + params.seed + params.time * 0.018;
+      let radiusA = 0.13 + fract(fi * 0.381) * 0.36;
+      let radiusB = 0.13 + fract((fi + 1.0) * 0.381) * 0.36;
+      let a = vec2f(cos(angleA), sin(angleA)) * radiusA;
+      let b = vec2f(cos(angleB), sin(angleB)) * radiusB;
+      let proximity = 1.0 - smoothstep(0.0, 0.32, distance(mouse, a));
+      nodes += exp(-distance(p, a) * 105.0) * (1.0 + proximity * 2.5);
+      connections += exp(-sdSegment(p, a, b) * 135.0) * 0.55;
+    }
+    let rings = exp(-abs(length(p) - 0.24) * 115.0) + exp(-abs(length(p) - 0.43) * 90.0) * 0.45;
+    let dustCell = floor(p * 25.0);
+    let dust = exp(-length(fract(p * 25.0) - 0.5) * 30.0) * smoothstep(0.82, 0.98, hash21(dustCell + params.seed));
+    color += primary * connections * 0.19 + accent * nodes * 0.55 + second * rings * 0.2 + primary * dust * 0.28;
+    color += accent * nodes * nodes * 0.14;
+  }
+
+  let vignette = 1.0 - smoothstep(0.32, 0.9, length((uv - 0.5) * vec2f(1.0, 0.82)));
+  let grain = hash21(uv * vec2f(1920.0, 1080.0) + params.time) - 0.5;
+  color = color * (0.42 + vignette * 0.66) + grain * 0.014;
+  return vec4f(color, 0.98);
+}
+`;
+
 export default function MachineGhostScene({
   mode,
   progress = 0,
@@ -17,284 +183,110 @@ export default function MachineGhostScene({
 }) {
   const host = useRef<HTMLDivElement>(null);
   const progressRef = useRef(progress);
-  const [renderer, setRenderer] = useState<'fallback' | 'webgl'>('fallback');
+  const [renderer, setRenderer] = useState<'fallback' | 'webgpu'>('fallback');
   progressRef.current = progress;
 
   useEffect(() => {
     const container = host.current;
-    if (!container || window.matchMedia('(max-width: 767px), (prefers-reduced-motion: reduce)').matches) return;
+    if (!container || !('gpu' in navigator) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let disposed = false;
-    let frame = 0;
     let cleanup = () => {};
 
-    import('three').then((THREE) => {
-      if (disposed) return;
-      try {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 50);
-        camera.position.z = 8;
-        const webgl = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
-        webgl.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-        webgl.setSize(innerWidth, innerHeight);
-        webgl.domElement.setAttribute('aria-hidden', 'true');
-        container.appendChild(webgl.domElement);
+    void import('vgpu').then(async ({ clock, effect, frameLoop, init, surface }) => {
+      const gpu = await init();
+      if (disposed) return gpu.dispose();
 
-        const geometry = new THREE.PlaneGeometry(7.2, 7.8, 56, 56);
-        const modeValue = mode === 'home' ? 0 : mode === 'about' ? 0.6 : mode === 'projects' ? 1 : 2;
-        const uniforms = {
-          uTime: { value: 0 },
-          uProgress: { value: 0 },
-          uMode: { value: modeValue },
-          uImpulse: { value: 0 },
-          uPointer: { value: new THREE.Vector2(0, 0) },
-          uAspect: { value: innerWidth / innerHeight },
-          uSeed: { value: 0 },
-          uTexture: { value: new THREE.Vector3(2.15, 1.12, 2) },
-          uPrimary: { value: new THREE.Color(0xded6c7) },
-          uAccent: { value: new THREE.Color(0x1f6bff) },
-          uDark: { value: new THREE.Color(0x020303) },
-        };
-        const vertexShader = `
-          uniform float uTime;
-          uniform float uProgress;
-          uniform float uMode;
-          uniform float uImpulse;
-          uniform vec2 uPointer;
-          uniform vec3 uTexture;
-          varying float vDepth;
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            vec3 p = position;
-            float pulse = sin(p.x * (2.2 + uMode * .3) * uTexture.z * .5 + uTime * .22) * cos(p.y * 1.7 * uTexture.z * .5 - uTime * .17);
-            float scan = sin((p.x + p.y) * 4.0 + uProgress * 9.0) * .12;
-            float assembled = .18 + smoothstep(0.0, .45, uProgress) * .42;
-            float pointerDistance = distance(p.xy, uPointer);
-            float impact = sin(pointerDistance * 8.0 - uTime * 7.0) * exp(-pointerDistance * .45) * uImpulse;
-            p.z += pulse * assembled + scan + impact;
-            p.x += sin(p.y * 1.3 + uTime * .1) * (.08 + uMode * .03) * uTexture.y / 1.12;
-            vDepth = p.z;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
-          }
-        `;
-        const membrane = new THREE.ShaderMaterial({
-          vertexShader,
-          fragmentShader: `
-            varying float vDepth;
-            varying vec2 vUv;
-            uniform float uProgress;
-            uniform float uImpulse;
-            uniform vec3 uPrimary;
-            uniform vec3 uAccent;
-            void main() {
-              float edge = smoothstep(0.0, .16, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
-              float trace = smoothstep(.92, 1.0, sin((vUv.x + vUv.y) * 34.0 + uProgress * 8.0) * .5 + .5);
-              vec3 color = mix(uPrimary, uAccent, trace * .75 + max(vDepth, 0.0) * .22);
-              gl_FragColor = vec4(color + uAccent * uImpulse * .18, (.055 + abs(vDepth) * .08 + trace * .07) * edge);
-            }
-          `,
-          uniforms,
-          transparent: true,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        });
-        const trace = new THREE.ShaderMaterial({
-          vertexShader,
-          fragmentShader: `
-            varying float vDepth;
-            varying vec2 vUv;
-            uniform float uImpulse;
-            uniform vec3 uAccent;
-            void main() {
-              float edge = smoothstep(0.0, .14, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
-              gl_FragColor = vec4(uAccent + uImpulse * .08, (.065 + abs(vDepth) * .07 + uImpulse * .08) * edge);
-            }
-          `,
-          uniforms,
-          transparent: true,
-          wireframe: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        });
-        const backgroundGeometry = mode === 'home' ? new THREE.PlaneGeometry(20, 12) : null;
-        const backgroundMaterial = mode === 'home' ? new THREE.ShaderMaterial({
-          vertexShader: `
-            varying vec2 vUv;
-            void main() {
-              vUv = uv;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            varying vec2 vUv;
-            uniform float uTime;
-            uniform float uProgress;
-            uniform float uImpulse;
-            uniform float uAspect;
-            uniform vec2 uPointer;
-            uniform float uSeed;
-            uniform vec3 uTexture;
-            uniform vec3 uPrimary;
-            uniform vec3 uAccent;
-            uniform vec3 uDark;
-            float hash(vec2 p) {
-              return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-            }
-            float noise(vec2 p) {
-              vec2 i = floor(p);
-              vec2 f = fract(p);
-              vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
-              return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-                         mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0)), u.x), u.y);
-            }
-            void main() {
-              vec2 p = vUv - .5;
-              p.x *= uAspect;
-              p *= uTexture.x;
-              p += uPointer * .025;
-              float drift = uTime * .018 + uProgress * .35;
-              vec2 q = p;
-              for (float i = 1.0; i < 4.0; i++) {
-                q.x -= uTexture.y * noise(q * i + vec2(7.3 + drift + uSeed, 2.1 - uSeed));
-                q.y -= uTexture.y * noise(q.yx * i + vec2(3.7 - uSeed, 9.2 - drift + uSeed));
-              }
-              float field = noise(q * uTexture.z + uSeed);
-              float vein = pow(1.0 - smoothstep(.03, .42, abs(field - .46)), 2.2);
-              float blue = pow(1.0 - smoothstep(.02, .2, abs(field - .57)), 4.0);
-              float clickWave = sin(length(p - uPointer * .28) * 12.0 - uTime * 8.0) * uImpulse;
-              vec3 color = uDark;
-              color += vein * uPrimary * .07;
-              color += blue * uAccent * .16 * (1.0 + uProgress * .8);
-              color += max(clickWave, 0.0) * uAccent * .16;
-              float vignette = 1.0 - smoothstep(.18, .92, length((vUv - .5) * vec2(1.0, .82)));
-              color *= vignette;
-              gl_FragColor = vec4(color, .96);
-            }
-          `,
-          uniforms,
-          depthTest: false,
-          depthWrite: false,
-        }) : null;
-        if (backgroundGeometry && backgroundMaterial) {
-          const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-          background.position.z = -4;
-          background.renderOrder = -10;
-          scene.add(background);
-        }
+      const mobile = matchMedia('(max-width: 767px)').matches;
+      const canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-hidden', 'true');
+      container.prepend(canvas);
+      cleanup = () => { canvas.remove(); gpu.dispose(); };
 
-        const layerSettings = mode === 'home' ? [
-          { x: -0.7, scaleX: 0.72, scaleY: 1.02, rotX: 0.12, rotY: 0.58, rotZ: -0.12 },
-          { x: 0.72, scaleX: 0.68, scaleY: 0.9, rotX: -0.08, rotY: -0.72, rotZ: 0.16 },
-          { x: 0, scaleX: 0.48, scaleY: 0.78, rotX: 0.2, rotY: 1.12, rotZ: 0.56 },
-        ] : [{ x: 0, scaleX: 1, scaleY: 1, rotX: 0, rotY: 0, rotZ: 0 }];
-        const membraneMeshes = layerSettings.map((settings, index) => {
-          const mesh = new THREE.Mesh(geometry, membrane);
-          mesh.position.x = settings.x;
-          mesh.scale.set(settings.scaleX, settings.scaleY, 1);
-          mesh.rotation.set(settings.rotX, settings.rotY, settings.rotZ);
-          mesh.userData = { ...settings, phase: index * 1.7 };
-          scene.add(mesh);
-          return mesh;
-        });
-        const traceMeshes = layerSettings.map((settings, index) => {
-          const mesh = new THREE.Mesh(geometry, trace);
-          mesh.position.x = settings.x;
-          mesh.scale.set(settings.scaleX * 1.012, settings.scaleY * 1.012, 1.012);
-          mesh.rotation.set(settings.rotX, settings.rotY, settings.rotZ);
-          mesh.userData = { ...settings, phase: index * 1.7 };
-          scene.add(mesh);
-          return mesh;
-        });
+      const target = surface(gpu, canvas, { dpr: [1, mobile ? 1 : 1.5] });
+      const modeValue = mode === 'home' ? 0 : mode === 'about' ? 0.6 : mode === 'projects' ? 1 : 2;
+      const values = {
+        pointer: [0, 0],
+        texture: [2.15, 1.12, 2],
+        time: 0,
+        progress: 0,
+        impulse: 0,
+        mode: modeValue,
+        aspect: innerWidth / innerHeight,
+        seed: 0,
+        quality: mobile ? 3 : 5,
+        primaryHue: 0.1,
+        accentHue: 0.61,
+      };
+      const visual = effect(gpu, VISUAL_SHADER, { label: 'route-visual', set: { params: values } });
+      const timer = clock(gpu);
+      let impulse = 0;
+      let smoothProgress = progressRef.current;
 
-        const pointer = { x: 0, y: 0 };
-        let impulse = 0;
-        const onPointer = (event: PointerEvent) => {
-          pointer.x = event.clientX / innerWidth - .5;
-          pointer.y = event.clientY / innerHeight - .5;
-        };
-        const onPointerDown = (event: PointerEvent) => {
-          onPointer(event);
-          impulse = 1.35;
-        };
-        const applyPreset = (value: unknown) => {
-          const preset = value as { seed?: number; texture?: number[]; hue?: number; accentHue?: number } | null;
-          if (!preset || typeof preset.seed !== 'number' || typeof preset.hue !== 'number' || typeof preset.accentHue !== 'number'
-            || !Number.isFinite(preset.seed) || !Number.isFinite(preset.hue) || !Number.isFinite(preset.accentHue)
-            || !Array.isArray(preset.texture) || preset.texture.length !== 3 || !preset.texture.every(Number.isFinite)) return;
-          uniforms.uSeed.value = preset.seed;
-          uniforms.uTexture.value.fromArray(preset.texture);
-          uniforms.uPrimary.value.setHSL(preset.hue, 0.18, 0.82);
-          uniforms.uAccent.value.setHSL(preset.accentHue, 0.78, 0.55);
-          uniforms.uDark.value.setHSL(preset.hue, 0.35, 0.012);
-          impulse = 0;
-        };
-        const randomize = (event: Event) => applyPreset((event as CustomEvent).detail);
-        const resize = () => {
-          camera.aspect = innerWidth / innerHeight;
-          camera.updateProjectionMatrix();
-          uniforms.uAspect.value = innerWidth / innerHeight;
-          webgl.setSize(innerWidth, innerHeight);
-        };
-        const contextLost = (event: Event) => {
-          event.preventDefault();
-          setRenderer('fallback');
-        };
-        addEventListener('pointermove', onPointer, { passive: true });
-        addEventListener('pointerdown', onPointerDown, { passive: true });
-        addEventListener('machine-ghost-random', randomize);
-        try { applyPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
-        addEventListener('resize', resize);
-        webgl.domElement.addEventListener('webglcontextlost', contextLost);
-        setRenderer('webgl');
+      const onPointer = (event: PointerEvent) => {
+        values.pointer = [event.clientX / innerWidth - 0.5, event.clientY / innerHeight - 0.5];
+      };
+      const onPointerDown = (event: PointerEvent) => {
+        onPointer(event);
+        impulse = 1.35;
+      };
+      const applyPreset = (value: unknown) => {
+        const preset = value as { seed?: number; texture?: number[]; hue?: number; accentHue?: number } | null;
+        if (!preset || typeof preset.seed !== 'number' || typeof preset.hue !== 'number' || typeof preset.accentHue !== 'number'
+          || !Number.isFinite(preset.seed) || !Number.isFinite(preset.hue) || !Number.isFinite(preset.accentHue)
+          || !Array.isArray(preset.texture) || preset.texture.length !== 3 || !preset.texture.every(Number.isFinite)) return;
+        values.seed = preset.seed;
+        values.texture = preset.texture;
+        values.primaryHue = preset.hue;
+        values.accentHue = preset.accentHue;
+        impulse = 0;
+      };
+      const randomize = (event: Event) => applyPreset((event as CustomEvent).detail);
+      const resize = () => { values.aspect = innerWidth / innerHeight; };
 
-        const animate = (time: number) => {
-          if (disposed) return;
-          uniforms.uTime.value = time / 1000;
-          uniforms.uProgress.value += (progressRef.current - uniforms.uProgress.value) * .06;
-          impulse *= .94;
-          uniforms.uImpulse.value = impulse;
-          uniforms.uPointer.value.set(pointer.x * 7, -pointer.y * 7);
-          membraneMeshes.forEach((mesh, index) => {
-            const base = mesh.userData;
-            const drift = Math.sin(time / 2600 + base.phase) * .055;
-            mesh.rotation.y += (base.rotY + pointer.x * .3 + drift + progressRef.current * (index - 1) * .18 - mesh.rotation.y) * .025;
-            mesh.rotation.x += (base.rotX - pointer.y * .2 + drift - mesh.rotation.x) * .025;
-            mesh.rotation.z = base.rotZ + Math.sin(time / 4100 + base.phase) * .035;
-            mesh.position.y = Math.sin(time / 3300 + base.phase) * .12;
-            traceMeshes[index].rotation.copy(mesh.rotation);
-            traceMeshes[index].position.copy(mesh.position);
-          });
-          webgl.render(scene, camera);
-          frame = requestAnimationFrame(animate);
-        };
-        frame = requestAnimationFrame(animate);
+      addEventListener('pointermove', onPointer, { passive: true });
+      addEventListener('pointerdown', onPointerDown, { passive: true });
+      addEventListener('machine-ghost-random', randomize);
+      addEventListener('resize', resize);
+      try { applyPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
 
-        cleanup = () => {
-          cancelAnimationFrame(frame);
-          removeEventListener('pointermove', onPointer);
-          removeEventListener('pointerdown', onPointerDown);
-          removeEventListener('machine-ghost-random', randomize);
-          removeEventListener('resize', resize);
-          webgl.domElement.removeEventListener('webglcontextlost', contextLost);
-          geometry.dispose();
-          membrane.dispose();
-          trace.dispose();
-          backgroundGeometry?.dispose();
-          backgroundMaterial?.dispose();
-          webgl.dispose();
-          webgl.forceContextLoss();
-          webgl.domElement.remove();
-        };
-      } catch {
-        setRenderer('fallback');
-      }
-    }).catch(() => setRenderer('fallback'));
+      const loop = frameLoop(gpu, (frame) => {
+        smoothProgress += (progressRef.current - smoothProgress) * 0.06;
+        impulse *= 0.93;
+        visual.set({ params: {
+          pointer: values.pointer,
+          texture: values.texture,
+          time: timer.time,
+          progress: smoothProgress,
+          impulse,
+          mode: values.mode,
+          aspect: values.aspect,
+          seed: values.seed,
+          quality: values.quality,
+          primaryHue: values.primaryHue,
+          accentHue: values.accentHue,
+        } });
+        frame.pass(target, visual);
+      }, { fps: mobile ? 30 : 60 });
+
+      setRenderer('webgpu');
+      cleanup = () => {
+        loop.stop();
+        removeEventListener('pointermove', onPointer);
+        removeEventListener('pointerdown', onPointerDown);
+        removeEventListener('machine-ghost-random', randomize);
+        removeEventListener('resize', resize);
+        canvas.remove();
+        gpu.dispose();
+      };
+    }).catch(() => {
+      cleanup();
+      cleanup = () => {};
+      setRenderer('fallback');
+    });
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(frame);
       cleanup();
     };
   }, [mode]);

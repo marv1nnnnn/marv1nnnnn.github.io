@@ -64,7 +64,7 @@ export default function ProjectsStage({ page, signalId }: { page: SignalCardsPag
           >
             <article>
               <div className="projects-stage__meta">
-                <span>{String(index + 1).padStart(2, '0')} / {String(cards.length).padStart(2, '0')}</span>
+                <span>{index + 1} of {cards.length}</span>
                 <span>{card.date?.replaceAll('-', '.')}</span>
               </div>
               <h2>{card.title}</h2>
@@ -78,19 +78,19 @@ export default function ProjectsStage({ page, signalId }: { page: SignalCardsPag
       </ol>
 
       <button className="project-index-button" type="button" onClick={() => indexDialog.current?.showModal()}>
-        INDEX <span>{String(active + 1).padStart(2, '0')}—{String(cards.length).padStart(2, '0')}</span>
+        ALL PROJECTS <span>{active + 1} of {cards.length}</span>
       </button>
       <dialog ref={indexDialog} className="project-index" onClick={(event) => {
         if (event.target === indexDialog.current) indexDialog.current.close();
       }}>
         <div className="site-index__head">
-          <span>PROJECT INDEX</span>
+          <span>PROJECTS</span>
           <button type="button" onClick={() => indexDialog.current?.close()}>CLOSE</button>
         </div>
         <nav aria-label="Project index">
           {cards.map((card, index) => (
             <a key={card.id} href={`#project-${card.id}`} onClick={() => indexDialog.current?.close()}>
-              <span>{String(index + 1).padStart(2, '0')}</span>{card.title}
+              {card.title}
             </a>
           ))}
         </nav>

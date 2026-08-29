@@ -67,7 +67,7 @@ export default function CanonField({ page }: { page: SignalInfluencesPage }) {
             <article>
               {record.image_url && <img className="canon-field__cover" src={record.image_url} alt={`${record.title} cover`} />}
               <p className="canon-field__meta">
-                <span>{String(index + 1).padStart(2, '0')} / {String(records.length).padStart(2, '0')}</span>
+                <span>{index + 1} of {records.length}</span>
                 <span>{record.medium} — {record.year}</span>
               </p>
               <h2>{record.title}</h2>
@@ -84,19 +84,19 @@ export default function CanonField({ page }: { page: SignalInfluencesPage }) {
       </ol>
 
       <button className="project-index-button" type="button" onClick={() => indexDialog.current?.showModal()}>
-        INDEX <span>{String(active + 1).padStart(2, '0')}—{String(records.length).padStart(2, '0')}</span>
+        ALL INFLUENCES <span>{active + 1} of {records.length}</span>
       </button>
       <dialog ref={indexDialog} className="project-index" onClick={(event) => {
         if (event.target === indexDialog.current) indexDialog.current.close();
       }}>
         <div className="site-index__head">
-          <span>CANON INDEX</span>
+          <span>INFLUENCES</span>
           <button type="button" onClick={() => indexDialog.current?.close()}>CLOSE</button>
         </div>
         <nav aria-label="Canon index">
           {records.map((record, index) => (
             <a key={record.id} href={`#influence-${record.id}`} onClick={() => indexDialog.current?.close()}>
-              <span>{String(index + 1).padStart(2, '0')}</span>{record.title}<small>{record.artist}</small>
+              {record.title}<small>{record.artist}</small>
             </a>
           ))}
         </nav>

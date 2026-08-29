@@ -13,16 +13,15 @@ export default function JournalIndex({ page, signalId }: { page: SignalCardsPage
     <main className="journal-index">
       <header className="journal-index__hero">
         <h1>Journal</h1>
-        <span>{String(page.cards.length).padStart(2, '0')} ARTICLES</span>
+        <span>{page.cards.length} articles</span>
       </header>
       <ol>
-        {page.cards.map((card, index) => {
+        {page.cards.map((card) => {
           const translation = translationFor(card, page.cards);
           return (
             <li key={card.id}>
               <Link href={`/signals/${signalId}/${card.id}`}>
                 <div className="journal-index__meta">
-                  <span>{String(index + 1).padStart(2, '0')}</span>
                   <time>{card.date?.replaceAll('-', '.')}</time>
                   <span>{card.tags?.includes('zh') ? '中文' : 'EN'}</span>
                 </div>

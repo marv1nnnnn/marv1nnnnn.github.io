@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
 
   if (!payload) {
     return {
-      title: 'Transmission Not Found · MARV1NNNNN',
+      title: 'Page not found · MARV1NNNNN',
     };
   }
 

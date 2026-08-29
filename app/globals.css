@@ -413,57 +413,25 @@ body {
 }
 
 .machine-cursor {
-  --cursor-angle: 0rad;
-  --cursor-stretch: 1;
   position: fixed;
-  left: -15px;
-  top: -15px;
+  left: -5px;
+  top: -5px;
   z-index: 9999;
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bone);
+  mix-blend-mode: difference;
   opacity: 0;
   pointer-events: none;
   will-change: translate;
-  transition: opacity 140ms ease;
+  transition: opacity 140ms ease, scale 160ms ease;
 }
 
 .machine-cursor.is-visible { opacity: 1; }
-.machine-cursor::before,
-.machine-cursor::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(237, 233, 222, 0.48);
-  border-radius: 42% 58% 64% 36% / 57% 39% 61% 43%;
-  transition: border-color 180ms ease, scale 220ms ease, rotate 220ms ease;
-}
-.machine-cursor::before { rotate: 18deg; }
-.machine-cursor::after { inset: 7px 2px; rotate: -34deg; opacity: 0.45; }
-.machine-cursor span {
-  width: 18px;
-  height: 1px;
-  background: #5e8cff;
-  box-shadow: 0 0 8px rgba(57, 116, 255, 0.9);
-  rotate: var(--cursor-angle);
-  scale: var(--cursor-stretch) 1;
-  transition: scale 90ms ease-out;
-}
-.machine-cursor.is-link::before,
-.machine-cursor.is-link::after { border-color: #5e8cff; scale: 1.28; rotate: 90deg; }
-.machine-cursor.is-down::before { animation: cursor-echo 420ms ease-out; }
-.machine-cursor.is-down span { scale: .25 1; }
-@keyframes cursor-echo {
-  50% { scale: 1.8; opacity: 0.2; }
-}
-
+.machine-cursor.is-link { scale: 1.8; }
+.machine-cursor.is-down { scale: 0.6; }
 @media (pointer: coarse) { .machine-cursor { display: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .machine-cursor span { scale: 1; rotate: 0deg; }
-  .machine-cursor::before,
-  .machine-cursor::after { animation: none !important; }
-}
 
 :focus-visible {
   outline: 1px solid var(--signal);
@@ -530,7 +498,14 @@ body {
 }
 
 .site-shell__parent { color: var(--muted) !important; }
-.site-shell__random { font: inherit; letter-spacing: inherit; cursor: pointer; }
+.site-shell__random {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
 .site-shell__random:hover { color: #86a9ff; border-color: rgba(57, 116, 255, 0.6); }
 .site-shell__index { border-color: rgba(57, 116, 255, 0.5) !important; }
 
@@ -585,7 +560,7 @@ body {
 .project-index nav a {
   display: grid;
   min-height: 72px;
-  grid-template-columns: 4rem 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 1rem;
   border-bottom: 1px solid var(--hairline);
@@ -648,9 +623,7 @@ body {
   translate: -50% -50%;
   border: 1px solid hsl(var(--ghost-hue) 35% 78% / 0.1);
   border-radius: 48% 52% 46% 54% / 58% 42% 58% 42%;
-  background:
-    repeating-linear-gradient(var(--ghost-angle), transparent 0 calc(var(--ghost-spacing) - 1px), hsl(var(--ghost-hue) 68% 65% / var(--ghost-line-alpha)) var(--ghost-spacing)),
-    radial-gradient(ellipse at 45% 40%, hsl(var(--ghost-hue) 35% 86% / 0.08), transparent 58%);
+  background: radial-gradient(ellipse at 45% 40%, hsl(var(--ghost-hue) 35% 86% / 0.08), transparent 58%);
   filter: blur(0.2px);
   transform: rotate(-7deg);
 }
@@ -662,7 +635,7 @@ body {
   border-color: rgba(57, 116, 255, 0.14);
 }
 
-.machine-ghost[data-renderer='webgl'] .machine-ghost__fallback { opacity: 0.28; }
+.machine-ghost[data-renderer='webgpu'] .machine-ghost__fallback { opacity: 0.18; }
 
 .machine-ghost__projection {
   position: absolute;
@@ -676,13 +649,6 @@ body {
   mix-blend-mode: screen;
   -webkit-mask-image: radial-gradient(ellipse 66% 72% at center, #000 48%, transparent 100%);
   mask-image: radial-gradient(ellipse 66% 72% at center, #000 48%, transparent 100%);
-}
-
-.machine-ghost__projection::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(57, 116, 255, 0.09) 5px);
 }
 
 .machine-ghost__projection img,
@@ -790,7 +756,7 @@ body {
 .home-machine__index nav a {
   display: grid;
   min-height: clamp(82px, 13vh, 142px);
-  grid-template-columns: 3.5rem minmax(0, 1fr) 2rem;
+  grid-template-columns: minmax(0, 1fr) 2rem;
   align-items: center;
   gap: 1rem;
   border-bottom: 1px solid var(--hairline);
@@ -1042,7 +1008,7 @@ body {
   .home-machine__index { margin-top: 0; padding-top: 15vh; }
   .home-machine__index > header { display: grid; gap: 0.6rem; }
   .home-machine__index nav a {
-    grid-template-columns: 2.2rem minmax(0, 1fr) 1.2rem;
+    grid-template-columns: minmax(0, 1fr) 1.2rem;
     min-height: 94px;
   }
   .home-machine__label { font-size: clamp(2.2rem, 11vw, 4rem); overflow-wrap: anywhere; }
@@ -1102,11 +1068,14 @@ body {
 .media-matrix { position: relative; z-index: 10; min-height: 100svh; }
 
 .about-archive__hero {
+  position: relative;
+  z-index: 2;
   display: flex;
   min-height: 105svh;
   flex-direction: column;
   justify-content: flex-end;
   padding: 8rem max(1rem, 5vw) 10vh;
+  background: linear-gradient(0deg, rgba(2, 3, 3, 0.94), rgba(2, 3, 3, 0.58) 35%, transparent 72%);
 }
 
 .about-archive__hero > p,
@@ -1126,8 +1095,10 @@ body {
   font-size: clamp(5rem, 15vw, 14rem);
   font-style: italic;
   font-weight: 400;
+  color: var(--bone);
   letter-spacing: -0.085em;
   line-height: 0.72;
+  text-shadow: 0 3px 28px #000, 0 1px 4px #000;
 }
 
 .about-archive__hero h2 {
@@ -1149,6 +1120,8 @@ body {
 
 .about-archive__scroll { align-self: flex-end; margin-top: 3rem; }
 .about-archive__dossier {
+  position: relative;
+  z-index: 2;
   padding: 12vh max(1rem, 5vw);
   background: linear-gradient(180deg, transparent, rgba(5, 6, 7, 0.9) 10%, var(--void));
 }
@@ -1163,7 +1136,7 @@ body {
 .about-trace {
   display: grid;
   min-height: 65svh;
-  grid-template-columns: minmax(6rem, 0.5fr) minmax(12rem, 1fr) minmax(18rem, 1.4fr);
+  grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 1.4fr);
   align-items: center;
   gap: 2rem;
   border-bottom: 1px solid var(--hairline);
@@ -1181,6 +1154,8 @@ body {
 .about-trace > div { color: #cfcdc6; font-size: clamp(1.05rem, 1.5vw, 1.3rem); line-height: 1.55; }
 .about-trace > div p + p { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(237,233,222,0.08); }
 .about-archive__access {
+  position: relative;
+  z-index: 2;
   display: grid;
   min-height: 100svh;
   grid-template-columns: 1fr 1fr;
@@ -1240,7 +1215,7 @@ body {
 .journal-index ol { list-style: none; }
 .journal-index li { position: relative; border-bottom: 1px solid var(--hairline); }
 .journal-index li > a:first-child { display: block; padding: clamp(2rem, 6vw, 6rem) 0; color: var(--bone); text-decoration: none; }
-.journal-index__meta { display: grid; grid-template-columns: 4rem 1fr auto; }
+.journal-index__meta { display: grid; grid-template-columns: 1fr auto; }
 .journal-index h2 {
   max-width: 14ch;
   margin-top: 1.5rem;
@@ -1364,7 +1339,7 @@ body {
   .media-matrix__hero { min-height: 48svh; grid-template-columns: 1fr; }
   .journal-index__hero h1,
   .media-matrix__hero h1 { font-size: clamp(3.8rem, 19vw, 6rem); }
-  .journal-index__meta { grid-template-columns: 2.5rem 1fr auto; }
+  .journal-index__meta { grid-template-columns: 1fr auto; }
   .journal-index h2 { font-size: clamp(2.7rem, 13vw, 4.2rem); }
   .journal-index__translation { position: static; display: inline-flex; min-height: 44px; align-items: center; margin-bottom: 1.5rem; }
 
@@ -1376,7 +1351,7 @@ body {
   .shows-archive > header { min-height: 46svh; }
   .shows-archive li > a,
   .shows-archive li > div { grid-template-columns: 1fr; gap: 1rem; }
-  .shows-archive__date { grid-template-columns: 2.5rem 1fr; }
+  .shows-archive__date { display: block; }
   .shows-archive__open { text-align: left; }
 
   .media-matrix__types { top: 4.2rem; justify-content: flex-start; }
@@ -1389,20 +1364,7 @@ body {
   .media-matrix__mobile small { display: block; margin-bottom: 0.35rem; color: var(--muted); font-family: var(--mono); font-size: 0.62rem; font-style: normal; text-transform: uppercase; }
 }
 
-/* Route changes pass through a brief Machine Ghost scan. */
 .route-transition { min-height: 100svh; }
-.route-transition__veil {
-  position: fixed;
-  inset: 0;
-  z-index: 850;
-  pointer-events: none;
-  transform-origin: top;
-  border-bottom: 1px solid rgba(94, 140, 255, 0.75);
-  background:
-    repeating-linear-gradient(112deg, transparent 0 28px, rgba(94, 140, 255, 0.045) 29px 30px),
-    radial-gradient(ellipse at 50% 70%, #171d24 0%, #07090b 42%, #020303 78%);
-  box-shadow: 0 12px 40px rgba(57, 116, 255, 0.12);
-}
 
 /* Condensed industrial display + bookish reading face. */
 .home-machine__hero h1,

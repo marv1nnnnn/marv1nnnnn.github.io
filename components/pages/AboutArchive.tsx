@@ -28,9 +28,8 @@ export default function AboutArchive({ page }: { page: SignalProfilePage }) {
       </section>
 
       <section className="about-archive__dossier" aria-label="Profile">
-        {page.sections.map((section, index) => (
+        {page.sections.map((section) => (
           <article key={section.title} className="about-trace">
-            <p>{String(index + 1).padStart(2, '0')}</p>
             <h2>{section.title}</h2>
             <div>{section.body.split('\n').map((line) => (
               <p key={line}>{line.replace(/^\s*-\s*/, '')}</p>

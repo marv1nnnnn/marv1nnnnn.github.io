@@ -38,6 +38,7 @@ test.describe('signal card routes', () => {
 
       // OG/JSON-LD script should be present for card pages
       await expect(page.locator('script[type="application/ld+json"]').first()).toHaveCount(1);
+      await expect(page.getByRole('button', { name: 'CHANGE' })).toBeVisible();
 
       const body = await page.locator('body').innerText();
       expect(body.trim().length).toBeGreaterThan(0);

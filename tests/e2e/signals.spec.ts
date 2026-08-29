@@ -8,6 +8,15 @@ const topLevelSignals = [
   'journal',
 ] as const;
 
+async function expectMobileGpuBudget(page: import('@playwright/test').Page) {
+  const canvas = page.locator('.machine-ghost canvas');
+  expect(await canvas.count()).toBeLessThanOrEqual(1);
+  if (await canvas.count()) {
+    await expect(page.locator('.machine-ghost')).toHaveAttribute('data-renderer', 'webgpu');
+    expect(await canvas.evaluate((node) => node.width)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
+  }
+}
+
 for (const id of topLevelSignals) {
   test(`signal "${id}" route renders without crashing`, async ({ page, isMobile }) => {
     const errors: string[] = [];
@@ -17,13 +26,13 @@ for (const id of topLevelSignals) {
     expect(response?.ok(), `expected 2xx for /signals/${id}`).toBeTruthy();
 
     await expect(page).toHaveTitle(/MARV1NNNNN/i);
+    await expect(page.getByRole('button', { name: 'CHANGE' })).toBeVisible();
     // Page should have some visible text content
     const body = await page.locator('body').innerText();
     expect(body.trim().length).toBeGreaterThan(0);
 
-    if (isMobile && ['projects', 'influences', 'journal'].includes(id)) {
-      await expect(page.locator('canvas')).toHaveCount(0);
-    }
+    if (isMobile && ['projects', 'influences'].includes(id)) await expectMobileGpuBudget(page);
+    if (isMobile && id === 'journal') await expect(page.locator('canvas')).toHaveCount(0);
 
     expect(errors, `pageerror on /signals/${id}:\n${errors.join('\n')}`).toEqual([]);
   });
@@ -31,16 +40,20 @@ for (const id of topLevelSignals) {
 
 test('About assembles a readable dossier with direct actions', async ({ page, isMobile }) => {
   await page.goto('/signals/about');
-  await expect(page.getByRole('heading', { name: 'Marvin' })).toBeVisible();
+  const heading = page.getByRole('heading', { name: 'Marvin' });
+  await expect(heading).toBeVisible();
+  expect(await heading.evaluate((node) => getComputedStyle(node.parentElement!).zIndex)).toBe('2');
   await expect(page.getByRole('link', { name: /resume/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /live \/ performances/i })).toBeVisible();
-  if (isMobile) await expect(page.locator('canvas')).toHaveCount(0);
+  if (isMobile) await expectMobileGpuBudget(page);
 });
 
 test('Journal is a stable editorial index without smoke canvas', async ({ page }) => {
   await page.goto('/signals/journal');
   await expect(page.getByRole('heading', { name: 'Journal' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Agents Need Shells, Not Selves/i }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'CHANGE' }).click();
+  await expect.poll(() => page.evaluate(() => document.documentElement.style.getPropertyValue('--signal'))).toMatch(/^hsl\(/);
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 

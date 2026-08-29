@@ -4,9 +4,12 @@ test.describe('home /', () => {
   test('starts with the randomizer, then reveals the minimal shell', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'marv1nnnnn' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'RANDOM' })).toBeVisible();
+    const change = page.getByRole('button', { name: 'CHANGE' });
+    await expect(change).toBeVisible();
+    const beforeScroll = await change.boundingBox();
     await page.evaluate(() => window.scrollTo(0, 80));
     await expect(page.getByRole('link', { name: 'MARV1NNNNN' })).toBeVisible();
+    expect(await change.boundingBox()).toEqual(beforeScroll);
     await expect(page.getByRole('button', { name: 'INDEX' })).toHaveCount(0);
   });
 
@@ -21,7 +24,7 @@ test.describe('home /', () => {
     await page.mouse.up();
   });
 
-  test('mobile nav lists all top-level signals and navigates without WebGL', async ({ page, isMobile }) => {
+  test('mobile nav stays usable with an optional low-power WebGPU field', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'mobile-only navigation');
     await page.goto('/');
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -32,7 +35,12 @@ test.describe('home /', () => {
     for (const label of ['about', 'projects', 'influences', 'media', 'journal']) {
       expect(navText, `mobile nav missing "${label}"`).toContain(label);
     }
-    await expect(page.locator('canvas')).toHaveCount(0);
+    const canvas = page.locator('.machine-ghost canvas');
+    expect(await canvas.count()).toBeLessThanOrEqual(1);
+    if (await canvas.count()) {
+      await expect(page.locator('.machine-ghost')).toHaveAttribute('data-renderer', 'webgpu');
+      expect(await canvas.evaluate((node) => node.width)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth + 1));
+    }
 
     await nav.getByRole('link', { name: /About/i }).click();
     await expect(page).toHaveURL(/\/signals\/about\/?$/);
