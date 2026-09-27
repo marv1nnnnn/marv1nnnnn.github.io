@@ -11,13 +11,16 @@ test.describe('home /', () => {
     await expect(page.getByRole('button', { name: /new tape/ })).toBeVisible();
   });
 
-  test('switching tape colour updates the page tokens and is remembered', async ({ page }) => {
+  test('new tape switches to a different palette and the choice carries to other pages', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'lain' }).click();
-    await expect(page.getByRole('button', { name: 'lain' })).toHaveAttribute('aria-pressed', 'true');
-    await expect.poll(() => page.evaluate(() => document.documentElement.style.getPropertyValue('--accent-rgb'))).toBe('226, 35, 48');
-    await page.reload();
-    await expect(page.getByRole('button', { name: 'lain' })).toHaveAttribute('aria-pressed', 'true');
+    const accent = () => page.evaluate(() => document.documentElement.style.getPropertyValue('--accent-rgb'));
+    await expect.poll(accent).not.toBe('');
+    const before = await accent();
+    await page.getByRole('button', { name: /new tape/ }).click();
+    await expect.poll(accent).not.toBe(before);
+    const chosen = await accent();
+    await page.goto('/make');
+    await expect.poll(accent).toBe(chosen);
   });
 
   test('the home page does not scroll sideways on phones', async ({ page }) => {

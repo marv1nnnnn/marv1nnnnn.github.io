@@ -1,12 +1,10 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { DEFAULT_PALETTE, PALETTES, Tape, type Scene } from './engine';
 
 interface TapeControls {
-  palette: string;
-  setPalette: (name: string) => void;
   setScene: (scene: Scene) => void;
   newTape: () => void;
 }
@@ -54,7 +52,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   const reducedRef = useRef(false);
   const pathname = usePathname();
   const lastPath = useRef<string | null>(null);
-  const [palette, setPaletteState] = useState(DEFAULT_PALETTE);
+  const paletteRef = useRef(DEFAULT_PALETTE);
 
   const updateObstacle = useCallback(() => {
     const tape = tapeRef.current;
@@ -82,7 +80,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     } catch {}
     tape.palette = PALETTES[saved];
     applyPaletteVars(saved);
-    setPaletteState(saved);
+    paletteRef.current = saved;
     tape.resize();
 
     let raf = 0;
@@ -167,21 +165,21 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     if (reducedRef.current) for (let i = 0; i < 400; i++) tape.frame();
   }, [updateObstacle]);
 
-  const setPalette = useCallback((name: string) => {
-    if (!PALETTES[name]) return;
+  // A new tape is a random palette (never the current one) and a fresh field. The choice is
+  // remembered so the rest of the site plays on the same tape.
+  const newTape = useCallback(() => {
+    const names = Object.keys(PALETTES).filter((n) => n !== paletteRef.current);
+    const name = names[Math.floor(Math.random() * names.length)];
+    paletteRef.current = name;
     applyPaletteVars(name);
-    setPaletteState(name);
     tapeRef.current?.setPalette(PALETTES[name]);
+    tapeRef.current?.reseed(`home-${Math.random()}`);
     try {
       localStorage.setItem('tape-palette', name);
     } catch {}
   }, []);
 
-  const newTape = useCallback(() => {
-    tapeRef.current?.reseed(`home-${Math.random()}`);
-  }, []);
-
-  const value = useMemo(() => ({ palette, setPalette, setScene, newTape }), [palette, setPalette, setScene, newTape]);
+  const value = useMemo(() => ({ setScene, newTape }), [setScene, newTape]);
 
   return (
     <TapeContext.Provider value={value}>

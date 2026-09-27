@@ -28,5 +28,5 @@ export default async function Essay({ params }: Props) {
   const { id } = await params;
   const card = getEssay(id);
   if (!card) notFound();
-  return <Article card={card} back="/think" backLabel="all notes" />;
+  return <Article card={card} back="/think" backLabel="all notes" section="think" kind="essay" />;
 }
