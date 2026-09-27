@@ -1,55 +1,28 @@
-import { notFound } from 'next/navigation';
-import { SIGNALS, getSignalById } from '@/lib/signals';
 import type { Metadata } from 'next';
-import SignalClientPage from './SignalClientPage';
+import { SIGNALS } from '@/lib/signals';
+import Redirect from '@/components/tape/Redirect';
+
+const MOVED: Record<string, string> = {
+  about: '/about',
+  projects: '/make',
+  journal: '/think',
+  influences: '/input',
+  listening: '/input#log',
+};
+
+type Props = { params: Promise<{ signalId: string }> };
 
 export function generateStaticParams() {
-  return SIGNALS.map((signal) => ({
-    signalId: signal.id,
-  }));
+  return SIGNALS.map((signal) => ({ signalId: signal.id }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ signalId: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { signalId } = await params;
-  const signal = getSignalById(signalId);
-
-  if (!signal) {
-    return {
-      title: 'Page not found',
-    };
-  }
-
-  const title = `${signal.title} · MARV1NNNNN`;
-  const description = signal.summary ?? `Selected ${signal.title.toLowerCase()} by Marvin Ma.`;
-  const url = `/signals/${signalId}`;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      images: [{ url: '/images/cursor_shenzhen.png', width: 1200, height: 630, alt: title }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/images/cursor_shenzhen.png'],
-    },
-  };
+  const to = MOVED[signalId] ?? '/';
+  return { title: 'Moved', robots: { index: false, follow: true }, alternates: { canonical: to.split('#')[0] } };
 }
 
-export default async function SignalPage({ params }: { params: Promise<{ signalId: string }> }) {
+export default async function MovedSignal({ params }: Props) {
   const { signalId } = await params;
-  const signal = getSignalById(signalId);
-
-  if (!signal) {
-    notFound();
-  }
-
-  return <SignalClientPage signal={signal} signalId={signalId} />;
+  return <Redirect to={MOVED[signalId] ?? '/'} />;
 }
