@@ -140,12 +140,14 @@ function generateSitemap(signals) {
   const baseUrl = 'https://marv1nnnnn.github.io';
   const today = new Date().toISOString().split('T')[0];
 
-  // Collect all card URLs
-  const cardUrls = [];
+  // Section pages plus one page per project (/make) and essay (/think).
+  const sectionFor = { projects: 'make', journal: 'think' };
+  const cardUrls = ['make', 'think', 'input', 'about'].map(section => `${baseUrl}/${section}`);
   signals.forEach(signal => {
-    if (signal.page.type === 'cards' && signal.page.cards) {
+    const section = sectionFor[signal.id];
+    if (section && signal.page.type === 'cards' && signal.page.cards) {
       signal.page.cards.forEach(card => {
-        cardUrls.push(`${baseUrl}/signals/${signal.id}/${card.id}`);
+        cardUrls.push(`${baseUrl}/${section}/${card.id}`);
       });
     }
   });

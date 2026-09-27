@@ -37,6 +37,8 @@ export default function SiteShell() {
     try { applyCssPreset(JSON.parse(localStorage.getItem('machine-ghost-preset') ?? 'null')); } catch {}
   }, []);
 
+  if (pathname.startsWith('/draft')) return null;
+
   const segments = pathname.split('/').filter(Boolean);
   const parent = pathname === '/shows'
     ? { href: '/signals/about', label: 'ABOUT' }

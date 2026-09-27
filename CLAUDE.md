@@ -16,14 +16,17 @@ pnpm lint         # ESLint
 
 ## Architecture
 
-- **Foundation**: `SiteShell` provides stable navigation; `MachineGhostScene` is the shared optional WebGL enhancement with mobile, reduced-motion, and failure fallbacks.
-- **Home (`app/page.tsx`)**: scroll-assembled Machine Ghost index backed by stable DOM navigation.
-- **Signals (`app/signals/[signalId]/`)**: renders About Archive, Projects Stage, Media Matrix, Canon Field, or Journal Index; card routes render readable Markdown details.
+The site is one "tape": a single interactive flow field that every page shares. Pages only change its parameters.
+
+- **Tape engine (`components/tape/engine.ts`)**: canvas flow field, pointer and touch interaction (stir, hold to gather, release to scatter, double-tap to erase a strip), palettes, wear, and the fast-forward/rewind played on page changes.
+- **`components/tape/TapeProvider.tsx`**: mounted once in `app/layout.tsx`, so the canvas survives navigation. Owns palette choice (saved in `localStorage`) and applies palette CSS variables.
+- **`components/tape/parts.tsx`**: `TapeScene` (each page sets seed, density and age), `Worn` (older items fade and drop characters), `TopNav`, `Clock`, `PalettePicker`, `HomeControls`, `PageFoot`.
+- **Routes**: `/` home, `/make` (+ `/make/[id]`), `/think` (+ `/think/[id]`), `/input`, `/about`. Detail pages render Markdown through `components/tape/Article.tsx`.
+- **Old URLs**: `/signals/*`, `/shows` and `/draft` are static redirect pages (`components/tape/Redirect.tsx`).
+- **Data (`lib/tape.ts`)**: selectors over `lib/signals.json` and `data/shows.json`. Talks vs tools is a hard-coded id list until Clin carries a `kind` field.
 - **Content export (`scripts/clin-content.js`)**: exports only positively allowlisted Clin notes tagged `site` into `content/` and `data/shows.json`.
 - **Signal build (`scripts/generate-signals.js`)**: compiles generated content into `lib/signals.json` and updates `public/sitemap.xml`.
 - **Types (`types/scanner.ts`)**: signal and page content types.
-
-`freq` is ordering/theming metadata, not a live tuner.
 
 ## Content workflow
 
@@ -38,7 +41,7 @@ See `content/README.md` for note formats and paths.
 
 ## Manual checks
 
-- `pnpm dev` — Home assembly, global INDEX, and each signal route.
-- Check desktop/mobile plus reduced-motion and WebGL-disabled fallbacks on Home, About, Projects, and Influences.
-- Card routes: `/signals/projects/<cardId>` and `/signals/journal/<cardId>`.
-- Shows route: `/shows`.
+- `pnpm dev`, then click through `/`, `/make`, `/think`, an essay, `/input`, `/about`: the canvas should keep running and play fast-forward/rewind between pages.
+- Check desktop and phone, touch interaction on the home page, each tape palette, and `prefers-reduced-motion` (the field renders still and moves only while the pointer moves).
+- Old URLs such as `/signals/journal/<id>` and `/shows` should land on their new pages.
+- `pnpm test:e2e` covers these routes on desktop and mobile viewports.

@@ -1,21 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import CustomCursor from "@/components/CustomCursor";
-import SiteShell from "@/components/SiteShell";
-import RouteTransition from "@/components/RouteTransition";
+import TapeProvider from "@/components/tape/TapeProvider";
+import { TopNav } from "@/components/tape/parts";
 
 const siteUrl = 'https://marv1nnnnn.github.io';
 const siteName = 'MARV1NNNNN';
-const siteTitle = 'Marvin Ma (MARV1NNNNN) · AI Engineer & Vibe Coding Builder';
+const siteTitle = 'Marvin Ma (MARV1NNNNN) · Product Manager';
 const siteDescription =
-  'Marvin Ma is an AI Engineer at YouWare and Cursor Ambassador exploring vibe coding, creative tools, live coding, music, games, and internet culture.';
+  'Marvin Ma is a product manager at YouWare and Cursor Ambassador. Formerly live coding and circuit bending in Beijing. Writing about agents, building small tools, and logging what he watches, reads and plays.';
 const defaultImage = '/images/cursor_shenzhen.png';
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#050505',
+  themeColor: '#07090C',
 };
 
 export const metadata: Metadata = {
@@ -29,12 +28,12 @@ export const metadata: Metadata = {
   keywords: [
     'Marvin Ma',
     'MARV1NNNNN',
-    'AI Engineer',
+    'Product Manager',
     'YouWare',
     'Cursor Ambassador',
-    'vibe coding',
-    'creative coding',
-    'portfolio',
+    'AI agents',
+    'live coding',
+    'generative art',
   ],
   authors: [{ name: 'Marvin Ma', url: siteUrl }],
   creator: 'Marvin Ma',
@@ -103,7 +102,7 @@ export default function RootLayout({
         alternateName: 'MARV1NNNNN',
         url: siteUrl,
         image: `${siteUrl}${defaultImage}`,
-        jobTitle: 'AI Engineer',
+        jobTitle: 'Product Manager',
         worksFor: { '@type': 'Organization', name: 'YouWare' },
         sameAs: [
           'https://github.com/marv1nnnnn',
@@ -126,16 +125,16 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" style={{ backgroundColor: '#050505' }}>
-      <body className="antialiased" style={{ backgroundColor: '#050505', color: '#ffffff' }}>
+    <html lang="en">
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <div className="site-atmosphere" aria-hidden="true" />
-        <CustomCursor />
-        <SiteShell />
-        <RouteTransition>{children}</RouteTransition>
+        <TapeProvider>
+          <TopNav />
+          <main id="content">{children}</main>
+        </TapeProvider>
       </body>
     </html>
   );
