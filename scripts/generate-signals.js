@@ -142,7 +142,7 @@ function generateSitemap(signals) {
 
   // Section pages plus one page per project (/make) and essay (/think).
   const sectionFor = { projects: 'make', journal: 'think' };
-  const cardUrls = ['make', 'think', 'input', 'about'].map(section => `${baseUrl}/${section}`);
+  const cardUrls = ['make', 'input', 'log', 'about'].map(section => `${baseUrl}/${section}`);
   signals.forEach(signal => {
     const section = sectionFor[signal.id];
     if (section && signal.page.type === 'cards' && signal.page.cards) {

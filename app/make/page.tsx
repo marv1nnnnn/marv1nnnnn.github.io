@@ -2,20 +2,22 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { TapeScene, Worn } from '@/components/tape/parts';
 import Rail from '@/components/tape/Rail';
-import { getMakes, getShows, groupBy, monthOf } from '@/lib/tape';
+import { dayOf, getEssays, getMakes, getShows, groupBy, monthOf, readingMinutes } from '@/lib/tape';
 
 export const metadata: Metadata = {
   title: 'make',
-  description: 'Tools, talks and workshops by Marvin Ma, and live coding and circuit bending shows in Beijing, 2016–2021.',
+  description: 'Essays, tools, talks and workshops by Marvin Ma, and live coding and circuit bending shows in Beijing, 2016–2021.',
   alternates: { canonical: '/make' },
 };
 
 const year = (date?: string) => (date ?? '').slice(0, 4);
 
 export default function MakePage() {
+  const essays = getEssays();
   const makes = groupBy(getMakes(), (m) => year(m.date));
   const shows = groupBy(getShows(), (s) => year(s.date));
   const marks = [
+    { id: 'writing', label: 'txt' },
     ...makes.map((g) => ({ id: `make-${g.key}`, label: g.key })),
     ...shows.map((g) => ({ id: `noise-${g.key}`, label: g.key })),
   ];
@@ -25,11 +27,26 @@ export default function MakePage() {
       <Rail marks={marks} />
       <header className="page-head">
         <h1>make</h1>
-        <p className="lede">Tools, talks, and five years of noise. Everything is on the same tape; the older a recording, the more it has worn.</p>
+        <p className="lede">Writing, tools, talks, and five years of noise. Everything is on the same tape; the older a recording, the more it has worn.</p>
       </header>
 
+      <section>
+        <h2 id="writing"><span>writing</span></h2>
+        <ul className="essays">
+          {essays.map((e) => (
+            <li key={e.id}>
+              <Link href={`/think/${e.id}`} className="essay-link">
+                <span className="essay-meta">{dayOf(e.date ?? '')} · {readingMinutes(e.markdown)} min read</span>
+                <span className="essay-title"><Worn text={e.title} date={e.date ?? ''} /></span>
+                <span className="essay-sub">{e.subtitle || e.summary}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className="side-a">
-        <h2><span>tools and talks</span></h2>
+        <h2 id="tools"><span>tools and talks</span></h2>
         {makes.map((g) => (
           <div className="year" id={`make-${g.key}`} key={g.key}>
             <p className="year-label" aria-hidden="true"><Worn text={g.key} date={`${g.key}-06-30`} /></p>

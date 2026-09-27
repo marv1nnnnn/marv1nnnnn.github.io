@@ -24,7 +24,7 @@ pnpm lint      # ESLint
 | Path | Role |
 |------|------|
 | `app/page.tsx` | Home: the interactive tape |
-| `app/make`, `app/think`, `app/input`, `app/about` | Sections; `make/[id]` and `think/[id]` are Markdown detail pages |
+| `app/make`, `app/input`, `app/log`, `app/about` | Sections; `make/[id]` and `think/[id]` are Markdown detail pages (`/think` itself redirects to `/make#writing`) |
 | `components/tape/` | Tape engine, provider, page parts, article and redirect components |
 | `lib/tape.ts` | Content selectors used by the pages |
 | `app/signals/**`, `app/shows` | Redirects from the old URLs |

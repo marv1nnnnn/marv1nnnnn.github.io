@@ -5,7 +5,7 @@ test.describe('home /', () => {
     await page.goto('/');
     await expect(page.locator('canvas.tape-canvas')).toBeVisible();
     await expect(page.getByText('Product manager at YouWare.')).toBeVisible();
-    for (const name of ['make', 'think', 'input', 'about']) {
+    for (const name of ['make', 'input', 'log', 'about']) {
       await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name })).toBeVisible();
     }
     await expect(page.getByRole('button', { name: /new tape/ })).toBeVisible();

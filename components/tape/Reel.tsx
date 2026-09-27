@@ -90,7 +90,7 @@ export default function Reel({ records }: { records: VinylRecord[] }) {
       <div className="reel-stage">
         <div className="reel-intro" ref={intro}>
           <p className="reel-word">input</p>
-          <p className="lede">Fourteen things that stayed with me, which don’t wear, and a running log of everything else, which does.</p>
+          <p className="lede">Fourteen things that stayed with me. These don’t wear.</p>
         </div>
         {records.map((rec, i) => (
           <figure
