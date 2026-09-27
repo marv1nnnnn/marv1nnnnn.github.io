@@ -5,9 +5,9 @@ import Redirect from '@/components/tape/Redirect';
 const MOVED: Record<string, string> = {
   about: '/about',
   projects: '/make',
-  journal: '/think',
+  journal: '/make#writing',
   influences: '/input',
-  listening: '/input#log',
+  listening: '/log',
 };
 
 type Props = { params: Promise<{ signalId: string }> };

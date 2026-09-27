@@ -363,8 +363,36 @@ button { font: inherit; color: inherit; }
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-.input-log { padding-top: 64px; }
-.input-log > h2#log { margin-top: 0; }
+.input-end { min-height: 0; padding-top: 48px; padding-bottom: 120px; }
+.to-log { display: inline-block; padding: 12px 0; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-decoration: none; border-bottom: 1px solid rgba(var(--accent-rgb), 0.35); }
+.to-log:hover { color: var(--accent); }
+
+/* Log: the last thing in, then the tape filtered by kind */
+.log-now { display: flex; flex-direction: column; gap: 8px; margin: -24px 0 56px; padding-left: 18px; border-left: 1px solid var(--accent); }
+.log-now-label { color: var(--accent); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.log-now-title { font-family: var(--read); font-style: italic; font-size: clamp(28px, 4vw, 44px); line-height: 1.05; text-wrap: balance; }
+.log-now-by { color: var(--muted); font-size: 12px; }
+.log-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 48px;
+}
+.log-filter button {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+.log-filter button span { color: var(--faint); font-variant-numeric: tabular-nums; margin-left: 4px; }
+.log-filter button:hover { color: var(--ink); border-color: rgba(var(--accent-rgb), 0.5); }
+.log-filter button[aria-pressed='true'] { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+.log-filter button[aria-pressed='true'] span { color: rgba(var(--bg-rgb), 0.7); }
 
 /* Detail pages */
 .article > * { max-width: 720px; }
@@ -467,6 +495,6 @@ button { font: inherit; color: inherit; }
   .page { animation: none; }
   .reel { display: none; }
   .canon-fallback { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
-  .input-log { padding-top: calc(env(safe-area-inset-top, 0px) + 104px); }
+  .input-end { padding-top: calc(env(safe-area-inset-top, 0px) + 104px); }
   .worn { transition: none; }
 }

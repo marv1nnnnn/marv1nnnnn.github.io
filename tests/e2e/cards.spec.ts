@@ -25,7 +25,7 @@ test.describe('detail pages', () => {
       await page.goto(`/${card.section}/${card.id}`);
       await expect(page.locator('h1[data-anchor]')).toBeVisible();
       await expect(page.locator('.prose')).not.toBeEmpty();
-      await expect(page.getByRole('link', { name: /^←/ })).toHaveAttribute('href', `/${card.section}`);
+      await expect(page.getByRole('link', { name: /^←/ })).toHaveAttribute('href', card.section === 'think' ? '/make#writing' : `/${card.section}`);
     });
   }
 });

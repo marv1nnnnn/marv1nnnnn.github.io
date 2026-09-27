@@ -28,8 +28,10 @@ export function Worn({ text, date }: { text: string; date: string }) {
 
 export function TopNav() {
   const pathname = usePathname();
-  const section = pathname.split('/').filter(Boolean)[0] ?? '';
-  const links = ['make', 'think', 'input', 'about'];
+  const first = pathname.split('/').filter(Boolean)[0] ?? '';
+  // Essays keep their /think/[id] URLs but belong to make.
+  const section = first === 'think' ? 'make' : first;
+  const links = ['make', 'input', 'log', 'about'];
   return (
     <header className="top">
       <Link className="mark" href="/">marv1nnnnn</Link>
