@@ -280,6 +280,92 @@ button { font: inherit; color: inherit; }
 .canon-by { color: var(--muted); font-size: 11px; }
 .canon q { display: block; margin-top: 4px; color: rgba(var(--ink-rgb), 0.78); font-family: var(--read); font-size: 16px; line-height: 1.45; quotes: none; }
 
+/* Input: the canon wound on a reel. */
+.reel { position: relative; z-index: 2; }
+.reel-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  perspective: 1000px;
+  perspective-origin: 50% 45%;
+}
+.reel-item {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(34vmin, 300px);
+  margin: 0;
+  will-change: transform, opacity;
+}
+.reel-item img, .reel-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  background: rgba(var(--ink-rgb), 0.06);
+}
+.reel-blank {
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  background-color: var(--bg);
+  background-image: linear-gradient(135deg, rgba(var(--accent-rgb), 0.22), rgba(var(--bg-rgb), 0) 70%);
+  font-family: var(--read);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.reel-item figcaption { margin-top: 10px; font-size: 10px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.reel-item img { transition: outline-color 300ms ease; outline: 1px solid transparent; outline-offset: 8px; }
+.reel-item.is-active img { outline-color: var(--accent); }
+.reel-item.is-active figcaption { color: var(--accent); }
+.reel-intro {
+  position: absolute;
+  left: clamp(24px, 11vw, 180px);
+  top: calc(env(safe-area-inset-top, 0px) + 104px);
+  pointer-events: none;
+}
+.reel-word {
+  margin: 0 0 0.2em -0.06em;
+  font-weight: 200;
+  font-stretch: 75%;
+  font-size: clamp(96px, 21vw, 260px);
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+}
+.reel-head {
+  position: absolute;
+  left: clamp(24px, 11vw, 180px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+  max-width: min(560px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 22px 20px;
+  background: rgba(var(--bg-rgb), 0.84);
+  border-left: 1px solid var(--accent);
+  animation: tape-in 420ms ease both;
+}
+.reel-count { color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+.reel-title { font-family: var(--read); font-style: italic; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; }
+.reel-by { color: var(--muted); font-size: 11px; }
+.reel-head q { margin-top: 6px; color: rgba(var(--ink-rgb), 0.85); font-family: var(--read); font-size: 17px; line-height: 1.45; quotes: none; }
+.canon-fallback {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.input-log { padding-top: 64px; }
+.input-log > h2#log { margin-top: 0; }
+
 /* Detail pages */
 .article > * { max-width: 720px; }
 .essay-head { margin-bottom: 56px; }
@@ -369,11 +455,18 @@ button { font: inherit; color: inherit; }
   .row .title { font-size: 17px; }
   .rows.compact .row { grid-template-columns: 24px minmax(0, 1fr); }
   .canon { grid-template-columns: minmax(0, 1fr); }
+  .reel-item { width: 54vw; top: 40%; }
+  .reel-intro { left: 18px; top: calc(env(safe-area-inset-top, 0px) + 88px); }
+  .reel-word { font-size: 30vw; }
+  .reel-head { left: 18px; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); max-width: none; }
   .prose { font-size: 18px; }
   .contact-row { grid-template-columns: 84px minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .page { animation: none; }
+  .reel { display: none; }
+  .canon-fallback { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+  .input-log { padding-top: calc(env(safe-area-inset-top, 0px) + 104px); }
   .worn { transition: none; }
 }

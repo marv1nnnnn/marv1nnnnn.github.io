@@ -19,6 +19,8 @@ test.describe('sections', () => {
   test('/input shows the canon and the log', async ({ page }) => {
     await page.goto('/input');
     await expect(page.locator('ol.canon > li')).toHaveCount(14);
+    await expect(page.locator('.reel-item')).toHaveCount(14);
+    await expect(page.locator('.reel-head .reel-count')).toHaveText('01 / 14');
     await expect(page.getByRole('heading', { name: /the log/i })).toBeVisible();
   });
 
