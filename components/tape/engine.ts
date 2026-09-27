@@ -54,10 +54,10 @@ export function rng(seed: number) {
   };
 }
 
-type Noise = (x: number, y: number, z: number) => number;
+export type Noise = (x: number, y: number, z: number) => number;
 
 // Improved Perlin noise, seeded.
-function makeNoise(rand: () => number): Noise {
+export function makeNoise(rand: () => number): Noise {
   const p = new Uint8Array(512);
   const perm = Array.from({ length: 256 }, (_, i) => i);
   for (let i = 255; i > 0; i--) {

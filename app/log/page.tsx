@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { TapeScene, Worn } from '@/components/tape/parts';
-import LogList from '@/components/tape/LogList';
-import { dayOf, getLog } from '@/lib/tape';
+import { TapeScene } from '@/components/tape/parts';
+import LogDeck from '@/components/tape/LogDeck';
+import { getLog } from '@/lib/tape';
 
 export const metadata: Metadata = {
   title: 'log',
@@ -11,22 +11,14 @@ export const metadata: Metadata = {
 
 export default function LogPage() {
   const log = getLog();
-  const now = log[0];
   return (
-    <article className="page">
+    <article className="page page-wide">
       <TapeScene seed="log" age={0.2} />
       <header className="page-head">
         <h1>log</h1>
-        <p className="lede">What I’ve been listening to, watching, reading and playing lately. It wears as it goes.</p>
+        <p className="lede">What I’ve been listening to, watching, reading and playing lately, one mark per entry. Drag along the tape to play it back.</p>
       </header>
-      {now && (
-        <p className="log-now">
-          <span className="log-now-label">last in · {dayOf(now.date ?? '')}</span>
-          <span className="log-now-title"><Worn text={now.title} date={now.date ?? ''} /></span>
-          <span className="log-now-by">{now.creator}</span>
-        </p>
-      )}
-      <LogList items={log} />
+      <LogDeck items={log} />
     </article>
   );
 }

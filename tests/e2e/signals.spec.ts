@@ -37,8 +37,20 @@ test.describe('sections', () => {
     await expect(page.locator('.rows .row .kind').filter({ hasNotText: 'heard' })).toHaveCount(0);
   });
 
+  test('/log plays back the entry under the read head', async ({ page }) => {
+    await page.goto('/log');
+    const strip = page.getByRole('slider', { name: 'Read head' });
+    const newest = await page.locator('.deck-title').textContent();
+    await strip.focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('.deck-title')).not.toHaveText(newest ?? '');
+    await page.keyboard.press('End');
+    await expect(page.locator('.deck-title')).toHaveText(newest ?? '');
+  });
+
   test('/about shows the current role and contact details', async ({ page }) => {
     await page.goto('/about');
+    await expect(page.locator('.jcard')).toHaveClass(/is-open/);
     await expect(page.getByText(/product manager/i).first()).toBeVisible();
     await expect(page.getByText('marvin1996325@gmail.com')).toBeVisible();
   });

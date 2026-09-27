@@ -26,7 +26,7 @@ function position(path: string) {
 }
 
 // Pointer contact with readable content should not gather the lines.
-const READING = 'a, button, input, .prose, .rows, .canon, .about-body';
+const READING = 'a, button, input, .prose, .rows, .canon, .credits, .strip, .jcard';
 
 function hexToRgb(hex: string) {
   const n = parseInt(hex.slice(1), 16);
