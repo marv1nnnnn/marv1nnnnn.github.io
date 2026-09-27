@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { PageFoot, TapeScene } from '@/components/tape/parts';
+import { TapeScene } from '@/components/tape/parts';
 import { getAbout } from '@/lib/tape';
 
 export const metadata: Metadata = {
@@ -14,18 +14,20 @@ export default function AboutPage() {
   return (
     <article className="page">
       <TapeScene seed="about" age={0.15} />
-      <h1>about</h1>
-      <div className="about-body">
+      <header className="page-head">
+        <h1>about</h1>
         {about.hero.subtitle && <p className="lede">{about.hero.subtitle}</p>}
-        {about.hero.description && <p>{about.hero.description}</p>}
+      </header>
+      <div className="about-body">
+        {about.hero.description && <p className="statement">{about.hero.description}</p>}
         {about.current && <p>{about.current}</p>}
 
-        <h2>fun facts</h2>
-        <ul className="facts">
+        <h2><span>fun facts</span></h2>
+        <ol className="facts">
           {about.facts.map((f) => <li key={f}>{f}</li>)}
-        </ul>
+        </ol>
 
-        <h2>contact</h2>
+        <h2><span>contact</span></h2>
         <div className="contact">
           {about.contact.map((c) => (
             <div key={c.label} className="contact-row">
@@ -45,7 +47,6 @@ export default function AboutPage() {
           )}
         </div>
       </div>
-      <PageFoot />
     </article>
   );
 }

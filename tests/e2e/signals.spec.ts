@@ -7,17 +7,20 @@ test.describe('sections', () => {
     await expect(page.getByRole('heading', { name: /tools and talks/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /noise/i })).toBeVisible();
     await expect(page.locator('.rows .row').first()).toBeVisible();
+    await expect(page.locator('.year-label').first()).toBeVisible();
   });
 
   test('/think links to each essay', async ({ page }) => {
     await page.goto('/think');
-    const first = page.locator('.rows .row a').first();
+    const first = page.locator('.essays a').first();
     await expect(first).toHaveAttribute('href', /^\/think\//);
   });
 
   test('/input shows the canon and the log', async ({ page }) => {
     await page.goto('/input');
-    await expect(page.locator('.canon > div')).toHaveCount(14);
+    await expect(page.locator('ol.canon > li')).toHaveCount(14);
+    await expect(page.locator('.reel-item')).toHaveCount(14);
+    await expect(page.locator('.reel-head .reel-count')).toHaveText('01 / 14');
     await expect(page.getByRole('heading', { name: /the log/i })).toBeVisible();
   });
 

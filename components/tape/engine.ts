@@ -116,6 +116,7 @@ export class Tape {
   private dropouts: { y: number; age: number }[] = [];
   private ff = 0;
   private ffDir = -1;
+  private frames = 0;
   scene: Scene = HOME_SCENE;
   palette: Palette = PALETTES[DEFAULT_PALETTE];
   obstacle: Obstacle | null = null;
@@ -223,6 +224,12 @@ export class Tape {
 
     ctx.fillStyle = `rgba(${bg}, ${scene.fade + this.ff * 0.08})`;
     ctx.fillRect(0, 0, W, H);
+    // A faint fade alone never fully clears: 8-bit rounding leaves a grey haze that builds up
+    // over minutes. A stronger pass every few frames pulls the residue back to the background.
+    if (++this.frames % 12 === 0) {
+      ctx.fillStyle = `rgba(${bg}, 0.06)`;
+      ctx.fillRect(0, 0, W, H);
+    }
 
     // Tape damage grows with the age of what is on screen.
     if (Math.random() < 0.02 + scene.age * 0.06) {

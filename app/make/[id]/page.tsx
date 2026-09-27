@@ -28,5 +28,5 @@ export default async function MakeDetail({ params }: Props) {
   const { id } = await params;
   const card = getMake(id);
   if (!card) notFound();
-  return <Article card={card} back="/make" backLabel="everything made" />;
+  return <Article card={card} back="/make" backLabel="everything made" section="make" kind={card.kind} />;
 }

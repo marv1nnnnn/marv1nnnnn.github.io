@@ -84,3 +84,23 @@ export function getAbout() {
 
 export const monthOf = (date: string) => date.slice(0, 7).replace('-', '.');
 export const dayOf = (date: string) => date.slice(0, 10).replaceAll('-', '.');
+
+// Groups date-sorted items into runs by a key (year or month), keeping order.
+export function groupBy<T>(items: T[], key: (item: T) => string) {
+  const groups: { key: string; items: T[] }[] = [];
+  for (const item of items) {
+    const k = key(item);
+    const last = groups[groups.length - 1];
+    if (last && last.key === k) last.items.push(item);
+    else groups.push({ key: k, items: [item] });
+  }
+  return groups;
+}
+
+// Minutes to read, from the Markdown body.
+export function readingMinutes(markdown: string) {
+  const text = markdown.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/[#>*_`[\]()-]/g, ' ');
+  const latin = (text.match(/[A-Za-z0-9']+/g) ?? []).length;
+  const cjk = (text.match(/[一-鿿]/g) ?? []).length;
+  return Math.max(1, Math.round(latin / 230 + cjk / 500));
+}
