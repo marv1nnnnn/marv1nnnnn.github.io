@@ -103,6 +103,12 @@ interface Particle { x: number; y: number; life: number; alt: boolean; heat: num
 interface Pointer { x: number; y: number; vx: number; vy: number; down: boolean; since: number }
 export interface Obstacle { cx: number; cy: number; hw: number; hh: number }
 
+// What the tape tells the sound: the moments worth hearing.
+export type TapeEvent =
+  | { type: 'burst'; x: number; y: number; power: number }
+  | { type: 'erase'; y: number }
+  | { type: 'seek'; direction: -1 | 1 };
+
 export class Tape {
   private ctx: CanvasRenderingContext2D;
   private W = 0;
@@ -117,10 +123,12 @@ export class Tape {
   private ff = 0;
   private ffDir = -1;
   private frames = 0;
+  private heard = { x: 0.5, y: 0.5 };
   scene: Scene = HOME_SCENE;
   palette: Palette = PALETTES[DEFAULT_PALETTE];
   obstacle: Obstacle | null = null;
   coarse: boolean;
+  onEvent: ((e: TapeEvent) => void) | null = null;
 
   constructor(private canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
@@ -164,6 +172,7 @@ export class Tape {
   // A page change plays as fast-forward (deeper into the site) or rewind (back up).
   seek(direction: -1 | 1, duration = 700) {
     this.ffDir = direction;
+    this.onEvent?.({ type: 'seek', direction });
     const t0 = performance.now();
     const tick = () => {
       const k = Math.min(1, (performance.now() - t0) / duration);
@@ -193,7 +202,11 @@ export class Tape {
     const p = this.pointers.get(id);
     if (p?.down) {
       const held = performance.now() - p.since;
-      if (held > 180) this.bursts.push({ x: p.x, y: p.y, age: 0, power: Math.min(1, held / 1400) });
+      if (held > 180) {
+        const power = Math.min(1, held / 1400);
+        this.bursts.push({ x: p.x, y: p.y, age: 0, power });
+        this.onEvent?.({ type: 'burst', x: p.x / this.W, y: p.y / this.H, power });
+      }
       p.down = false;
     }
     if (forget) this.pointers.delete(id);
@@ -205,6 +218,24 @@ export class Tape {
 
   erase(y: number) {
     this.dropouts.push({ y, age: 0 });
+    this.onEvent?.({ type: 'erase', y: y / this.H });
+  }
+
+  // The pointer as the sound hears it: the fastest one sets the position, the longest hold wins.
+  listen() {
+    const now = performance.now();
+    let speed = 0, hold = 0, x = this.heard.x, y = this.heard.y;
+    for (const p of this.pointers.values()) {
+      const s = Math.hypot(p.vx, p.vy);
+      if (p.down) hold = Math.max(hold, Math.min(1, (now - p.since) / 1400));
+      if (s >= speed) {
+        speed = s;
+        x = p.x / this.W;
+        y = p.y / this.H;
+      }
+    }
+    this.heard = { x, y };
+    return { speed, hold, x, y };
   }
 
   private spawn(p: Particle) {

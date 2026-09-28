@@ -35,11 +35,14 @@ export function TopNav() {
   return (
     <header className="top">
       <Link className="mark" href="/">marv1nnnnn</Link>
-      <nav aria-label="Site">
-        {links.map((l) => (
-          <Link key={l} href={`/${l}`} aria-current={section === l ? 'page' : undefined}>{l}</Link>
-        ))}
-      </nav>
+      <div className="top-right">
+        <nav aria-label="Site">
+          {links.map((l) => (
+            <Link key={l} href={`/${l}`} aria-current={section === l ? 'page' : undefined}>{l}</Link>
+          ))}
+        </nav>
+        <SoundToggle />
+      </div>
     </header>
   );
 }
@@ -47,4 +50,36 @@ export function TopNav() {
 export function HomeControls() {
   const { newTape } = useTape();
   return <button type="button" className="regen" onClick={newTape}>new tape ↻</button>;
+}
+
+// Sound is opt-in. Once it plays, { } shows the Strudel pattern and the values it is reading.
+export function SoundToggle() {
+  const { sound, toggleSound, code } = useTape();
+  const [open, setOpen] = useState(false);
+  const [reading, setReading] = useState('');
+  const shown = open && sound === 'on';
+  useEffect(() => {
+    if (!shown) return;
+    const id = window.setInterval(() => {
+      const ear = (window as unknown as { tape?: Record<string, number> }).tape;
+      if (ear) setReading(Object.entries(ear).map(([k, v]) => `tape.${k} = ${Number.isInteger(v) ? v : v.toFixed(2)}`).join('\n'));
+    }, 100);
+    return () => clearInterval(id);
+  }, [shown]);
+  return (
+    <>
+      <button type="button" className="sound" data-sound-toggle aria-label="Sound" aria-pressed={sound === 'on'} aria-busy={sound === 'loading'} onClick={toggleSound}>
+        ♪<span className="sound-state"> {sound === 'loading' ? '…' : sound}</span>
+      </button>
+      {sound === 'on' && (
+        <button type="button" className="sound sound-code" aria-label="Show the pattern" aria-expanded={open} onClick={() => setOpen(!open)}>{'{ }'}</button>
+      )}
+      {shown && (
+        <pre className="strudel" aria-label="The Strudel pattern playing now">
+          {code}
+          <span className="strudel-live">{reading}</span>
+        </pre>
+      )}
+    </>
+  );
 }

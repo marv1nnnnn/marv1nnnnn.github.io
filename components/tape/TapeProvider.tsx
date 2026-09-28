@@ -1,12 +1,18 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { DEFAULT_PALETTE, PALETTES, Tape, type Scene } from './engine';
+import { DEFAULT_PALETTE, PALETTES, Tape, nightness, type Scene } from './engine';
+import type { TapeSound } from './sound';
+
+export type SoundState = 'off' | 'loading' | 'on';
 
 interface TapeControls {
   setScene: (scene: Scene) => void;
   newTape: () => void;
+  sound: SoundState;
+  toggleSound: () => void;
+  code: string;
 }
 
 const TapeContext = createContext<TapeControls | null>(null);
@@ -46,6 +52,18 @@ function applyPaletteVars(name: string) {
   style.setProperty('--accent-rgb', p.hot.join(', '));
 }
 
+// Browsers (Safari especially) only start audio from inside a user gesture, and the Strudel
+// bundle is still downloading after it. So the context is created and woken here, synchronously.
+function unlockAudio() {
+  const ctx = new AudioContext({ latencyHint: 'playback' });
+  ctx.resume();
+  const src = ctx.createBufferSource();
+  src.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+  src.connect(ctx.destination);
+  src.start();
+  return ctx;
+}
+
 export default function TapeProvider({ children }: { children: React.ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tapeRef = useRef<Tape | null>(null);
@@ -53,6 +71,10 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const lastPath = useRef<string | null>(null);
   const paletteRef = useRef(DEFAULT_PALETTE);
+  const soundRef = useRef<TapeSound | null>(null);
+  const [sound, setSound] = useState<SoundState>('off');
+  const soundStateRef = useRef<SoundState>('off');
+  const [code, setCode] = useState('');
 
   const updateObstacle = useCallback(() => {
     const tape = tapeRef.current;
@@ -82,6 +104,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     applyPaletteVars(saved);
     paletteRef.current = saved;
     tape.resize();
+    tape.onEvent = (e) => soundRef.current?.event(e);
 
     let raf = 0;
     const run = () => {
@@ -125,6 +148,11 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     const onVisibility = () => {
       cancelAnimationFrame(raf);
       if (!document.hidden && !reducedRef.current) raf = requestAnimationFrame(run);
+      const s = soundRef.current;
+      if (s && soundStateRef.current === 'on') {
+        if (document.hidden) s.pause();
+        else s.resume();
+      }
     };
 
     window.addEventListener('pointerdown', onDown);
@@ -158,6 +186,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
 
   const setScene = useCallback((scene: Scene) => {
     document.body.classList.toggle('is-home', scene.home);
+    soundRef.current?.scene(scene.home, scene.age);
     const tape = tapeRef.current;
     if (!tape) return;
     tape.setScene(scene);
@@ -177,9 +206,85 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     try {
       localStorage.setItem('tape-palette', name);
     } catch {}
+    const s = soundRef.current;
+    if (s && soundStateRef.current === 'on') s.newTape(name).then(() => setCode(s.code));
   }, []);
 
-  const value = useMemo(() => ({ setScene, newTape }), [setScene, newTape]);
+  const changeSound = useCallback((next: SoundState) => {
+    soundStateRef.current = next;
+    setSound(next);
+  }, []);
+
+  // Sound is off until the visitor asks for it; the Strudel bundle loads only then.
+  const toggleSound = useCallback(async () => {
+    const state = soundStateRef.current;
+    if (state === 'loading') return;
+    if (state === 'on') {
+      changeSound('off');
+      soundRef.current?.pause();
+      try {
+        localStorage.setItem('tape-sound', 'off');
+      } catch {}
+      return;
+    }
+    try {
+      localStorage.setItem('tape-sound', 'on');
+    } catch {}
+    if (soundRef.current) {
+      changeSound('on');
+      await soundRef.current.resume(paletteRef.current);
+      setCode(soundRef.current.code);
+      return;
+    }
+    changeSound('loading');
+    const ctx = unlockAudio();
+    try {
+      const { TapeSound } = await import('./sound');
+      const s = await TapeSound.create(ctx, paletteRef.current);
+      soundRef.current = s;
+      const scene = tapeRef.current?.scene;
+      if (scene) s.scene(scene.home, scene.age);
+      setCode(s.code);
+      if (soundStateRef.current === 'loading') changeSound('on');
+    } catch (err) {
+      console.error('sound failed to start', err);
+      ctx.close();
+      changeSound('off');
+    }
+  }, [changeSound]);
+
+  // While sound is on, the pattern hears the pointer about thirty times a second.
+  useEffect(() => {
+    if (sound !== 'on') return;
+    const id = window.setInterval(() => {
+      const tape = tapeRef.current;
+      if (tape) soundRef.current?.update(tape.listen(), nightness());
+    }, 33);
+    return () => clearInterval(id);
+  }, [sound]);
+
+  // A visitor who left sound on gets it back at their first touch or key press.
+  useEffect(() => {
+    let wanted = false;
+    try {
+      wanted = localStorage.getItem('tape-sound') === 'on';
+    } catch {}
+    if (!wanted) return;
+    const onGesture = (e: Event) => {
+      if ((e.target as Element | null)?.closest?.('[data-sound-toggle]')) return;
+      remove();
+      if (soundStateRef.current === 'off') toggleSound();
+    };
+    const remove = () => {
+      window.removeEventListener('pointerup', onGesture);
+      window.removeEventListener('keydown', onGesture);
+    };
+    window.addEventListener('pointerup', onGesture);
+    window.addEventListener('keydown', onGesture);
+    return remove;
+  }, [toggleSound]);
+
+  const value = useMemo(() => ({ setScene, newTape, sound, toggleSound, code }), [setScene, newTape, sound, toggleSound, code]);
 
   return (
     <TapeContext.Provider value={value}>

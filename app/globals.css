@@ -116,6 +116,37 @@ button { font: inherit; color: inherit; }
 .top nav a { padding: 10px 8px; text-decoration: none; color: var(--muted); }
 .top nav a[aria-current='page'] { color: var(--ink); text-decoration: underline; }
 .top nav a:hover { color: var(--accent); }
+.top-right { display: flex; align-items: center; gap: 2px; }
+.sound {
+  border: 0;
+  background: transparent;
+  padding: 10px 6px;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sound[aria-pressed='true'], .sound[aria-expanded='true'] { color: var(--accent); }
+.sound:hover { color: var(--accent); }
+/* The pattern that is playing, shown like a live-coding screen. */
+.strudel {
+  position: fixed;
+  right: 16px;
+  top: calc(env(safe-area-inset-top, 0px) + 60px);
+  z-index: 4;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+  margin: 0;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: rgba(var(--bg-rgb), 0.88);
+  border: 1px solid var(--line);
+  white-space: pre;
+}
+.strudel-live { display: block; margin-top: 12px; color: var(--accent); }
 
 /* Home */
 .home {
@@ -595,6 +626,14 @@ button { font: inherit; color: inherit; }
 .rail-mark::before { content: ''; position: absolute; left: -10px; top: 50%; width: 6px; height: 1px; background: var(--faint); }
 .rail-mark:hover { color: var(--accent); }
 @media (min-width: 1100px) { .rail { display: block; } }
+
+@media (max-width: 480px) {
+  .top { padding-left: 14px; padding-right: 10px; }
+  .top nav a { padding: 10px 6px; }
+  .sound-state, .sound-code { display: none; }
+  .sound[aria-busy='true'] { animation: sound-wait 0.8s steps(2) infinite; }
+}
+@keyframes sound-wait { 50% { opacity: 0.3; } }
 
 @media (max-width: 640px) {
   .home-bottom { grid-template-columns: minmax(0, 1fr); }
