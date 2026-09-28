@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('sections', () => {
-  test('every section is a leaf of the booklet, with its track in the header', async ({ page }) => {
+  test('every section is a booklet, opening on its track\'s title page', async ({ page }) => {
     for (const [path, n] of [['/make', '02'], ['/input', '03'], ['/log', '04'], ['/about', '05']]) {
       await page.goto(path);
-      await expect(page.locator('.sheet .leaf-no')).toHaveText(n);
+      await expect(page.locator('.title-no')).toHaveText(n);
     }
   });
 
@@ -13,10 +13,10 @@ test.describe('sections', () => {
     await page.goto('/make');
     await expect(page.getByRole('heading', { level: 1, name: 'make' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /writing/i })).toBeVisible();
-    await expect(page.locator('.essays a').first()).toHaveAttribute('href', /^\/think\//);
+    await expect(page.locator('.song a').first()).toHaveAttribute('href', /^\/think\//);
     await expect(page.getByRole('heading', { name: /tools and talks/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /noise/i })).toBeVisible();
-    await expect(page.locator('.rows .row').first()).toBeVisible();
+    await expect(page.locator('.row').first()).toBeVisible();
     await expect(page.locator('.year-label').first()).toBeVisible();
   });
 
@@ -27,22 +27,26 @@ test.describe('sections', () => {
 
   test('/input shows the canon and points to the log', async ({ page }) => {
     await page.goto('/input');
-    await expect(page.locator('ol.canon > li')).toHaveCount(14);
-    await expect(page.locator('ol.canon .print')).toHaveCount(14);
-    await expect(page.locator('ol.canon .canon-no').first()).toHaveText('01');
+    await expect(page.locator('.canon-item')).toHaveCount(14);
+    await expect(page.locator('.print')).toHaveCount(14);
+    await expect(page.locator('.canon-no').first()).toHaveText('01');
     await expect(page.locator('a.to-log')).toHaveAttribute('href', '/log');
   });
 
   test('/log filters entries by kind', async ({ page }) => {
     await page.goto('/log');
     await expect(page.getByRole('heading', { level: 1, name: 'log' })).toBeVisible();
-    const rows = page.locator('.rows .row');
+    // The filters are on the page after the title page.
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => page.evaluate(() => scrollY / (innerHeight * 0.8)), { timeout: 15_000 }).toBeCloseTo(1, 1);
+    await page.waitForTimeout(300);
+    const rows = page.locator('.row');
     const all = await rows.count();
     expect(all).toBeGreaterThan(50);
     await page.getByRole('button', { name: /^heard/ }).click();
     await expect(page.getByRole('button', { name: /^heard/ })).toHaveAttribute('aria-pressed', 'true');
     await expect.poll(() => rows.count()).toBeLessThan(all);
-    await expect(page.locator('.rows .row .kind').filter({ hasNotText: 'heard' })).toHaveCount(0);
+    await expect(page.locator('.row .kind').filter({ hasNotText: 'heard' })).toHaveCount(0);
   });
 
   test('/log plays back the entry under the read head', async ({ page }) => {
@@ -58,8 +62,8 @@ test.describe('sections', () => {
 
   test('/about shows the current role and contact details', async ({ page }) => {
     await page.goto('/about');
-    await expect(page.locator('.sheet .cover')).toBeVisible();
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('marv1nnnnn');
+    await expect(page.locator('.cover')).toBeVisible();
+    await expect(page.locator('.cover-name')).toHaveText('marv1nnnnn');
     await expect(page.getByText(/product manager/i).first()).toBeVisible();
     await expect(page.getByText('marvin1996325@gmail.com')).toBeVisible();
   });
@@ -71,6 +75,21 @@ test.describe('sections', () => {
     await expect(page).toHaveURL(/\/make$/);
     await expect(page.locator('canvas.tape-canvas')).toHaveAttribute('data-probe', 'kept');
   });
+});
+
+test('the booklet turns its pages with the arrow keys, then winds on to the next track', async ({ page, isMobile }) => {
+  await page.goto('/about');
+  await expect(page.locator('.booklet-book')).toBeVisible();
+  const leaves = await page.locator('.leaf').count();
+  const steps = isMobile ? leaves - 1 : Math.ceil((await page.locator('.pg[data-page]').count() - 1) / 2);
+  for (let k = 0; k < steps; k++) {
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => page.evaluate(() => Math.round(scrollY / (innerHeight * 0.8)))).toBe(k + 1);
+  }
+  await expect(page).toHaveURL(/\/about$/);
+  // about is the last track: going back past the first page winds to log.
+  for (let k = 0; k <= steps; k++) await page.keyboard.press('ArrowLeft');
+  await expect(page).toHaveURL(/\/log$/, { timeout: 15_000 });
 });
 
 test.describe('old URLs', () => {

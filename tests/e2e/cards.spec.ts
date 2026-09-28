@@ -24,7 +24,7 @@ test.describe('detail pages', () => {
     test(`/${card.section}/${card.id} renders its title and body`, async ({ page }) => {
       await page.goto(`/${card.section}/${card.id}`);
       await expect(page.locator('h1[data-anchor]')).toBeVisible();
-      await expect(page.locator('.prose')).not.toBeEmpty();
+      await expect(page.locator('.prose').filter({ hasText: /\S/ }).first()).not.toBeEmpty();
       await expect(page.getByRole('link', { name: /^←/ })).toHaveAttribute('href', card.section === 'think' ? '/make#writing' : `/${card.section}`);
     });
   }

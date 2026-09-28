@@ -19,48 +19,35 @@ export default function AboutPage() {
   ];
   const sideA = [about.hero.description, about.current].filter((p): p is string => !!p);
   return (
-    <Booklet path="/about" className="about">
+    <Booklet path="/about" title="about" lede={about.hero.subtitle} className="about">
       <TapeScene seed="about" age={0.15} />
-      {/* The cover of the booklet. */}
-      <section className="cover">
+      {/* The booklet's cover art, a page of its own. */}
+      <section className="own cover" key="cover">
         <CoverArt />
         <p className="cover-handle">marvin ma</p>
-        <h1 className="cover-name">marv1nnnnn<span className="visually-hidden">, about</span></h1>
-        <p className="cover-role">{about.hero.subtitle}</p>
+        <p className="cover-name">marv1nnnnn</p>
         <p className="cover-spec" aria-hidden="true">side a · now&nbsp;&nbsp;/&nbsp;&nbsp;side b · before</p>
       </section>
 
-      <section>
-        <h2><span>side a · now</span></h2>
-        <div className="verses">
-          {sideA.map((p) => <p key={p}>{p}</p>)}
-        </div>
-      </section>
+      <h2 className="keep brk" key="side-a"><span>side a · now</span></h2>
+      {sideA.map((p) => <p className="verse" key={p}>{p}</p>)}
 
-      <section>
-        <h2><span>side b · before</span></h2>
-        <ol className="tracklist">
-          {about.facts.map((f, i) => <li key={f}><span>b{i + 1}</span>{f}</li>)}
-        </ol>
-      </section>
+      <h2 className="keep" key="side-b"><span>side b · before</span></h2>
+      {about.facts.map((f, i) => <p className="track-b" key={f}><span>b{i + 1}</span>{f}</p>)}
 
-      <section className="credits">
-        <h2><span>credits</span></h2>
-        <dl>
-          {links.map((c) => (
-            <div key={c.label} className="credit">
-              <dt>{c.label}</dt>
-              <dd>
-                {c.label === 'Email' ? (
-                  <span className="selectable">{c.value}</span>
-                ) : (
-                  <a href={c.href} target="_blank" rel="noopener noreferrer">{c.value}</a>
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <h2 className="keep brk" key="credits"><span>credits</span></h2>
+      {links.map((c) => (
+        <p key={c.label} className="credit">
+          <span className="credit-k">{c.label}</span>
+          <span className="credit-v">
+            {c.label === 'Email' ? (
+              <span className="selectable">{c.value}</span>
+            ) : (
+              <a href={c.href} target="_blank" rel="noopener noreferrer">{c.value}</a>
+            )}
+          </span>
+        </p>
+      ))}
     </Booklet>
   );
 }

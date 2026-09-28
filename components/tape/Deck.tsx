@@ -64,14 +64,20 @@ export default function Deck() {
     return () => cancelAnimationFrame(raf);
   }, [head, playing]);
 
-  // With nothing focused, the arrow keys skip tracks.
+  // With nothing focused, the arrow keys turn pages, then skip tracks.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented) return;
       const el = document.activeElement;
       if (el && el !== document.body && !el.closest('.deck')) return;
-      if (e.key === 'ArrowRight') skip(-1);
-      else if (e.key === 'ArrowLeft') skip(1);
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      // A booklet on the page turns its pages first; only past its last page does the tape wind on.
+      const dir = e.key === 'ArrowRight' ? 1 : -1;
+      if (!window.dispatchEvent(new CustomEvent('tape:arrow', { detail: dir, cancelable: true }))) {
+        e.preventDefault();
+        return;
+      }
+      skip(dir > 0 ? -1 : 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);

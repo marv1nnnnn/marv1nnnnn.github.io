@@ -5,9 +5,10 @@ Personal site built as one wearing tape: a single interactive flow field shared 
 ## Stack
 
 - Next.js 15 (App Router), TypeScript, Tailwind CSS
-- Canvas 2D flow field in `components/tape/engine.ts` (no WebGL required)
+- Canvas 2D desk of iron filings in `components/tape/engine.ts`
 - Opt-in interactive sound in `components/tape/sound.ts`: a [Strudel](https://strudel.cc) pattern driven by the pointer, played through a Web Audio tape deck
-- The home page is a cassette modelled in Blender (`scripts/blender/cassette.py` → `public/models/cassette.glb`) and rendered with three.js; turn the pencil to wind it
+- One cassette, modelled in Blender (`scripts/blender/cassette.py` → `public/models/cassette.glb`) and rendered with three.js: on the desk on the home page, docked in the top bar elsewhere; turn the pencil to wind it
+- Every other page is the tape's booklet, with pages that turn (`components/tape/Pages.tsx`)
 - The site is one cassette: each section is a track, and the top-bar deck (`components/tape/Deck.tsx`) winds between them
 
 ## Commands

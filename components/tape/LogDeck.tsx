@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SignalListItem } from '@/types/scanner';
 import { Worn } from './parts';
+import Pages from './Pages';
 
 const ORDER = ['music', 'video', 'text', 'game', 'live'];
 const LABEL: Record<string, string> = { music: 'heard', video: 'watched', text: 'read', game: 'played', live: 'live' };
@@ -103,8 +104,15 @@ export default function LogDeck({ items }: { items: SignalListItem[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marks, kind]);
 
+  // The booklet's thanks list: the tape and what is playing on the first page, then a line for
+  // every entry, month by month.
   return (
-    <div className="log-deck">
+    <Pages
+      path="/log"
+      title="log"
+      lede="What I’ve been listening to, watching, reading and playing lately: the thanks list at the back of the booklet. Drag along the tape to play one back."
+    >
+      <div className="log-deck" key={`deck-${kind}`}>
       <div className="log-filter" role="group" aria-label="Filter by kind">
         {['all', ...kinds].map((k) => (
           <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>
@@ -163,23 +171,20 @@ export default function LogDeck({ items }: { items: SignalListItem[] }) {
         </div>
       )}
 
-      {groups.map((m) => (
-        <div className="year month" id={`log-${m.key}`} key={m.key}>
-          <p className="year-label cue" aria-hidden="true"><Worn text={m.key.replace('-', '.')} date={`${m.key}-15`} /></p>
-          <ul className="rows compact">
-            {m.items.map(({ item: l, index }) => {
-              const title = <><Worn text={l.title} date={l.date ?? ''} /> <span className="by">{l.creator}</span></>;
-              return (
-                <li className={`row${index === sel ? ' is-on' : ''}`} key={`${l.date}-${l.title}`}>
-                  <span className="date">{(l.date ?? '').slice(8, 10)}</span>
-                  <span className="title">{l.url ? <a href={l.url} target="_blank" rel="noopener noreferrer">{title}</a> : title}</span>
-                  <span className="kind">{LABEL[l.type] ?? l.type}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
-    </div>
+      </div>
+      {groups.flatMap((m) => [
+        <p className="year-label keep" key={`m-${m.key}`} id={`log-${m.key}`}><Worn text={m.key.replace('-', '.')} date={`${m.key}-15`} /></p>,
+        ...m.items.map(({ item: l, index }) => {
+          const title = <><Worn text={l.title} date={l.date ?? ''} /> <span className="by">{l.creator}</span></>;
+          return (
+            <div className={`row compact${index === sel ? ' is-on' : ''}`} key={`${l.date}-${l.title}`}>
+              <span className="date">{(l.date ?? '').slice(8, 10)}</span>
+              <span className="title">{l.url ? <a href={l.url} target="_blank" rel="noopener noreferrer">{title}</a> : title}</span>
+              <span className="kind">{LABEL[l.type] ?? l.type}</span>
+            </div>
+          );
+        }),
+      ])}
+    </Pages>
   );
 }

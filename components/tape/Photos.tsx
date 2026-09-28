@@ -4,51 +4,35 @@ import { useEffect, useRef, useState } from 'react';
 import type { VinylRecord } from '@/types/scanner';
 import { hash } from './engine';
 
-// The canon as the booklet's photo pages: each work a print stuck on the paper at a slight angle,
-// with its number and a note written beside it.
-export default function Photos({ records }: { records: VinylRecord[] }) {
-  const list = useRef<HTMLOListElement>(null);
-  const [broken, setBroken] = useState<Record<string, boolean>>({});
+// One of the canon as a photo page of the booklet: the print stuck on at a slight angle with a
+// strip of tape, its number, and a note written under it.
+export default function Photo({ record: c, index }: { record: VinylRecord; index: number }) {
+  const img = useRef<HTMLImageElement>(null);
+  const [broken, setBroken] = useState(false);
 
-  // Images that failed before hydration never fire onError; catch them once after mount.
+  // An image that failed before hydration never fires onError; check once after mount.
   useEffect(() => {
-    const failed: Record<string, boolean> = {};
-    list.current?.querySelectorAll('img').forEach((img) => {
-      if (img.complete && img.naturalWidth === 0 && img.dataset.id) failed[img.dataset.id] = true;
-    });
-    if (Object.keys(failed).length) setBroken((b) => ({ ...b, ...failed }));
-  }, [records]);
+    const el = img.current;
+    if (el && el.complete && el.naturalWidth === 0) setBroken(true);
+  }, []);
 
+  const tilt = ((hash(c.id) % 100) / 100 - 0.5) * 4;
   return (
-    <ol className="canon" ref={list}>
-      {records.map((c, i) => {
-        const tilt = ((hash(c.id) % 100) / 100 - 0.5) * 4;
-        return (
-          <li key={c.id} className="cue" style={{ '--tilt': `${tilt.toFixed(2)}deg` } as React.CSSProperties}>
-            <figure className="print">
-              {c.image_url && !broken[c.id] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={c.image_url}
-                  alt={`${c.title}, ${c.artist}`}
-                  data-id={c.id}
-                  loading={i < 4 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  onError={() => setBroken((b) => ({ ...b, [c.id]: true }))}
-                />
-              ) : (
-                <span className="print-blank" aria-hidden="true">{c.title}</span>
-              )}
-            </figure>
-            <div className="canon-text">
-              <span className="canon-no">{String(i + 1).padStart(2, '0')}</span>
-              <span className="canon-title">{c.title}</span>
-              <span className="canon-by">{c.artist} · {c.medium} · {c.year}</span>
-              <q>{c.personalNote}</q>
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+    <figure className="canon-item" style={{ '--tilt': `${tilt.toFixed(2)}deg` } as React.CSSProperties}>
+      <div className="print">
+        {c.image_url && !broken ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img ref={img} src={c.image_url} alt={`${c.title}, ${c.artist}`} loading={index < 4 ? 'eager' : 'lazy'} decoding="async" onError={() => setBroken(true)} />
+        ) : (
+          <span className="print-blank" aria-hidden="true">{c.title}</span>
+        )}
+      </div>
+      <figcaption className="canon-text">
+        <span className="canon-no">{String(index + 1).padStart(2, '0')}</span>
+        <span className="canon-title">{c.title}</span>
+        <span className="canon-by">{c.artist} · {c.medium} · {c.year}</span>
+        <q>{c.personalNote}</q>
+      </figcaption>
+    </figure>
   );
 }

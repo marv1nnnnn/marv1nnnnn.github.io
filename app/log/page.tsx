@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function LogPage() {
   const log = getLog();
   return (
-    <Booklet path="/log" title="log" lede="What I’ve been listening to, watching, reading and playing lately: the thanks list at the back of the booklet, one line per entry. Drag along the tape to play one back." className="log">
+    <Booklet path="/log" own className="log">
       <TapeScene seed="log" age={0.2} />
       <LogDeck items={log} />
     </Booklet>
