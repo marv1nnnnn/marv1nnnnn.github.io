@@ -17,9 +17,9 @@ test.describe('home /', () => {
     await expect.poll(accent).not.toBe('');
     const before = await accent();
     const shelf = page.getByRole('group', { name: 'Tapes' });
-    await expect(shelf.getByRole('button', { name: /^oxide tape/ })).toHaveAttribute('aria-pressed', 'true');
-    await shelf.getByRole('button', { name: /^uv tape/ }).click();
-    await expect(shelf.getByRole('button', { name: /^uv tape/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(shelf.getByRole('button', { name: /^haze tape/ })).toHaveAttribute('aria-pressed', 'true');
+    await shelf.getByRole('button', { name: /^ritual tape/ }).click();
+    await expect(shelf.getByRole('button', { name: /^ritual tape/ })).toHaveAttribute('aria-pressed', 'true');
     await expect.poll(accent).not.toBe(before);
     const chosen = await accent();
     await page.goto('/make');

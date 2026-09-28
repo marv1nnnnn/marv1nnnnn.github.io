@@ -125,7 +125,7 @@ export default function Cassette() {
         // A different tape chosen on the shelf: eject this one and put that one in.
         const want = paletteRef.current;
         if (shown.current !== want) {
-          const look = LOOKS[want] ?? LOOKS.oxide;
+          const look = LOOKS[want] ?? LOOKS.haze;
           if (shown.current === null) scene.setLook(look);
           else scene.swap(look);
           shown.current = want;

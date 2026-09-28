@@ -125,8 +125,21 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* The booklets measure their pages in these, so fetch them before anything else. */}
+        <link rel="preload" href="/fonts/martian-mono.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/newsreader-italic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body>
+        {/* The tape a returning visitor chose, set before anything is drawn: its world decides the
+            lamp and the booklet's type, and the booklet measures its pages in that type. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('tape-palette');var r=${JSON.stringify({ oxide: 'haze', lain: '3am', phosphor: 'nightbus', uv: 'ritual', mono: 'pressure', noise: 'bent' })};document.documentElement.dataset.tape=(t&&r[t])||t||'haze'}catch(e){document.documentElement.dataset.tape='haze'}`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

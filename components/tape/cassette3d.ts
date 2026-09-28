@@ -47,7 +47,7 @@ export class CassetteScene {
   wound = 0; // 0..1, how much tape has moved to the right reel
   still = false;
   info: LabelInfo = { tracks: [], current: 0, count: '000' };
-  private look: TapeLook = LOOKS.oxide;
+  private look: TapeLook = LOOKS.haze;
   private mats: Record<string, THREE.MeshStandardMaterial[]> = {};
   private swapT0 = -1;
   private pencilHits: THREE.Object3D[] = [];

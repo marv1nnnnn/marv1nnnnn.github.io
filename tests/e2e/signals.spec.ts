@@ -36,6 +36,7 @@ test.describe('sections', () => {
   test('/log filters entries by kind', async ({ page }) => {
     await page.goto('/log');
     await expect(page.getByRole('heading', { level: 1, name: 'log' })).toBeVisible();
+    await expect(page.locator('.booklet-book[data-ready]')).toBeVisible();
     // The filters are on the page after the title page.
     await page.keyboard.press('ArrowRight');
     await expect.poll(() => page.evaluate(() => scrollY / (innerHeight * 0.8)), { timeout: 15_000 }).toBeCloseTo(1, 1);
@@ -51,6 +52,7 @@ test.describe('sections', () => {
 
   test('/log plays back the entry under the read head', async ({ page }) => {
     await page.goto('/log');
+    await expect(page.locator('.booklet-book[data-ready]')).toBeVisible();
     const strip = page.getByRole('slider', { name: 'Read head' });
     const newest = await page.locator('.deck-title').textContent();
     await strip.focus();
@@ -79,7 +81,9 @@ test.describe('sections', () => {
 
 test('the booklet turns its pages with the arrow keys, then winds on to the next track', async ({ page, isMobile }) => {
   await page.goto('/about');
-  await expect(page.locator('.booklet-book')).toBeVisible();
+  await expect(page.locator('.booklet-book[data-ready]')).toBeVisible();
+  await page.waitForFunction(() => document.fonts.status === 'loaded');
+  await page.waitForTimeout(300);
   const leaves = await page.locator('.leaf').count();
   const steps = isMobile ? leaves - 1 : Math.ceil((await page.locator('.pg[data-page]').count() - 1) / 2);
   for (let k = 0; k < steps; k++) {
