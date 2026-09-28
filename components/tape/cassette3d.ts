@@ -350,10 +350,22 @@ export class CassetteScene {
     const hub = new THREE.Vector3(HUB_X, HUB_Y, 0.6).applyMatrix4(this.space.matrixWorld).project(this.camera);
     const at = `${Math.round(((hub.x + 1) / 2) * this.width)},${Math.round(((1 - hub.y) / 2) * this.height)}`;
     if (this.canvas.dataset.hub !== at) this.canvas.dataset.hub = at;
+    // Where the cassette's top and bottom edges are, for the hint that sits beside it (CSS).
+    if (!this.dock) {
+      const y = (v: number) => Math.round(((1 - new THREE.Vector3(0, v, 0.3).applyMatrix4(this.space.matrixWorld).project(this.camera).y) / 2) * this.height);
+      const edges = `${y(3.3)}px ${y(-3.3)}px`;
+      if (edges !== this.edges) {
+        this.edges = edges;
+        const [top, bottom] = edges.split(' ');
+        document.documentElement.style.setProperty('--cassette-top', top);
+        document.documentElement.style.setProperty('--cassette-bottom', bottom);
+      }
+    }
   }
 
   // The label: cream card, the side and name, the counter, and the track list with the current one marked.
   private shadowKey = '';
+  private edges = '';
 
   private drawLabel() {
     const { tracks, current, count } = this.info;
