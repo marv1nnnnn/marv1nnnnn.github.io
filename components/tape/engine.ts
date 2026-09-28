@@ -21,6 +21,7 @@ export const PALETTES: Record<string, Palette> = {
   phosphor: { name: 'phosphor', bg: [5, 9, 7], line: [150, 220, 170], alt: [80, 140, 100], hot: [226, 255, 170], ink: '#CFEBD7', muted: '#7FA58A', faint: '#4F6B57' },
   uv: { name: 'uv', bg: [10, 8, 18], line: [205, 198, 255], alt: [120, 105, 200], hot: [255, 92, 214], ink: '#E4E0FF', muted: '#9690BF', faint: '#5F5A85' },
   mono: { name: 'mono', bg: [0, 0, 0], line: [255, 255, 255], alt: [140, 140, 140], hot: [255, 255, 255], ink: '#FFFFFF', muted: '#9A9A9A', faint: '#5E5E5E' },
+  noise: { name: 'noise', bg: [12, 9, 8], line: [226, 210, 196], alt: [150, 96, 70], hot: [255, 86, 36], ink: '#EFE3D8', muted: '#A08E80', faint: '#65574D' },
 };
 export const DEFAULT_PALETTE = 'oxide';
 
