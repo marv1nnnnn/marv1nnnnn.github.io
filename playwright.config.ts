@@ -14,6 +14,9 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     launchOptions: executablePath ? { executablePath } : undefined,
+    // The music starts at a visitor's first touch; the tests are a visitor who turned it off,
+    // except where they test the sound (home.spec.ts).
+    storageState: { cookies: [], origins: [{ origin: BASE_URL, localStorage: [{ name: 'tape-sound', value: 'off' }] }] },
   },
   projects: [
     {

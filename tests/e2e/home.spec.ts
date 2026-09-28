@@ -26,7 +26,26 @@ test.describe('home /', () => {
     await expect.poll(accent).toBe(chosen);
   });
 
-  test('sound stays off until asked for, then plays the Strudel pattern', async ({ page, isMobile }) => {
+  test.describe('a first visit', () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
+    test('the music starts at the first touch', async ({ page }) => {
+      await page.goto('/');
+      const toggle = page.getByRole('button', { name: 'Sound' });
+      // Browsers allow no sound before a gesture, so it waits for one.
+      await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await page.mouse.click(12, 320); // the desk, away from the cassette
+      await expect(toggle).toHaveAttribute('aria-pressed', 'true', { timeout: 30_000 });
+      // Turning it off is remembered.
+      await toggle.click();
+      await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await page.reload();
+      await page.mouse.click(12, 320); // the desk, away from the cassette
+      await page.waitForTimeout(1000);
+      await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    });
+  });
+
+  test('sound, once turned off, comes on when asked for and plays the Strudel pattern', async ({ page, isMobile }) => {
     await page.goto('/');
     const toggle = page.getByRole('button', { name: 'Sound' });
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
