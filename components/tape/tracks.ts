@@ -31,16 +31,31 @@ export function trackAt(head: number) {
   return 0;
 }
 
-// Where a page sits on the tape. Detail pages (an essay, a tool) sit somewhere inside their track;
-// `through` is how far down the page the reader has scrolled.
-export function headOf(path: string, through = 0) {
+const DETAIL = 40; // counter units a detail page (an essay, a tool) takes inside its track
+
+// The stretch of tape a page covers: a whole track for a section, a short stretch inside its
+// track for a detail page.
+export function spanOf(path: string): [number, number] {
   const track = TRACKS[trackIndex(path)];
   const parts = path.split('/').filter(Boolean);
   if (parts.length > 1) {
-    const room = track.length - 60;
-    return track.start + 30 + (hash(parts.slice(1).join('/')) % room) + through * 20;
+    const room = track.length - DETAIL - 40;
+    const lo = track.start + 20 + (hash(parts.slice(1).join('/')) % room);
+    return [lo, lo + DETAIL];
   }
-  return track.start + through * (track.length - 1);
+  return [track.start, track.start + track.length - 1];
+}
+
+// Where a page sits on the tape; `through` is how far down the page the reader has scrolled.
+export function headOf(path: string, through = 0) {
+  const [lo, hi] = spanOf(path);
+  return lo + through * (hi - lo);
+}
+
+// The other way round: how far down the page a head position inside its span is.
+export function throughOf(path: string, head: number) {
+  const [lo, hi] = spanOf(path);
+  return Math.min(1, Math.max(0, (head - lo) / (hi - lo)));
 }
 
 export const counter = (head: number) => String(Math.max(0, Math.min(TAPE_LENGTH - 1, Math.floor(head)))).padStart(3, '0');

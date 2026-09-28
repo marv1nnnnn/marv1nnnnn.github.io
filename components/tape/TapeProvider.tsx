@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { usePathname, useRouter } from 'next/navigation';
 import { DEFAULT_PALETTE, PALETTES, Tape, nightness, type Scene } from './engine';
 import type { TapeSound } from './sound';
-import { TAPE_LENGTH, TRACKS, headOf, trackAt, trackIndex } from './tracks';
+import Cassette from './Cassette';
+import { TAPE_LENGTH, TRACKS, headOf, spanOf, throughOf, trackAt, trackIndex } from './tracks';
 
 export type SoundState = 'off' | 'loading' | 'on';
 
@@ -38,7 +39,7 @@ const windTime = (distance: number) => 420 + Math.min(1, Math.abs(distance) / TA
 const SCAN_SPEED = 280; // counter units per second while fast-forward or rewind is held
 
 // Pointer contact with readable content should not gather the lines.
-const READING = 'a, button, input, .top, .prose, .rows, .canon, .credits, .strip, .jcard';
+const READING = 'a, button, input, .top, .sheet';
 
 function hexToRgb(hex: string) {
   const n = parseInt(hex.slice(1), 16);
@@ -128,7 +129,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
 
     let lastTap = { t: 0, x: 0, y: 0 };
     const onDown = (e: PointerEvent) => {
-      const reading = !!(e.target as Element | null)?.closest?.(READING) || !!(e as unknown as Record<string, boolean>).tapeCassette;
+      const reading = !!(e.target as Element | null)?.closest?.(READING);
       tape.pointerDown(e.pointerId, e.clientX, e.clientY, !reading);
       if (!reading && tape.scene.home) {
         const now = performance.now();
@@ -199,9 +200,16 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     const max = document.documentElement.scrollHeight - window.innerHeight;
     return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
   }, []);
+  // Set while the pencil turns inside the page's own stretch of tape: the page follows the head,
+  // not the other way round.
+  const scrubbing = useRef(false);
+  const scrollTo = useCallback((path: string, at: number) => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max > 0) window.scrollTo({ top: throughOf(path, at) * max, behavior: 'instant' as ScrollBehavior });
+  }, []);
   useEffect(() => {
     const onScroll = () => {
-      if (!windingRef.current) head.current = headOf(pathname, through());
+      if (!windingRef.current && !scrubbing.current) head.current = headOf(pathname, through());
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -272,13 +280,22 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     state.frame = requestAnimationFrame(tick);
   }, [setWind, skip]);
 
-  // Winding by hand (the pencil on the home cassette): positive runs the tape forward.
+  // Winding by hand with the pencil; positive runs the tape forward. Inside the page's own stretch
+  // it is just playing: the page scrolls with the head and the music carries on. Past either end
+  // the tape winds (music off the head, spool on) until the pencil is let go.
   const turn = useCallback((delta: number) => {
     const tape = tapeRef.current;
     const next = Math.max(0, Math.min(TAPE_LENGTH - 1, head.current + delta));
     if (!tape || next === head.current) return;
-    const dir: -1 | 1 = delta > 0 ? -1 : 1;
+    const [lo, hi] = spanOf(pathname);
     const state = windingRef.current;
+    if (!state?.scanning && next >= lo && next <= hi) {
+      scrubbing.current = true;
+      head.current = next;
+      scrollTo(pathname, next);
+      return;
+    }
+    const dir: -1 | 1 = delta > 0 ? -1 : 1;
     if (!state?.scanning || state.dir !== dir) {
       if (state) cancelAnimationFrame(state.frame);
       windingRef.current = { dir, scanning: true, frame: 0 };
@@ -286,23 +303,31 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
       setWind(dir);
     }
     head.current = next;
-  }, [setWind]);
+  }, [pathname, scrollTo, setWind]);
 
+  // Letting go: inside the page's stretch the page plays from there; anywhere else, the track
+  // under the head plays from its start.
   const release = useCallback(() => {
     const state = windingRef.current;
-    if (!state?.scanning) return;
+    if (!state?.scanning) {
+      scrubbing.current = false;
+      return;
+    }
     cancelAnimationFrame(state.frame);
-    const landed = trackAt(head.current);
-    if (landed !== trackIndex(pathname)) {
+    const [lo, hi] = spanOf(pathname);
+    const h = head.current;
+    if (h < lo || h > hi) {
+      const landed = trackAt(h);
+      scrubbing.current = false;
       router.push(TRACKS[landed].path);
       return;
     }
     windingRef.current = null;
     tapeRef.current?.land();
-    // Home does not scroll: the tape stays where the pencil left it.
-    if (pathname !== '/') head.current = headOf(pathname, through());
+    scrollTo(pathname, h);
+    scrubbing.current = false;
     setWind(0);
-  }, [pathname, router, setWind, through]);
+  }, [pathname, router, scrollTo, setWind]);
 
   const setScene = useCallback((scene: Scene) => {
     document.body.classList.toggle('is-home', scene.home);
@@ -415,6 +440,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     <TapeContext.Provider value={value}>
       <canvas ref={canvasRef} className="tape-canvas" aria-hidden="true" />
       {children}
+      <Cassette />
     </TapeContext.Provider>
   );
 }

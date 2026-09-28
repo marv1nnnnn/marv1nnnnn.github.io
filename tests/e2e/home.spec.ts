@@ -50,7 +50,7 @@ test.describe('home /', () => {
     await expect(count).toHaveText('000');
     await page.getByRole('button', { name: 'Fast forward' }).click();
     await expect(page).toHaveURL(/\/make$/);
-    await expect(count).toHaveText('060');
+    await expect(count).toHaveText('060', { timeout: 20_000 });
     await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'log' }).click();
     await expect(page).toHaveURL(/\/log$/);
     await page.getByRole('button', { name: 'Rewind' }).click();

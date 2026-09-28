@@ -80,23 +80,26 @@ export default function Deck() {
   return (
     <div className="deck">
       <div className="deck-window" aria-hidden="true">
-        <svg viewBox="0 0 80 32" width="80" height="32">
-          <rect x="0.5" y="0.5" width="79" height="31" rx="3" className="deck-shell" />
-          <path d="M20 29 H60" className="deck-tape" />
-          <g ref={reels}>
-            {[20, 60].map((cx) => (
-              <g key={cx} transform={`translate(${cx} 16)`}>
-                <circle r="8" className="deck-pack" />
-                <g>
-                  <circle r="3.6" className="deck-hub" />
-                  {[0, 120, 240].map((a) => (
-                    <path key={a} d="M0 -1.4 V-3.4" transform={`rotate(${a})`} className="deck-spoke" />
-                  ))}
+        {/* The 3D cassette docks into this slot; the drawing below stands in until it has loaded. */}
+        <span className="deck-dock">
+          <svg viewBox="0 0 80 32" width="80" height="32">
+            <rect x="0.5" y="0.5" width="79" height="31" rx="3" className="deck-shell" />
+            <path d="M20 29 H60" className="deck-tape" />
+            <g ref={reels}>
+              {[20, 60].map((cx) => (
+                <g key={cx} transform={`translate(${cx} 16)`}>
+                  <circle r="8" className="deck-pack" />
+                  <g>
+                    <circle r="3.6" className="deck-hub" />
+                    {[0, 120, 240].map((a) => (
+                      <path key={a} d="M0 -1.4 V-3.4" transform={`rotate(${a})`} className="deck-spoke" />
+                    ))}
+                  </g>
                 </g>
-              </g>
-            ))}
-          </g>
-        </svg>
+              ))}
+            </g>
+          </svg>
+        </span>
         <span className="deck-count" ref={count}>000</span>
       </div>
 

@@ -13,7 +13,9 @@ const HUB_Y = 0.3;
 const WIN = { w: 6.8, h: 2.0 };
 const LABEL = { w: 8.6, h: 4.2, y: 0.45 };
 const PACK = { min: 0.8, max: 2.4 };
-const TILT = THREE.MathUtils.degToRad(64); // the pencil leans this far off the hub axis
+// How far the pencil leans off the hub axis: well over on the home page, nearly upright when docked.
+const TILT_HOME = THREE.MathUtils.degToRad(64);
+const TILT_DOCK = THREE.MathUtils.degToRad(28);
 
 export interface LabelInfo { tracks: string[]; current: number; count: string }
 
@@ -48,6 +50,12 @@ export class CassetteScene {
   private look: TapeLook = LOOKS.oxide;
   private mats: Record<string, THREE.MeshStandardMaterial[]> = {};
   private swapT0 = -1;
+  private pencilHits: THREE.Object3D[] = [];
+  private m = 0; // 0 on the home page, 1 docked in the top bar
+  private lastFrame = performance.now();
+  private renderKey = '';
+  // The top-bar slot the cassette docks into, in CSS pixels; null keeps it on the home page.
+  dock: { x: number; y: number; w: number; h: number } | null = null;
   private pending: TapeLook | null = null;
 
   constructor(private canvas: HTMLCanvasElement) {
@@ -56,7 +64,12 @@ export class CassetteScene {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.shadowMap.enabled = true;
+    // Software WebGL (no GPU): draw small, without shadows, and only when something changes.
+    const gl = this.renderer.getContext();
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    this.lowPower = /swiftshader|llvmpipe|software|softpipe/i.test(name);
+    this.renderer.shadowMap.enabled = !this.lowPower;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     // The light moves with the cassette, so shadows only change when the pencil or the hubs do.
     this.renderer.shadowMap.autoUpdate = false;
@@ -128,6 +141,7 @@ export class CassetteScene {
     this.packR = model.getObjectByName('packR');
     // The pencil turns on the right hub: its point sits in the hub, just below the face.
     const pencil = model.getObjectByName('pencil');
+    pencil?.traverse((o) => (o as THREE.Mesh).isMesh && this.pencilHits.push(o));
     if (pencil) {
       const pivot = new THREE.Group();
       pivot.position.set(HUB_X, HUB_Y, 0.05);
@@ -138,7 +152,7 @@ export class CassetteScene {
     }
     this.applyLook();
     this.layout();
-    this.render();
+    this.frame();
   }
 
   // Dress the cassette as another tape: shell plastic, hubs, oxide and the label.
@@ -171,7 +185,7 @@ export class CassetteScene {
   resize(width: number, height: number) {
     this.width = width;
     this.height = height;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.renderer.setPixelRatio(this.lowPower ? 0.4 : this.still && this.slowFrames > 8 ? 0.6 : Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.layout();
@@ -206,19 +220,80 @@ export class CassetteScene {
     return Math.atan2(p.y - HUB_Y, p.x - HUB_X);
   }
 
+  // What is under the pointer: the pencil, the cassette, or nothing.
+  hitAt(x: number, y: number): 'pencil' | 'cassette' | null {
+    const r = this.canvas.getBoundingClientRect();
+    this.ray.setFromCamera(new THREE.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1), this.camera);
+    const hit = this.ray.intersectObjects(this.hits, false)[0];
+    if (!hit) return null;
+    return this.pencilHits.includes(hit.object) ? 'pencil' : 'cassette';
+  }
+
+  // The docked pose: where the slot's centre lands on the z=0 plane, and the scale that makes the
+  // cassette as wide as the slot.
+  private dockPose() {
+    const d = this.dock;
+    if (!d || !this.width) return null;
+    const ndc = new THREE.Vector2(((d.x + d.w / 2) / this.width) * 2 - 1, -((d.y + d.h / 2) / this.height) * 2 + 1);
+    this.ray.setFromCamera(ndc, this.camera);
+    const p = new THREE.Vector3();
+    if (!this.ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), p)) return null;
+    const a = p.clone().project(this.camera);
+    const b = p.clone().add(new THREE.Vector3(1, 0, 0)).project(this.camera);
+    const ppu = Math.abs(b.x - a.x) * 0.5 * this.width;
+    return { p, s: (d.w * 0.94) / (10.04 * ppu) };
+  }
+
   start() {
     const loop = () => {
-      this.render();
+      this.frame();
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
   }
 
+  // Move toward the pose for where we are, then draw if anything on screen changed. Docked and
+  // still, nothing is drawn at all.
+  private frame() {
+    const now = performance.now();
+    const dt = Math.min(0.3, (now - this.lastFrame) / 1000);
+    this.lastFrame = now;
+    const target = this.dock ? 1 : 0;
+    this.m += (target - this.m) * (1 - Math.exp(-dt * 5.5));
+    if (Math.abs(target - this.m) < 0.0005) this.m = target;
+    const moving = this.m !== target || this.swapT0 >= 0 || (this.m < 1 && !this.still && !this.lowPower);
+    const d = this.dock;
+    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
+    if (!moving && key === this.renderKey) return;
+    this.renderKey = key;
+    const t0 = performance.now();
+    this.render();
+    // A slow machine (software WebGL, an old phone) gives up the idle float and draws only when
+    // something actually changes, so the page around it stays responsive.
+    this.cost = this.cost * 0.8 + (performance.now() - t0) * 0.2;
+    if (this.cost > 45 && ++this.slowFrames > 8 && !this.still) {
+      this.still = true;
+      // And draws at a lower resolution.
+      this.renderer.setPixelRatio(0.6);
+      this.renderer.setSize(this.width, this.height, false);
+    }
+  }
+  private cost = 0;
+  private slowFrames = 0;
+  private lowPower = false;
+
   private render() {
     const t = (performance.now() - this.t0) / 1000;
-    const float = this.still ? 0 : 1;
-    this.rig.rotation.set(-0.5 + Math.sin(t * 0.4) * 0.02 * float, 0.1 + Math.sin(t * 0.27) * 0.04 * float, -0.03);
-    this.rig.position.set(0, Math.sin(t * 0.6) * 0.08 * float, 0);
+    const float = this.still ? 0 : 1 - this.m;
+    const k = this.m * this.m * (3 - 2 * this.m);
+    const dock = this.dockPose();
+    const s = dock ? 1 + (dock.s - 1) * k : 1;
+    const hx = 0, hy = Math.sin(t * 0.6) * 0.08 * float;
+    this.rig.position.set(dock ? hx + (dock.p.x - hx) * k : hx, dock ? hy + (dock.p.y - hy) * k : hy, 0);
+    this.rig.scale.setScalar(s);
+    const rx = -0.5 + Math.sin(t * 0.4) * 0.02 * float, ry = 0.1 + Math.sin(t * 0.27) * 0.04 * float, rz = -0.03;
+    this.rig.rotation.set(rx + (-0.34 - rx) * k, ry + (0.06 - ry) * k, rz + (0 - rz) * k);
+    this.scene.environmentIntensity = 0.7 - 0.3 * k;
     if (this.swapT0 >= 0) {
       const k = (performance.now() - this.swapT0) / 900;
       if (this.pending && k >= 0.4) {
@@ -230,8 +305,8 @@ export class CassetteScene {
         // Out: down and away; in: back up with a little settle.
         const out = k < 0.4 ? Math.pow(k / 0.4, 2) : Math.max(0, 1 - (k - 0.4) / 0.6);
         const settle = k > 0.4 ? Math.sin(((k - 0.4) / 0.6) * Math.PI) * 0.06 : 0;
-        this.rig.position.y -= out * 16;
-        this.rig.position.z -= out * 6;
+        this.rig.position.y -= out * 16 * s;
+        this.rig.position.z -= out * 6 * s;
         this.rig.rotation.x += out * 0.5 - settle;
       }
     }
@@ -248,10 +323,13 @@ export class CassetteScene {
       // The pencil's axis is its glTF +Y. Lean it TILT off the hub axis towards pencilAngle, and
       // turn it about its own axis with the hub, so the flats of the hexagon go round too.
       const a = this.pencilAngle;
-      const dir = new THREE.Vector3(Math.sin(TILT) * Math.cos(a), Math.sin(TILT) * Math.sin(a), Math.cos(TILT));
+      const tilt = TILT_HOME + (TILT_DOCK - TILT_HOME) * k;
+      const dir = new THREE.Vector3(Math.sin(tilt) * Math.cos(a), Math.sin(tilt) * Math.sin(a), Math.cos(tilt));
       const lean = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
       const spin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.hubAngleR);
       this.pencil.quaternion.copy(lean).multiply(spin);
+      // Docked, a stub of a pencil: it stays inside the top bar.
+      this.pencil.scale.setScalar(1 - 0.5 * k);
     }
 
     const shadow = `${this.pencilAngle.toFixed(3)}|${this.hubAngleL.toFixed(2)}|${this.wound.toFixed(3)}`;

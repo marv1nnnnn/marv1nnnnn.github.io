@@ -104,7 +104,7 @@ export default function LogDeck({ items }: { items: SignalListItem[] }) {
   }, [marks, kind]);
 
   return (
-    <div className="deck">
+    <div className="log-deck">
       <div className="log-filter" role="group" aria-label="Filter by kind">
         {['all', ...kinds].map((k) => (
           <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>
@@ -165,7 +165,7 @@ export default function LogDeck({ items }: { items: SignalListItem[] }) {
 
       {groups.map((m) => (
         <div className="year month" id={`log-${m.key}`} key={m.key}>
-          <p className="year-label" aria-hidden="true"><Worn text={m.key.replace('-', '.')} date={`${m.key}-15`} /></p>
+          <p className="year-label cue" aria-hidden="true"><Worn text={m.key.replace('-', '.')} date={`${m.key}-15`} /></p>
           <ul className="rows compact">
             {m.items.map(({ item: l, index }) => {
               const title = <><Worn text={l.title} date={l.date ?? ''} /> <span className="by">{l.creator}</span></>;

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { TapeScene } from '@/components/tape/parts';
-import JCard from '@/components/tape/JCard';
+import Booklet from '@/components/tape/Booklet';
+import CoverArt from '@/components/tape/CoverArt';
 import { getAbout } from '@/lib/tape';
 
 export const metadata: Metadata = {
@@ -16,17 +17,32 @@ export default function AboutPage() {
     ...about.contact.map((c) => ({ label: c.label, value: c.value, href: c.href })),
     ...(about.resume ? [{ label: 'Resume', value: 'PDF', href: about.resume.href }] : []),
   ];
+  const sideA = [about.hero.description, about.current].filter((p): p is string => !!p);
   return (
-    <article className="page about">
+    <Booklet path="/about" className="about">
       <TapeScene seed="about" age={0.15} />
-      <h1 className="visually-hidden">about</h1>
-      <JCard
-        name="马进"
-        handle="marv1nnnnn"
-        role={about.hero.subtitle ?? ''}
-        sideA={[about.hero.description, about.current].filter((p): p is string => !!p)}
-        sideB={about.facts}
-      />
+      {/* The cover of the booklet. */}
+      <section className="cover">
+        <CoverArt />
+        <p className="cover-handle">marvin ma</p>
+        <h1 className="cover-name">marv1nnnnn<span className="visually-hidden">, about</span></h1>
+        <p className="cover-role">{about.hero.subtitle}</p>
+        <p className="cover-spec" aria-hidden="true">side a · now&nbsp;&nbsp;/&nbsp;&nbsp;side b · before</p>
+      </section>
+
+      <section>
+        <h2><span>side a · now</span></h2>
+        <div className="verses">
+          {sideA.map((p) => <p key={p}>{p}</p>)}
+        </div>
+      </section>
+
+      <section>
+        <h2><span>side b · before</span></h2>
+        <ol className="tracklist">
+          {about.facts.map((f, i) => <li key={f}><span>b{i + 1}</span>{f}</li>)}
+        </ol>
+      </section>
 
       <section className="credits">
         <h2><span>credits</span></h2>
@@ -45,6 +61,6 @@ export default function AboutPage() {
           ))}
         </dl>
       </section>
-    </article>
+    </Booklet>
   );
 }

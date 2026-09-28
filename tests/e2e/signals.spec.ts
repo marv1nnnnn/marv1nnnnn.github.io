@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('sections', () => {
+  test('every section is a leaf of the booklet, with its track in the header', async ({ page }) => {
+    for (const [path, n] of [['/make', '02'], ['/input', '03'], ['/log', '04'], ['/about', '05']]) {
+      await page.goto(path);
+      await expect(page.locator('.sheet .leaf-no')).toHaveText(n);
+    }
+  });
+
+
   test('/make lists writing, tools, talks and shows', async ({ page }) => {
     await page.goto('/make');
     await expect(page.getByRole('heading', { level: 1, name: 'make' })).toBeVisible();
@@ -20,8 +28,8 @@ test.describe('sections', () => {
   test('/input shows the canon and points to the log', async ({ page }) => {
     await page.goto('/input');
     await expect(page.locator('ol.canon > li')).toHaveCount(14);
-    await expect(page.locator('.reel-item')).toHaveCount(14);
-    await expect(page.locator('.reel-head .reel-count')).toHaveText('01 / 14');
+    await expect(page.locator('ol.canon .print')).toHaveCount(14);
+    await expect(page.locator('ol.canon .canon-no').first()).toHaveText('01');
     await expect(page.locator('a.to-log')).toHaveAttribute('href', '/log');
   });
 
@@ -50,7 +58,8 @@ test.describe('sections', () => {
 
   test('/about shows the current role and contact details', async ({ page }) => {
     await page.goto('/about');
-    await expect(page.locator('.jcard')).toHaveClass(/is-open/);
+    await expect(page.locator('.sheet .cover')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('marv1nnnnn');
     await expect(page.getByText(/product manager/i).first()).toBeVisible();
     await expect(page.getByText('marvin1996325@gmail.com')).toBeVisible();
   });
