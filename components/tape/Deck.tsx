@@ -196,7 +196,7 @@ function PlayButton() {
     const id = window.setInterval(() => {
       const ear = (window as unknown as { tape?: Record<string, number | (number | null)[]> }).tape;
       const show = (v: number | (number | null)[]) =>
-        Array.isArray(v) ? `[${v.map((d) => (d === null ? '~' : d)).join(' ')}]` : Number.isInteger(v) ? String(v) : v.toFixed(2);
+        Array.isArray(v) ? `[${v.map((d) => (d === null ? '~' : Number.isInteger(d) ? d : d.toFixed(2))).join(' ')}]` : Number.isInteger(v) ? String(v) : v.toFixed(2);
       if (ear) setReading(Object.entries(ear).map(([k, v]) => `tape.${k} = ${show(v)}`).join('\n'));
     }, 100);
     return () => clearInterval(id);

@@ -17,7 +17,8 @@ const PACK = { min: 0.8, max: 2.4 };
 const TILT_HOME = THREE.MathUtils.degToRad(64);
 const TILT_DOCK = THREE.MathUtils.degToRad(28);
 
-export interface LabelInfo { tracks: string[]; current: number; count: string }
+// lead: which of the artists after the name is playing now (-1 with the sound off).
+export interface LabelInfo { tracks: string[]; current: number; count: string; lead: number }
 
 export class CassetteScene {
   private renderer: THREE.WebGLRenderer;
@@ -46,7 +47,7 @@ export class CassetteScene {
   hubAngleR = 0;
   wound = 0; // 0..1, how much tape has moved to the right reel
   still = false;
-  info: LabelInfo = { tracks: [], current: 0, count: '000' };
+  info: LabelInfo = { tracks: [], current: 0, count: '000', lead: -1 };
   private look: TapeLook = LOOKS.haze;
   private mats: Record<string, THREE.MeshStandardMaterial[]> = {};
   private swapT0 = -1;
@@ -263,7 +264,7 @@ export class CassetteScene {
     if (Math.abs(target - this.m) < 0.0005) this.m = target;
     const moving = this.m !== target || this.swapT0 >= 0 || (this.m < 1 && !this.still && !this.lowPower);
     const d = this.dock;
-    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
+    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.info.lead}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
     if (!moving && key === this.renderKey) return;
     this.renderKey = key;
     const t0 = performance.now();
@@ -349,10 +350,10 @@ export class CassetteScene {
   private shadowKey = '';
 
   private drawLabel() {
-    const { tracks, current, count } = this.info;
+    const { tracks, current, count, lead } = this.info;
     const L = this.look;
     const accent = L.stripe;
-    const key = `${tracks.join()}|${current}|${count}|${L.name}`;
+    const key = `${tracks.join()}|${current}|${count}|${lead}|${L.name}`;
     if (key === this.labelKey) return;
     this.labelKey = key;
     const c = this.label.getContext('2d');
@@ -392,9 +393,26 @@ export class CassetteScene {
     c.fillText('A', 56, 162);
     c.font = 'italic 400 66px "Newsreader", Georgia, serif';
     c.fillText(`${L.name} — ${L.mood}`, 150, 132);
-    c.globalAlpha = 0.65;
-    c.font = '400 26px "Martian Mono", monospace';
-    c.fillText(`marv1nnnnn · after ${L.after}`, 152, 172);
+    // The artists it is after; while it plays, the one leading is inked in and underlined.
+    const artists = L.after.split(' · ');
+    let ax = 152;
+    const part = (text: string, on: boolean) => {
+      c.globalAlpha = on ? 1 : 0.65;
+      c.font = `${on ? 600 : 400} 26px "Martian Mono", monospace`;
+      c.fillText(text, ax, 172);
+      const w = c.measureText(text).width;
+      if (on) {
+        c.fillStyle = accent;
+        c.fillRect(ax, 180, w, 4);
+        c.fillStyle = L.ink;
+      }
+      ax += w;
+    };
+    part('marv1nnnnn · after ', false);
+    artists.forEach((a, i) => {
+      if (i) part(' · ', false);
+      part(a, artists.length > 1 && i === lead);
+    });
     c.globalAlpha = 1;
     c.font = '500 40px "Martian Mono", monospace';
     c.textAlign = 'right';

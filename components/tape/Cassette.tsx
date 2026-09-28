@@ -119,8 +119,9 @@ export default function Cassette() {
         scene.hubAngleR = s.angle;
         scene.hubAngleL = s.left;
         scene.wound = h / TAPE_LENGTH;
-        if (scene.info.count !== counter(h) || scene.info.current !== i) {
-          scene.info = { tracks: TRACKS.map((t) => t.label), current: i, count: counter(h) };
+        const lead = (window as unknown as { tape?: { lead: number } }).tape?.lead ?? -1;
+        if (scene.info.count !== counter(h) || scene.info.current !== i || scene.info.lead !== lead) {
+          scene.info = { tracks: TRACKS.map((t) => t.label), current: i, count: counter(h), lead };
         }
         // A different tape chosen on the shelf: eject this one and put that one in.
         const want = paletteRef.current;
