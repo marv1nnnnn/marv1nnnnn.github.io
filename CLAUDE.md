@@ -50,4 +50,4 @@ See `content/README.md` for note formats and paths.
 - The deck: tap ◀◀/▶▶, hold them, click tracks on the strip, and scroll a long page; the counter and reels should follow, and the wind should land on the right page.
 - Sound: on a first visit, touch anywhere and the music starts; then stir, hold and release, double-tap, pick another tape on the shelf (new key and a clunk) and wind between tracks (music drops, the spool spins, the tape comes back up to speed). Switching tabs pauses it; after turning it off with ▶ play, it stays off on the next visit.
 - Old URLs such as `/signals/journal/<id>` and `/shows` should land on their new pages.
-- `pnpm test:e2e` covers these routes on desktop and mobile viewports.
+- `pnpm test:e2e` covers these routes on desktop and mobile viewports, against the static export (`pnpm build`, served by `scripts/serve-out.js` as GitHub Pages serves it).
