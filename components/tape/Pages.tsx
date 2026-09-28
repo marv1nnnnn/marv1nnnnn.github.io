@@ -16,7 +16,10 @@ import { TRACKS, counter, headOf, spanOf, trackIndex } from './tracks';
 // A page holds pieces of blocks: most whole, but a long run of text is cut between two lines and
 // goes on at the top of the next page, as in a book (from and to are pixels into the block).
 interface Piece { k: number; from: number; to: number | null }
-interface Layout { pages: Piece[][]; spread: boolean; w: number; h: number; top: number }
+interface Layout { pages: Piece[][]; spread: boolean; w: number; h: number; top: number; vh: number }
+
+// On a phone the pages lie in a column, this far apart, and the browser snaps the scroll to each.
+const GAP = 14;
 
 // Where each line of text in a block ends, in pixels from the block's top. Only plain text is cut:
 // a block with a picture, code or a table in it moves on whole.
@@ -44,7 +47,7 @@ function measureScreen() {
   const spread = vw >= 920;
   const h = Math.max(420, Math.min(spread ? 720 : 860, vh - top - (spread ? 52 : 22)));
   const w = spread ? Math.min(480, Math.floor((vw - 110) / 2), Math.round(h * 0.74)) : Math.min(vw - 16, 560);
-  return { spread, w, h, top };
+  return { spread, w, h, top, vh };
 }
 
 export default function Pages({ path, title, lede, kicker, label, children }: {
@@ -195,32 +198,20 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
   useEffect(() => {
     if (!layout) return;
     const vh = () => window.innerHeight;
-    const stepPx = () => vh() * 0.8;
+    // A spread turns a leaf every 0.8 of a screen; a phone's column moves a page and a gap.
+    const stepPx = () => (spread ? vh() * 0.8 : layout.h + GAP);
+    const book = stage.current?.parentElement;
     let raf = 0;
     const draw = () => {
       raf = 0;
       const q = Math.min(steps, Math.max(0, window.scrollY / stepPx()));
+      // The page being read (tests read it too).
+      const at = String(Math.round(q));
+      if (book && book.dataset.at !== at) book.dataset.at = at;
+      // A phone's pages are a plain column the browser scrolls and snaps: nothing to draw.
+      if (!spread) return;
       leaves.current.forEach((leaf, j) => {
         if (!leaf) return;
-        // A phone does not fold paper in 3D (stacked 3D layers show through each other on mobile
-        // GPUs): the page there slides a little and fades into the next, one page at a time.
-        if (!spread) {
-          // d: where this page is from the one being read (0 it, 1 the next); the page going
-          // lies on top and fades out over the next one waiting underneath.
-          const d = j - q;
-          const shown = d > -1 && d < 1;
-          const going = d <= 0;
-          // Pages out of play are transparent (not hidden, so they stay readable to assistive
-          // technology) and untransformed, so a phone's GPU only composites the two in play.
-          leaf.style.transform = shown && going && d < 0 ? `translateX(${(d * 28).toFixed(1)}px)` : '';
-          leaf.style.opacity = !shown ? '0' : going ? (1 + d).toFixed(3) : '';
-          leaf.style.zIndex = shown ? (going ? '3' : '2') : '0';
-          // Only the page nearer the reader takes touches.
-          leaf.style.pointerEvents = Math.abs(d) <= 0.5 ? '' : 'none';
-          leaf.classList.toggle('is-turned', d <= -1);
-          leaf.classList.toggle('is-over', false);
-          return;
-        }
         const a = Math.min(1, Math.max(0, q - j));
         leaf.style.transform = `rotateY(${(-180 * a).toFixed(2)}deg)`;
         leaf.style.zIndex = String(a <= 0 ? leafCount - j : a >= 1 ? j + 1 : leafCount + 2);
@@ -237,6 +228,7 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     let aim: number | null = null;
     const onScroll = () => {
       schedule();
+      if (!spread) return; // the browser snaps a phone's column itself
       clearTimeout(settle);
       settle = window.setTimeout(() => {
         if (document.body.classList.contains('is-winding-by-hand') || document.body.dataset.wind) {
@@ -285,11 +277,19 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     const letGo = () => { aim = null; };
     window.addEventListener('wheel', letGo, { passive: true });
     window.addEventListener('touchstart', letGo, { passive: true });
+    // A phone's column snaps page by page, natively (globals.css), with each page coming to rest
+    // where the first one starts, under the deck.
+    if (!spread) {
+      // The book's own top (the pages inside are still easing in) and the space above the first page.
+      const rest = (book ? book.getBoundingClientRect().top + window.scrollY : 0) + layout.top + 10;
+      document.documentElement.style.setProperty('--snap-top', `${Math.round(rest)}px`);
+      document.documentElement.classList.add('snap-pages');
+    }
     // Turning from here on (tests wait for this too).
-    const book = stage.current?.parentElement;
     book?.setAttribute('data-ready', '');
     return () => {
       book?.removeAttribute('data-ready');
+      document.documentElement.classList.remove('snap-pages');
       cancelAnimationFrame(raf);
       clearTimeout(settle);
       window.removeEventListener('scroll', onScroll);
@@ -312,7 +312,11 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     );
   }
 
-  const { w, h, top, pages } = layout;
+  const { w, h, top, vh, pages } = layout;
+  // A spread is as tall as its turns; a phone's column is its pages, with room below the last so
+  // it too can come to the top.
+  const stageTop = top + (spread ? 26 : 10);
+  const height = spread ? `calc(${steps * 80}vh + 100vh)` : `${stageTop + count * h + (count - 1) * GAP + Math.max(0, vh - stageTop - h)}px`;
   const through = (k: number) => (steps ? (spread ? Math.ceil(k / 2) : k) / steps : 0);
   const page = (k: number, side: 'left' | 'right') => {
     const ids = pages[k];
@@ -350,7 +354,7 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
   return (
     <div
       className={`booklet-book${spread ? ' is-spread' : ' is-single'}`}
-      style={{ '--pw': `${w}px`, '--ph': `${h}px`, '--stage-top': `${top + (spread ? 26 : 10)}px`, height: `calc(${steps * 80}vh + 100vh)` } as React.CSSProperties}
+      style={{ '--pw': `${w}px`, '--ph': `${h}px`, '--gap': `${GAP}px`, '--stage-top': `${stageTop}px`, height } as React.CSSProperties}
     >
       <div className="booklet-stage" ref={stage}>
         <div className="booklet-pages">
@@ -371,7 +375,7 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
           {Array.from({ length: leafCount }, (_, j) => (
             <div className="leaf" key={j} ref={(el) => { leaves.current[j] = el; }}>
               <div className="face front">{page(spread ? 2 * j : j, 'right')}</div>
-              <div className="face back">{spread ? page(2 * j + 1, 'left') : <div className="pg pg-left pg-blank" />}</div>
+              {spread && <div className="face back">{page(2 * j + 1, 'left')}</div>}
             </div>
           ))}
         </div>
