@@ -179,8 +179,12 @@ export class Tape {
 
   resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.W = window.innerWidth;
-    this.H = window.innerHeight;
+    // The canvas is as tall as the large viewport (globals.css), so it keeps its size while a
+    // phone's address bar comes and goes.
+    const w = this.canvas.clientWidth || window.innerWidth, h = this.canvas.clientHeight || window.innerHeight;
+    if (w === this.W && h === this.H && this.filings.length) return;
+    this.W = w;
+    this.H = h;
     this.canvas.width = Math.floor(this.W * dpr);
     this.canvas.height = Math.floor(this.H * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

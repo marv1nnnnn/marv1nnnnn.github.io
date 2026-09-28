@@ -77,7 +77,15 @@ export default function Cassette() {
         if (!alive) return;
         const scene = new CassetteScene(el);
         scene.still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const size = () => scene.resize(window.innerWidth, window.innerHeight);
+        // Sized to the canvas (the large viewport), and only when that changes: a phone's address
+        // bar coming and going would otherwise clear it mid-scroll.
+        let was = '';
+        const size = () => {
+          const w = el.clientWidth || window.innerWidth, h = el.clientHeight || window.innerHeight;
+          if (`${w}x${h}` === was) return;
+          was = `${w}x${h}`;
+          scene.resize(w, h);
+        };
         size();
         window.addEventListener('resize', size);
         cleanups.push(() => window.removeEventListener('resize', size));

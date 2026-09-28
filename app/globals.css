@@ -89,9 +89,12 @@ button { font: inherit; color: inherit; }
 
 .tape-canvas {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  /* The large viewport: a phone's address bar coming and going does not resize (and clear) it. */
+  height: 100vh;
+  height: 100lvh;
   display: block;
   z-index: 0;
   -webkit-user-select: none;
@@ -274,10 +277,12 @@ body[data-wind] #content { opacity: 0.12; }
    Cassette.tsx claims the ones that land on it. */
 .cassette-canvas {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 4;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
   opacity: 0;
   transition: opacity 900ms ease, filter 600ms ease;
@@ -285,6 +290,10 @@ body[data-wind] #content { opacity: 0.12; }
 }
 .cassette-canvas.is-ready { opacity: 1; }
 body:not(.is-home) .cassette-canvas { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); }
+/* A CSS filter over a WebGL canvas makes phones flicker when it redraws: no shadow there. */
+@media (hover: none), (max-width: 899px) {
+  .cassette-canvas, body:not(.is-home) .cassette-canvas { filter: none; transition: opacity 900ms ease; }
+}
 body.over-cassette, body.over-cassette * { cursor: grab !important; }
 body.is-winding-by-hand, body.is-winding-by-hand * { cursor: grabbing !important; -webkit-user-select: none; user-select: none; }
 .deck-dock { display: flex; align-items: center; justify-content: center; width: 96px; height: 60px; touch-action: none; }
@@ -295,7 +304,7 @@ body.has-cassette .deck-dock svg { visibility: hidden; }
   pointer-events: none;
   left: 0;
   right: 0;
-  top: 74%;
+  top: calc(var(--cassette-bottom, 70vh) + 12px);
   margin: 0;
   text-align: center;
   color: var(--muted);
@@ -507,6 +516,9 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 }
 .booklet-flow > .blk + .blk { margin-top: 0; }
 .blk { display: flow-root; }
+/* A block cut over two pages: each page shows its own stretch of it. */
+.blk-cut { overflow: hidden; }
+.blk-cut-in { display: flow-root; }
 .flow-page { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; height: var(--ph, 700px); }
 .flow-room { height: calc(var(--ph, 700px) - var(--pad-t) - var(--pad-b) - var(--head) - var(--foot) - 16px); }
 
@@ -705,6 +717,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
   .deck-track .deck-n { display: none; }
   .sound-state, .sound-code { display: none; }
   .deck-play[aria-busy='true'] { animation: sound-wait 0.8s steps(2) infinite; }
+  .prose, .verse { font-size: 16px; line-height: 1.55; }
 }
 @keyframes sound-wait { 50% { opacity: 0.3; } }
 
@@ -713,7 +726,8 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 }
 
 @media (max-width: 640px) {
-  .cassette-hint { top: 62%; }
+  /* On a phone the intro sits right under the cassette: the hint goes above it instead. */
+  .cassette-hint { top: calc(var(--cassette-top, 20vh) - 30px); }
   .home-bottom { grid-template-columns: minmax(0, 1fr); }
   .home-bottom .shelf { justify-self: stretch; width: auto; margin-left: 22px; }
   .leaf-title { font-size: 22vw; }

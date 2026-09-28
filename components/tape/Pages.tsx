@@ -13,7 +13,25 @@ import { TRACKS, counter, headOf, spanOf, trackIndex } from './tracks';
 // `brk` starts a new page. Without script, or with reduced motion, the blocks simply run on in
 // one column (the server renders that too).
 
-interface Layout { pages: number[][]; spread: boolean; w: number; h: number; top: number }
+// A page holds pieces of blocks: most whole, but a long run of text is cut between two lines and
+// goes on at the top of the next page, as in a book (from and to are pixels into the block).
+interface Piece { k: number; from: number; to: number | null }
+interface Layout { pages: Piece[][]; spread: boolean; w: number; h: number; top: number }
+
+// Where each line of text in a block ends, in pixels from the block's top. Only plain text is cut:
+// a block with a picture, code or a table in it moves on whole.
+function lineEnds(cell: HTMLElement) {
+  if (cell.querySelector('img, svg, pre, table, figure, iframe, video')) return null;
+  const top = cell.getBoundingClientRect().top;
+  const ends = new Set<number>();
+  const walk = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let t = walk.nextNode(); t; t = walk.nextNode()) {
+    range.selectNodeContents(t);
+    for (const r of range.getClientRects()) if (r.height > 0) ends.add(Math.ceil(r.bottom - top));
+  }
+  return [...ends].sort((a, b) => a - b);
+}
 
 const classOf = (node: React.ReactNode) =>
   isValidElement(node) ? String((node.props as { className?: string }).className ?? '') : '';
@@ -76,7 +94,11 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     if (layout) return;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Measure once the type is in; until then the one column stands in.
-    if (document.fonts && document.fonts.status !== 'loaded') return;
+    if (document.fonts && document.fonts.status !== 'loaded') {
+      let alive = true;
+      document.fonts.ready.then(() => { if (alive) setRemeasure((r) => r + 1); });
+      return () => { alive = false; };
+    }
     const el = flow.current;
     if (!el) return;
     const screen = measureScreen();
@@ -84,22 +106,44 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     el.style.setProperty('--ph', `${screen.h}px`);
     const room = el.querySelector<HTMLElement>('.flow-room')?.offsetHeight ?? screen.h - 120;
     const cells = [...el.querySelectorAll<HTMLElement>(':scope > .blk')];
-    const pages: number[][] = [[]];
+    const pages: Piece[][] = [[]];
     let used = 0;
     const heights = cells.map((c) => c.offsetHeight);
+    const turn = () => { pages.push([]); used = 0; };
     cells.forEach((cell, k) => {
       const cls = cell.dataset.kind ?? '';
       const own = has(cls, 'own');
       const hk = heights[k];
       const page = pages[pages.length - 1];
+      // Text that does not fit is cut after the last line that does, and goes on over the page.
+      if ((has(cls, 'prose') || has(cls, 'verse')) && !own && !has(cls, 'brk') && !has(cls, 'keep') && used + hk > room) {
+        const ends = lineEnds(cell);
+        if (ends && ends.length > 1) {
+          let from = 0;
+          while (hk - from > room - used) {
+            const cut = ends.filter((e) => e > from && e - from <= room - used).pop();
+            // Leave a page at least two lines, or turn over and try on a fresh one.
+            if (cut === undefined || (from === 0 && ends.indexOf(cut) < 1)) {
+              if (!pages[pages.length - 1].length) break; // a line taller than a page: give up
+              turn();
+              continue;
+            }
+            pages[pages.length - 1].push({ k, from, to: cut });
+            from = cut;
+            turn();
+          }
+          if (from > 0 || pages[pages.length - 1].length === 0 || used + hk <= room) {
+            pages[pages.length - 1].push({ k, from, to: null });
+            used += hk - from;
+            return;
+          }
+        }
+      }
       let fresh = own || has(cls, 'brk') || used + hk > room;
       // A heading (or a year) never ends a page on its own.
       if (!fresh && has(cls, 'keep') && k + 1 < cells.length && used + hk + Math.min(heights[k + 1], room * 0.25) > room) fresh = true;
-      if (fresh && page.length) {
-        pages.push([]);
-        used = 0;
-      }
-      pages[pages.length - 1].push(k);
+      if (fresh && page.length) turn();
+      pages[pages.length - 1].push({ k, from: 0, to: null });
       used += own ? room : hk;
     });
     setLayout({ pages: pages.filter((p) => p.length), ...screen });
@@ -254,11 +298,21 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
   const page = (k: number, side: 'left' | 'right') => {
     const ids = pages[k];
     if (!ids) return <div className={`pg pg-${side} pg-blank`} />;
-    const own = ids.length === 1 && has(classOf(blocks[ids[0]]), 'own');
+    const own = ids.length === 1 && has(classOf(blocks[ids[0].k]), 'own');
     return (
       <div className={`pg pg-${side}${k === 0 ? ' pg-title' : ''}${own ? ' pg-own' : ''}`} data-page={k}>
         {k > 0 && <p className="pg-head" aria-hidden="true"><span>{n} · {name}</span><span>side a</span></p>}
-        <div className="pg-body">{ids.map((id) => <div className="blk" key={id}>{blocks[id]}</div>)}</div>
+        <div className="pg-body">
+          {ids.map(({ k: id, from, to }) => (
+            <div className="blk" key={`${id}:${from}`}>
+              {from === 0 && to === null ? blocks[id] : (
+                <div className="blk-cut" style={{ height: to === null ? undefined : to - from }}>
+                  <div className="blk-cut-in" style={{ marginTop: -from }}>{blocks[id]}</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
         <p className="pg-foot" aria-hidden="true">
           <span className="pg-count">{counter(headOf(path, through(k)))}</span>
           <span className="pg-no">— {k + 1} —</span>
