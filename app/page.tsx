@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Cassette from '@/components/tape/Cassette';
 import { HomeControls, TapeScene } from '@/components/tape/parts';
 import { getEssays } from '@/lib/tape';
 
@@ -8,6 +9,7 @@ export default function Home() {
     <section className="home" aria-label="Home">
       <TapeScene seed="home" home />
       <h1 className="visually-hidden">Marvin Ma, marv1nnnnn</h1>
+      <Cassette />
       <div className="home-bottom">
         <div className="intro">
           <span className="cn" lang="zh">马进</span>

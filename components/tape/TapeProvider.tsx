@@ -10,7 +10,8 @@ export type SoundState = 'off' | 'loading' | 'on';
 
 interface TapeControls {
   setScene: (scene: Scene) => void;
-  newTape: () => void;
+  newTape: (name?: string) => void;
+  palette: string;
   sound: SoundState;
   toggleSound: () => void;
   code: string;
@@ -19,6 +20,7 @@ interface TapeControls {
   // -1 while fast-forwarding, 1 while rewinding.
   winding: -1 | 0 | 1;
   skip: (direction: -1 | 1) => void;
+  turn: (delta: number) => void;
   scan: (direction: -1 | 1) => void;
   release: () => void;
 }
@@ -76,6 +78,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   const router = useRouter();
   const lastPath = useRef<string | null>(null);
   const head = useRef(0);
+  const [palette, setPalette] = useState(DEFAULT_PALETTE);
   const [winding, setWinding] = useState<-1 | 0 | 1>(0);
   const windingRef = useRef<{ dir: -1 | 1; scanning: boolean; frame: number } | null>(null);
   const paletteRef = useRef(DEFAULT_PALETTE);
@@ -111,6 +114,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     tape.palette = PALETTES[saved];
     applyPaletteVars(saved);
     paletteRef.current = saved;
+    setPalette(saved);
     tape.resize();
     tape.onEvent = (e) => soundRef.current?.event(e);
 
@@ -124,7 +128,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
 
     let lastTap = { t: 0, x: 0, y: 0 };
     const onDown = (e: PointerEvent) => {
-      const reading = !!(e.target as Element | null)?.closest?.(READING);
+      const reading = !!(e.target as Element | null)?.closest?.(READING) || !!(e as unknown as Record<string, boolean>).tapeCassette;
       tape.pointerDown(e.pointerId, e.clientX, e.clientY, !reading);
       if (!reading && tape.scene.home) {
         const now = performance.now();
@@ -268,6 +272,22 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     state.frame = requestAnimationFrame(tick);
   }, [setWind, skip]);
 
+  // Winding by hand (the pencil on the home cassette): positive runs the tape forward.
+  const turn = useCallback((delta: number) => {
+    const tape = tapeRef.current;
+    const next = Math.max(0, Math.min(TAPE_LENGTH - 1, head.current + delta));
+    if (!tape || next === head.current) return;
+    const dir: -1 | 1 = delta > 0 ? -1 : 1;
+    const state = windingRef.current;
+    if (!state?.scanning || state.dir !== dir) {
+      if (state) cancelAnimationFrame(state.frame);
+      windingRef.current = { dir, scanning: true, frame: 0 };
+      tape.scan(dir);
+      setWind(dir);
+    }
+    head.current = next;
+  }, [setWind]);
+
   const release = useCallback(() => {
     const state = windingRef.current;
     if (!state?.scanning) return;
@@ -279,7 +299,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     }
     windingRef.current = null;
     tapeRef.current?.land();
-    head.current = headOf(pathname, through());
+    // Home does not scroll: the tape stays where the pencil left it.
+    if (pathname !== '/') head.current = headOf(pathname, through());
     setWind(0);
   }, [pathname, router, setWind, through]);
 
@@ -293,12 +314,14 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     if (reducedRef.current) for (let i = 0; i < 400; i++) tape.frame();
   }, [updateObstacle]);
 
-  // A new tape is a random palette (never the current one) and a fresh field. The choice is
+  // Putting in another tape: its palette, its pattern and a fresh field. The choice is
   // remembered so the rest of the site plays on the same tape.
-  const newTape = useCallback(() => {
+  const newTape = useCallback((chosen?: string) => {
     const names = Object.keys(PALETTES).filter((n) => n !== paletteRef.current);
-    const name = names[Math.floor(Math.random() * names.length)];
+    const name = chosen && PALETTES[chosen] ? chosen : names[Math.floor(Math.random() * names.length)];
+    if (name === paletteRef.current) return;
     paletteRef.current = name;
+    setPalette(name);
     applyPaletteVars(name);
     tapeRef.current?.setPalette(PALETTES[name]);
     tapeRef.current?.reseed(`home-${Math.random()}`);
@@ -384,8 +407,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   }, [toggleSound]);
 
   const value = useMemo(
-    () => ({ setScene, newTape, sound, toggleSound, code, head, winding, skip, scan, release }),
-    [setScene, newTape, sound, toggleSound, code, winding, skip, scan, release],
+    () => ({ setScene, newTape, palette, sound, toggleSound, code, head, winding, skip, turn, scan, release }),
+    [setScene, newTape, palette, sound, toggleSound, code, winding, skip, turn, scan, release],
   );
 
   return (

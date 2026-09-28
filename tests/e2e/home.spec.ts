@@ -8,15 +8,18 @@ test.describe('home /', () => {
     for (const name of ['make', 'input', 'log', 'about']) {
       await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name })).toBeVisible();
     }
-    await expect(page.getByRole('button', { name: /new tape/ })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Tapes' }).getByRole('button')).toHaveCount(5);
   });
 
-  test('new tape switches to a different palette and the choice carries to other pages', async ({ page }) => {
+  test('another tape from the shelf switches the palette and the choice carries to other pages', async ({ page }) => {
     await page.goto('/');
     const accent = () => page.evaluate(() => document.documentElement.style.getPropertyValue('--accent-rgb'));
     await expect.poll(accent).not.toBe('');
     const before = await accent();
-    await page.getByRole('button', { name: /new tape/ }).click();
+    const shelf = page.getByRole('group', { name: 'Tapes' });
+    await expect(shelf.getByRole('button', { name: /^oxide tape/ })).toHaveAttribute('aria-pressed', 'true');
+    await shelf.getByRole('button', { name: /^uv tape/ }).click();
+    await expect(shelf.getByRole('button', { name: /^uv tape/ })).toHaveAttribute('aria-pressed', 'true');
     await expect.poll(accent).not.toBe(before);
     const chosen = await accent();
     await page.goto('/make');
@@ -64,6 +67,29 @@ test.describe('home /', () => {
     await page.waitForTimeout(1600);
     await page.mouse.up();
     await expect(page).not.toHaveURL(/\/$/);
+  });
+
+  test('turning the pencil on the cassette winds to the next track', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto('/');
+    const canvas = page.locator('.cassette-canvas.is-ready');
+    await expect(canvas).toHaveAttribute('data-hub', /\d+,\d+/, { timeout: 90_000 });
+    const [hx, hy] = (await canvas.getAttribute('data-hub'))!.split(',').map(Number);
+    const slider = page.getByRole('slider', { name: /Wind the tape/ });
+    // Clockwise around the hub, as the pencil would go, until the head is into track 02.
+    let a = Math.PI;
+    const r = 50;
+    await page.mouse.move(hx + Math.cos(a) * r, hy + Math.sin(a) * r);
+    await page.mouse.down();
+    for (let i = 0; i < 90; i++) {
+      a += Math.PI / 30;
+      await page.mouse.move(hx + Math.cos(a) * r, hy + Math.sin(a) * r);
+      if (/02 make/.test((await slider.getAttribute('aria-valuetext')) ?? '')) break;
+    }
+    await expect(slider).toHaveAttribute('aria-valuetext', '02 make');
+    await page.waitForTimeout(200);
+    await page.mouse.up();
+    await expect(page).toHaveURL(/\/make$/, { timeout: 15_000 });
   });
 
   test('the home page does not scroll sideways on phones', async ({ page }) => {

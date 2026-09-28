@@ -263,6 +263,34 @@ body[data-wind] #content { opacity: 0.12; }
   pointer-events: none;
 }
 .home a, .home button { pointer-events: auto; }
+
+/* The home cassette: a Blender model in WebGL over the field, wound by the pencil in the take-up hub. */
+.cassette { position: absolute; inset: 0; pointer-events: none; }
+.cassette-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 900ms ease;
+  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55));
+}
+.cassette-canvas.is-ready { opacity: 1; }
+.cassette-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 74%;
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  transition: opacity 600ms ease;
+}
+.cassette-hint.is-gone { opacity: 0; }
+body.is-home .deck-window { display: none; }
 .home-bottom {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -275,15 +303,38 @@ body[data-wind] #content { opacity: 0.12; }
 .intro .cn { font-family: var(--cjk); font-size: 22px; line-height: 1; }
 .intro p { margin: 0; }
 .latest { color: var(--muted); font-size: 11px; }
-.regen {
-  justify-self: end;
-  border: 1px solid var(--line);
-  background: transparent;
-  padding: 10px 14px;
-  font-size: 12px;
+/* The tape shelf: a stack of cases seen from the spine. */
+.shelf { justify-self: end; display: flex; flex-direction: column; gap: 3px; width: 250px; }
+.spine {
+  position: relative;
+  display: block;
+  height: 24px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.14), transparent 40%, rgba(0, 0, 0, 0.25)), var(--shell);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   cursor: pointer;
+  transition: transform 240ms ease;
 }
-.regen:hover { background: var(--ink); color: var(--bg); }
+.spine-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  height: 100%;
+  padding: 0 8px;
+  border-left: 6px solid var(--stripe);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 10px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.spine-label b { font-weight: 700; }
+.spine-label span { opacity: 0.7; font-family: var(--read); font-style: italic; font-size: 12px; }
+.spine:hover { transform: translateX(-6px); }
+.spine[aria-pressed='true'] { transform: translateX(-22px); outline: 1px solid var(--accent); outline-offset: 2px; }
 
 /* Pages: content sits on the left, the tape stays visible on the right. */
 .page {
@@ -744,8 +795,9 @@ body[data-wind] #content { opacity: 0.12; }
 @keyframes sound-wait { 50% { opacity: 0.3; } }
 
 @media (max-width: 640px) {
+  .cassette-hint { top: 62%; }
   .home-bottom { grid-template-columns: minmax(0, 1fr); }
-  .home-bottom .regen { justify-self: start; }
+  .home-bottom .shelf { justify-self: stretch; width: auto; margin-left: 22px; }
   .page { padding: calc(env(safe-area-inset-top, 0px) + 116px) 18px 96px; background: rgba(var(--bg-rgb), 0.88); }
   .page-head { margin-bottom: 48px; }
   .page-head h1 { font-size: 30vw; }

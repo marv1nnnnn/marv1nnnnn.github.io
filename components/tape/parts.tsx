@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Deck from './Deck';
 import { HOME_SCENE, PAGE_SCENE, hash, rng, wearOf } from './engine';
 import { useTape } from './TapeProvider';
+import { LOOKS } from './tapes';
 
 // Sets the tape parameters for the page it is rendered on.
 export function TapeScene({ seed, date, age, home = false }: { seed: string; date?: string; age?: number; home?: boolean }) {
@@ -35,7 +36,28 @@ export function TopNav() {
   );
 }
 
+// The tape shelf: every tape as a case spine. The one in the deck is pulled out; pick another to
+// eject the cassette and put that one in (its look, its palette and its music).
 export function HomeControls() {
-  const { newTape } = useTape();
-  return <button type="button" className="regen" onClick={newTape}>new tape ↻</button>;
+  const { newTape, palette } = useTape();
+  return (
+    <div className="shelf" role="group" aria-label="Tapes">
+      {Object.values(LOOKS).map((t) => (
+        <button
+          key={t.name}
+          type="button"
+          className="spine"
+          aria-pressed={palette === t.name}
+          aria-label={`${t.name} tape: ${t.mood}, after ${t.after}`}
+          style={{ '--shell': t.shell, '--paper': t.paper, '--ink': t.ink, '--stripe': t.stripe } as React.CSSProperties}
+          onClick={() => newTape(t.name)}
+        >
+          <span className="spine-label">
+            <b>{t.name}</b>
+            <span>{t.mood}</span>
+          </span>
+        </button>
+      ))}
+    </div>
+  );
 }
