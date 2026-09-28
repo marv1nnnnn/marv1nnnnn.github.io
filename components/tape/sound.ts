@@ -21,6 +21,7 @@ export interface Ear {
   register: number; // scale degrees above the root, from the pointer height
   night: number; // 1 at 3am, 0 at 3pm
   home: number; // 1 on the home page, 0 while reading
+  decay: number; // how long this tape has been playing: 0 when it goes in, 1 after six minutes
 }
 
 export interface Listening {
@@ -30,59 +31,246 @@ export interface Listening {
   y: number;
 }
 
-interface Mode {
-  scale: string;
-  root: number; // MIDI note of the scale root
+interface Tape {
+  root: number; // MIDI note of the scale root, for the notes a release scatters
   steps: number[];
   cps: number;
-  pad: string;
-  lead: string;
-  burst: string;
-  sparse: number; // 0 plays every stirred step, 1 almost none
-  padGain: number; // levels differ a lot between waveforms; these even them out
-  leadGain: number;
+  voice: Record<string, number | string>; // the instrument a released hold scatters
+  crackle: number; // surface noise this tape carries even when new
+  code: string; // the Strudel pattern; every tape answers the pointer the same way
 }
 
-// One mode per palette: a new tape is a new key, a new tempo and a new instrument.
-const MODES: Record<string, Mode> = {
-  oxide: { scale: 'D3:dorian', root: 50, steps: [0, 2, 3, 5, 7, 9, 10], cps: 0.45, pad: 'sawtooth', lead: 's("triangle")', burst: 'triangle', sparse: 0.2, padGain: 0.08, leadGain: 0.28 },
-  lain: { scale: 'E3:phrygian', root: 52, steps: [0, 1, 3, 5, 7, 8, 10], cps: 0.35, pad: 'sine', lead: 's("sine").hpf(300)', burst: 'sine', sparse: 0.45, padGain: 0.05, leadGain: 0.24 },
-  phosphor: { scale: 'A3:minor:pentatonic', root: 57, steps: [0, 3, 5, 7, 10], cps: 0.55, pad: 'square', lead: 's("square").crush(6)', burst: 'square', sparse: 0.1, padGain: 0.045, leadGain: 0.15 },
-  uv: { scale: 'F3:lydian', root: 53, steps: [0, 2, 4, 6, 7, 9, 11], cps: 0.4, pad: 'supersaw', lead: 's("triangle")', burst: 'supersaw', sparse: 0.25, padGain: 0.11, leadGain: 0.3 },
-  mono: { scale: 'C3:major:pentatonic', root: 48, steps: [0, 2, 4, 7, 9], cps: 0.5, pad: 'sine', lead: 's("sine")', burst: 'sine', sparse: 0.55, padGain: 0.05, leadGain: 0.24 },
+// One tape per palette, each after music from the canon and the log. Every tape follows the same
+// rules so the site feels the same whichever is playing: still is quiet, moving fills the rhythm
+// and the melody in, holding swells, releasing scatters. Orbits keep reverb and echo settings
+// apart: Strudel rebuilds an orbit's reverb whenever its size changes.
+const TAPES: Record<string, Tape> = {
+  oxide: {
+    root: 50,
+    steps: [0, 2, 4, 5, 7, 9, 10],
+    cps: 0.2,
+    voice: { s: 'sine', fmi: 2, fmh: 3.01 },
+    crackle: 0.02,
+    code: `// tape: oxide. a loop that wears away the longer it plays.
+// after William Basinski, Boards of Canada, Oneohtrix Point Never
+setcps(.2)
+const mode = "D3:mixolydian"
+
+stack(
+  // the loop: the same two bars, losing a little more on every pass
+  n("<[0,4,7] [-1,3,5]>").scale(mode)
+    .s("supersaw").detune(.1).unison(3).attack(1.2).release(4)
+    .lpf(ref(() => 1500 - tape.decay * 1000)).gain(.08)
+    .degradeBy(ref(() => tape.decay * .5))
+    .orbit(1).room(.8).roomsize(9),
+  n("[4 5 4 ~ 3 ~ 1 ~]/2").scale(mode)
+    .s("sawtooth").attack(.25).release(1.6)
+    .lpf(ref(() => 1100 - tape.decay * 600))
+    .vib(.6).vibmod(ref(() => .08 + tape.decay * .5))
+    .degradeBy(ref(() => tape.decay * .8)).gain(.09)
+    .orbit(1).room(.8).roomsize(9),
+
+  // moving: a music box somewhere in the house
+  n(irand(8).segment(8).add(ref(() => tape.register))).scale("D4:mixolydian")
+    .s("sine").fm(2).fmh(3.01).decay(.5).sustain(0).release(1)
+    .degradeBy(ref(() => .95 - tape.stir * .7))
+    .pan(ref(() => tape.x)).gain(.16)
+    .orbit(2).delay(.5).delaytime(.75).delayfeedback(.45).room(.4).roomsize(4),
+
+  // holding: the loop swells, as if played back too loud
+  n("[0,4,7,9]*16").scale(mode).s("supersaw").detune(.2).decay(.3).sustain(0)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
+    .lpf(ref(() => 300 + tape.hold * 4000)).lpq(5)
+    .gain(ref(() => tape.hold * .2))
+    .orbit(1).room(.8).roomsize(9),
+)`,
+  },
+  lain: {
+    root: 52,
+    steps: [0, 2, 3, 5, 7, 8, 10],
+    cps: 0.38,
+    voice: { s: 'sine', fmi: 3.5, fmh: 4 },
+    crackle: 0.01,
+    code: `// tape: lain. 3am.
+// after HTRK, Angelo Badalamenti, Fishmans
+setcps(.38)
+const mode = "E3:aeolian"
+const beat = () => (.35 + tape.stir * .65) * (.5 + tape.home * .5)
+
+stack(
+  // drum machine: slow, dry, a room away
+  s("sbd ~ ~ ~ ~ ~ sbd ~").decay(.7).gain(ref(() => beat() * .3)).orbit(3),
+  s("~ ~ white ~").decay(.04).sustain(0).bpf(2400)
+    .gain(ref(() => beat() * .35)).orbit(3).room(.3).roomsize(2),
+
+  // bass: round and low, mostly the root
+  note("<e1 [e1 ~ ~ e1] c1 d1>").s("sine").decay(1.2).sustain(.4).release(.3)
+    .shape(.25).lpf(400).gain(.11).orbit(3),
+
+  // guitar on the offbeat, thrown into a dub echo
+  n("<[0,2,4] [0,2,4] [-2,0,2] [-1,1,3]>").struct("~ x ~ x").scale(mode)
+    .s("triangle").decay(.25).sustain(0).hpf(300).gain(.3)
+    .orbit(2).delay(.45).delaytime(.49).delayfeedback(.5).room(.5).roomsize(5),
+
+  // moving: a vibraphone in an empty diner
+  n(irand(7).segment(8).add(ref(() => tape.register))).scale("E4:aeolian")
+    .s("sine").fm(3.5).fmh(4).decay(.8).sustain(0).release(1.2)
+    .degradeBy(ref(() => .95 - tape.stir * .7))
+    .pan(ref(() => tape.x)).gain(.14)
+    .orbit(2).delay(.3).delaytime(.49).delayfeedback(.5).room(.5).roomsize(5),
+
+  // holding: a chord leaning in, the red room getting louder
+  n("[0,2,4,6]*8").scale(mode).s("sawtooth").decay(.2).sustain(0)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
+    .lpf(ref(() => 250 + tape.hold * 3500)).lpq(6)
+    .gain(ref(() => tape.hold * .25))
+    .orbit(1).room(.7).roomsize(7),
+)`,
+  },
+  phosphor: {
+    root: 57,
+    steps: [0, 2, 3, 5, 7, 9, 10],
+    cps: 0.45,
+    voice: { s: 'square', crush: 8, lpf: 3000 },
+    crackle: 0,
+    code: `// tape: phosphor. machines that dream.
+// after Autechre, Boards of Canada
+setcps(.45)
+const mode = "A3:dorian"
+const beat = () => (.25 + tape.stir * .75) * (.5 + tape.home * .5)
+
+stack(
+  // glass pads, slowly changing their minds
+  n("<[0,4,9] [2,5,9] [-1,4,7] [0,3,7]>/2").scale(mode)
+    .s("supersaw").detune(.25).unison(4).attack(1.5).release(3)
+    .lpf(ref(() => 700 + tape.night * 700)).gain(.1)
+    .orbit(1).room(.7).roomsize(6),
+
+  // five notes against sixteen steps: it never lines up the same way twice
+  n("{0 2 4 7 5}%16".add(ref(() => tape.register))).scale(mode)
+    .s("square").decay(.1).sustain(0).lpq(8)
+    .lpf(ref(() => 500 + tape.stir * 3500))
+    .degradeBy(ref(() => .8 - tape.stir * .7))
+    .pan(ref(() => tape.x)).gain(.1)
+    .orbit(2).delay(.3).delaytime(.2).delayfeedback(.4).room(.3).roomsize(3),
+
+  // broken beat
+  s("sbd(3,8,2)").decay(.35).gain(ref(() => beat() * .3)).orbit(3),
+  s("~ white ~ [~ white]").decay(.07).sustain(0).bpf(1700).crush(7)
+    .sometimesBy(.25, x => x.ply(2))
+    .gain(ref(() => beat() * .35)).orbit(3),
+  s("white*16").decay(.015).sustain(0).hpf(9000)
+    .degradeBy(ref(() => .8 - tape.stir * .6))
+    .gain(ref(() => beat() * .25)).orbit(3),
+
+  // holding: the signal overloads and turns to grit
+  n("[0,4,7,11]*8").scale(mode).s("square").decay(.1).sustain(0)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
+    .coarse(ref(() => 1 + Math.round(tape.hold * 10)))
+    .lpf(ref(() => 400 + tape.hold * 5000))
+    .gain(ref(() => tape.hold * .22))
+    .orbit(1).room(.7).roomsize(6),
+)`,
+  },
+  uv: {
+    root: 48,
+    steps: [0, 2, 3, 5, 7, 8, 10],
+    cps: 0.58,
+    voice: { s: 'sawtooth', vowel: 'o', lpf: 2400 },
+    crackle: 0.12,
+    code: `// tape: uv. a night bus in the rain.
+// after Burial, Oneohtrix Point Never
+setcps(.58)
+const mode = "C3:minor"
+const beat = () => (.25 + tape.stir * .75) * (.5 + tape.home * .5)
+
+stack(
+  // minor ninths, soft and far away
+  n("<[0,4,6,8] [-2,2,4,6] [-3,1,3,5] [-1,3,4,6]>/2").scale(mode)
+    .s("supersaw").detune(.2).unison(3).attack(.8).release(2.5)
+    .lpf(ref(() => 600 + tape.night * 500)).gain(.07)
+    .orbit(1).room(.85).roomsize(8),
+
+  // voices: formants that almost sing, pitched from the pointer height
+  n("<[~ 7] [~ 9 ~ 8] [~ ~ 7] [11 ~ 9 ~]>".add(ref(() => tape.register - 3))).scale(mode)
+    .s("sawtooth").vowel("<o a o e>").attack(.02).decay(.3).sustain(.2).release(.8)
+    .degradeBy(ref(() => .5 - tape.stir * .45))
+    .pan(ref(() => tape.x)).gain(.1)
+    .orbit(2).delay(.35).delaytime(.31).delayfeedback(.45).room(.7).roomsize(6),
+
+  // two-step: a skipping kick, snares on two and four, shuffled hats
+  s("sbd ~ ~ ~ ~ ~ ~ ~ ~ ~ sbd ~ ~ ~ ~ ~").decay(.4)
+    .gain(ref(() => beat() * .3)).orbit(3),
+  s("~ white ~ white").decay(.1).sustain(0).bpf(1900)
+    .gain(ref(() => beat() * .65)).orbit(3).room(.4).roomsize(2),
+  s("white*16").swingBy(1/6, 8).decay(.02).sustain(0).hpf(8000)
+    .degradeBy(ref(() => .7 - tape.stir * .5))
+    .gain(ref(() => beat() * .22)).orbit(3).room(.4).roomsize(2),
+
+  // sub
+  n("<0 ~ -2 [-1 ~]>").scale("C1:minor").s("sine").decay(.9).sustain(.3)
+    .shape(.2).gain(.16).orbit(3),
+
+  // holding: the voices gather into a choir
+  n("[0,2,4,6]*8").scale(mode).s("sawtooth").vowel("a").decay(.25).sustain(0)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
+    .lpf(ref(() => 400 + tape.hold * 3000))
+    .gain(ref(() => tape.hold * .3))
+    .orbit(1).room(.85).roomsize(8),
+)`,
+  },
+  mono: {
+    root: 48,
+    steps: [0, 1, 3, 5, 7, 8, 10],
+    cps: 0.58,
+    voice: { s: 'square', hpf: 400, lpf: 2400 },
+    crackle: 0.04,
+    code: `// tape: mono. pressure.
+// after The Bug, Coil, Swans, Source Direct
+setcps(.58)
+const mode = "C3:phrygian"
+const beat = () => (.3 + tape.stir * .7) * (.5 + tape.home * .5)
+
+stack(
+  // the hum: a low drone that fills the room
+  note("<c2 c2 c2 db2>/2").s("sawtooth").attack(2).release(4)
+    .lpf(ref(() => 140 + tape.night * 80)).shape(.5).gain(.055)
+    .orbit(1).room(.6).roomsize(8),
+
+  // riddim: half-time, three-three-two, heavy
+  s("sbd ~ ~ sbd ~ ~ sbd ~").decay(.9).shape(.3)
+    .gain(ref(() => beat() * .15)).orbit(3),
+  s("~ ~ ~ ~ white ~ ~ ~").decay(.18).sustain(0).bpf(1200)
+    .gain(ref(() => beat() * .35)).orbit(3).room(.5).roomsize(3),
+  // move fast enough and the hats double into jungle
+  s("white*8").ply(ref(() => tape.stir > .6 ? 2 : 1)).decay(.02).sustain(0).hpf(9000)
+    .gain(ref(() => beat() * .2 * tape.stir)).orbit(3).room(.5).roomsize(3),
+
+  // dub: one stab, thrown into a long echo
+  n("<[~ [0,3]] ~ [~ ~ [0,3] ~] ~>".add(ref(() => tape.register))).scale(mode)
+    .s("square").hpf(500).lpf(2400).decay(.08).sustain(0).gain(.08)
+    .orbit(2).delay(.6).delaytime(.31).delayfeedback(.7).room(.3).roomsize(4),
+
+  // moving: metal, struck somewhere in the dark
+  n(irand(5).segment(8).add(ref(() => tape.register))).scale("C4:phrygian")
+    .s("sine").fm(5).fmh(1.41).decay(.25).sustain(0)
+    .degradeBy(ref(() => .95 - tape.stir * .6))
+    .pan(ref(() => tape.x)).gain(.1)
+    .orbit(2).delay(.3).delaytime(.31).delayfeedback(.7).room(.3).roomsize(4),
+
+  // holding: it only gets louder
+  n("[0,1,4,7]*8").scale("C2:phrygian").s("sawtooth").decay(.2).sustain(.2)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
+    .distort(ref(() => tape.hold * 2)).postgain(.2)
+    .lpf(ref(() => 200 + tape.hold * 3000))
+    .gain(ref(() => tape.hold * .2))
+    .orbit(1).room(.6).roomsize(8),
+)`,
+  },
 };
 
 export function codeFor(palette: string, seed: number) {
-  const m = MODES[palette] ?? MODES.oxide;
-  return `// tape: ${palette}. \`tape\` is written by the canvas every frame.
-setcps(${m.cps})
-const mode = "${m.scale}"
-
-stack(
-  // bed: slow chords, brighter late at night
-  n("<[0,2,4] [-2,0,3] [-1,1,4] [-3,0,2]>/2").scale(mode)
-    .s("${m.pad}").attack(1.5).release(3)
-    .lpf(ref(() => 380 + tape.night * 520)).gain(${m.padGain})
-    .room(.9).roomsize(8),
-
-  // stir: moving plays; height picks the register, speed the density
-  n(irand(7).segment(16).add(ref(() => tape.register))).scale(mode)
-    .${m.lead}.decay(.25).sustain(0).release(.4)
-    .degradeBy(ref(() => .97 - tape.stir * ${(0.85 * (1 - m.sparse)).toFixed(2)}))
-    .lpf(ref(() => 900 + tape.stir * 4200)).pan(ref(() => tape.x))
-    .gain(${m.leadGain}).delay(.45).delaytime(.375).delayfeedback(.5).room(.5),
-
-  // gather: holding pulls a chord in and it swells
-  n("[0,2,4,7]*8").scale(mode).s("sawtooth").decay(.12).sustain(0)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .lpf(ref(() => 300 + tape.hold * 5200)).lpq(8)
-    .gain(ref(() => tape.hold * .3)).room(.7),
-
-  // transport: the heads ticking over, quieter while reading
-  s("white(5,16)").decay(.03).sustain(0).hpf(7000)
-    .gain(ref(() => (.05 + tape.stir * .12) * (.4 + tape.home * .6))),
-).seed(${seed})
-`;
+  return `${(TAPES[palette] ?? TAPES.oxide).code}.seed(${seed})\n`;
 }
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
@@ -177,12 +365,12 @@ class Deck {
   }
 
   // Reading pages play the same tape, quieter and darker; older pages are more worn.
-  set(home: boolean, wear: number, night: number) {
+  set(home: boolean, wear: number, night: number, crackle: number) {
     const t = this.ctx.currentTime;
     this.duck.gain.setTargetAtTime(home ? 1 : 0.4, t, 0.4);
     this.tone.frequency.setTargetAtTime(home ? 16000 - wear * 6000 : 5200 - wear * 3000, t, 0.4);
     this.hiss.gain.setTargetAtTime(0.012 + wear * 0.02 + night * 0.006, t, 0.4);
-    this.crackle.gain.setTargetAtTime(wear * 0.25, t, 0.4);
+    this.crackle.gain.setTargetAtTime(wear * 0.25 + crackle, t, 0.4);
     this.wowDepth.gain.setTargetAtTime(0.0008 + wear * 0.003, t, 0.4);
   }
 
@@ -234,10 +422,11 @@ class Deck {
 }
 
 export class TapeSound {
-  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1 };
+  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0 };
   private deck: Deck;
-  private mode: Mode = MODES.oxide;
+  private tape: Tape = TAPES.oxide;
   private palette = 'oxide';
+  private loadedAt = 0;
   code = '';
   private home = true;
   private wear = 0;
@@ -271,8 +460,10 @@ export class TapeSound {
   }
 
   async load(palette: string) {
-    this.palette = MODES[palette] ? palette : 'oxide';
-    this.mode = MODES[this.palette];
+    this.palette = TAPES[palette] ? palette : 'oxide';
+    this.tape = TAPES[this.palette];
+    this.loadedAt = performance.now();
+    this.ear.decay = 0;
     this.code = codeFor(this.palette, Math.floor(Math.random() * 1000));
     await evaluate(this.code);
   }
@@ -296,16 +487,21 @@ export class TapeSound {
     e.night = night;
     e.home = this.home ? 1 : 0;
     const now = performance.now();
+    e.decay = clamp((now - this.loadedAt) / 360_000);
     if (now - this.lastSet > 200) {
       this.lastSet = now;
-      this.deck.set(this.home, this.wear, night);
+      this.setDeck();
     }
   }
 
   scene(home: boolean, wear: number) {
     this.home = home;
     this.wear = wear;
-    this.deck.set(home, wear, this.ear.night);
+    this.setDeck();
+  }
+
+  private setDeck() {
+    this.deck.set(this.home, this.wear, this.ear.night, this.tape.crackle + this.ear.decay * 0.04);
   }
 
   event(e: TapeEvent) {
@@ -314,18 +510,20 @@ export class TapeSound {
     else if (e.type === 'burst') this.burst(e.power, e.x);
   }
 
-  // Releasing a hold scatters the gathered chord: more power, more notes, wider and longer.
+  // Releasing a hold scatters the gathered chord in the tape's own voice: more power, more notes,
+  // wider and longer. Bursts get an orbit of their own so their echo never disturbs the pattern.
   private burst(power: number, x: number) {
-    const { mode } = this;
+    const { tape } = this;
     const t = this.ctx.currentTime + 0.03;
     const count = 3 + Math.round(power * 5);
-    const len = mode.steps.length;
+    const len = tape.steps.length;
     for (let i = 0; i < count; i++) {
       const degree = this.ear.register + i * 2;
-      const note = mode.root + 12 + mode.steps[degree % len] + 12 * Math.floor(degree / len);
+      const note = tape.root + 12 + tape.steps[degree % len] + 12 * Math.floor(degree / len);
       superdough(
         {
-          s: mode.burst,
+          lpf: 1800 + power * 6000,
+          ...tape.voice,
           note,
           gain: (0.16 + power * 0.14) * (this.home ? 1 : 0.5),
           attack: 0.003,
@@ -333,16 +531,16 @@ export class TapeSound {
           sustain: 0,
           release: 1,
           pan: clamp(x + (Math.random() - 0.5) * (0.2 + power * 0.8)),
-          lpf: 1800 + power * 6000,
-          room: 0.5 + power * 0.4,
-          roomsize: 3 + power * 6,
+          orbit: 4,
+          room: 0.4 + power * 0.5,
+          roomsize: 6,
           delay: 0.3,
           delaytime: 0.25,
           delayfeedback: 0.35,
         },
         t + i * (0.09 - power * 0.06),
         0.4 + power,
-        mode.cps,
+        tape.cps,
       );
     }
   }
