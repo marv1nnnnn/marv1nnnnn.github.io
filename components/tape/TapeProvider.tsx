@@ -405,7 +405,7 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     if (sound !== 'on') return;
     const id = window.setInterval(() => {
       const tape = tapeRef.current;
-      if (tape) soundRef.current?.update(tape.listen(), nightness());
+      if (tape) soundRef.current?.update(tape.listen(), nightness(), trackAt(head.current));
     }, 33);
     return () => clearInterval(id);
   }, [sound]);

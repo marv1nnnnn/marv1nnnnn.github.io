@@ -22,7 +22,21 @@ export interface Ear {
   night: number; // 1 at 3am, 0 at 3pm
   home: number; // 1 on the home page, 0 while reading
   decay: number; // how long this tape has been playing: 0 when it goes in, 1 after six minutes
+  // The arrangement for the track under the head (orbit 1 pads and holds, 2 melody, 3 drums and bass).
+  mix1: number;
+  mix2: number;
+  mix3: number;
 }
+
+// Each track is a section of the same piece: the intro sparse, make the full band, input the
+// melody, log the rhythm, about only the air. Kept at or under 1 (velocity scales gain).
+const ARRANGEMENT: [number, number, number][] = [
+  [1, 0.8, 0.4],
+  [1, 1, 1],
+  [0.85, 1, 0.45],
+  [0.5, 0.55, 1],
+  [1, 0.35, 0.12],
+];
 
 export interface Listening {
   speed: number;
@@ -269,8 +283,10 @@ stack(
   },
 };
 
+// Every layer also answers the arrangement of the track it is heard on, through its orbit.
 export function codeFor(palette: string, seed: number) {
-  return `${(TAPES[palette] ?? TAPES.oxide).code}.seed(${seed})\n`;
+  const code = (TAPES[palette] ?? TAPES.oxide).code.replace(/\.orbit\(([123])\)/g, '.velocity(ref(() => tape.mix$1)).orbit($1)');
+  return `${code}.seed(${seed})\n`;
 }
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
@@ -453,7 +469,7 @@ class Deck {
 }
 
 export class TapeSound {
-  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0 };
+  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0, mix1: 1, mix2: 0.8, mix3: 0.4 };
   private deck: Deck;
   private tape: Tape = TAPES.oxide;
   private palette = 'oxide';
@@ -507,8 +523,12 @@ export class TapeSound {
     await this.load(palette);
   }
 
-  update(l: Listening, night: number) {
+  update(l: Listening, night: number, track = 0) {
     const e = this.ear;
+    const [a, b, c] = ARRANGEMENT[track] ?? ARRANGEMENT[0];
+    e.mix1 += (a - e.mix1) * 0.05;
+    e.mix2 += (b - e.mix2) * 0.05;
+    e.mix3 += (c - e.mix3) * 0.05;
     const target = clamp(l.speed / 24) * (this.home ? 1 : 0.35);
     // Quick to wake up, slow to settle, like a meter.
     e.stir += (target - e.stir) * (target > e.stir ? 0.25 : 0.02);
