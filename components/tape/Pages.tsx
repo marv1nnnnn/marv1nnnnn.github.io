@@ -202,6 +202,25 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
       const q = Math.min(steps, Math.max(0, window.scrollY / stepPx()));
       leaves.current.forEach((leaf, j) => {
         if (!leaf) return;
+        // A phone does not fold paper in 3D (stacked 3D layers show through each other on mobile
+        // GPUs): the page there slides a little and fades into the next, one page at a time.
+        if (!spread) {
+          // d: where this page is from the one being read (0 it, 1 the next); the page going
+          // lies on top and fades out over the next one waiting underneath.
+          const d = j - q;
+          const shown = d > -1 && d < 1;
+          const going = d <= 0;
+          // Pages out of play are transparent (not hidden, so they stay readable to assistive
+          // technology) and untransformed, so a phone's GPU only composites the two in play.
+          leaf.style.transform = shown && going && d < 0 ? `translateX(${(d * 28).toFixed(1)}px)` : '';
+          leaf.style.opacity = !shown ? '0' : going ? (1 + d).toFixed(3) : '';
+          leaf.style.zIndex = shown ? (going ? '3' : '2') : '0';
+          // Only the page nearer the reader takes touches.
+          leaf.style.pointerEvents = Math.abs(d) <= 0.5 ? '' : 'none';
+          leaf.classList.toggle('is-turned', d <= -1);
+          leaf.classList.toggle('is-over', false);
+          return;
+        }
         const a = Math.min(1, Math.max(0, q - j));
         leaf.style.transform = `rotateY(${(-180 * a).toFixed(2)}deg)`;
         leaf.style.zIndex = String(a <= 0 ? leafCount - j : a >= 1 ? j + 1 : leafCount + 2);
