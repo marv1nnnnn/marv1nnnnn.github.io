@@ -434,11 +434,16 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
   background: linear-gradient(90deg, rgba(0, 0, 0, calc(var(--lift, 0) * 0.5)), rgba(var(--ink-rgb), calc(var(--lift, 0) * 0.07)) 55%, rgba(0, 0, 0, calc(var(--lift, 0) * 0.3)));
 }
 .is-single .leaf.is-turned { visibility: hidden; }
-/* On a phone the pages are flat: no perspective, no 3D layers, just one page over the next. */
-.is-single .booklet-pages { perspective: none; transform-style: flat; animation-name: book-in-flat; }
-.is-single .leaf { transform-style: flat; transform-origin: center; will-change: auto; }
+/* On a phone the pages are a column: the finger moves them directly, and the browser snaps to
+   each page (Pages.tsx adds .snap-pages to html). No 3D, no animation of our own. */
+.is-single .booklet-stage { position: static; height: auto; display: block; }
+.is-single .booklet-pages { margin: 0 auto; height: auto; perspective: none; transform-style: flat; animation-name: book-in-flat; }
+.is-single .leaf { position: relative; height: var(--ph); margin-bottom: var(--gap); transform-style: flat; will-change: auto; scroll-snap-align: start; scroll-snap-stop: always; }
 .is-single .face { -webkit-backface-visibility: visible; backface-visibility: visible; }
-.is-single .face::after, .is-single .face.back { display: none; }
+.is-single .face::after { display: none; }
+html.snap-pages { scroll-snap-type: y mandatory; scroll-padding-top: var(--snap-top, 0px); }
+/* The pages pass under the deck as they scroll: it is solid there. */
+html.snap-pages .top { background: rgb(var(--bg-rgb)); }
 @keyframes book-in-flat { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
 .pg {

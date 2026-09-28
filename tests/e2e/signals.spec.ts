@@ -39,7 +39,7 @@ test.describe('sections', () => {
     await expect(page.locator('.booklet-book[data-ready]')).toBeVisible();
     // The filters are on the page after the title page.
     await page.keyboard.press('ArrowRight');
-    await expect.poll(() => page.evaluate(() => scrollY / (innerHeight * 0.8)), { timeout: 15_000 }).toBeCloseTo(1, 1);
+    await expect(page.locator('.booklet-book')).toHaveAttribute('data-at', '1', { timeout: 15_000 });
     await page.waitForTimeout(300);
     const rows = page.locator('.row');
     const all = await rows.count();
@@ -88,7 +88,7 @@ test('the booklet turns its pages with the arrow keys, then winds on to the next
   const steps = isMobile ? leaves - 1 : Math.ceil((await page.locator('.pg[data-page]').count() - 1) / 2);
   for (let k = 0; k < steps; k++) {
     await page.keyboard.press('ArrowRight');
-    await expect.poll(() => page.evaluate(() => Math.round(scrollY / (innerHeight * 0.8)))).toBe(k + 1);
+    await expect(page.locator('.booklet-book')).toHaveAttribute('data-at', String(k + 1));
   }
   await expect(page).toHaveURL(/\/about$/);
   // about is the last track: going back past the first page winds to log.

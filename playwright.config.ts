@@ -31,9 +31,11 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: 'pnpm dev',
+        // The static export, served as GitHub Pages serves it: the dev server compiles each page
+        // on its first visit, which can outlast a test's wait for a navigation.
+        command: `pnpm build && node scripts/serve-out.js`,
         url: BASE_URL,
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 300_000,
       },
 });
