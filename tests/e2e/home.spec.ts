@@ -41,6 +41,31 @@ test.describe('home /', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
   });
 
+  test('the deck winds between tracks', async ({ page }) => {
+    await page.goto('/');
+    const count = page.locator('.deck-count');
+    await expect(count).toHaveText('000');
+    await page.getByRole('button', { name: 'Fast forward' }).click();
+    await expect(page).toHaveURL(/\/make$/);
+    await expect(count).toHaveText('060');
+    await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'log' }).click();
+    await expect(page).toHaveURL(/\/log$/);
+    await page.getByRole('button', { name: 'Rewind' }).click();
+    await expect(page).toHaveURL(/\/input$/);
+  });
+
+  test('holding fast-forward winds until it is let go', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'mouse hold');
+    await page.goto('/');
+    const ff = page.getByRole('button', { name: 'Fast forward' });
+    await ff.hover();
+    await page.mouse.down();
+    await expect(page.locator('.deck-cue')).toBeVisible();
+    await page.waitForTimeout(1600);
+    await page.mouse.up();
+    await expect(page).not.toHaveURL(/\/$/);
+  });
+
   test('the home page does not scroll sideways on phones', async ({ page }) => {
     await page.goto('/');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);

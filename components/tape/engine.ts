@@ -107,7 +107,9 @@ export interface Obstacle { cx: number; cy: number; hw: number; hh: number }
 export type TapeEvent =
   | { type: 'burst'; x: number; y: number; power: number }
   | { type: 'erase'; y: number }
-  | { type: 'seek'; direction: -1 | 1 };
+  | { type: 'seek'; direction: -1 | 1; seconds: number }
+  | { type: 'scan'; direction: -1 | 1 }
+  | { type: 'land' };
 
 export class Tape {
   private ctx: CanvasRenderingContext2D;
@@ -122,6 +124,8 @@ export class Tape {
   private dropouts: { y: number; age: number }[] = [];
   private ff = 0;
   private ffDir = -1;
+  private scanning = false;
+  private winds = 0;
   private frames = 0;
   private heard = { x: 0.5, y: 0.5 };
   scene: Scene = HOME_SCENE;
@@ -169,18 +173,52 @@ export class Tape {
     this.clear();
   }
 
-  // A page change plays as fast-forward (deeper into the site) or rewind (back up).
+  // Winding between tracks: fast-forward (-1, further along the tape) or rewind (1). The field
+  // streaks for the length of the wind, then the tape lands and plays again.
   seek(direction: -1 | 1, duration = 700) {
     this.ffDir = direction;
-    this.onEvent?.({ type: 'seek', direction });
+    this.scanning = false;
+    this.onEvent?.({ type: 'seek', direction, seconds: duration / 1000 });
     const t0 = performance.now();
+    const from = this.ff;
+    const run = ++this.winds;
     const tick = () => {
+      if (run !== this.winds) return;
       const k = Math.min(1, (performance.now() - t0) / duration);
-      this.ff = Math.sin(Math.PI * k);
+      // Up to speed quickly, hold, then slow down into the landing.
+      const up = Math.min(1, k / 0.2);
+      const down = Math.min(1, (1 - k) / 0.3);
+      this.ff = Math.max(from * (1 - up), Math.min(up, down));
       if (k < 1) requestAnimationFrame(tick);
       else this.ff = 0;
     };
     requestAnimationFrame(tick);
+  }
+
+  // Holding fast-forward or rewind: the tape winds until land() or the next seek().
+  scan(direction: -1 | 1) {
+    this.ffDir = direction;
+    this.scanning = true;
+    this.onEvent?.({ type: 'scan', direction });
+    const run = ++this.winds;
+    const tick = () => {
+      if (run !== this.winds) return;
+      if (this.scanning) {
+        this.ff += (1 - this.ff) * 0.12;
+        requestAnimationFrame(tick);
+      } else {
+        this.ff *= 0.85;
+        if (this.ff > 0.01) requestAnimationFrame(tick);
+        else this.ff = 0;
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  land() {
+    if (!this.scanning) return;
+    this.scanning = false;
+    this.onEvent?.({ type: 'land' });
   }
 
   pointerDown(id: number, x: number, y: number, gathers: boolean) {

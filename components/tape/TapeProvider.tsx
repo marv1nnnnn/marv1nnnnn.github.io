@@ -1,9 +1,10 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { DEFAULT_PALETTE, PALETTES, Tape, nightness, type Scene } from './engine';
 import type { TapeSound } from './sound';
+import { TAPE_LENGTH, TRACKS, headOf, trackAt, trackIndex } from './tracks';
 
 export type SoundState = 'off' | 'loading' | 'on';
 
@@ -13,6 +14,13 @@ interface TapeControls {
   sound: SoundState;
   toggleSound: () => void;
   code: string;
+  // The tape position, 0..TAPE_LENGTH, read every frame by the deck.
+  head: React.MutableRefObject<number>;
+  // -1 while fast-forwarding, 1 while rewinding.
+  winding: -1 | 0 | 1;
+  skip: (direction: -1 | 1) => void;
+  scan: (direction: -1 | 1) => void;
+  release: () => void;
 }
 
 const TapeContext = createContext<TapeControls | null>(null);
@@ -23,16 +31,12 @@ export function useTape() {
   return ctx;
 }
 
-// Order of the sections on the tape: moving right fast-forwards, moving left rewinds.
-const ORDER = ['', 'make', 'think', 'input', 'about'];
-function position(path: string) {
-  const parts = path.split('/').filter(Boolean);
-  const top = ORDER.indexOf(parts[0] ?? '');
-  return (top < 0 ? 0 : top) + (parts.length > 1 ? 0.5 : 0);
-}
+// How long a wind takes: longer the further the tape has to travel.
+const windTime = (distance: number) => 420 + Math.min(1, Math.abs(distance) / TAPE_LENGTH) * 1400;
+const SCAN_SPEED = 280; // counter units per second while fast-forward or rewind is held
 
 // Pointer contact with readable content should not gather the lines.
-const READING = 'a, button, input, .prose, .rows, .canon, .credits, .strip, .jcard';
+const READING = 'a, button, input, .top, .prose, .rows, .canon, .credits, .strip, .jcard';
 
 function hexToRgb(hex: string) {
   const n = parseInt(hex.slice(1), 16);
@@ -69,7 +73,11 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   const tapeRef = useRef<Tape | null>(null);
   const reducedRef = useRef(false);
   const pathname = usePathname();
+  const router = useRouter();
   const lastPath = useRef<string | null>(null);
+  const head = useRef(0);
+  const [winding, setWinding] = useState<-1 | 0 | 1>(0);
+  const windingRef = useRef<{ dir: -1 | 1; scanning: boolean; frame: number } | null>(null);
   const paletteRef = useRef(DEFAULT_PALETTE);
   const soundRef = useRef<TapeSound | null>(null);
   const [sound, setSound] = useState<SoundState>('off');
@@ -176,13 +184,104 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     };
   }, [updateObstacle]);
 
+  const setWind = useCallback((dir: -1 | 0 | 1) => {
+    setWinding(dir);
+    if (dir) document.body.dataset.wind = dir < 0 ? 'ff' : 'rew';
+    else delete document.body.dataset.wind;
+  }, []);
+
+  // Reading down a page plays through its track.
+  const through = useCallback(() => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+  }, []);
+  useEffect(() => {
+    const onScroll = () => {
+      if (!windingRef.current) head.current = headOf(pathname, through());
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [pathname, through]);
+
+  // Every page change winds the tape from where it was to where the new page sits.
   useEffect(() => {
     const prev = lastPath.current;
     lastPath.current = pathname;
+    const to = headOf(pathname);
+    const w = windingRef.current;
+    if (w) cancelAnimationFrame(w.frame);
     const tape = tapeRef.current;
-    if (!tape || prev === null || prev === pathname || reducedRef.current) return;
-    tape.seek(position(pathname) >= position(prev) ? -1 : 1);
-  }, [pathname]);
+    if (!tape || prev === null || prev === pathname || reducedRef.current) {
+      windingRef.current = null;
+      head.current = to;
+      if (w?.scanning) tape?.land();
+      setWind(0);
+      return;
+    }
+    const from = head.current;
+    const dir = to >= from ? -1 : 1;
+    // After a held scan the tape is already close: only the landing is left.
+    const duration = w?.scanning ? 360 : windTime(to - from);
+    tape.seek(dir, duration);
+    setWind(dir);
+    const t0 = performance.now();
+    const state = { dir, scanning: false, frame: 0 } as { dir: -1 | 1; scanning: boolean; frame: number };
+    windingRef.current = state;
+    const tick = () => {
+      const k = Math.min(1, (performance.now() - t0) / duration);
+      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      head.current = from + (to - from) * e;
+      if (k < 1) state.frame = requestAnimationFrame(tick);
+      else {
+        windingRef.current = null;
+        head.current = headOf(pathname, through());
+        setWind(0);
+      }
+    };
+    state.frame = requestAnimationFrame(tick);
+  }, [pathname, setWind, through]);
+
+  // Next or previous track.
+  const skip = useCallback((direction: -1 | 1) => {
+    const i = trackIndex(pathname) + (direction < 0 ? 1 : -1);
+    if (i >= 0 && i < TRACKS.length) router.push(TRACKS[i].path);
+  }, [pathname, router]);
+
+  // Holding fast-forward or rewind runs the tape until it is let go, then plays the track under the head.
+  const scan = useCallback((direction: -1 | 1) => {
+    const tape = tapeRef.current;
+    if (!tape || reducedRef.current) return skip(direction);
+    const prev = windingRef.current;
+    if (prev) cancelAnimationFrame(prev.frame);
+    const state = { dir: direction, scanning: true, frame: 0 } as { dir: -1 | 1; scanning: boolean; frame: number };
+    windingRef.current = state;
+    tape.scan(direction);
+    setWind(direction);
+    let last = performance.now();
+    const tick = () => {
+      const now = performance.now();
+      const step = ((now - last) / 1000) * SCAN_SPEED * (direction < 0 ? 1 : -1);
+      last = now;
+      head.current = Math.max(0, Math.min(TAPE_LENGTH - 1, head.current + step));
+      state.frame = requestAnimationFrame(tick);
+    };
+    state.frame = requestAnimationFrame(tick);
+  }, [setWind, skip]);
+
+  const release = useCallback(() => {
+    const state = windingRef.current;
+    if (!state?.scanning) return;
+    cancelAnimationFrame(state.frame);
+    const landed = trackAt(head.current);
+    if (landed !== trackIndex(pathname)) {
+      router.push(TRACKS[landed].path);
+      return;
+    }
+    windingRef.current = null;
+    tapeRef.current?.land();
+    head.current = headOf(pathname, through());
+    setWind(0);
+  }, [pathname, router, setWind, through]);
 
   const setScene = useCallback((scene: Scene) => {
     document.body.classList.toggle('is-home', scene.home);
@@ -284,7 +383,10 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     return remove;
   }, [toggleSound]);
 
-  const value = useMemo(() => ({ setScene, newTape, sound, toggleSound, code }), [setScene, newTape, sound, toggleSound, code]);
+  const value = useMemo(
+    () => ({ setScene, newTape, sound, toggleSound, code, head, winding, skip, scan, release }),
+    [setScene, newTape, sound, toggleSound, code, winding, skip, scan, release],
+  );
 
   return (
     <TapeContext.Provider value={value}>
