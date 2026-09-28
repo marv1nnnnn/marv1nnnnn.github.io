@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { TapeScene } from '@/components/tape/parts';
-import JCard from '@/components/tape/JCard';
+import Booklet from '@/components/tape/Booklet';
+import CoverArt from '@/components/tape/CoverArt';
 import { getAbout } from '@/lib/tape';
 
 export const metadata: Metadata = {
@@ -16,35 +17,37 @@ export default function AboutPage() {
     ...about.contact.map((c) => ({ label: c.label, value: c.value, href: c.href })),
     ...(about.resume ? [{ label: 'Resume', value: 'PDF', href: about.resume.href }] : []),
   ];
+  const sideA = [about.hero.description, about.current].filter((p): p is string => !!p);
   return (
-    <article className="page about">
+    <Booklet path="/about" title="about" lede={about.hero.subtitle} className="about">
       <TapeScene seed="about" age={0.15} />
-      <h1 className="visually-hidden">about</h1>
-      <JCard
-        name="马进"
-        handle="marv1nnnnn"
-        role={about.hero.subtitle ?? ''}
-        sideA={[about.hero.description, about.current].filter((p): p is string => !!p)}
-        sideB={about.facts}
-      />
-
-      <section className="credits">
-        <h2><span>credits</span></h2>
-        <dl>
-          {links.map((c) => (
-            <div key={c.label} className="credit">
-              <dt>{c.label}</dt>
-              <dd>
-                {c.label === 'Email' ? (
-                  <span className="selectable">{c.value}</span>
-                ) : (
-                  <a href={c.href} target="_blank" rel="noopener noreferrer">{c.value}</a>
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
+      {/* The booklet's cover art, a page of its own. */}
+      <section className="own cover" key="cover">
+        <CoverArt />
+        <p className="cover-handle">marvin ma</p>
+        <p className="cover-name">marv1nnnnn</p>
+        <p className="cover-spec" aria-hidden="true">side a · now&nbsp;&nbsp;/&nbsp;&nbsp;side b · before</p>
       </section>
-    </article>
+
+      <h2 className="keep brk" key="side-a"><span>side a · now</span></h2>
+      {sideA.map((p) => <p className="verse" key={p}>{p}</p>)}
+
+      <h2 className="keep" key="side-b"><span>side b · before</span></h2>
+      {about.facts.map((f, i) => <p className="track-b" key={f}><span>b{i + 1}</span>{f}</p>)}
+
+      <h2 className="keep brk" key="credits"><span>credits</span></h2>
+      {links.map((c) => (
+        <p key={c.label} className="credit">
+          <span className="credit-k">{c.label}</span>
+          <span className="credit-v">
+            {c.label === 'Email' ? (
+              <span className="selectable">{c.value}</span>
+            ) : (
+              <a href={c.href} target="_blank" rel="noopener noreferrer">{c.value}</a>
+            )}
+          </span>
+        </p>
+      ))}
+    </Booklet>
   );
 }

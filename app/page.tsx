@@ -10,7 +10,6 @@ export default function Home() {
       <h1 className="visually-hidden">Marvin Ma, marv1nnnnn</h1>
       <div className="home-bottom">
         <div className="intro">
-          <span className="cn" lang="zh">马进</span>
           <p>Product manager at YouWare. Used to make noise in Beijing. Building agents, mostly for myself.</p>
           {latest && <Link className="latest" href={`/think/${latest.id}`}>latest: {latest.title} →</Link>}
         </div>

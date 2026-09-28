@@ -1,4 +1,6 @@
-// The tape: one flow field shared by every page. Pages only change its parameters.
+// The desk the cassette lies on: iron filings over a slow magnetic field, shared by every page.
+// Pages only change its parameters. The pointer is a magnet: filings turn to it as it passes,
+// gather under it while it is held, and scatter when it lets go.
 
 export type RGB = [number, number, number];
 
@@ -99,7 +101,8 @@ export function nightness(d = new Date()) {
   return 0.5 + 0.5 * Math.cos(((h - 3) / 24) * TAU);
 }
 
-interface Particle { x: number; y: number; life: number; alt: boolean; heat: number }
+// A filing rests at (hx, hy); it is pushed and pulled from there and springs back.
+interface Filing { hx: number; hy: number; x: number; y: number; vx: number; vy: number; a: number; len: number; tone: number; heat: number }
 interface Pointer { x: number; y: number; vx: number; vy: number; down: boolean; since: number }
 export interface Obstacle { cx: number; cy: number; hw: number; hh: number }
 
@@ -107,7 +110,9 @@ export interface Obstacle { cx: number; cy: number; hw: number; hh: number }
 export type TapeEvent =
   | { type: 'burst'; x: number; y: number; power: number }
   | { type: 'erase'; y: number }
-  | { type: 'seek'; direction: -1 | 1 };
+  | { type: 'seek'; direction: -1 | 1; seconds: number }
+  | { type: 'scan'; direction: -1 | 1 }
+  | { type: 'land' };
 
 export class Tape {
   private ctx: CanvasRenderingContext2D;
@@ -115,13 +120,16 @@ export class Tape {
   private H = 0;
   private noise: Noise = makeNoise(rng(1));
   private t = Math.random() * 10;
-  private parts: Particle[] = [];
+  private filings: Filing[] = [];
+  private slide = 0; // how far the filings have slid sideways while the tape winds
   private density = 1;
   private pointers = new Map<number, Pointer>();
   private bursts: { x: number; y: number; age: number; power: number }[] = [];
   private dropouts: { y: number; age: number }[] = [];
   private ff = 0;
   private ffDir = -1;
+  private scanning = false;
+  private winds = 0;
   private frames = 0;
   private heard = { x: 0.5, y: 0.5 };
   scene: Scene = HOME_SCENE;
@@ -145,14 +153,28 @@ export class Tape {
     this.canvas.height = Math.floor(this.H * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.clear();
-    const n = Math.min(this.coarse ? 1600 : 2600, Math.floor((this.W * this.H) / 650));
-    while (this.parts.length < n) this.parts.push(this.spawn({ x: 0, y: 0, life: 0, alt: false, heat: 0 }));
-    this.parts.length = n;
+    // Scattered evenly (jittered grid), the same every time for a given size.
+    const n = Math.min(this.coarse ? 1100 : 2000, Math.floor((this.W * this.H) / 560));
+    const cols = Math.max(1, Math.round(Math.sqrt((n * this.W) / this.H)));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    const r = rng(hash('filings'));
+    this.filings = [];
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
+        const hx = ((i + r()) * this.W) / cols, hy = ((j + r()) * this.H) / rows;
+        this.filings.push({ hx, hy, x: hx, y: hy, vx: 0, vy: 0, a: r() * Math.PI, len: 2.5 + r() * r() * 8, tone: r(), heat: 0 });
+      }
+    }
+    // Draw order shuffled, so a thinner density drops filings evenly rather than whole rows.
+    for (let i = this.filings.length - 1; i > 0; i--) {
+      const k = Math.floor(r() * (i + 1));
+      [this.filings[i], this.filings[k]] = [this.filings[k], this.filings[i]];
+    }
   }
 
+  // The canvas is transparent: the desk itself is drawn by the page background (globals.css).
   clear() {
-    this.ctx.fillStyle = `rgb(${this.palette.bg})`;
-    this.ctx.fillRect(0, 0, this.W, this.H);
+    this.ctx.clearRect(0, 0, this.W, this.H);
   }
 
   setScene(scene: Scene) {
@@ -169,18 +191,52 @@ export class Tape {
     this.clear();
   }
 
-  // A page change plays as fast-forward (deeper into the site) or rewind (back up).
+  // Winding between tracks: fast-forward (-1, further along the tape) or rewind (1). The field
+  // streaks for the length of the wind, then the tape lands and plays again.
   seek(direction: -1 | 1, duration = 700) {
     this.ffDir = direction;
-    this.onEvent?.({ type: 'seek', direction });
+    this.scanning = false;
+    this.onEvent?.({ type: 'seek', direction, seconds: duration / 1000 });
     const t0 = performance.now();
+    const from = this.ff;
+    const run = ++this.winds;
     const tick = () => {
+      if (run !== this.winds) return;
       const k = Math.min(1, (performance.now() - t0) / duration);
-      this.ff = Math.sin(Math.PI * k);
+      // Up to speed quickly, hold, then slow down into the landing.
+      const up = Math.min(1, k / 0.2);
+      const down = Math.min(1, (1 - k) / 0.3);
+      this.ff = Math.max(from * (1 - up), Math.min(up, down));
       if (k < 1) requestAnimationFrame(tick);
       else this.ff = 0;
     };
     requestAnimationFrame(tick);
+  }
+
+  // Holding fast-forward or rewind: the tape winds until land() or the next seek().
+  scan(direction: -1 | 1) {
+    this.ffDir = direction;
+    this.scanning = true;
+    this.onEvent?.({ type: 'scan', direction });
+    const run = ++this.winds;
+    const tick = () => {
+      if (run !== this.winds) return;
+      if (this.scanning) {
+        this.ff += (1 - this.ff) * 0.12;
+        requestAnimationFrame(tick);
+      } else {
+        this.ff *= 0.85;
+        if (this.ff > 0.01) requestAnimationFrame(tick);
+        else this.ff = 0;
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  land() {
+    if (!this.scanning) return;
+    this.scanning = false;
+    this.onEvent?.({ type: 'land' });
   }
 
   pointerDown(id: number, x: number, y: number, gathers: boolean) {
@@ -238,51 +294,13 @@ export class Tape {
     return { speed, hold, x, y };
   }
 
-  private spawn(p: Particle) {
-    p.x = Math.random() * this.W;
-    p.y = Math.random() * this.H;
-    p.life = 60 + Math.random() * 260;
-    p.alt = Math.random() < 0.07;
-    p.heat = 0;
-    return p;
-  }
-
   frame() {
     const { ctx, W, H, scene, palette: pal } = this;
-    const bg = pal.bg;
     const night = nightness();
     this.density += (scene.density - this.density) * 0.04;
+    ctx.clearRect(0, 0, W, H);
 
-    ctx.fillStyle = `rgba(${bg}, ${scene.fade + this.ff * 0.08})`;
-    ctx.fillRect(0, 0, W, H);
-    // A faint fade alone never fully clears: 8-bit rounding leaves a grey haze that builds up
-    // over minutes. A stronger pass every few frames pulls the residue back to the background.
-    if (++this.frames % 12 === 0) {
-      ctx.fillStyle = `rgba(${bg}, 0.06)`;
-      ctx.fillRect(0, 0, W, H);
-    }
-
-    // Tape damage grows with the age of what is on screen.
-    if (Math.random() < 0.02 + scene.age * 0.06) {
-      ctx.fillStyle = `rgba(${bg}, ${0.5 + scene.age * 0.3})`;
-      ctx.fillRect(0, Math.random() * H, W, 1 + Math.random() * Math.random() * (36 + scene.age * 60));
-    }
-    if (Math.random() < 0.01 + scene.age * 0.03) {
-      ctx.fillStyle = `rgba(${pal.line}, 0.06)`;
-      ctx.fillRect(0, Math.random() * H, W, 1);
-    }
-    for (let i = this.dropouts.length - 1; i >= 0; i--) {
-      const d = this.dropouts[i];
-      const h = 18 + d.age * 5;
-      ctx.fillStyle = `rgba(${bg}, ${0.5 - d.age * 0.03})`;
-      ctx.fillRect(0, d.y - h / 2, W, h);
-      if (d.age === 0) {
-        ctx.fillStyle = `rgba(${pal.hot}, 0.5)`;
-        ctx.fillRect(0, d.y, W, 1);
-      }
-      if (++d.age > 14) this.dropouts.splice(i, 1);
-    }
-
+    for (let i = this.dropouts.length - 1; i >= 0; i--) if (++this.dropouts[i].age > 14) this.dropouts.splice(i, 1);
     const now = performance.now();
     const active = [...this.pointers.values()].map((p) => {
       const q = { x: p.x, y: p.y, vx: p.vx, vy: p.vy, speed: Math.hypot(p.vx, p.vy), down: p.down, hold: p.down ? Math.min(1, (now - p.since) / 1400) : 0 };
@@ -291,85 +309,111 @@ export class Tape {
       return q;
     });
     for (let i = this.bursts.length - 1; i >= 0; i--) if (++this.bursts[i].age > 45) this.bursts.splice(i, 1);
-    const holding = active.reduce((m, q) => Math.max(m, q.hold), 0);
 
-    const R = this.coarse ? 110 : 150;
+    const R = this.coarse ? 120 : 160;
     const R2 = R * R;
     const ob = this.obstacle;
     const ff = this.ff;
-    const lineP = new Path2D(), altP = new Path2D(), hotP = new Path2D();
-    const n = Math.floor(this.parts.length * Math.min(1, this.density + ff));
+    this.slide += this.ffDir * ff * 26;
+    const shadow = new Path2D(), body = new Path2D(), bright = new Path2D(), hot = new Path2D();
+    const n = Math.floor(this.filings.length * Math.min(1, this.density + ff * 0.5));
+    // Older pages: the filings have drifted more and rusted a little.
+    const drift = 1 + scene.age * 1.5;
 
     for (let i = 0; i < n; i++) {
-      const p = this.parts[i];
-      const a = this.noise(p.x * 0.0017, p.y * 0.0017, this.t) * TAU * 1.7;
-      let vx = Math.cos(a) * 1.35, vy = Math.sin(a) * 1.35;
+      const f = this.filings[i];
+      // Where it is drawn: its own position, slid along with the tape while it winds.
+      let px = (f.x + this.slide) % W;
+      if (px < 0) px += W;
+      const py = f.y;
+
+      // The field: slow, large loops, like lines of force.
+      const base = this.noise(px * 0.0019, py * 0.0019, this.t) * TAU * 1.2;
+      let fx = Math.cos(base) * drift, fy = Math.sin(base) * drift;
       let touch = 0;
 
       for (const q of active) {
-        const dx = p.x - q.x, dy = p.y - q.y, d2 = dx * dx + dy * dy;
-        if (d2 > R2 * 9) continue;
+        const dx = px - q.x, dy = py - q.y, d2 = dx * dx + dy * dy;
+        if (d2 > R2 * 12) continue;
         const d = Math.sqrt(d2) + 0.001;
-        const f = Math.exp(-d2 / R2);
-        const swirl = f * (1.6 + Math.min(q.speed, 40) * 0.09);
-        vx += (-dy / d) * swirl + q.vx * f * 0.3;
-        vy += (dx / d) * swirl + q.vy * f * 0.3;
+        // The magnet: filings point at it, more strongly the closer it is.
+        const pull = (R2 * 1.4) / (d2 + R2 * 0.18);
+        fx += (dx / d) * pull;
+        fy += (dy / d) * pull;
+        const g = Math.exp(-d2 / R2);
+        // Moving drags the nearest filings along.
+        f.vx += q.vx * g * 0.05;
+        f.vy += q.vy * g * 0.05;
         if (q.down) {
-          // Holding builds a crescendo: the pull and the glow keep growing.
-          const g = Math.exp(-d2 / (R2 * (3 + q.hold * 3))) * (1.2 + q.hold * 3.2);
-          vx -= (dx / d) * g;
-          vy -= (dy / d) * g;
-          touch = Math.max(touch, g * 0.5);
+          // Holding draws them in, harder the longer it is held.
+          const k = Math.exp(-d2 / (R2 * (1.5 + q.hold * 3))) * (0.35 + q.hold * 1.3);
+          f.vx -= (dx / d) * k;
+          f.vy -= (dy / d) * k;
+          touch = Math.max(touch, k);
         }
-        touch = Math.max(touch, f * (0.4 + Math.min(q.speed, 30) / 30));
+        touch = Math.max(touch, g * (0.3 + Math.min(q.speed, 30) / 30));
       }
       for (const b of this.bursts) {
-        const dx = p.x - b.x, dy = p.y - b.y, d2 = dx * dx + dy * dy;
+        const dx = px - b.x, dy = py - b.y, d2 = dx * dx + dy * dy;
         if (d2 > R2 * 20) continue;
         const d = Math.sqrt(d2) + 0.001;
-        const k = Math.exp(-d2 / (R2 * (4 + b.power * 4))) * (3 + b.power * 10) * (1 - b.age / 45);
-        vx += (dx / d) * k;
-        vy += (dy / d) * k;
-        touch = Math.max(touch, k * 0.25);
-      }
-      // Lines part around the title of whatever is being read.
-      if (ob) {
-        const ex = (p.x - ob.cx) / ob.hw, ey = (p.y - ob.cy) / ob.hh;
-        const e = ex * ex + ey * ey;
-        if (e < 1.6) {
-          const k = (1.6 - e) * 2.4;
-          vx += ex * k;
-          vy += ey * k;
-        }
+        const k = Math.exp(-d2 / (R2 * (3 + b.power * 4))) * (2 + b.power * 7) * (1 - b.age / 45) * (b.age < 6 ? 1 : 0.2);
+        f.vx += (dx / d) * k;
+        f.vy += (dy / d) * k;
+        touch = Math.max(touch, k * 0.3);
       }
       if (ff > 0) {
-        vx += this.ffDir * ff * 22;
-        vy *= 1 - ff * 0.8;
-        touch = Math.max(touch, ff * 0.6);
+        fx += this.ffDir * ff * 40;
+        touch = Math.max(touch, ff * 0.3);
       }
 
-      p.heat = Math.min(1, p.heat * 0.965 + touch * 0.35);
-      const nx = p.x + vx, ny = p.y + vy;
-      const path = p.heat > 0.3 ? hotP : p.alt ? altP : lineP;
-      path.moveTo(p.x, p.y);
-      path.lineTo(nx, ny);
-      p.x = nx;
-      p.y = ny;
-      p.life -= 1;
-      if (p.life <= 0 || nx < -30 || ny < -30 || nx > W + 30 || ny > H + 30) {
-        this.spawn(p);
-        if (ff > 0.2) p.x = this.ffDir < 0 ? W + 10 : -10;
+      // Spring home, with friction.
+      f.vx = (f.vx + (f.hx - f.x) * 0.018) * 0.86;
+      f.vy = (f.vy + (f.hy - f.y) * 0.018) * 0.86;
+      f.x += f.vx;
+      f.y += f.vy;
+      // A filing has no head or tail: turn the short way round (mod half a turn).
+      let da = Math.atan2(fy, fx) - f.a;
+      da -= Math.PI * Math.round(da / Math.PI);
+      f.a += da * (0.08 + touch * 0.25);
+      f.heat = Math.min(1, f.heat * 0.95 + touch * 0.3);
+
+      // Hidden under the title being read, and in a fresh dropout.
+      if (ob) {
+        const ex = (px - ob.cx) / ob.hw, ey = (py - ob.cy) / ob.hh;
+        if (ex * ex + ey * ey < 1) continue;
       }
+      let gone = false;
+      for (const d of this.dropouts) if (Math.abs(py - d.y) < 10 + d.age * 3) gone = true;
+      if (gone) continue;
+
+      const len = f.len * (1 + ff * 2.5) * (1 + f.heat * 0.4);
+      const cx = Math.cos(f.a) * len * 0.5, cy = Math.sin(f.a) * len * 0.5;
+      shadow.moveTo(px - cx + 0.8, py - cy + 1.4);
+      shadow.lineTo(px + cx + 0.8, py + cy + 1.4);
+      const path = f.heat > 0.35 ? hot : f.tone > 0.82 ? bright : body;
+      path.moveTo(px - cx, py - cy);
+      path.lineTo(px + cx, py + cy);
     }
 
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 1.3;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.stroke(shadow);
     ctx.lineWidth = 1;
-    ctx.strokeStyle = `rgba(${pal.line}, ${0.15 + night * 0.08})`;
-    ctx.stroke(lineP);
-    ctx.strokeStyle = `rgba(${pal.alt}, ${0.24 + night * 0.12})`;
-    ctx.stroke(altP);
-    ctx.lineWidth = 1.2 + holding * 0.6;
-    ctx.strokeStyle = `rgba(${pal.hot}, ${0.38 + night * 0.1 + holding * 0.35})`;
-    ctx.stroke(hotP);
-    this.t += 0.0009;
+    ctx.strokeStyle = `rgba(${pal.line}, ${0.2 + night * 0.06})`;
+    ctx.stroke(body);
+    ctx.strokeStyle = `rgba(${pal.line}, ${0.42 + night * 0.08})`;
+    ctx.stroke(bright);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = `rgba(${pal.hot}, ${0.55 + night * 0.1})`;
+    ctx.stroke(hot);
+    // A dropout leaves a thin bright scar for a moment.
+    for (const d of this.dropouts) {
+      if (d.age > 3) continue;
+      ctx.fillStyle = `rgba(${pal.hot}, ${0.5 - d.age * 0.12})`;
+      ctx.fillRect(0, d.y, W, 1);
+    }
+    this.t += 0.0004;
   }
 }

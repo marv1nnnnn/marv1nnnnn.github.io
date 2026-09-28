@@ -22,7 +22,21 @@ export interface Ear {
   night: number; // 1 at 3am, 0 at 3pm
   home: number; // 1 on the home page, 0 while reading
   decay: number; // how long this tape has been playing: 0 when it goes in, 1 after six minutes
+  // The arrangement for the track under the head (orbit 1 pads and holds, 2 melody, 3 drums and bass).
+  mix1: number;
+  mix2: number;
+  mix3: number;
 }
+
+// Each track is a section of the same piece: the intro sparse, make the full band, input the
+// melody, log the rhythm, about only the air. Kept at or under 1 (velocity scales gain).
+const ARRANGEMENT: [number, number, number][] = [
+  [1, 0.8, 0.4],
+  [1, 1, 1],
+  [0.85, 1, 0.45],
+  [0.5, 0.55, 1],
+  [1, 0.35, 0.12],
+];
 
 export interface Listening {
   speed: number;
@@ -269,8 +283,10 @@ stack(
   },
 };
 
+// Every layer also answers the arrangement of the track it is heard on, through its orbit.
 export function codeFor(palette: string, seed: number) {
-  return `${(TAPES[palette] ?? TAPES.oxide).code}.seed(${seed})\n`;
+  const code = (TAPES[palette] ?? TAPES.oxide).code.replace(/\.orbit\(([123])\)/g, '.velocity(ref(() => tape.mix$1)).orbit($1)');
+  return `${code}.seed(${seed})\n`;
 }
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
@@ -293,6 +309,16 @@ function pinkBuffer(ctx: AudioContext) {
   });
 }
 
+// Freeze a parameter where it is now, so the next ramp starts from there.
+function hold(p: AudioParam, t: number) {
+  if (p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(t);
+  else {
+    const v = p.value;
+    p.cancelScheduledValues(t);
+    p.setValueAtTime(v, t);
+  }
+}
+
 function loop(ctx: AudioContext, buffer: AudioBuffer) {
   const src = ctx.createBufferSource();
   src.buffer = buffer;
@@ -312,6 +338,9 @@ class Deck {
   private duck: GainNode;
   private gate: GainNode;
   private master: GainNode;
+  private run: GainNode;
+  private spool: GainNode;
+  private spoolBand: BiquadFilterNode;
   private hiss: GainNode;
   private crackle: GainNode;
   private wowDepth: GainNode;
@@ -331,8 +360,11 @@ class Deck {
     this.master = g(0);
     const limiter = new DynamicsCompressorNode(ctx, { threshold: -10, knee: 6, ratio: 12, attack: 0.003, release: 0.25 });
 
-    this.input.connect(this.wow).connect(this.dry).connect(this.tone);
-    this.input.connect(this.warp).connect(this.wet).connect(this.tone);
+    // While the tape winds the music is lifted off the head; hiss and crackle stay.
+    this.run = g(1);
+    this.input.connect(this.run);
+    this.run.connect(this.wow).connect(this.dry).connect(this.tone);
+    this.run.connect(this.warp).connect(this.wet).connect(this.tone);
     this.tone.connect(this.duck).connect(this.gate).connect(this.master).connect(limiter).connect(ctx.destination);
 
     // Wow (slow) and flutter (fast): the delay line drifts, so the pitch drifts with it.
@@ -355,6 +387,11 @@ class Deck {
     this.crackle = g(0);
     const pops = noiseBuffer(ctx, 5, () => (Math.random() < 0.0004 ? (Math.random() * 2 - 1) * 0.8 : 0));
     loop(ctx, pops).connect(new BiquadFilterNode(ctx, { type: 'lowpass', frequency: 4000 })).connect(this.crackle).connect(this.tone);
+
+    // The spool: filtered noise whose pitch follows the winding speed.
+    this.spool = g(0);
+    this.spoolBand = new BiquadFilterNode(ctx, { type: 'bandpass', Q: 3, frequency: 600 });
+    loop(ctx, this.white).connect(this.spoolBand).connect(this.spool).connect(this.gate);
   }
 
   fade(to: number, seconds = 0.6) {
@@ -374,33 +411,43 @@ class Deck {
     this.wowDepth.gain.setTargetAtTime(0.0008 + wear * 0.003, t, 0.4);
   }
 
-  // Fast-forward (deeper into the site) runs the tape fast and high; rewind runs it slow and low.
-  seek(direction: -1 | 1, seconds = 0.7) {
-    const { ctx } = this;
-    const t = ctx.currentTime;
-    const up = direction < 0;
-    const span = 0.42;
-    this.warp.delayTime.cancelScheduledValues(t);
-    this.warp.delayTime.setValueAtTime(up ? span : 0, t);
-    this.warp.delayTime.linearRampToValueAtTime(up ? 0 : span, t + seconds);
-    for (const [node, a, b] of [[this.wet, 1, 0], [this.dry, 0, 1]] as const) {
-      node.gain.cancelScheduledValues(t);
-      node.gain.setTargetAtTime(a, t, 0.02);
-      node.gain.setTargetAtTime(b, t + seconds, 0.06);
-    }
-    // The spool itself: filtered noise sweeping with the tape speed.
-    const src = ctx.createBufferSource();
-    src.buffer = this.white;
-    const band = new BiquadFilterNode(ctx, { type: 'bandpass', Q: 3 });
-    band.frequency.setValueAtTime(up ? 500 : 3200, t);
-    band.frequency.exponentialRampToValueAtTime(up ? 4200 : 280, t + seconds);
-    const env = new GainNode(ctx, { gain: 0 });
-    env.gain.setValueAtTime(0, t);
-    env.gain.linearRampToValueAtTime(0.09, t + seconds * 0.3);
-    env.gain.linearRampToValueAtTime(0, t + seconds);
-    src.connect(band).connect(env).connect(this.gate);
-    src.start(t);
-    src.stop(t + seconds + 0.05);
+  // Winding: the music drops out, the spool spins up, fast-forward higher than rewind.
+  scan(direction: -1 | 1) {
+    const t = this.ctx.currentTime;
+    const ff = direction < 0;
+    this.holdAll(t);
+    this.dry.gain.setTargetAtTime(1, t, 0.02);
+    this.wet.gain.setTargetAtTime(0, t, 0.02);
+    this.run.gain.setTargetAtTime(0, t, 0.03);
+    this.spool.gain.setTargetAtTime(0.06, t, 0.05);
+    this.spoolBand.frequency.setTargetAtTime(ff ? 3400 : 1900, t, 0.25);
+  }
+
+  // Back to play: the spool stops and the tape comes up to speed, the pitch rising into place.
+  land(at?: number) {
+    const t = at ?? this.ctx.currentTime;
+    if (at === undefined) this.holdAll(t);
+    this.spool.gain.setTargetAtTime(0, t, 0.04);
+    this.spoolBand.frequency.setTargetAtTime(300, t, 0.08);
+    this.run.gain.setTargetAtTime(1, t, 0.02);
+    // The delay grows fast, then settles: the pitch starts near half and rises to normal.
+    const span = 0.05;
+    this.warp.delayTime.setValueAtTime(0, t);
+    this.warp.delayTime.setTargetAtTime(span, t, 0.1);
+    this.wet.gain.setTargetAtTime(1, t, 0.005);
+    this.dry.gain.setTargetAtTime(0, t, 0.005);
+    this.wet.gain.setTargetAtTime(0, t + 0.4, 0.03);
+    this.dry.gain.setTargetAtTime(1, t + 0.4, 0.03);
+  }
+
+  private holdAll(t: number) {
+    for (const p of [this.run.gain, this.spool.gain, this.spoolBand.frequency, this.warp.delayTime, this.wet.gain, this.dry.gain]) hold(p, t);
+  }
+
+  // A wind of known length, from one track to another.
+  wind(direction: -1 | 1, seconds: number) {
+    this.scan(direction);
+    this.land(this.ctx.currentTime + seconds);
   }
 
   // A dropout: the signal is simply gone for a moment, with a click on each edge.
@@ -422,7 +469,7 @@ class Deck {
 }
 
 export class TapeSound {
-  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0 };
+  readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0, mix1: 1, mix2: 0.8, mix3: 0.4 };
   private deck: Deck;
   private tape: Tape = TAPES.oxide;
   private palette = 'oxide';
@@ -476,8 +523,12 @@ export class TapeSound {
     await this.load(palette);
   }
 
-  update(l: Listening, night: number) {
+  update(l: Listening, night: number, track = 0) {
     const e = this.ear;
+    const [a, b, c] = ARRANGEMENT[track] ?? ARRANGEMENT[0];
+    e.mix1 += (a - e.mix1) * 0.05;
+    e.mix2 += (b - e.mix2) * 0.05;
+    e.mix3 += (c - e.mix3) * 0.05;
     const target = clamp(l.speed / 24) * (this.home ? 1 : 0.35);
     // Quick to wake up, slow to settle, like a meter.
     e.stir += (target - e.stir) * (target > e.stir ? 0.25 : 0.02);
@@ -505,7 +556,9 @@ export class TapeSound {
   }
 
   event(e: TapeEvent) {
-    if (e.type === 'seek') this.deck.seek(e.direction);
+    if (e.type === 'seek') this.deck.wind(e.direction, e.seconds);
+    else if (e.type === 'scan') this.deck.scan(e.direction);
+    else if (e.type === 'land') this.deck.land();
     else if (e.type === 'erase') this.deck.dropout();
     else if (e.type === 'burst') this.burst(e.power, e.x);
   }
