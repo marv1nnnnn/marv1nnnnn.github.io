@@ -16,14 +16,43 @@ export interface Palette {
 }
 
 export const PALETTES: Record<string, Palette> = {
-  oxide: { name: 'oxide', bg: [7, 9, 12], line: [196, 206, 216], alt: [96, 140, 170], hot: [108, 224, 255], ink: '#D7DEE5', muted: '#8E99A4', faint: '#5D6873' },
-  lain: { name: 'lain', bg: [10, 10, 11], line: [232, 232, 232], alt: [130, 130, 130], hot: [226, 35, 48], ink: '#EDEDED', muted: '#9A9A9A', faint: '#666666' },
-  phosphor: { name: 'phosphor', bg: [5, 9, 7], line: [150, 220, 170], alt: [80, 140, 100], hot: [226, 255, 170], ink: '#CFEBD7', muted: '#7FA58A', faint: '#4F6B57' },
-  uv: { name: 'uv', bg: [10, 8, 18], line: [205, 198, 255], alt: [120, 105, 200], hot: [255, 92, 214], ink: '#E4E0FF', muted: '#9690BF', faint: '#5F5A85' },
-  mono: { name: 'mono', bg: [0, 0, 0], line: [255, 255, 255], alt: [140, 140, 140], hot: [255, 255, 255], ink: '#FFFFFF', muted: '#9A9A9A', faint: '#5E5E5E' },
-  noise: { name: 'noise', bg: [12, 9, 8], line: [226, 210, 196], alt: [150, 96, 70], hot: [255, 86, 36], ink: '#EFE3D8', muted: '#A08E80', faint: '#65574D' },
+  haze: { name: 'haze', bg: [10, 8, 6], line: [224, 208, 186], alt: [156, 122, 88], hot: [255, 178, 92], ink: '#E9DECF', muted: '#A49584', faint: '#6B5F52' },
+  '3am': { name: '3am', bg: [10, 10, 11], line: [232, 232, 232], alt: [130, 130, 130], hot: [226, 35, 48], ink: '#EDEDED', muted: '#9A9A9A', faint: '#666666' },
+  nightbus: { name: 'nightbus', bg: [6, 8, 12], line: [182, 198, 222], alt: [92, 112, 152], hot: [255, 150, 60], ink: '#D6DFEB', muted: '#8A96A7', faint: '#566071' },
+  ritual: { name: 'ritual', bg: [10, 8, 18], line: [205, 198, 255], alt: [120, 105, 200], hot: [255, 92, 214], ink: '#E4E0FF', muted: '#9690BF', faint: '#5F5A85' },
+  pressure: { name: 'pressure', bg: [0, 0, 0], line: [255, 255, 255], alt: [140, 140, 140], hot: [255, 255, 255], ink: '#FFFFFF', muted: '#9A9A9A', faint: '#5E5E5E' },
+  bent: { name: 'bent', bg: [12, 9, 8], line: [226, 210, 196], alt: [150, 96, 70], hot: [255, 86, 36], ink: '#EFE3D8', muted: '#A08E80', faint: '#65574D' },
 };
-export const DEFAULT_PALETTE = 'oxide';
+// Each tape's world: how its filings lie and move, and the lamp over the desk (globals.css reads
+// the lamp through CSS variables that TapeProvider sets).
+export interface World {
+  field: 'loops' | 'rain' | 'rings' | 'glitch';
+  speed: number; // how fast the field changes (1 usual)
+  scale: number; // how tight its loops are (lower is wider)
+  len: number; // filing length
+  width: number; // filing weight
+  alpha: number;
+  density: number;
+  pulse: number; // a heavy beat the filings throb to (0 none)
+  lamp: string; // CSS colour of the lamp
+  lampAt: string; // where it hangs
+  lamp2: string; // a second light, or transparent
+  lamp2At: string;
+  shade: number; // how far the corners fall into dark
+}
+
+export const WORLDS: Record<string, World> = {
+  haze: { field: 'loops', speed: 0.5, scale: 0.7, len: 1.5, width: 1, alpha: 0.8, density: 0.85, pulse: 0, lamp: 'rgba(255, 196, 120, 0.14)', lampAt: '28% 14%', lamp2: 'transparent', lamp2At: '50% 50%', shade: 0.62 },
+  '3am': { field: 'loops', speed: 0.7, scale: 1.25, len: 1.1, width: 1, alpha: 0.9, density: 0.6, pulse: 0, lamp: 'rgba(226, 40, 50, 0.12)', lampAt: '74% 10%', lamp2: 'rgba(255, 220, 190, 0.035)', lamp2At: '20% 80%', shade: 0.72 },
+  nightbus: { field: 'rain', speed: 1, scale: 1, len: 1.7, width: 0.9, alpha: 1, density: 1, pulse: 0, lamp: 'rgba(255, 150, 60, 0.11)', lampAt: '84% 6%', lamp2: 'rgba(90, 130, 255, 0.08)', lamp2At: '10% 92%', shade: 0.66 },
+  ritual: { field: 'rings', speed: 0.6, scale: 1, len: 1.1, width: 1, alpha: 1, density: 0.9, pulse: 0, lamp: 'rgba(170, 110, 255, 0.13)', lampAt: '50% 108%', lamp2: 'transparent', lamp2At: '50% 50%', shade: 0.74 },
+  pressure: { field: 'loops', speed: 0.9, scale: 0.5, len: 0.8, width: 2, alpha: 1.25, density: 1.15, pulse: 1, lamp: 'rgba(255, 255, 255, 0.1)', lampAt: '50% -4%', lamp2: 'transparent', lamp2At: '50% 50%', shade: 0.8 },
+  bent: { field: 'glitch', speed: 1.6, scale: 1.4, len: 1, width: 1, alpha: 1.1, density: 1, pulse: 0, lamp: 'rgba(255, 90, 40, 0.11)', lampAt: '22% 28%', lamp2: 'rgba(255, 255, 255, 0.03)', lamp2At: '80% 70%', shade: 0.6 },
+};
+
+export const DEFAULT_PALETTE = 'haze';
+// Tapes renamed in 2026-09; a visitor's saved choice follows its tape to the new name.
+export const RENAMED: Record<string, string> = { oxide: 'haze', lain: '3am', phosphor: 'nightbus', uv: 'ritual', mono: 'pressure', noise: 'bent' };
 
 export interface Scene {
   seed: string;
@@ -123,6 +152,8 @@ export class Tape {
   private t = Math.random() * 10;
   private filings: Filing[] = [];
   private slide = 0; // how far the filings have slid sideways while the tape winds
+  private fall = 0; // how far the rain has run down (the rain field)
+  private tears: { y: number; h: number; shift: number; life: number }[] = [];
   private density = 1;
   private pointers = new Map<number, Pointer>();
   private bursts: { x: number; y: number; age: number; power: number }[] = [];
@@ -317,7 +348,16 @@ export class Tape {
     const ff = this.ff;
     this.slide += this.ffDir * ff * 26;
     const shadow = new Path2D(), body = new Path2D(), bright = new Path2D(), hot = new Path2D();
-    const n = Math.floor(this.filings.length * Math.min(1, this.density + ff * 0.5));
+    const world = WORLDS[pal.name] ?? WORLDS[DEFAULT_PALETTE];
+    const n = Math.floor(this.filings.length * Math.min(1, (this.density + ff * 0.5) * world.density));
+    if (world.field === 'rain') this.fall += 0.5 + ff * 4;
+    // The bent tape tears: a band of the desk jumps sideways for a few frames.
+    if (world.field === 'glitch') {
+      if (Math.random() < 0.03) this.tears.push({ y: Math.random() * H, h: 6 + Math.random() * 40, shift: (Math.random() - 0.5) * 160, life: 3 + Math.floor(Math.random() * 6) });
+      this.tears = this.tears.filter((t) => --t.life > 0);
+    }
+    const throb = world.pulse ? 1 + world.pulse * 0.3 * Math.pow(Math.max(0, Math.sin(now / 260)), 6) : 1;
+    const cx0 = W / 2, cy0 = H * 0.52;
     // Older pages: the filings have drifted more and rusted a little.
     const drift = 1 + scene.age * 1.5;
 
@@ -326,10 +366,17 @@ export class Tape {
       // Where it is drawn: its own position, slid along with the tape while it winds.
       let px = (f.x + this.slide) % W;
       if (px < 0) px += W;
-      const py = f.y;
+      let py = f.y;
+      if (world.field === 'rain') py = (f.y + this.fall * (0.6 + f.tone * 0.8)) % H;
+      for (const t of this.tears) if (Math.abs(py - t.y) < t.h / 2) px = (px + t.shift + W) % W;
 
-      // The field: slow, large loops, like lines of force.
-      const base = this.noise(px * 0.0019, py * 0.0019, this.t) * TAU * 1.2;
+      // The field: slow, large loops like lines of force; or rain; or rings round the middle.
+      const k = 0.0019 * world.scale;
+      const wander = this.noise(px * k, py * k, this.t);
+      let base = wander * TAU * 1.2;
+      if (world.field === 'rain') base = Math.PI / 2 + 0.32 + wander * 0.35;
+      else if (world.field === 'rings') base = Math.atan2(py - cy0, px - cx0) + Math.PI / 2 + wander * 0.3;
+      else if (world.field === 'glitch' && f.tone > 0.97) base += (Math.random() - 0.5) * 3;
       let fx = Math.cos(base) * drift, fy = Math.sin(base) * drift;
       let touch = 0;
 
@@ -388,7 +435,7 @@ export class Tape {
       for (const d of this.dropouts) if (Math.abs(py - d.y) < 10 + d.age * 3) gone = true;
       if (gone) continue;
 
-      const len = f.len * (1 + ff * 2.5) * (1 + f.heat * 0.4);
+      const len = f.len * world.len * throb * (1 + ff * 2.5) * (1 + f.heat * 0.4);
       const cx = Math.cos(f.a) * len * 0.5, cy = Math.sin(f.a) * len * 0.5;
       shadow.moveTo(px - cx + 0.8, py - cy + 1.4);
       shadow.lineTo(px + cx + 0.8, py + cy + 1.4);
@@ -398,16 +445,17 @@ export class Tape {
     }
 
     ctx.lineCap = 'round';
-    ctx.lineWidth = 1.3;
+    const a = world.alpha;
+    ctx.lineWidth = 1.3 * world.width;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
     ctx.stroke(shadow);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = `rgba(${pal.line}, ${0.2 + night * 0.06})`;
+    ctx.lineWidth = world.width;
+    ctx.strokeStyle = `rgba(${pal.line}, ${(0.2 + night * 0.06) * a})`;
     ctx.stroke(body);
-    ctx.strokeStyle = `rgba(${pal.line}, ${0.42 + night * 0.08})`;
+    ctx.strokeStyle = `rgba(${pal.line}, ${(0.42 + night * 0.08) * a})`;
     ctx.stroke(bright);
-    ctx.lineWidth = 1.2;
-    ctx.strokeStyle = `rgba(${pal.hot}, ${0.55 + night * 0.1})`;
+    ctx.lineWidth = 1.2 * world.width;
+    ctx.strokeStyle = `rgba(${pal.hot}, ${Math.min(1, (0.55 + night * 0.1) * a)})`;
     ctx.stroke(hot);
     // A dropout leaves a thin bright scar for a moment.
     for (const d of this.dropouts) {
@@ -415,6 +463,6 @@ export class Tape {
       ctx.fillStyle = `rgba(${pal.hot}, ${0.5 - d.age * 0.12})`;
       ctx.fillRect(0, d.y, W, 1);
     }
-    this.t += 0.0004;
+    this.t += 0.0004 * world.speed;
   }
 }

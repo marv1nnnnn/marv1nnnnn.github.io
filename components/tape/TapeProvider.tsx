@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { DEFAULT_PALETTE, PALETTES, Tape, nightness, type Scene } from './engine';
+import { DEFAULT_PALETTE, PALETTES, RENAMED, Tape, WORLDS, nightness, type Scene } from './engine';
 import type { TapeSound } from './sound';
 import Cassette from './Cassette';
 import { TAPE_LENGTH, TRACKS, headOf, spanOf, throughOf, trackAt, trackIndex } from './tracks';
@@ -57,6 +57,14 @@ function applyPaletteVars(name: string) {
   style.setProperty('--faint', p.faint);
   style.setProperty('--accent', `rgb(${p.hot})`);
   style.setProperty('--accent-rgb', p.hot.join(', '));
+  // The tape's world: the lamp over the desk, and the booklet's print (globals.css, [data-tape]).
+  const w = WORLDS[name] ?? WORLDS[DEFAULT_PALETTE];
+  style.setProperty('--lamp', w.lamp);
+  style.setProperty('--lamp-at', w.lampAt);
+  style.setProperty('--lamp2', w.lamp2);
+  style.setProperty('--lamp2-at', w.lamp2At);
+  style.setProperty('--shade', String(w.shade));
+  if (document.documentElement.dataset.tape !== name) document.documentElement.dataset.tape = name;
 }
 
 // Browsers (Safari especially) only start audio from inside a user gesture, and the Strudel
@@ -109,7 +117,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
 
     let saved = DEFAULT_PALETTE;
     try {
-      const stored = localStorage.getItem('tape-palette');
+      const raw = localStorage.getItem('tape-palette');
+      const stored = raw ? RENAMED[raw] ?? raw : null;
       if (stored && PALETTES[stored]) saved = stored;
     } catch {}
     tape.palette = PALETTES[saved];

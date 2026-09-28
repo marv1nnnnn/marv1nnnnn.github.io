@@ -75,6 +75,8 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
   useLayoutEffect(() => {
     if (layout) return;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Measure once the type is in; until then the one column stands in.
+    if (document.fonts && document.fonts.status !== 'loaded') return;
     const el = flow.current;
     if (!el) return;
     const screen = measureScreen();
@@ -126,7 +128,14 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
       }, 180);
     };
     window.addEventListener('resize', onResize);
-    return () => { window.removeEventListener('resize', onResize); clearTimeout(t); };
+    // Each tape prints in its own type (html[data-tape]), and fonts arrive late: either changes
+    // how much fits on a page.
+    const relayout = () => { setLayout(null); setRemeasure((r) => r + 1); };
+    const tape = new MutationObserver(relayout);
+    tape.observe(document.documentElement, { attributes: true, attributeFilter: ['data-tape'] });
+    let alive = true;
+    if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { if (alive) setRemeasure((r) => r + 1); });
+    return () => { alive = false; window.removeEventListener('resize', onResize); clearTimeout(t); tape.disconnect(); };
   }, []);
 
   const count = layout?.pages.length ?? 0;
@@ -165,11 +174,16 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
       schedule();
       clearTimeout(settle);
       settle = window.setTimeout(() => {
-        aim = null;
-        if (document.body.classList.contains('is-winding-by-hand') || document.body.dataset.wind) return;
+        if (document.body.classList.contains('is-winding-by-hand') || document.body.dataset.wind) {
+          aim = null;
+          return;
+        }
         const q = window.scrollY / stepPx();
-        const target = Math.round(Math.min(steps, Math.max(0, q)));
+        // A page on its way (an arrow, a corner) keeps going there, even when a slow machine
+        // pauses mid-turn; otherwise the nearest page settles.
+        const target = aim ?? Math.round(Math.min(steps, Math.max(0, q)));
         if (Math.abs(q - target) > 0.004) window.scrollTo({ top: target * stepPx(), behavior: 'smooth' });
+        else aim = null;
       }, 170);
     };
     // The arrow keys (sent on by the deck) turn one page, and only past the last one wind on.
@@ -202,12 +216,22 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('tape:arrow', onArrow);
     window.addEventListener('booklet:turn', onTurn);
+    // A hand on the wheel or the glass takes over from a page on its way.
+    const letGo = () => { aim = null; };
+    window.addEventListener('wheel', letGo, { passive: true });
+    window.addEventListener('touchstart', letGo, { passive: true });
+    // Turning from here on (tests wait for this too).
+    const book = stage.current?.parentElement;
+    book?.setAttribute('data-ready', '');
     return () => {
+      book?.removeAttribute('data-ready');
       cancelAnimationFrame(raf);
       clearTimeout(settle);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('tape:arrow', onArrow);
       window.removeEventListener('booklet:turn', onTurn);
+      window.removeEventListener('wheel', letGo);
+      window.removeEventListener('touchstart', letGo);
     };
   }, [layout, steps, leafCount, spread]);
 

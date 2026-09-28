@@ -148,7 +148,7 @@ interface Tape {
 // apart (Strudel rebuilds an orbit's reverb whenever its size changes) and carry the arrangement:
 // 1 the ground (pads, drones, holds), 2 the melody, 3 the rhythm.
 const TAPES: Record<string, Tape> = {
-  oxide: {
+  haze: {
     root: 50,
     steps: [0, 2, 4, 5, 7, 9, 10],
     cps: 0.22,
@@ -156,7 +156,7 @@ const TAPES: Record<string, Tape> = {
     crackle: 0.02,
     deck: { wow: 2.6, hiss: 1.8, drive: 0.05, bright: 0.75 },
     evolve: { length: 8, range: [0, 8], rest: 0.45, mutate: 0.08, every: 4, chords: { 0: [3, 6, 4], 3: [0, 4], 6: [0, 3], 4: [0, 5], 5: [3] } },
-    code: `// tape: oxide. a loop that wears away the longer it plays.
+    code: `// tape: haze. a loop that wears away the longer it plays.
 // after William Basinski, Boards of Canada, Oneohtrix Point Never
 setcps(.22)
 const mode = "D3:mixolydian"
@@ -189,7 +189,7 @@ stack(
     .orbit(1).room(.8).roomsize(9),
 )`,
   },
-  lain: {
+  '3am': {
     root: 53,
     steps: [0, 2, 3, 5, 7, 9, 10],
     cps: 0.3,
@@ -197,7 +197,7 @@ stack(
     crackle: 0.012,
     deck: { wow: 1, hiss: 0.9, drive: 0.1, bright: 0.8 },
     evolve: { length: 8, range: [0, 9], rest: 0.35, mutate: 0.12, every: 2, chords: { 0: [3, 6, 2], 3: [0, 4, 6], 6: [0, 2], 2: [3, 4], 4: [0] } },
-    code: `// tape: lain. 3am, a diner, the red room.
+    code: `// tape: 3am. a diner, the red room.
 // after HTRK, Angelo Badalamenti, Fishmans
 setcps(.3)
 const mode = "F3:dorian"
@@ -235,7 +235,7 @@ stack(
     .orbit(1).room(.6).roomsize(6),
 )`,
   },
-  phosphor: {
+  nightbus: {
     root: 57,
     steps: [0, 2, 3, 5, 7, 8, 10],
     cps: 0.5625,
@@ -243,7 +243,7 @@ stack(
     crackle: 0.03,
     deck: { wow: 0.25, hiss: 0.35, drive: 0.15, bright: 1 },
     evolve: { length: 16, range: [-2, 9], rest: 0.5, mutate: 0.25, every: 4, chords: { 0: [5, 3, 6], 5: [3, 6], 3: [0, 6], 6: [0, 5] } },
-    code: `// tape: phosphor. broken machines, a night bus, rain.
+    code: `// tape: night bus. broken machines, rain on the window.
 // after Autechre, Burial
 setcps(.5625)
 const beat = () => (.3 + tape.stir * .7) * (.5 + tape.home * .5)
@@ -278,7 +278,7 @@ stack(
     .orbit(2).delay(.3).delaytime(.1875).delayfeedback(.4),
 )`,
   },
-  uv: {
+  ritual: {
     root: 40,
     steps: [0, 1, 4, 5, 7, 8, 10],
     cps: 0.28,
@@ -286,7 +286,7 @@ stack(
     crackle: 0.015,
     deck: { wow: 1.3, hiss: 1, drive: 0.2, bright: 0.85 },
     evolve: { length: 8, range: [0, 7], rest: 0.55, mutate: 0.15, every: 4, chords: { 0: [1, 0, 3], 1: [0], 3: [1, 0], 6: [0] } },
-    code: `// tape: uv. musick to play in the dark.
+    code: `// tape: ritual. musick to play in the dark.
 // after Coil, Xiu Xiu
 setcps(.28)
 const mode = "E3:phrygian dominant"
@@ -322,7 +322,7 @@ stack(
     .orbit(1).room(.9).roomsize(9),
 )`,
   },
-  mono: {
+  pressure: {
     root: 36,
     steps: [0, 1, 3, 5, 7, 8, 10],
     cps: 0.35,
@@ -330,7 +330,7 @@ stack(
     crackle: 0.03,
     deck: { wow: 0.8, hiss: 0.8, drive: 0.7, bright: 0.7 },
     evolve: { length: 8, range: [0, 5], rest: 0.6, mutate: 0.1, every: 8, chords: { 0: [0, 1, 0, 3], 1: [0], 3: [0] } },
-    code: `// tape: mono. pressure.
+    code: `// tape: pressure.
 // after The Bug, Swans, Source Direct
 setcps(.35)
 const mode = "C2:phrygian"
@@ -362,7 +362,7 @@ stack(
     .orbit(2).delay(.6).delaytime(.4286).delayfeedback(.65),
 )`,
   },
-  noise: {
+  bent: {
     root: 45,
     steps: [0, 1, 3, 6, 7, 9, 10],
     cps: 0.5,
@@ -370,7 +370,7 @@ stack(
     crackle: 0.05,
     deck: { wow: 1.6, hiss: 1.2, drive: 1, bright: 1 },
     evolve: { length: 16, range: [-7, 14], rest: 0.4, mutate: 0.5, every: 1, chords: { 0: [1, 3, 5, 6], 1: [0, 4], 3: [0, 6], 4: [1], 5: [0, 3], 6: [0, 1] } },
-    code: `// tape: noise. bent circuits, Beijing.
+    code: `// tape: bent. bent circuits, Beijing.
 // after fRUITYSPACE and the shows there, 2016-2021
 setcps(.5)
 const beat = () => (.2 + tape.stir * .8) * (.5 + tape.home * .5)
@@ -406,7 +406,7 @@ stack(
 
 // Every layer also answers the arrangement of the track it is heard on, through its orbit.
 export function codeFor(palette: string, seed: number) {
-  const code = (TAPES[palette] ?? TAPES.oxide).code.replace(/\.orbit\(([123])\)/g, '.velocity(ref(() => tape.mix$1)).orbit($1)');
+  const code = (TAPES[palette] ?? TAPES.haze).code.replace(/\.orbit\(([123])\)/g, '.velocity(ref(() => tape.mix$1)).orbit($1)');
   return `${code}.seed(${seed})\n`;
 }
 
@@ -611,8 +611,8 @@ export class TapeSound {
   readonly ear: Ear = { stir: 0, hold: 0, x: 0.5, register: 3, night: 0.5, home: 1, decay: 0, mix1: 1, mix2: 0.8, mix3: 0.4, motif: [0], chord: 0, density: 0.6, drift: 0 };
   private composer: Composer | null = null;
   private deck: Deck;
-  private tape: Tape = TAPES.oxide;
-  private palette = 'oxide';
+  private tape: Tape = TAPES.haze;
+  private palette = 'haze';
   private loadedAt = 0;
   code = '';
   private home = true;
@@ -658,7 +658,7 @@ export class TapeSound {
   }
 
   async load(palette: string) {
-    this.palette = TAPES[palette] ? palette : 'oxide';
+    this.palette = TAPES[palette] ? palette : 'haze';
     this.tape = TAPES[this.palette];
     this.loadedAt = performance.now();
     this.ear.decay = 0;
