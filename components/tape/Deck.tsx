@@ -194,8 +194,10 @@ function PlayButton() {
   useEffect(() => {
     if (!shown) return;
     const id = window.setInterval(() => {
-      const ear = (window as unknown as { tape?: Record<string, number> }).tape;
-      if (ear) setReading(Object.entries(ear).map(([k, v]) => `tape.${k} = ${Number.isInteger(v) ? v : v.toFixed(2)}`).join('\n'));
+      const ear = (window as unknown as { tape?: Record<string, number | (number | null)[]> }).tape;
+      const show = (v: number | (number | null)[]) =>
+        Array.isArray(v) ? `[${v.map((d) => (d === null ? '~' : d)).join(' ')}]` : Number.isInteger(v) ? String(v) : v.toFixed(2);
+      if (ear) setReading(Object.entries(ear).map(([k, v]) => `tape.${k} = ${show(v)}`).join('\n'));
     }, 100);
     return () => clearInterval(id);
   }, [shown]);
