@@ -23,6 +23,24 @@ test.describe('home /', () => {
     await expect.poll(accent).toBe(chosen);
   });
 
+  test('sound stays off until asked for, then plays the Strudel pattern', async ({ page, isMobile }) => {
+    await page.goto('/');
+    const toggle = page.getByRole('button', { name: 'Sound' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true', { timeout: 30_000 });
+    // The pattern view is a desktop extra; phones only get the toggle.
+    if (!isMobile) {
+      await page.getByRole('button', { name: 'Show the pattern' }).click();
+      await expect(page.getByLabel('The Strudel pattern playing now')).toContainText('stack(');
+    }
+    await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'make' }).click();
+    await expect(page).toHaveURL(/\/make$/);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  });
+
   test('the home page does not scroll sideways on phones', async ({ page }) => {
     await page.goto('/');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);

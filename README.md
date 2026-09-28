@@ -6,6 +6,7 @@ Personal site built as one wearing tape: a single interactive flow field shared 
 
 - Next.js 15 (App Router), TypeScript, Tailwind CSS
 - Canvas 2D flow field in `components/tape/engine.ts` (no WebGL required)
+- Opt-in interactive sound in `components/tape/sound.ts`: a [Strudel](https://strudel.cc) pattern driven by the pointer, played through a Web Audio tape deck
 
 ## Commands
 

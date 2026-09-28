@@ -16,6 +16,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@strudel/web": "1.3.0",
     "framer-motion": "^11.15.0",
     "gray-matter": "^4.0.3",
     "next": "15.0.3",
