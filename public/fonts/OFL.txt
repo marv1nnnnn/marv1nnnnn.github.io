@@ -1,6 +1,12 @@
-Copyright 2021 The Martian Mono Project Authors (https://github.com/evilmartians/mono)
+Copyright 2013 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime)
+Copyright 2012 The Libre Caslon Project Authors (https://github.com/impallari/Libre-Caslon-Text)
+Copyright 2010 James Grieshaber (Reenie Beanie)
+Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)
+Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)
+Copyright 2010 j. 'mach' wust (UnifrakturMaguntia)
+Copyright 2011 JM Solé (Alfa Slab One)
 
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
+These Font Softwares are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 

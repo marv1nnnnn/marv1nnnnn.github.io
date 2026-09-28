@@ -135,7 +135,9 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     tape.observe(document.documentElement, { attributes: true, attributeFilter: ['data-tape'] });
     let alive = true;
     if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { if (alive) setRemeasure((r) => r + 1); });
-    return () => { alive = false; window.removeEventListener('resize', onResize); clearTimeout(t); tape.disconnect(); };
+    // A tape chosen later brings its title face with it, which arrives after the switch.
+    document.fonts?.addEventListener('loadingdone', relayout);
+    return () => { alive = false; window.removeEventListener('resize', onResize); clearTimeout(t); tape.disconnect(); document.fonts?.removeEventListener('loadingdone', relayout); };
   }, []);
 
   const count = layout?.pages.length ?? 0;

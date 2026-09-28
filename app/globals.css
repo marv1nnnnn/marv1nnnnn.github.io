@@ -1,35 +1,18 @@
-@font-face {
-  font-family: 'Martian Mono';
-  src: url('/fonts/martian-mono.woff2') format('woff2');
-  font-weight: 100 800;
-  font-stretch: 75% 112.5%;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Newsreader';
-  src: url('/fonts/newsreader.woff2') format('woff2');
-  font-weight: 200 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Newsreader';
-  src: url('/fonts/newsreader-italic.woff2') format('woff2');
-  font-weight: 200 800;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Chinese Serif';
-  src: url('/fonts/chinese-serif.woff2') format('woff2');
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
+/* The type of a dubbed tape: typed (Courier Prime), printed (Libre Caslon), written in ballpoint
+   (Reenie Beanie), and each tape's own face for its titles (see html[data-tape] below). */
+@font-face { font-family: 'Courier Prime'; src: url('/fonts/courier-prime.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Courier Prime'; src: url('/fonts/courier-prime-bold.woff2') format('woff2'); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Courier Prime'; src: url('/fonts/courier-prime-italic.woff2') format('woff2'); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Libre Caslon Text'; src: url('/fonts/libre-caslon.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Libre Caslon Text'; src: url('/fonts/libre-caslon-bold.woff2') format('woff2'); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Libre Caslon Text'; src: url('/fonts/libre-caslon-italic.woff2') format('woff2'); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Reenie Beanie'; src: url('/fonts/reenie-beanie.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Bodoni Moda'; src: url('/fonts/bodoni-moda-italic.woff2') format('woff2'); font-style: italic; font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Big Shoulders Display'; src: url('/fonts/big-shoulders.woff2') format('woff2'); font-style: normal; font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'UnifrakturMaguntia'; src: url('/fonts/unifraktur-maguntia.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Alfa Slab One'; src: url('/fonts/alfa-slab-one.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Special Elite'; src: url('/fonts/special-elite.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Chinese Serif'; src: url('/fonts/chinese-serif.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
 
 @tailwind base;
 @tailwind components;
@@ -48,8 +31,13 @@
   --accent-rgb: 108, 224, 255;
   --panel: rgba(var(--bg-rgb), 0.82);
   --line: rgba(var(--ink-rgb), 0.16);
-  --mono: 'Martian Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --read: 'Newsreader', 'Chinese Serif', Georgia, serif;
+  --mono: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  --read: 'Libre Caslon Text', 'Chinese Serif', Georgia, serif;
+  --hand: 'Reenie Beanie', 'Bradley Hand', cursive;
+  /* Each tape's titles; haze (and no tape) types them. */
+  --display: var(--mono);
+  --display-case: lowercase;
+  --display-track: -0.02em;
   --cjk: 'Chinese Serif', 'Noto Serif SC', 'PingFang SC', serif;
 }
 
@@ -228,11 +216,12 @@ body[data-wind] #content { opacity: 0.12; }
   align-items: baseline;
   gap: 0.4em;
   color: var(--ink);
-  font-weight: 200;
-  font-stretch: 75%;
+  font-weight: 400;
+  font-family: var(--display);
+  text-transform: var(--display-case);
   font-size: clamp(48px, 11vw, 150px);
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--display-track);
   white-space: nowrap;
   pointer-events: none;
   animation: cue-flicker 110ms steps(2) infinite;
@@ -360,16 +349,19 @@ body.is-home .top { background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0
 .spine:hover { transform: translateX(-6px); }
 .spine[aria-pressed='true'] { transform: translateX(-22px); outline: 1px solid var(--accent); outline-offset: 2px; }
 
-/* Each tape prints its booklet its own way (TapeProvider sets html[data-tape]). */
-html[data-tape='haze'] :is(.leaf-title, .essay-title, .cover-name, .year-label, .inside-mark) { font-family: var(--read); font-style: italic; font-weight: 300; font-stretch: normal; letter-spacing: -0.02em; }
-html[data-tape='3am'] :is(.leaf-title, .essay-title, .cover-name, .inside-mark) { font-family: var(--read); font-weight: 400; font-stretch: normal; letter-spacing: -0.015em; }
-html[data-tape='3am'] .title-no, html[data-tape='3am'] .pg-count { font-family: var(--read); font-style: italic; }
-html[data-tape='ritual'] :is(.leaf-title, .cover-name, .inside-mark) { font-family: var(--read); font-weight: 400; font-stretch: normal; text-transform: uppercase; letter-spacing: 0.28em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.1; }
-html[data-tape='ritual'] .essay-title { font-family: var(--read); font-weight: 400; font-stretch: normal; text-transform: uppercase; letter-spacing: 0.14em; font-size: clamp(18px, 1.9vw, 24px); line-height: 1.3; }
+/* Each tape prints its booklet its own way (TapeProvider sets html[data-tape]): its own face for
+   the titles, and how that face is set. haze types them (the default above). */
+html[data-tape='3am'] { --display: 'Bodoni Moda', var(--read); --display-case: none; --display-track: -0.01em; }
+html[data-tape='3am'] :is(.leaf-title, .essay-title, .cover-name) { font-style: italic; font-weight: 500; }
+html[data-tape='nightbus'] { --display: 'Big Shoulders Display', var(--mono); --display-case: uppercase; --display-track: 0.01em; }
+html[data-tape='nightbus'] :is(.leaf-title, .essay-title, .cover-name) { font-weight: 800; line-height: 0.86; color: var(--accent); }
+html[data-tape='ritual'] { --display: 'UnifrakturMaguntia', var(--read); --display-case: none; --display-track: 0; }
 html[data-tape='ritual'] .title-mid { align-items: center; text-align: center; }
-html[data-tape='pressure'] :is(.leaf-title, .essay-title, .cover-name, .year-label, .inside-mark) { font-weight: 800; font-stretch: 75%; text-transform: uppercase; letter-spacing: -0.045em; line-height: 0.86; }
+html[data-tape='pressure'] { --display: 'Alfa Slab One', var(--mono); --display-case: uppercase; --display-track: -0.01em; }
+html[data-tape='pressure'] :is(.leaf-title, .essay-title, .cover-name) { line-height: 0.88; }
 html[data-tape='pressure'] .booklet h2 { color: var(--ink); }
-html[data-tape='bent'] :is(.leaf-title, .essay-title, .cover-name) { font-weight: 700; font-stretch: 100%; letter-spacing: -0.03em; text-shadow: 2px 0 rgba(var(--accent-rgb), 0.55), -1px 1px rgba(var(--ink-rgb), 0.25); transform: rotate(-1.6deg); transform-origin: left center; }
+html[data-tape='bent'] { --display: 'Special Elite', var(--mono); --display-case: none; --display-track: -0.01em; }
+html[data-tape='bent'] :is(.leaf-title, .essay-title, .cover-name) { text-shadow: 2px 0 rgba(var(--accent-rgb), 0.55), -1px 1px rgba(var(--ink-rgb), 0.25); transform: rotate(-1.6deg); transform-origin: left center; }
 html[data-tape='bent'] .pg { background-blend-mode: normal, multiply, normal; }
 html[data-tape='bent'] .row, html[data-tape='bent'] .song { border-bottom-style: dashed; }
 /* The bent tape's lamp is on a bad wire. */
@@ -460,7 +452,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 .is-single .pg-right::before { width: 18px; }
 .pg-inside { left: 0; width: var(--pw); display: flex; flex-direction: column; justify-content: flex-end; }
 .pg-back { left: var(--pw); gap: 6px; }
-.inside-mark { margin: 0; font-weight: 200; font-stretch: 75%; font-size: 44px; letter-spacing: -0.04em; color: rgba(var(--ink-rgb), 0.16); }
+.inside-mark { margin: 0; font-weight: 400; font-size: 60px; color: rgba(var(--ink-rgb), 0.16); font-family: var(--hand); letter-spacing: 0; }
 .inside-small { margin: 10px 0 0; font-size: 9px; letter-spacing: 0.12em; color: var(--faint); text-transform: uppercase; line-height: 1.8; }
 
 .pg-head {
@@ -523,18 +515,19 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 .booklet-flow .title-page { height: auto; margin-bottom: 40px; }
 .title-top { display: flex; justify-content: space-between; margin: 0; padding-bottom: 8px; border-bottom: 2px solid var(--accent); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
 .title-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.title-no { margin: 0 0 6px; font-weight: 200; font-stretch: 75%; font-size: 30px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.title-no { margin: 0 0 2px; font-weight: 400; font-size: 46px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; font-family: var(--hand); letter-spacing: 0; }
 .title-kicker { margin: 0 0 14px; font-size: 10px; letter-spacing: 0.08em; color: var(--muted); }
 .leaf-title {
   margin: 0 0 0.24em -0.06em;
-  font-weight: 200;
-  font-stretch: 75%;
+  font-weight: 400;
   font-size: clamp(64px, 8.4vw, 124px);
   line-height: 0.82;
-  letter-spacing: -0.06em;
   overflow-wrap: anywhere;
+  font-family: var(--display);
+  text-transform: var(--display-case);
+  letter-spacing: var(--display-track);
 }
-.article .leaf-title { font-weight: 300; font-size: clamp(36px, 4.2vw, 56px); line-height: 0.98; letter-spacing: -0.035em; text-wrap: balance; }
+.article .leaf-title { font-weight: 400; font-size: clamp(36px, 4.2vw, 56px); line-height: 0.98; text-wrap: balance; font-family: var(--display); text-transform: var(--display-case); letter-spacing: var(--display-track); }
 .leaf-lede { margin: 0; max-width: 40ch; font-family: var(--read); font-style: italic; font-size: 17px; line-height: 1.45; color: var(--muted); }
 .title-credit { margin: 0; padding-top: 8px; border-top: 1px solid var(--line-p); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); }
 
@@ -545,7 +538,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
   gap: 10px;
   margin: 22px 0 12px;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--accent);
@@ -556,7 +549,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 .booklet a { color: inherit; }
 .booklet a:hover { color: var(--accent); }
 
-.year-label { margin: 18px 0 4px; font-weight: 200; font-stretch: 75%; font-size: 34px; line-height: 1; letter-spacing: -0.04em; color: var(--faint); font-variant-numeric: tabular-nums; }
+.year-label { margin: 18px 0 2px; font-weight: 400; font-size: 42px; line-height: 1; color: var(--faint); font-variant-numeric: tabular-nums; font-family: var(--hand); letter-spacing: 0; }
 .row {
   position: relative;
   display: grid;
@@ -571,19 +564,19 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 .row:hover::after, .row:focus-within::after, .row.is-on::after { transform: scaleX(1); }
 .row .date { color: var(--muted); font-size: 10px; }
 .row .kind { color: var(--faint); font-size: 10px; }
-.row .title { display: inline-block; font-size: 16px; font-stretch: 87%; line-height: 1.25; transition: color 300ms ease, transform 300ms ease; }
+.row .title { display: inline-block; font-size: 16px; line-height: 1.25; transition: color 300ms ease, transform 300ms ease; }
 .row .sub { display: block; color: var(--muted); font-size: 10px; margin-top: 3px; }
 .row a { text-decoration: none; }
 .row:hover .title, .row.is-on .title { color: var(--accent); }
 .row:hover .title { transform: translateX(4px); }
 .row.compact { grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; padding: 5px 0; border-bottom-style: dotted; }
-.row.compact .title { font-size: 12px; font-stretch: 100%; line-height: 1.35; }
+.row.compact .title { font-size: 12px; line-height: 1.35; }
 .row.compact .by { color: var(--faint); font-size: 10px; }
 
 .song { border-bottom: 1px solid var(--line-p); }
 .essay-link { display: flex; flex-direction: column; gap: 6px; padding: 16px 0 18px; text-decoration: none; }
 .essay-meta { color: var(--muted); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
-.essay-title { font-weight: 300; font-stretch: 75%; font-size: clamp(26px, 2.9vw, 38px); line-height: 1; letter-spacing: -0.03em; text-wrap: balance; transition: color 300ms ease; }
+.essay-title { font-weight: 400; font-size: clamp(26px, 2.9vw, 38px); line-height: 1; text-wrap: balance; transition: color 300ms ease; font-family: var(--display); text-transform: var(--display-case); letter-spacing: var(--display-track); }
 .essay-sub { color: var(--muted); font-family: var(--read); font-style: italic; font-size: 15px; line-height: 1.4; }
 .essay-link:hover .essay-title { color: var(--accent); }
 
@@ -659,7 +652,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 .cover-art { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > p { position: relative; margin: 0; }
 .cover-handle { font-size: 11px; letter-spacing: 0.22em; }
-.cover-name { font-weight: 200; font-stretch: 75%; font-size: clamp(40px, 4.2vw, 58px); line-height: 0.9; letter-spacing: -0.05em; overflow-wrap: anywhere; }
+.cover-name { font-weight: 400; font-size: clamp(40px, 4.2vw, 58px); line-height: 0.9; overflow-wrap: anywhere; font-family: var(--display); text-transform: var(--display-case); letter-spacing: var(--display-track); }
 .cover-spec { color: var(--accent); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; }
 .verse { margin: 0 0 0.9em; font-family: var(--read); font-size: 17px; line-height: 1.55; color: rgba(var(--ink-rgb), 0.9); }
 .track-b { display: grid; grid-template-columns: 34px minmax(0, 1fr); margin: 0; padding: 8px 0; border-top: 1px solid var(--line-p); font-family: var(--read); font-size: 16px; line-height: 1.4; }
@@ -672,8 +665,8 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
 /* A detail page: the words. */
 .prose { font-family: var(--read); font-size: 17px; line-height: 1.6; color: rgba(var(--ink-rgb), 0.92); overflow-wrap: break-word; }
 .prose p { margin: 0 0 0.9em; }
-.prose.first > p:first-child::first-letter { float: left; font-family: var(--mono); font-weight: 200; font-stretch: 75%; font-size: 3.4em; line-height: 0.82; margin: 0.06em 0.1em 0 0; color: var(--accent); }
-.prose h1, .prose h2, .prose h3, .prose h4 { display: block; margin: 1.4em 0 0.8em; color: var(--accent); font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; }
+.prose.first > p:first-child::first-letter { float: left; font-family: var(--display); font-weight: 400; font-size: 3.4em; line-height: 0.82; margin: 0.06em 0.1em 0 0; color: var(--accent); }
+.prose h1, .prose h2, .prose h3, .prose h4 { display: block; margin: 1.4em 0 0.8em; color: var(--accent); font-family: var(--mono); font-size: 10px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase; }
 .prose h1::before, .prose h2::before, .prose h3::before, .prose h4::before, .prose h1::after, .prose h2::after, .prose h3::after, .prose h4::after { content: none; }
 .pg-body > .blk:first-child .prose > :first-child { margin-top: 0; }
 .prose blockquote { margin: 1em 0; padding-left: 16px; border-left: 1px solid var(--accent); font-style: italic; color: rgba(var(--ink-rgb), 0.8); }
