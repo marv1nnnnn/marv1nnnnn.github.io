@@ -120,7 +120,7 @@ const beat = () => (.4 + tape.stir * .6) * (.5 + tape.home * .5)
 stack(
   // brushes and a soft kick, a room away
   s("bassdrum2 ~ ~ ~ ~ ~ bassdrum2 ~").n(3).lpf(900).gain(ref(() => beat() * .55)).orbit(3),
-  s("[~ snare_low]*2").n(irand(20)).hpf(1800).decay(.12).gain(ref(() => beat() * .3)).orbit(3).room(.3).roomsize(2),
+  s("[~ framedrum]*2").n(irand(18)).hpf(2400).decay(.12).gain(ref(() => beat() * .35)).orbit(3).room(.3).roomsize(2),
   s("hihat*8").n(irand(15)).hpf(7000).postgain(perlin.range(.4, 1)).gain(ref(() => beat() * .16)).orbit(3).room(.3).roomsize(2),
 
   // moving: the bass starts to walk
@@ -131,8 +131,8 @@ stack(
   // the electric piano, slow ninths
   n("<[0,2,4,8] [-1,1,3,5] [-2,0,2,6] [-3,-1,1,5]>").scale(mode).s("fmpiano")
     .attack(.02).release(2.5).gain(.3).orbit(1).room(.6).roomsize(6),
-  // Fishmans: a kalimba skank on the offbeat, thrown into the echo
-  n("<[4,6] [3,5]>").struct("~ x ~ x").scale("F4:dorian").s("kalimba").gain(.28)
+  // Fishmans: a marimba skank on the offbeat, thrown into the echo
+  n("<[4,6] [3,5]>").struct("~ x ~ x").scale("F4:dorian").s("marimba").gain(.3)
     .orbit(2).delay(.5).delaytime(.5).delayfeedback(.55).room(.5).roomsize(5),
   // and a vibraphone, when the pointer moves
   n(irand(7).segment(8).add(ref(() => tape.register))).scale("F4:dorian").s("vibraphone_soft")
@@ -513,10 +513,12 @@ export class TapeSound {
     await initStrudel();
     await initAudio();
     // The sample banks the tapes play (only their indexes load here; each sound loads when first
-    // played). They come from the projects' own GitHub repositories, as on strudel.cc.
+    // played). They come from the projects' own GitHub repositories, as on strudel.cc. Some VCSL
+    // folders have a comma in their name, which GitHub sends in an unquoted Content-Disposition
+    // that Chrome refuses: the tapes avoid those instruments (snare_*, kalimba, steinway).
     const dough = 'https://raw.githubusercontent.com/felixroos/dough-samples/main';
     await Promise.all([
-      samples('github:tidalcycles/dirt-samples'),
+      samples('https://raw.githubusercontent.com/tidalcycles/dirt-samples/master/strudel.json'),
       samples(`${dough}/tidal-drum-machines.json`),
       samples(`${dough}/vcsl.json`),
       samples(`${dough}/piano.json`),
