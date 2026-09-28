@@ -42,15 +42,15 @@ export function HomeControls() {
   const { newTape, palette } = useTape();
   return (
     <div className="shelf" role="group" aria-label="Tapes">
-      {Object.values(LOOKS).map((t) => (
+      {Object.entries(LOOKS).map(([key, t]) => (
         <button
-          key={t.name}
+          key={key}
           type="button"
           className="spine"
-          aria-pressed={palette === t.name}
-          aria-label={`${t.name} tape: ${t.mood}, after ${t.after}`}
+          aria-pressed={palette === key}
+          aria-label={`${t.name} tape: ${t.mood}`}
           style={{ '--shell': t.shell, '--paper': t.paper, '--ink': t.ink, '--stripe': t.stripe } as React.CSSProperties}
-          onClick={() => newTape(t.name)}
+          onClick={() => newTape(key)}
         >
           <span className="spine-label">
             <b>{t.name}</b>

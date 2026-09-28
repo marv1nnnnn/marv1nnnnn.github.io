@@ -17,8 +17,7 @@ const PACK = { min: 0.8, max: 2.4 };
 const TILT_HOME = THREE.MathUtils.degToRad(64);
 const TILT_DOCK = THREE.MathUtils.degToRad(28);
 
-// lead: which of the artists after the name is playing now (-1 with the sound off).
-export interface LabelInfo { tracks: string[]; current: number; count: string; lead: number }
+export interface LabelInfo { tracks: string[]; current: number; count: string }
 
 export class CassetteScene {
   private renderer: THREE.WebGLRenderer;
@@ -47,7 +46,9 @@ export class CassetteScene {
   hubAngleR = 0;
   wound = 0; // 0..1, how much tape has moved to the right reel
   still = false;
-  info: LabelInfo = { tracks: [], current: 0, count: '000', lead: -1 };
+  info: LabelInfo = { tracks: [], current: 0, count: '000' };
+  // Bumped when the label's fonts arrive, so it is written again in them.
+  private fontsIn = 0;
   private look: TapeLook = LOOKS.haze;
   private mats: Record<string, THREE.MeshStandardMaterial[]> = {};
   private swapT0 = -1;
@@ -100,6 +101,11 @@ export class CassetteScene {
     this.labelTex.colorSpace = THREE.SRGBColorSpace;
     this.labelTex.anisotropy = 8;
     this.labelTex.flipY = false; // glTF UVs start at the top
+    if (document.fonts) {
+      Promise.all(['84px "Reenie Beanie"', '700 40px "Courier Prime"', '400 24px "Courier Prime"'].map((f) => document.fonts.load(f)))
+        .then(() => { this.fontsIn++; })
+        .catch(() => {});
+    }
 
     this.rig.add(this.space);
     this.scene.add(this.rig);
@@ -264,7 +270,7 @@ export class CassetteScene {
     if (Math.abs(target - this.m) < 0.0005) this.m = target;
     const moving = this.m !== target || this.swapT0 >= 0 || (this.m < 1 && !this.still && !this.lowPower);
     const d = this.dock;
-    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.info.lead}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
+    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.fontsIn}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
     if (!moving && key === this.renderKey) return;
     this.renderKey = key;
     const t0 = performance.now();
@@ -350,10 +356,10 @@ export class CassetteScene {
   private shadowKey = '';
 
   private drawLabel() {
-    const { tracks, current, count, lead } = this.info;
+    const { tracks, current, count } = this.info;
     const L = this.look;
     const accent = L.stripe;
-    const key = `${tracks.join()}|${current}|${count}|${lead}|${L.name}`;
+    const key = `${tracks.join()}|${current}|${count}|${L.name}|${this.fontsIn}`;
     if (key === this.labelKey) return;
     this.labelKey = key;
     const c = this.label.getContext('2d');
@@ -387,34 +393,22 @@ export class CassetteScene {
     c.roundRect(wx - 10, wy - 10, ww + 20, wh + 20, 0.62 * px + 10);
     c.fill();
 
+    // Printed: the side and the tape's small print. Written in ballpoint: its name and mood.
     c.fillStyle = L.ink;
-    c.font = '700 92px "Martian Mono", monospace';
+    c.font = '700 92px "Courier Prime", monospace';
     c.textBaseline = 'alphabetic';
     c.fillText('A', 56, 162);
-    c.font = 'italic 400 66px "Newsreader", Georgia, serif';
-    c.fillText(`${L.name} — ${L.mood}`, 150, 132);
-    // The artists it is after; while it plays, the one leading is inked in and underlined.
-    const artists = L.after.split(' · ');
-    let ax = 152;
-    const part = (text: string, on: boolean) => {
-      c.globalAlpha = on ? 1 : 0.65;
-      c.font = `${on ? 600 : 400} 26px "Martian Mono", monospace`;
-      c.fillText(text, ax, 172);
-      const w = c.measureText(text).width;
-      if (on) {
-        c.fillStyle = accent;
-        c.fillRect(ax, 180, w, 4);
-        c.fillStyle = L.ink;
-      }
-      ax += w;
-    };
-    part('marv1nnnnn · after ', false);
-    artists.forEach((a, i) => {
-      if (i) part(' · ', false);
-      part(a, artists.length > 1 && i === lead);
-    });
+    // A ballpoint line is thin: go over it once more so it reads at the size the cassette is drawn.
+    c.font = '400 92px "Reenie Beanie", cursive';
+    c.strokeStyle = L.ink;
+    c.lineWidth = 2.5;
+    c.strokeText(`${L.name} — ${L.mood}`, 150, 138);
+    c.fillText(`${L.name} — ${L.mood}`, 150, 138);
+    c.globalAlpha = 0.65;
+    c.font = '400 24px "Courier Prime", monospace';
+    c.fillText('marv1nnnnn · C-60 · NORMAL BIAS 120µs', 152, 176);
     c.globalAlpha = 1;
-    c.font = '500 40px "Martian Mono", monospace';
+    c.font = '700 40px "Courier Prime", monospace';
     c.textAlign = 'right';
     c.fillText(count, W - 60, 132);
     c.textAlign = 'left';
@@ -426,10 +420,13 @@ export class CassetteScene {
       const x = 60 + i * slot;
       c.globalAlpha = 0.6;
       c.fillStyle = L.ink;
-      c.font = '500 30px "Martian Mono", monospace';
+      c.font = '400 30px "Courier Prime", monospace';
       c.fillText(String(i + 1).padStart(2, '0'), x, y - 44);
       c.globalAlpha = i === current ? 1 : 0.75;
-      c.font = `italic ${i === current ? 600 : 400} 58px "Newsreader", Georgia, serif`;
+      c.font = '400 76px "Reenie Beanie", cursive';
+      c.strokeStyle = L.ink;
+      c.lineWidth = 2;
+      c.strokeText(name, x, y + 10);
       c.fillText(name, x, y + 10);
       c.globalAlpha = 1;
       if (i === current) {

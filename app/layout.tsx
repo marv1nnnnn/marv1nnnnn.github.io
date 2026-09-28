@@ -87,6 +87,10 @@ export const metadata: Metadata = {
   },
 };
 
+// The face each tape sets its titles in (app/globals.css), fetched early so the booklet is
+// measured once.
+const TITLE_FACES: Record<string, string> = { '3am': 'bodoni-moda-italic', nightbus: 'big-shoulders', ritual: 'unifraktur-maguntia', pressure: 'alfa-slab-one', bent: 'special-elite' };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -128,16 +132,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* The booklets measure their pages in these, so fetch them before anything else. */}
-        <link rel="preload" href="/fonts/martian-mono.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/newsreader-italic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/courier-prime.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/libre-caslon.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/libre-caslon-italic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/reenie-beanie.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body>
         {/* The tape a returning visitor chose, set before anything is drawn: its world decides the
             lamp and the booklet's type, and the booklet measures its pages in that type. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('tape-palette');var r=${JSON.stringify({ oxide: 'haze', lain: '3am', phosphor: 'nightbus', uv: 'ritual', mono: 'pressure', noise: 'bent' })};document.documentElement.dataset.tape=(t&&r[t])||t||'haze'}catch(e){document.documentElement.dataset.tape='haze'}`,
+            __html: `try{var t=localStorage.getItem('tape-palette');var r=${JSON.stringify({ oxide: 'haze', lain: '3am', phosphor: 'nightbus', uv: 'ritual', mono: 'pressure', noise: 'bent' })};var d=document.documentElement;d.dataset.tape=(t&&r[t])||t||'haze';var f=${JSON.stringify(TITLE_FACES)}[d.dataset.tape];if(f){var l=document.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';l.href='/fonts/'+f+'.woff2';document.head.appendChild(l)}}catch(e){document.documentElement.dataset.tape='haze'}`,
           }}
         />
         <script
