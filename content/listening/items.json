@@ -782,5 +782,35 @@
     "type": "video",
     "date": "2026-08-31",
     "url": "https://tw.gundam-official.com/series/hathaway-ii"
+  },
+  {
+    "title": "还珠格格",
+    "creator": "琼瑶",
+    "type": "video",
+    "date": "2026-09-15"
+  },
+  {
+    "title": "I Saw the TV Glow",
+    "creator": "Jane Schoenbrun",
+    "type": "video",
+    "date": "2026-09-26"
+  },
+  {
+    "title": "Steel Ball Run (JoJo's Bizarre Adventure Part 7)",
+    "creator": "Hirohiko Araki",
+    "type": "text",
+    "date": "2026-09-26"
+  },
+  {
+    "title": "Shape of Dreams",
+    "creator": "Lizard Smoothie",
+    "type": "game",
+    "date": "2026-09-21"
+  },
+  {
+    "title": "Tennis Elbow 4",
+    "creator": "Mana Games",
+    "type": "game",
+    "date": "2026-09-26"
   }
 ]
