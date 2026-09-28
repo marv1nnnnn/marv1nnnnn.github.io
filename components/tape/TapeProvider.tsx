@@ -371,7 +371,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     setSound(next);
   }, []);
 
-  // Sound is off until the visitor asks for it; the Strudel bundle loads only then.
+  // Sound starts at the visitor's first touch (browsers allow no sound before one) unless they
+  // turned it off; the Strudel bundle loads only then.
   const toggleSound = useCallback(async () => {
     const state = soundStateRef.current;
     if (state === 'loading') return;
@@ -419,11 +420,12 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     return () => clearInterval(id);
   }, [sound]);
 
-  // A visitor who left sound on gets it back at their first touch or key press.
+  // The music is on by default: it starts at the first touch, click or key press (the first
+  // moment a browser lets a page make sound), unless this visitor turned it off before.
   useEffect(() => {
-    let wanted = false;
+    let wanted = true;
     try {
-      wanted = localStorage.getItem('tape-sound') === 'on';
+      wanted = localStorage.getItem('tape-sound') !== 'off';
     } catch {}
     if (!wanted) return;
     const onGesture = (e: Event) => {
@@ -433,9 +435,12 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     };
     const remove = () => {
       window.removeEventListener('pointerup', onGesture);
+      window.removeEventListener('touchend', onGesture);
       window.removeEventListener('keydown', onGesture);
     };
+    // touchend as well: it is what iOS Safari counts as the gesture that may start audio.
     window.addEventListener('pointerup', onGesture);
+    window.addEventListener('touchend', onGesture);
     window.addEventListener('keydown', onGesture);
     return remove;
   }, [toggleSound]);
