@@ -8,6 +8,7 @@ import {
   getSuperdoughAudioController,
   initAudio,
   initStrudel,
+  samples,
   setAudioContext,
   superdough,
 } from '@strudel/web';
@@ -45,240 +46,244 @@ export interface Listening {
   y: number;
 }
 
+// How the deck colours a tape on its way out: wow and hiss relative to the usual, a drive into
+// the output stage (0 clean, 1 into the red), and how much top end survives.
+interface DeckProfile { wow: number; hiss: number; drive: number; bright: number }
+
 interface Tape {
   root: number; // MIDI note of the scale root, for the notes a release scatters
   steps: number[];
   cps: number;
   voice: Record<string, number | string>; // the instrument a released hold scatters
   crackle: number; // surface noise this tape carries even when new
-  code: string; // the Strudel pattern; every tape answers the pointer the same way
+  deck: DeckProfile;
+  code: string; // the Strudel pattern
 }
 
-// One tape per palette, each after music from the canon and the log. Every tape follows the same
-// rules so the site feels the same whichever is playing: still is quiet, moving fills the rhythm
-// and the melody in, holding swells, releasing scatters. Orbits keep reverb and echo settings
-// apart: Strudel rebuilds an orbit's reverb whenever its size changes.
+// One tape per palette, each a different kind of music from the canon and the log, with its own
+// instruments (samples: tidal-drum-machines, Dirt-Samples, VCSL, the Salamander piano), its own
+// tempo, and its own idea of what the pointer is: a hand on the reel, a bass player, a
+// sequencer, a ritual, a sound system, a bent circuit. What they share: still is quiet, moving
+// brings the music in, holding builds, releasing lets go. Orbits keep reverb and echo settings
+// apart (Strudel rebuilds an orbit's reverb whenever its size changes) and carry the arrangement:
+// 1 the ground (pads, drones, holds), 2 the melody, 3 the rhythm.
 const TAPES: Record<string, Tape> = {
   oxide: {
     root: 50,
     steps: [0, 2, 4, 5, 7, 9, 10],
-    cps: 0.2,
-    voice: { s: 'sine', fmi: 2, fmh: 3.01 },
+    cps: 0.22,
+    voice: { s: 'glockenspiel' },
     crackle: 0.02,
+    deck: { wow: 2.6, hiss: 1.8, drive: 0.05, bright: 0.75 },
     code: `// tape: oxide. a loop that wears away the longer it plays.
 // after William Basinski, Boards of Canada, Oneohtrix Point Never
-setcps(.2)
-const mode = "D3:mixolydian"
+setcps(.22)
 
 stack(
-  // the loop: the same two bars, losing a little more on every pass
-  n("<[0,4,7] [-1,3,5]>").scale(mode)
-    .s("supersaw").detune(.1).unison(3).attack(1.2).release(4)
-    .lpf(ref(() => 1500 - tape.decay * 1000)).gain(.08)
-    .degradeBy(ref(() => tape.decay * .5))
+  // the loop: two piano chords, losing a little more on every pass
+  note("<[d3,a3,e4,f#4] [b2,f#3,d4,a4]>").s("piano").clip(1)
+    .attack(.3).release(3).lpf(ref(() => 2600 - tape.decay * 1800))
+    .degradeBy(ref(() => tape.decay * .5)).gain(.55)
     .orbit(1).room(.8).roomsize(9),
-  n("[4 5 4 ~ 3 ~ 1 ~]/2").scale(mode)
-    .s("sawtooth").attack(.25).release(1.6)
-    .lpf(ref(() => 1100 - tape.decay * 600))
-    .vib(.6).vibmod(ref(() => .08 + tape.decay * .5))
-    .degradeBy(ref(() => tape.decay * .8)).gain(.09)
-    .orbit(1).room(.8).roomsize(9),
+  // under it, a long pad, very slow
+  s("padlong").loopAt(8).lpf(1100).gain(.3).orbit(1).room(.8).roomsize(9),
 
-  // moving: a music box somewhere in the house
-  n(irand(8).segment(8).add(ref(() => tape.register))).scale("D4:mixolydian")
-    .s("sine").fm(2).fmh(3.01).decay(.5).sustain(0).release(1)
-    .degradeBy(ref(() => .95 - tape.stir * .7))
-    .pan(ref(() => tape.x)).gain(.16)
-    .orbit(2).delay(.5).delaytime(.75).delayfeedback(.45).room(.4).roomsize(4),
+  // moving: the hand on the reel scrubs through the pad
+  s("padlong*8").begin(ref(() => tape.x * .9)).end(ref(() => tape.x * .9 + .03))
+    .gain(ref(() => tape.stir * .7)).pan(ref(() => tape.x))
+    .orbit(2).delay(.4).delaytime(.68).delayfeedback(.45).room(.4).roomsize(4),
+  // and a music box in the next room
+  n(irand(8).segment(4).add(ref(() => tape.register))).scale("D5:major pentatonic")
+    .s("glockenspiel").degradeBy(ref(() => .9 - tape.stir * .6)).gain(.22)
+    .orbit(2).delay(.4).delaytime(.68).delayfeedback(.45).room(.4).roomsize(4),
 
-  // holding: the loop swells, as if played back too loud
-  n("[0,4,7,9]*16").scale(mode).s("supersaw").detune(.2).decay(.3).sustain(0)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .lpf(ref(() => 300 + tape.hold * 4000)).lpq(5)
-    .gain(ref(() => tape.hold * .2))
+  // holding: the moment freezes, grains of it piling up
+  s("padlong*32").begin(ref(() => tape.x * .9)).end(ref(() => tape.x * .9 + .012))
+    .degradeBy(ref(() => tape.hold > .02 ? .15 : 1)).pan(rand)
+    .gain(ref(() => tape.hold * .55))
     .orbit(1).room(.8).roomsize(9),
 )`,
   },
   lain: {
-    root: 52,
-    steps: [0, 2, 3, 5, 7, 8, 10],
-    cps: 0.38,
-    voice: { s: 'sine', fmi: 3.5, fmh: 4 },
-    crackle: 0.01,
-    code: `// tape: lain. 3am.
+    root: 53,
+    steps: [0, 2, 3, 5, 7, 9, 10],
+    cps: 0.3,
+    voice: { s: 'vibraphone_soft' },
+    crackle: 0.012,
+    deck: { wow: 1, hiss: 0.9, drive: 0.1, bright: 0.8 },
+    code: `// tape: lain. 3am, a diner, the red room.
 // after HTRK, Angelo Badalamenti, Fishmans
-setcps(.38)
-const mode = "E3:aeolian"
-const beat = () => (.35 + tape.stir * .65) * (.5 + tape.home * .5)
+setcps(.3)
+const mode = "F3:dorian"
+const beat = () => (.4 + tape.stir * .6) * (.5 + tape.home * .5)
 
 stack(
-  // drum machine: slow, dry, a room away
-  s("sbd ~ ~ ~ ~ ~ sbd ~").decay(.7).gain(ref(() => beat() * .3)).orbit(3),
-  s("~ ~ white ~").decay(.04).sustain(0).bpf(2400)
-    .gain(ref(() => beat() * .35)).orbit(3).room(.3).roomsize(2),
+  // brushes and a soft kick, a room away
+  s("bassdrum2 ~ ~ ~ ~ ~ bassdrum2 ~").n(3).lpf(900).gain(ref(() => beat() * .55)).orbit(3),
+  s("[~ snare_low]*2").n(irand(20)).hpf(1800).decay(.12).gain(ref(() => beat() * .3)).orbit(3).room(.3).roomsize(2),
+  s("hihat*8").n(irand(15)).hpf(7000).postgain(perlin.range(.4, 1)).gain(ref(() => beat() * .16)).orbit(3).room(.3).roomsize(2),
 
-  // bass: round and low, mostly the root
-  note("<e1 [e1 ~ ~ e1] c1 d1>").s("sine").decay(1.2).sustain(.4).release(.3)
-    .shape(.25).lpf(400).gain(.11).orbit(3),
+  // moving: the bass starts to walk
+  n("<[0 2 4 5] [4 3 2 0] [-3 -1 0 2] [3 2 1 -1]>").scale("F1:dorian").s("triangle")
+    .decay(.35).sustain(.25).lpf(600).shape(.2)
+    .degradeBy(ref(() => .85 - tape.stir * .85)).gain(.5).orbit(3),
 
-  // guitar on the offbeat, thrown into a dub echo
-  n("<[0,2,4] [0,2,4] [-2,0,2] [-1,1,3]>").struct("~ x ~ x").scale(mode)
-    .s("triangle").decay(.25).sustain(0).hpf(300).gain(.3)
-    .orbit(2).delay(.45).delaytime(.49).delayfeedback(.5).room(.5).roomsize(5),
+  // the electric piano, slow ninths
+  n("<[0,2,4,8] [-1,1,3,5] [-2,0,2,6] [-3,-1,1,5]>").scale(mode).s("fmpiano")
+    .attack(.02).release(2.5).gain(.3).orbit(1).room(.6).roomsize(6),
+  // Fishmans: a kalimba skank on the offbeat, thrown into the echo
+  n("<[4,6] [3,5]>").struct("~ x ~ x").scale("F4:dorian").s("kalimba").gain(.28)
+    .orbit(2).delay(.5).delaytime(.5).delayfeedback(.55).room(.5).roomsize(5),
+  // and a vibraphone, when the pointer moves
+  n(irand(7).segment(8).add(ref(() => tape.register))).scale("F4:dorian").s("vibraphone_soft")
+    .degradeBy(ref(() => .95 - tape.stir * .7)).pan(ref(() => tape.x)).gain(.4)
+    .orbit(2).delay(.5).delaytime(.5).delayfeedback(.55).room(.5).roomsize(5),
 
-  // moving: a vibraphone in an empty diner
-  n(irand(7).segment(8).add(ref(() => tape.register))).scale("E4:aeolian")
-    .s("sine").fm(3.5).fmh(4).decay(.8).sustain(0).release(1.2)
-    .degradeBy(ref(() => .95 - tape.stir * .7))
-    .pan(ref(() => tape.x)).gain(.14)
-    .orbit(2).delay(.3).delaytime(.49).delayfeedback(.5).room(.5).roomsize(5),
-
-  // holding: a chord leaning in, the red room getting louder
-  n("[0,2,4,6]*8").scale(mode).s("sawtooth").decay(.2).sustain(0)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .lpf(ref(() => 250 + tape.hold * 3500)).lpq(6)
-    .gain(ref(() => tape.hold * .25))
-    .orbit(1).room(.7).roomsize(7),
+  // holding: the organ leans in
+  n("[0,2,4,7]").scale(mode).s("pipeorgan_quiet").attack(.4).release(1.5)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1)).gain(ref(() => tape.hold * .5))
+    .orbit(1).room(.6).roomsize(6),
 )`,
   },
   phosphor: {
     root: 57,
-    steps: [0, 2, 3, 5, 7, 9, 10],
-    cps: 0.45,
-    voice: { s: 'square', crush: 8, lpf: 3000 },
-    crackle: 0,
-    code: `// tape: phosphor. machines that dream.
-// after Autechre, Boards of Canada
-setcps(.45)
-const mode = "A3:dorian"
-const beat = () => (.25 + tape.stir * .75) * (.5 + tape.home * .5)
-
-stack(
-  // glass pads, slowly changing their minds
-  n("<[0,4,9] [2,5,9] [-1,4,7] [0,3,7]>/2").scale(mode)
-    .s("supersaw").detune(.25).unison(4).attack(1.5).release(3)
-    .lpf(ref(() => 700 + tape.night * 700)).gain(.1)
-    .orbit(1).room(.7).roomsize(6),
-
-  // five notes against sixteen steps: it never lines up the same way twice
-  n("{0 2 4 7 5}%16".add(ref(() => tape.register))).scale(mode)
-    .s("square").decay(.1).sustain(0).lpq(8)
-    .lpf(ref(() => 500 + tape.stir * 3500))
-    .degradeBy(ref(() => .8 - tape.stir * .7))
-    .pan(ref(() => tape.x)).gain(.1)
-    .orbit(2).delay(.3).delaytime(.2).delayfeedback(.4).room(.3).roomsize(3),
-
-  // broken beat
-  s("sbd(3,8,2)").decay(.35).gain(ref(() => beat() * .3)).orbit(3),
-  s("~ white ~ [~ white]").decay(.07).sustain(0).bpf(1700).crush(7)
-    .sometimesBy(.25, x => x.ply(2))
-    .gain(ref(() => beat() * .35)).orbit(3),
-  s("white*16").decay(.015).sustain(0).hpf(9000)
-    .degradeBy(ref(() => .8 - tape.stir * .6))
-    .gain(ref(() => beat() * .25)).orbit(3),
-
-  // holding: the signal overloads and turns to grit
-  n("[0,4,7,11]*8").scale(mode).s("square").decay(.1).sustain(0)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .coarse(ref(() => 1 + Math.round(tape.hold * 10)))
-    .lpf(ref(() => 400 + tape.hold * 5000))
-    .gain(ref(() => tape.hold * .22))
-    .orbit(1).room(.7).roomsize(6),
-)`,
-  },
-  uv: {
-    root: 48,
     steps: [0, 2, 3, 5, 7, 8, 10],
-    cps: 0.58,
-    voice: { s: 'sawtooth', vowel: 'o', lpf: 2400 },
-    crackle: 0.12,
-    code: `// tape: uv. a night bus in the rain.
-// after Burial, Oneohtrix Point Never
-setcps(.58)
-const mode = "C3:minor"
-const beat = () => (.25 + tape.stir * .75) * (.5 + tape.home * .5)
-
-stack(
-  // minor ninths, soft and far away
-  n("<[0,4,6,8] [-2,2,4,6] [-3,1,3,5] [-1,3,4,6]>/2").scale(mode)
-    .s("supersaw").detune(.2).unison(3).attack(.8).release(2.5)
-    .lpf(ref(() => 600 + tape.night * 500)).gain(.07)
-    .orbit(1).room(.85).roomsize(8),
-
-  // voices: formants that almost sing, pitched from the pointer height
-  n("<[~ 7] [~ 9 ~ 8] [~ ~ 7] [11 ~ 9 ~]>".add(ref(() => tape.register - 3))).scale(mode)
-    .s("sawtooth").vowel("<o a o e>").attack(.02).decay(.3).sustain(.2).release(.8)
-    .degradeBy(ref(() => .5 - tape.stir * .45))
-    .pan(ref(() => tape.x)).gain(.1)
-    .orbit(2).delay(.35).delaytime(.31).delayfeedback(.45).room(.7).roomsize(6),
-
-  // two-step: a skipping kick, snares on two and four, shuffled hats
-  s("sbd ~ ~ ~ ~ ~ ~ ~ ~ ~ sbd ~ ~ ~ ~ ~").decay(.4)
-    .gain(ref(() => beat() * .3)).orbit(3),
-  s("~ white ~ white").decay(.1).sustain(0).bpf(1900)
-    .gain(ref(() => beat() * .65)).orbit(3).room(.4).roomsize(2),
-  s("white*16").swingBy(1/6, 8).decay(.02).sustain(0).hpf(8000)
-    .degradeBy(ref(() => .7 - tape.stir * .5))
-    .gain(ref(() => beat() * .22)).orbit(3).room(.4).roomsize(2),
-
-  // sub
-  n("<0 ~ -2 [-1 ~]>").scale("C1:minor").s("sine").decay(.9).sustain(.3)
-    .shape(.2).gain(.16).orbit(3),
-
-  // holding: the voices gather into a choir
-  n("[0,2,4,6]*8").scale(mode).s("sawtooth").vowel("a").decay(.25).sustain(0)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .lpf(ref(() => 400 + tape.hold * 3000))
-    .gain(ref(() => tape.hold * .3))
-    .orbit(1).room(.85).roomsize(8),
-)`,
-  },
-  mono: {
-    root: 48,
-    steps: [0, 1, 3, 5, 7, 8, 10],
-    cps: 0.58,
-    voice: { s: 'square', hpf: 400, lpf: 2400 },
-    crackle: 0.04,
-    code: `// tape: mono. pressure.
-// after The Bug, Coil, Swans, Source Direct
-setcps(.58)
-const mode = "C3:phrygian"
+    cps: 0.5625,
+    voice: { s: 'square', crush: 6, lpf: 3200 },
+    crackle: 0.03,
+    deck: { wow: 0.25, hiss: 0.35, drive: 0.15, bright: 1 },
+    code: `// tape: phosphor. broken machines, a night bus, rain.
+// after Autechre, Burial
+setcps(.5625)
 const beat = () => (.3 + tape.stir * .7) * (.5 + tape.home * .5)
 
 stack(
-  // the hum: a low drone that fills the room
-  note("<c2 c2 c2 db2>/2").s("sawtooth").attack(2).release(4)
-    .lpf(ref(() => 140 + tape.night * 80)).shape(.5).gain(.055)
-    .orbit(1).room(.6).roomsize(8),
+  // 2-step on a crunchy sampler: kick, a late snare, hats pushed off the grid
+  s("bd ~ ~ ~ ~ ~ ~ ~ ~ ~ bd ~ ~ ~ ~ ~").bank("AkaiMPC60").lpf(3500).gain(ref(() => beat() * .9)).orbit(3),
+  s("~ ~ ~ ~ sd ~ ~ ~ ~ ~ ~ ~ sd ~ ~ [~ sd]").bank("AkaiMPC60").n(1).gain(ref(() => beat() * .55)).orbit(3).room(.3).roomsize(2),
+  s("hh*16").bank("AkaiMPC60").swingBy(1/6, 8).degradeBy(.35).hpf(6000).gain(ref(() => beat() * .35)).orbit(3).room(.3).roomsize(2),
+  // the sub
+  note("<a0 [~ a0] f0 [g0 ~]>").s("sine").decay(.6).sustain(.3).gain(.35).orbit(3),
 
-  // riddim: half-time, three-three-two, heavy
-  s("sbd ~ ~ sbd ~ ~ sbd ~").decay(.9).shape(.3)
-    .gain(ref(() => beat() * .15)).orbit(3),
-  s("~ ~ ~ ~ white ~ ~ ~").decay(.18).sustain(0).bpf(1200)
-    .gain(ref(() => beat() * .35)).orbit(3).room(.5).roomsize(3),
-  // move fast enough and the hats double into jungle
-  s("white*8").ply(ref(() => tape.stir > .6 ? 2 : 1)).decay(.02).sustain(0).hpf(9000)
-    .gain(ref(() => beat() * .2 * tape.stir)).orbit(3).room(.5).roomsize(3),
+  // ghost vocals, pitched down and cut up; the pointer's height pitches them
+  s("diphone").n("<3 9 14 21>").chop(8).speed(ref(() => .55 + tape.register * .06))
+    .degradeBy(ref(() => .85 - tape.stir * .6)).ply(ref(() => tape.hold > .3 ? 4 : 1))
+    .gain(.55).orbit(1).room(.75).roomsize(7),
+  // pad: minor ninths behind rain on the window
+  n("<[0,2,4,8] [-2,0,3,5]>").scale("A3:minor").s("supersaw").detune(.15).lpf(1200)
+    .attack(.6).release(2).gain(.07).orbit(1).room(.75).roomsize(7),
 
-  // dub: one stab, thrown into a long echo
-  n("<[~ [0,3]] ~ [~ ~ [0,3] ~] ~>".add(ref(() => tape.register))).scale(mode)
-    .s("square").hpf(500).lpf(2400).decay(.08).sustain(0).gain(.08)
-    .orbit(2).delay(.6).delaytime(.31).delayfeedback(.7).room(.3).roomsize(4),
+  // moving: the machines; where the pointer is rewrites their rhythm
+  s("bleep").n(irand(13)).euclidRot(ref(() => 3 + Math.round(tape.x * 8)), 16, ref(() => tape.register))
+    .speed(rand.range(.5, 2)).crush(7).pan(rand)
+    .gain(ref(() => .06 + tape.stir * .3))
+    .orbit(2).delay(.3).delaytime(.1875).delayfeedback(.4),
+)`,
+  },
+  uv: {
+    root: 40,
+    steps: [0, 1, 4, 5, 7, 8, 10],
+    cps: 0.28,
+    voice: { s: 'tubularbells' },
+    crackle: 0.015,
+    deck: { wow: 1.3, hiss: 1, drive: 0.2, bright: 0.85 },
+    code: `// tape: uv. musick to play in the dark.
+// after Coil, Xiu Xiu
+setcps(.28)
+const mode = "E3:phrygian dominant"
+const beat = () => (.25 + tape.stir * .75) * (.5 + tape.home * .5)
 
-  // moving: metal, struck somewhere in the dark
-  n(irand(5).segment(8).add(ref(() => tape.register))).scale("C4:phrygian")
-    .s("sine").fm(5).fmh(1.41).decay(.25).sustain(0)
-    .degradeBy(ref(() => .95 - tape.stir * .6))
-    .pan(ref(() => tape.x)).gain(.1)
-    .orbit(2).delay(.3).delaytime(.31).delayfeedback(.7).room(.3).roomsize(4),
+stack(
+  // the drone: an organ pedal, and a didgeridoo breathing under it
+  note("<e1 [e1 f1]>").s("pipeorgan_quiet_pedal").attack(2).release(4).gain(.4).orbit(1).room(.9).roomsize(9),
+  s("didgeridoo").n("<0 3 5 3>").slow(2).lpf(800).gain(.3).orbit(1).room(.9).roomsize(9),
+  // the ritual: a gong, bells far apart
+  s("gong").n(irand(7)).struct("x ~ ~ ~").slow(2).gain(.28).orbit(1).room(.9).roomsize(9),
+  n("<0 ~ 4 ~ [1 0] ~ ~ ~>").scale("E3:phrygian dominant").s("tubularbells").gain(.25)
+    .orbit(2).room(.6).roomsize(7),
 
-  // holding: it only gets louder
-  n("[0,1,4,7]*8").scale("C2:phrygian").s("sawtooth").decay(.2).sustain(.2)
-    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1))
-    .distort(ref(() => tape.hold * 2)).postgain(.2)
-    .lpf(ref(() => 200 + tape.hold * 3000))
-    .gain(ref(() => tape.hold * .2))
-    .orbit(1).room(.6).roomsize(8),
+  // a cheap drum machine, stiff and too loud
+  s("bd ~ sd ~ bd bd sd ~").bank("KorgMinipops").gain(ref(() => beat() * .55)).orbit(3),
+  // moving: a glockenspiel, unsure of itself
+  n(irand(7).segment(8).add(ref(() => tape.register))).scale("E5:phrygian dominant")
+    .s("glockenspiel").degradeBy(ref(() => .95 - tape.stir * .7)).pan(ref(() => tape.x)).gain(.3)
+    .orbit(2).room(.6).roomsize(7),
+  // pushed hard, it breaks: noise, all at once
+  s("industrial*4").n(irand(32)).degradeBy(ref(() => tape.stir > .72 ? .15 : 1))
+    .distort(2).postgain(.3).gain(.6).orbit(3),
+
+  // holding: bowed bars in a cluster, pulling tighter
+  n("[0,1,3,4]").scale(mode).add(7).s("vibraphone_bowed").attack(.8).release(2)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1)).gain(ref(() => tape.hold * .6))
+    .orbit(1).room(.9).roomsize(9),
+)`,
+  },
+  mono: {
+    root: 36,
+    steps: [0, 1, 3, 5, 7, 8, 10],
+    cps: 0.35,
+    voice: { s: 'sawtooth', distort: 1.5, lpf: 1600, delayfeedback: 0.7 },
+    crackle: 0.03,
+    deck: { wow: 0.8, hiss: 0.8, drive: 0.7, bright: 0.7 },
+    code: `// tape: mono. pressure.
+// after The Bug, Swans, Source Direct
+setcps(.35)
+const mode = "C2:phrygian"
+const beat = () => (.35 + tape.stir * .65) * (.5 + tape.home * .5)
+
+stack(
+  // 3-3-2 on an 808, the kick into the red
+  s("bd ~ ~ bd ~ ~ bd ~").bank("RolandTR808").n(3).distort(1.2).postgain(.5).gain(ref(() => beat())).orbit(3),
+  s("~ ~ rim ~ ~ ~ rim ~").bank("RolandTR808").gain(ref(() => beat() * .5)).orbit(3).room(.3).roomsize(2),
+  s("hh*8").bank("RolandTR808").ply(ref(() => tape.stir > .6 ? 2 : 1)).gain(ref(() => beat() * .35 * tape.stir)).orbit(3).room(.3).roomsize(2),
+  // the sub, saturated
+  note("<c1 c1 [c1 ~ ~ db1] c1>").s("sine").decay(.8).sustain(.4).shape(.5).gain(.4).orbit(3),
+
+  // Swans: the same chord, again and again, heavier the more it is pushed
+  s("dist*4").n("<0 0 4 4>").speed(.5).lpf(ref(() => 700 + tape.stir * 3200))
+    .gain(ref(() => .12 + tape.stir * .4)).orbit(1).room(.4).roomsize(4),
+  // a dub stab thrown into the delay
+  n("<[0,3,7] ~ ~ ~>").scale(mode).add(14).s("sawtooth").decay(.15).sustain(0).lpf(1500).gain(.2)
+    .orbit(2).delay(.6).delaytime(.4286).delayfeedback(.65),
+
+  // holding: the siren
+  note(sine.range(72, 84).fast(4).segment(16)).s("square").lpf(3000)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1)).gain(ref(() => tape.hold * .16))
+    .orbit(2).delay(.6).delaytime(.4286).delayfeedback(.65),
+)`,
+  },
+  noise: {
+    root: 45,
+    steps: [0, 1, 3, 6, 7, 9, 10],
+    cps: 0.5,
+    voice: { s: 'square', crush: 4, coarse: 6, lpf: 5000 },
+    crackle: 0.05,
+    deck: { wow: 1.6, hiss: 1.2, drive: 1, bright: 1 },
+    code: `// tape: noise. bent circuits, Beijing.
+// after fRUITYSPACE and the shows there, 2016-2021
+setcps(.5)
+const beat = () => (.2 + tape.stir * .8) * (.5 + tape.home * .5)
+
+stack(
+  // a Casio with its pitch pin shorted: where the pointer is bends it
+  s("casio*8").n(irand(3)).speed(ref(() => .4 + tape.x * 2.6)).crush(ref(() => 3 + tape.register))
+    .degradeBy(ref(() => .75 - tape.stir * .65)).gain(.35).orbit(2),
+  s("toys").n(irand(13)).struct("x ~ x x ~ ~ x ~").speed(rand.range(.5, 3)).coarse(4).gain(.22)
+    .orbit(2).delay(.25).delaytime(.125).delayfeedback(.6),
+  // a drum machine losing its clock
+  s("bd sd [~ bd] sd").bank("CasioSK1").degradeBy(.3).speed(perlin.range(.8, 1.4))
+    .gain(ref(() => beat() * .6)).orbit(3),
+  // harsh: the moving hand is the noise
+  s("noise2*16").n(irand(8)).hpf(ref(() => 200 + tape.register * 400)).distort(3).postgain(.2)
+    .gain(ref(() => tape.stir * tape.stir * .5)).orbit(3),
+  s("glitch2*8").n(irand(8)).degradeBy(.5).gain(ref(() => .06 + tape.stir * .3)).orbit(2),
+
+  // holding: feedback, the mixer turned back on itself
+  note(ref(() => 50 + tape.register * 7)).segment(16).s("sawtooth")
+    .lpf(ref(() => 400 + tape.hold * 6000)).lpq(18).distort(ref(() => tape.hold * 3)).postgain(.2)
+    .degradeBy(ref(() => tape.hold > .02 ? 0 : 1)).gain(ref(() => tape.hold * .35)).orbit(1),
+  // and under everything, the hum of the room
+  note("a0").s("sine").gain(.08).orbit(1),
 )`,
   },
 };
@@ -339,6 +344,9 @@ class Deck {
   private gate: GainNode;
   private master: GainNode;
   private run: GainNode;
+  private shaper: WaveShaperNode;
+  private driveNow = -1;
+  private profile: DeckProfile = { wow: 1, hiss: 1, drive: 0, bright: 1 };
   private spool: GainNode;
   private spoolBand: BiquadFilterNode;
   private hiss: GainNode;
@@ -365,7 +373,9 @@ class Deck {
     this.input.connect(this.run);
     this.run.connect(this.wow).connect(this.dry).connect(this.tone);
     this.run.connect(this.warp).connect(this.wet).connect(this.tone);
-    this.tone.connect(this.duck).connect(this.gate).connect(this.master).connect(limiter).connect(ctx.destination);
+    // The output stage: some tapes are driven into it (see DeckProfile.drive).
+    this.shaper = new WaveShaperNode(ctx, { oversample: '2x' });
+    this.tone.connect(this.shaper).connect(this.duck).connect(this.gate).connect(this.master).connect(limiter).connect(ctx.destination);
 
     // Wow (slow) and flutter (fast): the delay line drifts, so the pitch drifts with it.
     this.wowDepth = g(0.0012);
@@ -402,13 +412,26 @@ class Deck {
   }
 
   // Reading pages play the same tape, quieter and darker; older pages are more worn.
-  set(home: boolean, wear: number, night: number, crackle: number) {
+  set(home: boolean, wear: number, night: number, crackle: number, profile = this.profile) {
+    this.profile = profile;
     const t = this.ctx.currentTime;
-    this.duck.gain.setTargetAtTime(home ? 1 : 0.4, t, 0.4);
-    this.tone.frequency.setTargetAtTime(home ? 16000 - wear * 6000 : 5200 - wear * 3000, t, 0.4);
-    this.hiss.gain.setTargetAtTime(0.012 + wear * 0.02 + night * 0.006, t, 0.4);
+    const p = profile;
+    this.duck.gain.setTargetAtTime(home ? 1 : 0.45, t, 0.4);
+    this.tone.frequency.setTargetAtTime((home ? 16000 - wear * 6000 : 7000 - wear * 3000) * p.bright, t, 0.4);
+    this.hiss.gain.setTargetAtTime((0.012 + wear * 0.02 + night * 0.006) * p.hiss, t, 0.4);
     this.crackle.gain.setTargetAtTime(wear * 0.25 + crackle, t, 0.4);
-    this.wowDepth.gain.setTargetAtTime(0.0008 + wear * 0.003, t, 0.4);
+    this.wowDepth.gain.setTargetAtTime((0.0008 + wear * 0.003) * p.wow, t, 0.4);
+    if (p.drive !== this.driveNow) {
+      this.driveNow = p.drive;
+      // tanh saturation, level-matched so a clean tape and a driven one sit at the same loudness.
+      const k = 0.5 + p.drive * 5;
+      const curve = new Float32Array(1025);
+      for (let i = 0; i < curve.length; i++) {
+        const x = (i / (curve.length - 1)) * 2 - 1;
+        curve[i] = Math.tanh(k * x) / Math.tanh(k);
+      }
+      this.shaper.curve = curve;
+    }
   }
 
   // Winding: the music drops out, the spool spins up, fast-forward higher than rewind.
@@ -489,6 +512,15 @@ export class TapeSound {
     setAudioContext(ctx);
     await initStrudel();
     await initAudio();
+    // The sample banks the tapes play (only their indexes load here; each sound loads when first
+    // played). They come from the projects' own GitHub repositories, as on strudel.cc.
+    const dough = 'https://raw.githubusercontent.com/felixroos/dough-samples/main';
+    await Promise.all([
+      samples('github:tidalcycles/dirt-samples'),
+      samples(`${dough}/tidal-drum-machines.json`),
+      samples(`${dough}/vcsl.json`),
+      samples(`${dough}/piano.json`),
+    ]).catch((err) => console.warn('some sample banks did not load', err));
     const sound = new TapeSound(getAudioContext());
     // Superdough sends everything to the speakers; send it through the deck instead. It rebuilds
     // its output on reset, so keep the rerouting in place when that happens.
@@ -512,6 +544,7 @@ export class TapeSound {
     this.loadedAt = performance.now();
     this.ear.decay = 0;
     this.code = codeFor(this.palette, Math.floor(Math.random() * 1000));
+    this.setDeck();
     await evaluate(this.code);
   }
 
@@ -552,7 +585,7 @@ export class TapeSound {
   }
 
   private setDeck() {
-    this.deck.set(this.home, this.wear, this.ear.night, this.tape.crackle + this.ear.decay * 0.04);
+    this.deck.set(this.home, this.wear, this.ear.night, this.tape.crackle + this.ear.decay * 0.04, this.tape.deck);
   }
 
   event(e: TapeEvent) {

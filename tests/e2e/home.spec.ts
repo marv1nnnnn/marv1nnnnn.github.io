@@ -8,7 +8,7 @@ test.describe('home /', () => {
     for (const name of ['make', 'input', 'log', 'about']) {
       await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name })).toBeVisible();
     }
-    await expect(page.getByRole('group', { name: 'Tapes' }).getByRole('button')).toHaveCount(5);
+    await expect(page.getByRole('group', { name: 'Tapes' }).getByRole('button')).toHaveCount(6);
   });
 
   test('another tape from the shelf switches the palette and the choice carries to other pages', async ({ page }) => {

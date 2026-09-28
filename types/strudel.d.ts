@@ -6,5 +6,6 @@ declare module '@strudel/web' {
   export function getAudioContext(): AudioContext;
   export function setAudioContext(ctx: AudioContext): AudioContext;
   export function getSuperdoughAudioController(): { output: unknown };
+  export function samples(source: string | Record<string, unknown>, base?: string, options?: Record<string, unknown>): Promise<void>;
   export function superdough(value: Record<string, unknown>, time: number, duration: number, cps?: number): Promise<void>;
 }
