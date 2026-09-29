@@ -4,7 +4,7 @@ test.describe('home /', () => {
   test('shows the tape, the intro and the site navigation', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('canvas.tape-canvas')).toBeVisible();
-    await expect(page.getByText('Product manager at YouWare.')).toBeVisible();
+    await expect(page.getByText('AI engineer at YouWare.')).toBeVisible();
     for (const name of ['make', 'input', 'log', 'about']) {
       await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name })).toBeVisible();
     }

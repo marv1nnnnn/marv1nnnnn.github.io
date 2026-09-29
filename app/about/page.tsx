@@ -6,7 +6,7 @@ import { getAbout } from '@/lib/tape';
 
 export const metadata: Metadata = {
   title: 'about',
-  description: 'About Marvin Ma: product manager at YouWare, Cursor Ambassador, former live coding performer in Beijing.',
+  description: 'About Marvin Ma: AI engineer at YouWare, Cursor Ambassador, former live coding performer in Beijing.',
   alternates: { canonical: '/about' },
 };
 
