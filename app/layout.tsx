@@ -5,9 +5,9 @@ import { TopNav } from "@/components/tape/parts";
 
 const siteUrl = 'https://marv1nnnnn.github.io';
 const siteName = 'MARV1NNNNN';
-const siteTitle = 'Marvin Ma (MARV1NNNNN) · Product Manager';
+const siteTitle = 'Marvin Ma (MARV1NNNNN) · AI Engineer';
 const siteDescription =
-  'Marvin Ma is a product manager at YouWare and Cursor Ambassador. Formerly live coding and circuit bending in Beijing. Writing about agents, building small tools, and logging what he watches, reads and plays.';
+  'Marvin Ma is an AI engineer at YouWare and Cursor Ambassador. Formerly live coding and circuit bending in Beijing. Writing about agents, building small tools, and logging what he watches, reads and plays.';
 const defaultImage = '/images/cursor_shenzhen.png';
 
 export const viewport: Viewport = {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   keywords: [
     'Marvin Ma',
     'MARV1NNNNN',
-    'Product Manager',
+    'AI Engineer',
     'YouWare',
     'Cursor Ambassador',
     'AI agents',
@@ -106,7 +106,7 @@ export default function RootLayout({
         alternateName: 'MARV1NNNNN',
         url: siteUrl,
         image: `${siteUrl}${defaultImage}`,
-        jobTitle: 'Product Manager',
+        jobTitle: 'AI Engineer',
         worksFor: { '@type': 'Organization', name: 'YouWare' },
         sameAs: [
           'https://github.com/marv1nnnnn',

@@ -357,10 +357,13 @@ export class Tape {
     if (world.field === 'rain') this.fall += 0.5 + ff * 4;
     // The bent tape tears: a band of the desk jumps sideways for a few frames.
     if (world.field === 'glitch') {
-      if (Math.random() < 0.03) this.tears.push({ y: Math.random() * H, h: 6 + Math.random() * 40, shift: (Math.random() - 0.5) * 160, life: 3 + Math.floor(Math.random() * 6) });
+      if (Math.random() < (this.coarse ? 0.008 : 0.03)) this.tears.push({ y: Math.random() * H, h: 6 + Math.random() * 40, shift: (Math.random() - 0.5) * 160, life: 3 + Math.floor(Math.random() * 6) });
       this.tears = this.tears.filter((t) => --t.life > 0);
     }
-    const throb = world.pulse ? 1 + world.pulse * 0.3 * Math.pow(Math.max(0, Math.sin(now / 260)), 6) : 1;
+    // Reading on a phone the desk keeps still: no throb, and the filings dim, so a page scrolling
+    // over bright moving lines does not flicker. The throb itself is slow and slight everywhere.
+    const reading = this.coarse && !scene.home;
+    const throb = world.pulse && !reading ? 1 + world.pulse * 0.12 * Math.pow(Math.max(0, Math.sin(now / 420)), 6) : 1;
     const cx0 = W / 2, cy0 = H * 0.52;
     // Older pages: the filings have drifted more and rusted a little.
     const drift = 1 + scene.age * 1.5;
@@ -449,7 +452,7 @@ export class Tape {
     }
 
     ctx.lineCap = 'round';
-    const a = world.alpha;
+    const a = world.alpha * (reading ? 0.4 : 1);
     ctx.lineWidth = 1.3 * world.width;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
     ctx.stroke(shadow);

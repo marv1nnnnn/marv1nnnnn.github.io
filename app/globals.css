@@ -206,8 +206,9 @@ body[data-wind='rew'] .deck-transport .deck-button[aria-label='Rewind'] { color:
 
 /* While the tape winds, the page drops away and the track under the head is called out.
    Opacity only: a filter or transform here would unpin the fixed layers inside the page. */
-#content { transition: opacity 160ms ease; }
-body[data-wind] #content { opacity: 0.12; }
+#content { transition: opacity 260ms ease; }
+/* Dimmed, not blacked out: a full-screen flash on every page change is hard on the eyes. */
+body[data-wind] #content { opacity: 0.35; }
 .deck-cue {
   position: fixed;
   left: 50%;
@@ -227,10 +228,8 @@ body[data-wind] #content { opacity: 0.12; }
   letter-spacing: var(--display-track);
   white-space: nowrap;
   pointer-events: none;
-  animation: cue-flicker 110ms steps(2) infinite;
 }
 .deck-cue-dir { color: var(--accent); font-size: 0.35em; letter-spacing: -0.1em; }
-@keyframes cue-flicker { 50% { opacity: 0.82; } }
 
 @media (max-width: 899px) {
   .top { flex-wrap: wrap; row-gap: 4px; }
@@ -374,8 +373,8 @@ html[data-tape='bent'] :is(.leaf-title, .essay-title, .cover-name) { text-shadow
 html[data-tape='bent'] .pg { background-blend-mode: normal, multiply, normal; }
 html[data-tape='bent'] .row, html[data-tape='bent'] .song { border-bottom-style: dashed; }
 /* The bent tape's lamp is on a bad wire. */
-html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; }
-@keyframes bad-wire { 0%, 61%, 64%, 88%, 100% { opacity: 1; } 62% { opacity: 0.55; } 63% { opacity: 0.85; } 89% { opacity: 0.7; } }
+@media (hover: hover) { html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; } }
+@keyframes bad-wire { 0%, 61%, 64%, 88%, 100% { opacity: 1; } 62% { opacity: 0.8; } 63% { opacity: 0.92; } 89% { opacity: 0.86; } }
 @media (prefers-reduced-motion: reduce) { html[data-tape='bent'] body::before { animation: none; } }
 
 /* The booklet (Pages.tsx): the insert that came with the tape, as pages that turn. Dark card,
