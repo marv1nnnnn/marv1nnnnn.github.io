@@ -116,6 +116,10 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
   const back = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<Layout | null>(null);
   const [remeasure, setRemeasure] = useState(0);
+  // Pictures without a size of their own (from elsewhere): whether the book has waited for them,
+  // and the ones whose height it has laid out with.
+  const waited = useRef(false);
+  const measured = useRef(new Set<string>());
 
   // Fill pages from the blocks' heights, measured in the one-column flow at the page's width.
   useLayoutEffect(() => {
@@ -129,6 +133,21 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     }
     const el = flow.current;
     if (!el) return;
+    // A picture without a size takes its height only when it arrives: wait for it, but not long.
+    const unsized = [...el.querySelectorAll('img')].filter((img) => !(img.getAttribute('width') && img.getAttribute('height')));
+    const coming = unsized.filter((img) => !img.complete);
+    if (coming.length && !waited.current) {
+      waited.current = true;
+      let alive = true;
+      const arrived = (img: HTMLImageElement) => new Promise((done) => {
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      });
+      Promise.race([Promise.all(coming.map(arrived)), new Promise((done) => setTimeout(done, 2500))])
+        .then(() => { if (alive) setRemeasure((r) => r + 1); });
+      return () => { alive = false; };
+    }
+    for (const img of unsized) if (img.complete) measured.current.add(img.currentSrc || img.src);
     const screen = measureScreen();
     el.style.setProperty('--pw', `${screen.w}px`);
     el.style.setProperty('--ph', `${screen.h}px`);
@@ -209,7 +228,17 @@ export default function Pages({ path, title, lede, kicker, label, children }: {
     if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { if (alive) setRemeasure((r) => r + 1); });
     // A tape chosen later brings its title face with it, which arrives after the switch.
     document.fonts?.addEventListener('loadingdone', relayout);
-    return () => { alive = false; window.removeEventListener('resize', onResize); clearTimeout(t); tape.disconnect(); document.fonts?.removeEventListener('loadingdone', relayout); };
+    // A picture without a size that arrives after the pages were laid out: lay them out again, once.
+    const onPicture = (e: Event) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || (img.getAttribute('width') && img.getAttribute('height'))) return;
+      const src = img.currentSrc || img.src;
+      if (measured.current.has(src) || !img.closest('.booklet-book')) return;
+      measured.current.add(src);
+      relayout();
+    };
+    document.addEventListener('load', onPicture, true);
+    return () => { alive = false; window.removeEventListener('resize', onResize); clearTimeout(t); tape.disconnect(); document.fonts?.removeEventListener('loadingdone', relayout); document.removeEventListener('load', onPicture, true); };
   }, []);
 
   const count = layout?.pages.length ?? 0;
