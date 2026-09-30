@@ -400,6 +400,8 @@ html[data-tape='bent'] .row, html[data-tape='bent'] .song { border-bottom-style:
   align-items: flex-start;
   padding-top: var(--stage-top, 110px);
 }
+/* A big screen draws the same pages larger (Pages.tsx sets the scale). */
+.booklet-scale { transform-origin: top center; }
 .booklet-pages {
   position: relative;
   width: var(--pw);
@@ -432,6 +434,7 @@ html[data-tape='bent'] .row, html[data-tape='bent'] .song { border-bottom-style:
   pointer-events: none;
   background: linear-gradient(90deg, rgba(0, 0, 0, calc(var(--lift, 0) * 0.5)), rgba(var(--ink-rgb), calc(var(--lift, 0) * 0.07)) 55%, rgba(0, 0, 0, calc(var(--lift, 0) * 0.3)));
 }
+.is-spread .is-away { opacity: 0; pointer-events: none; }
 .is-single .leaf.is-turned { visibility: hidden; }
 /* On a phone the pages are a column: the finger moves them directly, and the browser snaps to
    each page (Pages.tsx adds .snap-pages to html). No 3D, no animation of our own. */
@@ -687,6 +690,7 @@ html.snap-pages .top { background: rgb(var(--bg-rgb)); }
 /* A detail page: the words. */
 .prose { font-family: var(--read); font-size: 17px; line-height: 1.6; color: rgba(var(--ink-rgb), 0.92); overflow-wrap: break-word; }
 .prose p { margin: 0 0 0.9em; }
+.prose a { text-decoration-color: rgba(var(--accent-rgb), 0.6); }
 .prose.first > p:first-child::first-letter { float: left; font-family: var(--display); font-weight: 400; font-size: 3.4em; line-height: 0.82; margin: 0.06em 0.1em 0 0; color: var(--accent); }
 .prose h1, .prose h2, .prose h3, .prose h4 { display: block; margin: 1.4em 0 0.8em; color: var(--accent); font-family: var(--mono); font-size: 10px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase; }
 .prose h1::before, .prose h2::before, .prose h3::before, .prose h4::before, .prose h1::after, .prose h2::after, .prose h3::after, .prose h4::after { content: none; }
@@ -703,7 +707,8 @@ html.snap-pages .top { background: rgb(var(--bg-rgb)); }
 .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 13px; margin: 0 0 0.9em; }
 .prose th, .prose td { border-bottom: 1px solid var(--line-p); padding: 5px 8px; text-align: left; }
 .back-line { margin: 22px 0 0; }
-.back { display: inline-block; padding: 8px 0; font-size: 11px; letter-spacing: 0.06em; }
+/* The link back (not the back of a leaf, .face.back, whose pages would take its size and spacing). */
+a.back { display: inline-block; padding: 8px 0; font-size: 11px; letter-spacing: 0.06em; }
 .colophon { margin-top: 26px; padding-top: 10px; border-top: 1px solid var(--line-p); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
 .colophon p { margin: 0 0 4px; }
 

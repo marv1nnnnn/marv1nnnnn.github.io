@@ -1,10 +1,16 @@
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import type { SignalCardContent } from '@/types/scanner';
 import Booklet from './Booklet';
 import { TapeScene, Worn } from './parts';
 import { dayOf, readingMinutes } from '@/lib/tape';
+
+// Links out of the site open in a tab of their own, so the booklet stays open at its page.
+const markdown: Components = {
+  a: ({ node: _node, href, ...props }) =>
+    /^https?:\/\//.test(href ?? '') ? <a href={href} target="_blank" rel="noopener noreferrer" {...props} /> : <a href={href} {...props} />,
+};
 
 // Markdown split into its top-level blocks (paragraphs, headings, lists, code), so the booklet can
 // lay them out page by page. Fenced code stays whole.
@@ -61,7 +67,7 @@ export default function Article({ card, back, backLabel, section, kind }: {
         const first = !heading && /^[^\s!<>#*\-\d|`]/.test(md) && paragraphs++ === 0;
         return (
           <div className={`prose${heading ? ' keep' : ''}${first ? ' first' : ''}`} lang={lang} key={k}>
-            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{md}</ReactMarkdown>
+            <ReactMarkdown rehypePlugins={[rehypeRaw]} components={markdown}>{md}</ReactMarkdown>
           </div>
         );
       })}
