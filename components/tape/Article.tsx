@@ -4,12 +4,19 @@ import rehypeRaw from 'rehype-raw';
 import type { SignalCardContent } from '@/types/scanner';
 import Booklet from './Booklet';
 import { TapeScene, Worn } from './parts';
+import { imageSize } from '@/lib/image-size';
 import { dayOf, readingMinutes } from '@/lib/tape';
 
-// Links out of the site open in a tab of their own, so the booklet stays open at its page.
+// Links out of the site open in a tab of their own, so the booklet stays open at its page. A picture
+// from the site carries its size, so its page keeps room for it before it arrives.
 const markdown: Components = {
   a: ({ node: _node, href, ...props }) =>
     /^https?:\/\//.test(href ?? '') ? <a href={href} target="_blank" rel="noopener noreferrer" {...props} /> : <a href={href} {...props} />,
+  img: ({ node: _node, src, alt, ...props }) => {
+    const size = typeof src === 'string' ? imageSize(src) : null;
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt ?? ''} {...(size ?? {})} {...props} />;
+  },
 };
 
 // Markdown split into its top-level blocks (paragraphs, headings, lists, code), so the booklet can
