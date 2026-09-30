@@ -7,7 +7,7 @@ summary: "Cyberia is a club that never closes, where Claude Opus 5.5 live-codes 
 tags: ["cyberia","music","live-coding","strudel","agents","claude-code","essay"]
 ---
 
-![Cyberia, from the street.](/images/cyberia-street.jpg)
+<video src="/video/cyberia-walk-in.mp4" poster="/images/cyberia-walk-in-poster.jpg" width="1280" height="720" autoplay muted loop playsinline controls style="width: 100%; height: auto; border-radius: 4px;"></video>
 
 **Come in:** [cyberia.love](https://cyberia.love)
 
@@ -21,19 +21,31 @@ I could not have built this with earlier models. The code was never the hard par
 
 I found out a few days before I started on Cyberia, with 249 photos from a spring trip to Aomori. I had it cut them into a video five times, after [Shunji Iwai](https://en.wikipedia.org/wiki/Shunji_Iwai), [Terayama](https://en.wikipedia.org/wiki/Sh%C5%ABji_Terayama), [Anno](https://en.wikipedia.org/wiki/Hideaki_Anno), the opening titles of [*Keizoku*](https://en.wikipedia.org/wiki/Keizoku), and [*The Silver Case*](https://en.wikipedia.org/wiki/The_Silver_Case) with Lain, and each came back as a film of its own. For the last one I said nothing about music. It wrote the score itself, in code, down to a 50 Hz mains hum under everything, because Aomori is in eastern Japan, where the grid runs at fifty hertz. That was when I knew a model could be the one on the air.
 
-![Layer:02, the night town. "It smelled of rain. Only the vending machines were awake."](/images/cyberia-aomori-layer02.jpg)
+<video src="/video/cyberia-aomori-layer02.mp4" poster="/images/cyberia-aomori-layer02.jpg" width="720" height="960" autoplay muted loop playsinline controls style="display: block; height: 340px; width: auto; max-width: 100%; margin: 0 auto; border-radius: 4px;"></video>
+
+*Layer:02, the night town, with the score it wrote. Turn the sound on.*
 
 ## Why a club
 
 I hardly choose music any more. Every app I open hands my own taste back to me, a little narrower each time. The one thing I still reach for is [NTS](https://www.nts.live), on the air twenty-four hours a day since 2011 under a two-word motto, [*Don't Assume*](https://www.nts.live/about). Whenever I tune in, someone somewhere is playing something I would never have picked, for reasons of their own.
 
-Almost everything we build with AI is the opposite: faster code, cleaner inboxes, more of what I already wanted. I wanted a place, not a tool. [late.sh](https://late.sh), a lounge you reach with `ssh late.sh`, had shown me a place could be made of very little: a bar drawn in ASCII, a jukebox, little figures at the tables, nothing to accomplish. So I had two halves of an idea: a place like that, and a radio like NTS. The question was who would be playing.
+![The NTS studio on Gillett Square, with a Don't Assume sticker on the counter.](/images/cyberia-nts-gillett-square.jpg)
+
+*Photo: Andy Parsons / [Time Out London](https://www.timeout.com/london/blog/making-waves-how-radio-came-to-rule-london-again-082917).*
+
+Almost everything we build with AI is the opposite: faster code, cleaner inboxes, more of what I already wanted. I wanted a place, not a tool. [late.sh](https://late.sh), a lounge that lives in a terminal, had shown me a place could be made of very little: a bar drawn in ASCII, a jukebox, little figures at the tables, nothing to accomplish. So I had two halves of an idea: a place like that, and a radio like NTS. The question was who would be playing.
+
+![The bar in late.sh, drawn from its own map.](/images/cyberia-late-bar.png)
+
+*[late.sh](https://github.com/mpiorowski/late-sh) © Mateusz Piórowski.*
 
 The answer came from live coding, writing music as code in front of an audience while it plays. Between 2016 and 2021 I played a run of shows in Beijing, mostly at [fRUITYSPACE](https://thevinylfactory.com/features/a-guide-beijing-record-stores/), with [SuperCollider](https://supercollider.github.io) and [TidalCycles](https://tidalcycles.org); the last was called [Robot's party](http://soniferous.tartarie.com/events/5nf215_Fruity_Robots_party/index.html). The code is the instrument and the score at once, and a set is always slightly in danger: a sequence of edits to something that is already running. Once [Strudel](https://strudel.cc) brought Tidal's patterns to the browser, I kept asking whether a model could be the one on the air. For a long time the answer was no: models wrote valid Strudel that sounded like someone who had read about music. Opus 5.5 changed that.
 
+![Robot's party, fRUITYSPACE, 29 May 2021.](/images/cyberia-robots-party.jpg)
+
 ## A room it understood
 
-I built Cyberia with the same model, almost all of it written with [Claude Code](https://claude.com/claude-code) on Opus 5.5, and the club as it stands took two days. I never modelled anything by hand: the club is a [Blender](https://www.blender.org) script, and the tunnel is fourteen metres long because a line in it says `TL = 14.0`. I brought it the pieces I had been carrying for most of my life, and it understood them.
+I built Cyberia with the same model, almost all of it written with [Claude Code](https://claude.com/claude-code) on Opus 5.5, and the club as it stands took two days. I brought it the pieces I had been carrying for most of my life, and it understood them.
 
 The name comes from [*Serial Experiments Lain*](https://en.wikipedia.org/wiki/Serial_Experiments_Lain), which has shaped me more than almost anything else I have watched: in 1998 it was already talking about the network as a place you could live in. Cyberia is the club in the show, a basement full of kids dancing under strobes where the network leaks into the room. Last year I went to [a Lain party](https://absurdtrax.bandcamp.com/album/lain-os-is-online-vol-2-club-cyberia-at-033) in Hong Kong billed as a real-world Club Cyberia; the Lain part was a television in a corner. The music can be right and the room still not be Cyberia. I wanted a room that was itself wired: screens that show the crowd and the code, telephones hanging from the ceiling on their cords at no one's height in particular.
 
@@ -41,17 +53,23 @@ The name comes from [*Serial Experiments Lain*](https://en.wikipedia.org/wiki/Se
 
 *Serial Experiments Lain © 1998 triangle staff / NBCUniversal Entertainment Japan. Image via [lain.wiki](https://lain.wiki/wiki/Cyberia).*
 
+![In Cyberia: the telephones on their cords.](/images/cyberia-telephones.jpg)
+
 The dance floor comes from the nightclubs of [*Vampire: The Masquerade – Bloodlines*](https://store.steampowered.com/app/2600/), where vampires dance among the living and for a minute the whole game shrinks to a dark room with a beat in it. Games give us endless cities and almost never a club you can simply be in.
 
-And the way in comes from [Shelter](https://www.chinamusicradar.com/venues/the-shelter-2007-2016/), a club in an old air-raid shelter in Shanghai that I went to all the time around 2014. What I remember most is getting to the dance floor: a long, low tunnel off the street, and by the time you reached the music the street was already behind you. So Cyberia has that tunnel, unlit, green paint to the waist, `>>> B1` stencilled in red on the wall, the music coming up through the walls.
+![Confession, a nightclub in Vampire: The Masquerade – Bloodlines.](/images/cyberia-bloodlines-confession.jpg)
+
+*Vampire: The Masquerade – Bloodlines © Activision / Troika Games. Screenshot by Charles the Bald, via [Steam Community](https://steamcommunity.com/sharedfiles/filedetails/?id=1703573782).*
+
+And the way in comes from [Shelter](https://www.chinamusicradar.com/venues/the-shelter-2007-2016/), a club in an old air-raid shelter in Shanghai that I went to all the time around 2014. What I remember most is getting to the dance floor: a long, low tunnel off the street, and by the time you reached the music the street was already behind you. So Cyberia has that tunnel, unlit, green paint to the waist, the music coming up through the walls.
 
 ![The stairs down into Shelter, Shanghai.](/images/cyberia-shelter-stairs.jpg)
 
 *Photo © [SmartShanghai](https://www.smartshanghai.com).*
 
-What I had not expected was how much the model would bring of its own. I showed it the key visual from [a Lain exhibition in Harajuku](https://news.denfaminicogamer.jp/news/2608264y) and asked what it took from it, and it came back with a look for the room: everything gone grey but the LED wall, a hole of deep blue behind the booth, one warm light on whoever is talking. It wrote the bar a menu of states to be in: a Cold Boot, a Context Window of gin and everything you said tonight, an Air Raid of baijiu and sour plum, and water, free, always. It hung the walls with posters for club nights that never happened, and gave the claw machine a claw that almost always slips. Your membership is a passport, and the authority that issues it is B1 · Down the Stairs.
+![The tunnel into Cyberia, and the club at the end of it.](/images/cyberia-tunnel.jpg)
 
-![The menu behind the bar.](/images/cyberia-bar-menu.jpg)
+What I had not expected was how much the model would bring of its own. I showed it the key visual from [a Lain exhibition in Harajuku](https://news.denfaminicogamer.jp/news/2608264y) and asked what it took from it, and it came back with a look for the room: everything gone grey but the LED wall, a hole of deep blue behind the booth, one warm light on whoever is talking. It hung the walls with posters for club nights that never happened, and gave the claw machine a claw that almost always slips. Your membership is a passport, and the authority that issues it is B1 · Down the Stairs.
 
 ## What plays there now
 
@@ -80,9 +98,3 @@ I first built it for agents only. They came in over MCP and danced as figures on
 What I wanted, in the end, was what NTS gives me: to tune in at any hour and find someone playing, for reasons of their own, something I would never have picked. At Cyberia that someone is a model with a taste of its own, and the people and agents on the floor are telling it where to go next. [Twenty-four hour party people](https://en.wikipedia.org/wiki/24_Hour_Party_People).
 
 The club is open all night at [cyberia.love](https://cyberia.love). Come in yourself, or send your agent, leave the DJ a note, and see what it plays.
-
-## How it works, briefly
-
-- **Nobody streams audio.** The station, a Cloudflare [Durable Object](https://developers.cloudflare.com/durable-objects/), keeps a timeline of which Strudel program is on the air and when it came in; every listener's browser plays that program in time with the station's clock, so everyone hears the same set.
-- **The residents are Claude Opus 5.5**, through the [Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk/overview). Before each move the DJ reads a brief: what is on, where the set has been, every note on the table, what the room has been saying.
-- **Nothing reaches a listener unchecked.** A program goes on the air only if it passes a guard that allows a small, pure subset of JavaScript, and it plays in a sandboxed frame. The DJ has no ears: if listeners' browsers report that a program failed, the station goes back to the record before and tells the DJ why.
