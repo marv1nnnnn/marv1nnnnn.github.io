@@ -4,17 +4,31 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useTape } from './TapeProvider';
+import { SIDE_B, workUrl } from './sides';
 import { TAPE_LENGTH, TRACKS, counter, trackAt, trackIndex } from './tracks';
 
 const n = (i: number) => String(i + 1).padStart(2, '0');
 const HOLD_MS = 260;
 
 // The deck in the top bar: a cassette window whose reels follow the tape, the counter, the tracks
-// (the site's sections) along a strip with the play head, and the transport.
+// along a strip with the play head, and the transport. The strip shows the side that is up: side A
+// is the site's sections; turned over (on the home page), side B is the works, and playing one
+// winds the tape out to it.
 export default function Deck() {
   const pathname = usePathname();
   const current = trackIndex(pathname);
-  const { head, winding, sound, skip, scan, release } = useTape();
+  const { head, winding, sound, skip, scan, release, side, work, pickWork, play } = useTape();
+  const sideB = pathname === '/' && side === 'b';
+  const atB = useRef({ sideB, work });
+  atB.current = { sideB, work };
+  // On side B the transport and the arrow keys step through the works.
+  const step = (direction: -1 | 1) => pickWork(work + (direction < 0 ? 1 : -1));
+  const goWork = (e: React.MouseEvent, i: number) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
+    e.preventDefault();
+    pickWork(i);
+    play(workUrl(SIDE_B[i]));
+  };
   const count = useRef<HTMLSpanElement>(null);
   const cue = useRef<HTMLParagraphElement>(null);
   const cueTrack = useRef<HTMLSpanElement>(null);
@@ -48,6 +62,14 @@ export default function Deck() {
         (g.children[0] as SVGCircleElement).setAttribute('r', r.toFixed(2));
         (g.children[1] as SVGGElement).setAttribute('transform', `rotate(${(a % 360).toFixed(1)})`);
       }
+      if (atB.current.sideB) {
+        const w = atB.current.work;
+        if (count.current) count.current.textContent = `B${w + 1}`;
+        const seg = strip.current?.querySelectorAll<HTMLElement>('.deck-track')[w];
+        if (needle.current && seg) needle.current.style.transform = `translateX(${seg.offsetLeft.toFixed(1)}px)`;
+        raf = requestAnimationFrame(draw);
+        return;
+      }
       if (count.current) count.current.textContent = counter(h);
       const i = trackAt(h);
       // Labels keep their width, so the head is placed inside the segment of the track it is on.
@@ -77,11 +99,12 @@ export default function Deck() {
         e.preventDefault();
         return;
       }
-      skip(dir > 0 ? -1 : 1);
+      if (atB.current.sideB) pickWork(atB.current.work + dir);
+      else skip(dir > 0 ? -1 : 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [skip]);
+  }, [skip, pickWork]);
 
   return (
     <div className="deck">
@@ -109,9 +132,14 @@ export default function Deck() {
         <span className="deck-count" ref={count}>000</span>
       </div>
 
-      <nav aria-label="Site" className="deck-tracks" ref={strip}>
+      <nav aria-label={sideB ? 'Side B' : 'Site'} className={`deck-tracks${sideB ? ' is-side-b' : ''}`} ref={strip}>
         <span className="deck-needle" ref={needle} aria-hidden="true" />
-        {TRACKS.map((t, i) => (
+        {sideB && SIDE_B.map((w, i) => (
+          <a key={w.id} href={workUrl(w)} className="deck-track" style={{ flexGrow: 1 }} aria-current={i === work ? 'true' : undefined} onClick={(e) => goWork(e, i)}>
+            <span className="deck-n" aria-hidden="true">B{i + 1}</span> {w.title}
+          </a>
+        ))}
+        {!sideB && TRACKS.map((t, i) => (
           <Link
             key={t.path}
             href={t.path}
@@ -125,9 +153,9 @@ export default function Deck() {
       </nav>
 
       <div className="deck-transport">
-        <WindButton direction={1} label="Rewind" disabled={current === 0} skip={skip} scan={scan} release={release}>◀◀</WindButton>
+        <WindButton direction={1} label="Rewind" disabled={sideB ? work === 0 : current === 0} skip={sideB ? step : skip} scan={sideB ? step : scan} release={sideB ? () => {} : release}>◀◀</WindButton>
         <PlayButton />
-        <WindButton direction={-1} label="Fast forward" disabled={current === TRACKS.length - 1} skip={skip} scan={scan} release={release}>▶▶</WindButton>
+        <WindButton direction={-1} label="Fast forward" disabled={sideB ? work === SIDE_B.length - 1 : current === TRACKS.length - 1} skip={sideB ? step : skip} scan={sideB ? step : scan} release={sideB ? () => {} : release}>▶▶</WindButton>
       </div>
 
       {winding !== 0 && (

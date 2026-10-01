@@ -127,8 +127,11 @@ test.describe('home /', () => {
     await page.mouse.up();
     await expect(flip).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText('Product manager at YouWare.')).toBeHidden();
-    const play = page.getByRole('link', { name: /play B1/ });
+    // The strip in the top bar is side B's now: its track goes out to the work.
+    await expect(page.getByRole('navigation', { name: 'Site' })).toHaveCount(0);
+    const play = page.getByRole('navigation', { name: 'Side B' }).getByRole('link', { name: 'cyberia' });
     await expect(play).toHaveAttribute('href', 'https://cyberia.marv1nnnnn.com');
+    await expect(page.locator('.deck-count')).toHaveText('B1');
     await play.click();
     await expect(page).toHaveURL('https://cyberia.marv1nnnnn.com/', { timeout: 15_000 });
   });
@@ -138,6 +141,10 @@ test.describe('home /', () => {
     const flip = page.getByRole('button', { name: 'Side B: the works to play' });
     await expect(flip).toHaveAttribute('aria-pressed', 'true');
     await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole('navigation', { name: 'Side B' }).getByRole('link', { name: 'cyberia' })).toBeVisible();
+    // turned back over, the strip is the site again
+    await flip.press('Enter');
+    await expect(flip).toHaveAttribute('aria-pressed', 'false');
     await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'make' }).click();
     await expect(page).toHaveURL(/\/make$/);
     await page.getByRole('link', { name: 'marv1nnnnn' }).first().click();
