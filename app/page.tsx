@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { HomeControls, TapeScene } from '@/components/tape/parts';
+import { FlipButton, HomeControls, HomeIntro, TapeScene } from '@/components/tape/parts';
 import { getEssays } from '@/lib/tape';
 
 export default function Home() {
@@ -9,11 +9,16 @@ export default function Home() {
       <TapeScene seed="home" home />
       <h1 className="visually-hidden">Marvin Ma, marv1nnnnn</h1>
       <div className="home-bottom">
-        <div className="intro">
-          <p>Product manager at YouWare. Used to make noise in Beijing. Building agents, mostly for myself.</p>
-          {latest && <Link className="latest" href={`/think/${latest.id}`}>latest: {latest.title} →</Link>}
+        <HomeIntro>
+          <div className="intro">
+            <p>Product manager at YouWare. Used to make noise in Beijing. Building agents, mostly for myself.</p>
+            {latest && <Link className="latest" href={`/think/${latest.id}`}>latest: {latest.title} →</Link>}
+          </div>
+        </HomeIntro>
+        <div className="home-right">
+          <FlipButton />
+          <HomeControls />
         </div>
-        <HomeControls />
       </div>
     </section>
   );

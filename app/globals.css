@@ -357,6 +357,36 @@ body.is-home .top { background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0
 .spine-label span { opacity: 0.7; font-family: var(--read); font-style: italic; font-size: 12px; }
 .spine:hover { transform: translateX(-6px); }
 .spine[aria-pressed='true'] { transform: translateX(-22px); outline: 1px solid var(--accent); outline-offset: 2px; }
+.home-right { justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+/* Turning the tape over: the side that is up is circled in ballpoint. */
+.flip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(var(--bg-rgb), 0.6);
+  color: var(--muted);
+  cursor: pointer;
+}
+.flip:hover { color: var(--ink); border-color: var(--accent); }
+/* Once the 3D cassette is in, a hand turns it over itself; the button stays for the keyboard. */
+body.has-cassette .flip:not(:focus-visible) { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); }
+.flip span:first-child, .flip span:last-child { font-family: var(--hand); font-size: 22px; line-height: 1; padding: 0 4px; border-radius: 50%; }
+.flip .is-up { color: var(--ink); box-shadow: 0 0 0 1.5px var(--accent); }
+/* Side B under the cassette: the works to play, and the way out to one. */
+.side-b-head { color: var(--muted); font-size: 11px; }
+.side-b-title { font-family: var(--hand); font-size: 30px; font-weight: 400; line-height: 1; }
+.side-b-year { color: var(--muted); font-family: var(--hand); font-size: 20px; }
+.side-b-list { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; list-style: none; }
+.side-b-list button { padding: 2px 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.side-b-list button[aria-pressed='true'] { color: var(--ink); text-decoration: underline var(--accent); text-underline-offset: 4px; }
+.play-out { align-self: flex-start; padding: 6px 12px; white-space: nowrap; border: 1px solid var(--accent); color: var(--ink); text-decoration: none; }
+.play-out:hover { background: rgba(var(--accent-rgb), 0.15); }
+/* Playing a work: the tape winds out and the desk goes dark before the page goes to it. */
+body.is-leaving::after { content: ''; position: fixed; inset: 0; z-index: 20; pointer-events: none; background: #000; animation: leave 900ms ease-in forwards; }
+@keyframes leave { from { opacity: 0; } to { opacity: 1; } }
 
 /* Each tape prints its booklet its own way (TapeProvider sets html[data-tape]): its own face for
    the titles, and how that face is set. haze types them (the default above). */
@@ -740,7 +770,11 @@ html.snap-pages .top { background: rgb(var(--bg-rgb)); }
   /* On a phone the intro sits right under the cassette: the hint goes above it instead. */
   .cassette-hint { top: calc(var(--cassette-top, 20vh) - 30px); }
   .home-bottom { grid-template-columns: minmax(0, 1fr); }
-  .home-bottom .shelf { justify-self: stretch; width: auto; margin-left: 22px; }
+  /* The flip sits beside the words, over the shelf, so the cassette keeps its room. */
+  .home-bottom .home-right { position: relative; justify-self: stretch; align-items: stretch; }
+  .home-bottom .flip { position: absolute; right: 0; bottom: calc(100% + 12px); }
+  .side-b-head, .play-host { display: none; }
+  .home-bottom .shelf { width: auto; margin-left: 22px; }
   .leaf-title { font-size: 22vw; }
   .article .leaf-title { font-size: 9vw; }
   .row { grid-template-columns: 46px minmax(0, 1fr); }

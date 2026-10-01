@@ -6,9 +6,12 @@ import { useTape } from './TapeProvider';
 import { TAPE_LENGTH, TRACKS, counter, trackAt } from './tracks';
 import type { CassetteScene } from './cassette3d';
 import { LOOKS } from './tapes';
+import { SIDE_B } from './sides';
 
 // Counter units per radian of the pencil: a full turn winds about 190, a little more than half a track.
 const PER_RADIAN = 30;
+// On side B the pencil steps through the works: about a third of a turn for each.
+const PER_WORK = 2;
 const PACK_MIN = 0.8;
 const PACK_MAX = 2.4;
 const n = (i: number) => String(i + 1).padStart(2, '0');
@@ -20,7 +23,7 @@ const radius = (share: number) => Math.sqrt(PACK_MIN ** 2 + share * (PACK_MAX **
 // track. A tap on the docked cassette goes back home. The model comes from Blender
 // (scripts/blender/cassette.py); the scene is loaded after first paint.
 export default function Cassette() {
-  const { head, turn, release, skip, palette } = useTape();
+  const { head, turn, release, skip, palette, side, flip, work, pickWork } = useTape();
   const pathname = usePathname();
   const router = useRouter();
   const home = pathname === '/';
@@ -33,10 +36,22 @@ export default function Cassette() {
   const [ready, setReady] = useState(false);
   const [turned, setTurned] = useState(false);
   // angle: the pencil around the hub, counter-clockwise on the cassette face.
-  const spin = useRef({ angle: 0.45, left: 0, v: 0, last: 0, grab: null as number | null, id: -1, travel: 0, since: 0 });
+  const spin = useRef({ angle: 0.45, left: 0, v: 0, last: 0, grab: null as number | null, id: -1, travel: 0, since: 0, step: 0 });
+  // Turning the cassette over by hand (home page): where the hand started, how wide the cassette
+  // was then, and how far over it is.
+  const over = useRef({ id: -1, x: 0, w: 1, yaw: 0, v: 0, last: 0, dir: 0 });
 
+  const sideB = home && side === 'b';
+  const sideBRef = useRef(sideB);
+  const workRef = useRef(work);
+  const pickRef = useRef(pickWork);
   homeRef.current = home;
   paletteRef.current = palette;
+  sideBRef.current = sideB;
+  workRef.current = work;
+  pickRef.current = pickWork;
+  const flipRef = useRef(flip);
+  flipRef.current = flip;
 
   useEffect(() => {
     const el = canvas.current;
@@ -49,6 +64,23 @@ export default function Cassette() {
     // One step of the pencil: the take-up hub turns with it, the supply hub at its own radius.
     // Clockwise (a falling angle) runs the tape forward.
     const apply = (da: number) => {
+      // Side B: the hubs turn freely and every so far the next (or previous) work comes under the head.
+      if (sideBRef.current) {
+        s.angle += da;
+        s.left += da;
+        s.step -= da;
+        const i = workRef.current;
+        if (Math.abs(s.step) >= PER_WORK) {
+          const next = i + Math.sign(s.step);
+          s.step = 0;
+          if (next < 0 || next >= SIDE_B.length) s.v = 0;
+          else {
+            workRef.current = next;
+            pickRef.current(next);
+          }
+        }
+        return;
+      }
       const before = head.current;
       turn(-da * PER_RADIAN);
       const moved = -(head.current - before) / PER_RADIAN;
@@ -115,20 +147,25 @@ export default function Cassette() {
         apply(s.v);
         if (Math.abs(s.v) <= 0.002) {
           s.v = 0;
-          release();
+          if (!sideBRef.current) release();
         }
       }
       const h = head.current;
       const i = trackAt(h);
+      const b = sideBRef.current;
+      const w = workRef.current;
       const scene = sceneRef.current;
       if (scene) {
         scene.dock = dockRect();
         scene.pencilAngle = s.angle;
         scene.hubAngleR = s.angle;
         scene.hubAngleL = s.left;
-        scene.wound = h / TAPE_LENGTH;
-        if (scene.info.count !== counter(h) || scene.info.current !== i) {
-          scene.info = { tracks: TRACKS.map((t) => t.label), current: i, count: counter(h) };
+        scene.wound = b ? (w + 0.5) / SIDE_B.length : h / TAPE_LENGTH;
+        const info = scene.info;
+        if (b && (info.side !== 'B' || info.current !== w)) {
+          scene.info = { side: 'B', tracks: SIDE_B.map((t) => t.title), current: w, count: `B${w + 1}`, print: 'marv1nnnnn · side B · to play' };
+        } else if (!b && (info.side !== 'A' || info.count !== counter(h) || info.current !== i)) {
+          scene.info = { side: 'A', tracks: TRACKS.map((t) => t.label), current: i, count: counter(h), print: 'marv1nnnnn · C-60 · NORMAL BIAS 120µs' };
         }
         // A different tape chosen on the shelf: eject this one and put that one in.
         const want = paletteRef.current;
@@ -139,8 +176,8 @@ export default function Cassette() {
           shown.current = want;
         }
       }
-      slider.current?.setAttribute('aria-valuenow', String(Math.floor(h)));
-      slider.current?.setAttribute('aria-valuetext', `${n(i)} ${TRACKS[i].label}`);
+      slider.current?.setAttribute('aria-valuenow', String(b ? w : Math.floor(h)));
+      slider.current?.setAttribute('aria-valuetext', b ? `B${w + 1} ${SIDE_B[w].title}` : `${n(i)} ${TRACKS[i].label}`);
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
@@ -160,8 +197,36 @@ export default function Cassette() {
       // Docked, the pencil sticks out over the page; only a mouse can pick it up there.
       return e.pointerType === 'mouse' && scene.hitAt(e.clientX, e.clientY) === 'pencil';
     };
+    const o = over.current;
+    // Past on edge, the other side is up: the side changes then, and the angle is counted from it.
+    const turnTo = (yaw: number) => {
+      const scene = sceneRef.current;
+      if (!scene) return;
+      if (Math.abs(yaw) >= Math.PI / 2) {
+        yaw -= Math.sign(yaw) * Math.PI;
+        sideBRef.current = !sideBRef.current;
+        flipRef.current(sideBRef.current ? 'b' : 'a');
+      }
+      o.yaw = yaw;
+      scene.yawHeld = yaw;
+    };
     const onDown = (e: PointerEvent) => {
       if (!grabs(e)) return;
+      const scene = sceneRef.current;
+      // On the home page the shell, away from the take-up reel and the pencil, turns the cassette over.
+      if (scene && homeRef.current && scene.hitAt(e.clientX, e.clientY) === 'cassette' && !scene.onReel(e.clientX, e.clientY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        o.id = e.pointerId;
+        o.x = e.clientX;
+        o.w = scene.widthPx();
+        o.v = 0;
+        o.dir = 0;
+        o.last = performance.now();
+        turnTo(0);
+        document.body.classList.add('is-winding-by-hand');
+        return;
+      }
       const a = sceneRef.current?.angleAt(e.clientX, e.clientY, false);
       if (a == null) return;
       e.preventDefault();
@@ -170,12 +235,26 @@ export default function Cassette() {
       s.grab = a;
       s.v = 0;
       s.travel = 0;
+      s.step = 0;
       s.since = s.last = performance.now();
       document.body.classList.add('is-winding-by-hand');
     };
     const onMove = (e: PointerEvent) => {
       const scene = sceneRef.current;
       if (!scene) return;
+      if (e.pointerId === o.id) {
+        e.stopPropagation();
+        // Half the cassette's width across the screen turns it a quarter, up on edge.
+        const d = ((e.clientX - o.x) / o.w) * Math.PI;
+        o.x = e.clientX;
+        const now = performance.now();
+        o.v = o.v * 0.5 + (d / Math.max(1, now - o.last)) * 0.5;
+        o.last = now;
+        if (d) o.dir = Math.sign(d);
+        turnTo(o.yaw + d);
+        if (d !== 0) setTurned(true);
+        return;
+      }
       if (e.pointerId !== s.id || s.grab === null) {
         if (e.pointerType === 'mouse') document.body.classList.toggle('over-cassette', grabs(e));
         return;
@@ -196,6 +275,25 @@ export default function Cassette() {
       if (da !== 0) setTurned(true);
     };
     const onUp = (e: PointerEvent) => {
+      if (e.pointerId === o.id) {
+        e.stopPropagation();
+        o.id = -1;
+        swallowClick = true;
+        window.setTimeout(() => (swallowClick = false), 0);
+        document.body.classList.remove('is-winding-by-hand');
+        const scene = sceneRef.current;
+        if (!scene) return;
+        scene.yawHeld = null;
+        // Still lifting it off the side that is up, a third of the way to on edge or with a flick:
+        // it goes on over. Otherwise (or coming down onto a side) it settles flat.
+        const lifting = o.dir !== 0 && o.dir === Math.sign(o.yaw);
+        const flick = performance.now() - o.last < 80 && Math.abs(o.v) > 0.004;
+        if (lifting && (Math.abs(o.yaw) > 0.5 || (flick && Math.abs(o.yaw) > 0.12))) {
+          sideBRef.current = !sideBRef.current;
+          flipRef.current(sideBRef.current ? 'b' : 'a');
+        }
+        return;
+      }
       if (e.pointerId !== s.id) return;
       e.stopPropagation();
       s.id = -1;
@@ -211,7 +309,7 @@ export default function Cassette() {
         return;
       }
       if (performance.now() - s.last > 80) s.v = 0;
-      if (Math.abs(s.v) <= 0.002) release();
+      if (Math.abs(s.v) <= 0.002 && !sideBRef.current) release();
     };
     const onClick = (e: MouseEvent) => {
       if (!swallowClick) return;
@@ -251,17 +349,20 @@ export default function Cassette() {
             className="visually-hidden"
             role="slider"
             tabIndex={0}
-            aria-label="Wind the tape: turn the pencil, or use the arrow keys"
+            aria-label={sideB ? 'Side B, the works: turn the pencil, or use the arrow keys' : 'Wind the tape: turn the pencil, or use the arrow keys'}
             aria-valuemin={0}
-            aria-valuemax={TAPE_LENGTH - 1}
+            aria-valuemax={sideB ? SIDE_B.length - 1 : TAPE_LENGTH - 1}
             aria-valuenow={0}
             aria-valuetext="01 intro"
             onKeyDown={(e) => {
-              if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); skip(-1); }
-              else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); skip(1); }
+              const fwd = e.key === 'ArrowRight' || e.key === 'ArrowUp';
+              if (!fwd && e.key !== 'ArrowLeft' && e.key !== 'ArrowDown') return;
+              e.preventDefault();
+              if (sideB) pickWork(work + (fwd ? 1 : -1));
+              else skip(fwd ? -1 : 1);
             }}
           />
-          <p className={`cassette-hint${ready && !turned ? '' : ' is-gone'}`} aria-hidden="true">turn the pencil ↻ to wind the tape</p>
+          <p className={`cassette-hint${ready && !turned ? '' : ' is-gone'}`} aria-hidden="true">turn the pencil ↻ to wind the tape · drag the shell to turn it over</p>
         </>
       )}
     </>

@@ -6,6 +6,7 @@ import Deck from './Deck';
 import { HOME_SCENE, PAGE_SCENE, hash, rng, wearOf } from './engine';
 import { useTape } from './TapeProvider';
 import { LOOKS } from './tapes';
+import { SIDE_B, workHost, workUrl } from './sides';
 
 // Sets the tape parameters for the page it is rendered on.
 export function TapeScene({ seed, date, age, home = false }: { seed: string; date?: string; age?: number; home?: boolean }) {
@@ -58,6 +59,58 @@ export function HomeControls() {
           </span>
         </button>
       ))}
+    </div>
+  );
+}
+
+// Turning the cassette over: side A is the site, side B the works to play (sides.ts).
+export function FlipButton() {
+  const { side, flip } = useTape();
+  return (
+    <button type="button" className="flip" aria-pressed={side === 'b'} aria-label="Side B: the works to play" onClick={() => flip()}>
+      <span className={side === 'a' ? 'is-up' : ''}>A</span>
+      <span aria-hidden="true">↻</span>
+      <span className={side === 'b' ? 'is-up' : ''}>B</span>
+    </button>
+  );
+}
+
+// The words under the cassette: side A's intro (children), or side B's tracklist and the way out
+// to the work under the head.
+export function HomeIntro({ children }: { children: React.ReactNode }) {
+  const { side, work, pickWork, play } = useTape();
+  if (side === 'a') return <>{children}</>;
+  const w = SIDE_B[work];
+  return (
+    <div className="intro side-b" aria-label="Side B">
+      <p className="side-b-head">side B · things to play</p>
+      {SIDE_B.length > 1 && (
+        <ol className="side-b-list">
+          {SIDE_B.map((t, i) => (
+            <li key={t.id}>
+              <button type="button" aria-pressed={i === work} onClick={() => pickWork(i)}>
+                <span className="deck-n">B{i + 1}</span> {t.title}
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+      <p>
+        <b className="side-b-title">{w.title}</b> <span className="side-b-year">{w.year}</span>
+        <br />
+        {w.note}
+      </p>
+      <a
+        className="play-out"
+        href={workUrl(w)}
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
+          e.preventDefault();
+          play(workUrl(w));
+        }}
+      >
+        ▶ play B{work + 1}<span className="play-host"> · {workHost(w)}</span>
+      </a>
     </div>
   );
 }

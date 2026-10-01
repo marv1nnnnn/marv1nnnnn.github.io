@@ -111,6 +111,41 @@ test.describe('home /', () => {
     await expect(page).toHaveURL(/\/make$/, { timeout: 15_000 });
   });
 
+  test('turning the tape over shows side B, and playing a work winds out to its subdomain', async ({ page }) => {
+    await page.route('https://cyberia.marv1nnnnn.com/**', (route) => route.fulfill({ contentType: 'text/html', body: '<title>cyberia</title>' }));
+    test.setTimeout(120_000);
+    await page.goto('/');
+    const flip = page.getByRole('button', { name: 'Side B: the works to play' });
+    await expect(flip).toHaveAttribute('aria-pressed', 'false');
+    // A hand on the shell, away from the reel, drags it over.
+    const canvas = page.locator('.cassette-canvas.is-ready');
+    await expect(canvas).toHaveAttribute('data-shell', /\d+,\d+/, { timeout: 90_000 });
+    const [sx, sy] = (await canvas.getAttribute('data-shell'))!.split(',').map(Number);
+    await page.mouse.move(sx, sy);
+    await page.mouse.down();
+    for (let i = 1; i <= 12; i++) await page.mouse.move(sx + i * 22, sy);
+    await page.mouse.up();
+    await expect(flip).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Product manager at YouWare.')).toBeHidden();
+    const play = page.getByRole('link', { name: /play B1/ });
+    await expect(play).toHaveAttribute('href', 'https://cyberia.marv1nnnnn.com');
+    await play.click();
+    await expect(page).toHaveURL('https://cyberia.marv1nnnnn.com/', { timeout: 15_000 });
+  });
+
+  test('a work links back to side B with /?side=b, and other pages are side A', async ({ page }) => {
+    await page.goto('/?side=b');
+    const flip = page.getByRole('button', { name: 'Side B: the works to play' });
+    await expect(flip).toHaveAttribute('aria-pressed', 'true');
+    await expect(page).toHaveURL(/\/$/);
+    await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'make' }).click();
+    await expect(page).toHaveURL(/\/make$/);
+    await page.getByRole('link', { name: 'marv1nnnnn' }).first().click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(flip).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByText('Product manager at YouWare.')).toBeVisible();
+  });
+
   test('the home page does not scroll sideways on phones', async ({ page }) => {
     await page.goto('/');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);

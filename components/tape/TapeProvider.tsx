@@ -6,6 +6,7 @@ import { DEFAULT_PALETTE, PALETTES, RENAMED, Tape, WORLDS, nightness, type Scene
 import type { TapeSound } from './sound';
 import Cassette from './Cassette';
 import { TAPE_LENGTH, TRACKS, headOf, spanOf, throughOf, trackAt, trackIndex } from './tracks';
+import { SIDE_B, type Side } from './sides';
 
 export type SoundState = 'off' | 'loading' | 'on';
 
@@ -24,6 +25,13 @@ interface TapeControls {
   turn: (delta: number) => void;
   scan: (direction: -1 | 1) => void;
   release: () => void;
+  // Which side of the tape is up: side B (the works to play) only shows on the home page.
+  side: Side;
+  flip: (to?: Side) => void;
+  // The track on side B under the head, and playing it: the tape winds out to that work.
+  work: number;
+  pickWork: (i: number) => void;
+  play: (url: string) => void;
 }
 
 const TapeContext = createContext<TapeControls | null>(null);
@@ -95,6 +103,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   const [sound, setSound] = useState<SoundState>('off');
   const soundStateRef = useRef<SoundState>('off');
   const [code, setCode] = useState('');
+  const [side, setSide] = useState<Side>('a');
+  const [work, setWork] = useState(0);
 
   const updateObstacle = useCallback(() => {
     const tape = tapeRef.current;
@@ -338,6 +348,62 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
     setWind(0);
   }, [pathname, router, scrollTo, setWind]);
 
+  // Side B shows only on the home page; any other page is side A. A work links back to /?side=b,
+  // and a visitor coming back from one (or reloading) finds the tape the way they left it.
+  const flip = useCallback((to?: Side) => {
+    setSide((was) => {
+      const next = to ?? (was === 'a' ? 'b' : 'a');
+      try {
+        sessionStorage.setItem('tape-side', next);
+      } catch {}
+      return next;
+    });
+  }, []);
+  useEffect(() => {
+    if (pathname !== '/') {
+      flip('a');
+      return;
+    }
+    const url = new URL(window.location.href);
+    let wanted: string | null = url.searchParams.get('side');
+    if (wanted) {
+      url.searchParams.delete('side');
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    } else {
+      try {
+        wanted = sessionStorage.getItem('tape-side');
+      } catch {}
+    }
+    if (wanted === 'b') flip('b');
+    // Only on arriving at the home page.
+  }, [pathname]);
+
+  const pickWork = useCallback((i: number) => setWork(Math.max(0, Math.min(SIDE_B.length - 1, i))), []);
+
+  // Playing a work on side B: the music lifts off the head, the tape winds out, and the page
+  // goes to the work. Back from it (the browser's own back), the tape is where it was.
+  const play = useCallback((url: string) => {
+    const tape = tapeRef.current;
+    if (!tape || reducedRef.current) {
+      window.location.assign(url);
+      return;
+    }
+    tape.seek(-1, 1100);
+    setWind(-1);
+    document.body.classList.add('is-leaving');
+    window.setTimeout(() => window.location.assign(url), 900);
+  }, [setWind]);
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (!e.persisted || !document.body.classList.contains('is-leaving')) return;
+      document.body.classList.remove('is-leaving');
+      tapeRef.current?.land();
+      setWind(0);
+    };
+    window.addEventListener('pageshow', onShow);
+    return () => window.removeEventListener('pageshow', onShow);
+  }, [setWind]);
+
   const setScene = useCallback((scene: Scene) => {
     document.body.classList.toggle('is-home', scene.home);
     soundRef.current?.scene(scene.home, scene.age);
@@ -446,8 +512,8 @@ export default function TapeProvider({ children }: { children: React.ReactNode }
   }, [toggleSound]);
 
   const value = useMemo(
-    () => ({ setScene, newTape, palette, sound, toggleSound, code, head, winding, skip, turn, scan, release }),
-    [setScene, newTape, palette, sound, toggleSound, code, winding, skip, turn, scan, release],
+    () => ({ setScene, newTape, palette, sound, toggleSound, code, head, winding, skip, turn, scan, release, side, flip, work, pickWork, play }),
+    [setScene, newTape, palette, sound, toggleSound, code, winding, skip, turn, scan, release, side, flip, work, pickWork, play],
   );
 
   return (

@@ -17,7 +17,10 @@ const PACK = { min: 0.8, max: 2.4 };
 const TILT_HOME = THREE.MathUtils.degToRad(64);
 const TILT_DOCK = THREE.MathUtils.degToRad(28);
 
-export interface LabelInfo { tracks: string[]; current: number; count: string }
+// side: which side is up (sides.ts); print: the small print under the tape's name.
+export interface LabelInfo { side: 'A' | 'B'; tracks: string[]; current: number; count: string; print: string }
+
+const PRINT_A = 'marv1nnnnn · C-60 · NORMAL BIAS 120µs';
 
 export class CassetteScene {
   private renderer: THREE.WebGLRenderer;
@@ -46,7 +49,16 @@ export class CassetteScene {
   hubAngleR = 0;
   wound = 0; // 0..1, how much tape has moved to the right reel
   still = false;
-  info: LabelInfo = { tracks: [], current: 0, count: '000' };
+  info: LabelInfo = { side: 'A', tracks: [], current: 0, count: '000', print: PRINT_A };
+  // What the label shows: info, except while the cassette is turning over and the old side is
+  // still up.
+  private shown: LabelInfo = this.info;
+  private loaded = false;
+  // How far the cassette is turned over on its long axis, from the side that is up: 0 lies flat,
+  // ±π/2 is on edge. Held by the page while a hand turns it (yawHeld); let go, it settles on the
+  // nearer side, and a change of side in info turns it the rest of the way over.
+  yawHeld: number | null = null;
+  private yaw = 0;
   // Bumped when the label's fonts arrive, so it is written again in them.
   private fontsIn = 0;
   private look: TapeLook = LOOKS.haze;
@@ -159,6 +171,8 @@ export class CassetteScene {
     }
     this.applyLook();
     this.layout();
+    this.shown = this.info;
+    this.loaded = true;
     this.frame();
   }
 
@@ -251,6 +265,50 @@ export class CassetteScene {
     return { p, s: (d.w * 0.94) / (10.04 * ppu) };
   }
 
+  // Turning over. In hand, the cassette follows the hand (the page changes the side as it passes
+  // on edge). Let go on the side asked for, it settles flat; otherwise it goes on over the way it
+  // was leaning, and the other label comes round as it passes on edge.
+  private turnOver(dt: number) {
+    if (this.yawHeld !== null) {
+      this.yaw = this.yawHeld;
+      this.shown = this.info;
+      return;
+    }
+    if (this.info.side === this.shown.side) {
+      this.yaw *= Math.exp(-dt * 9);
+      if (Math.abs(this.yaw) < 0.002) this.yaw = 0;
+      return;
+    }
+    if (!this.loaded || this.still) {
+      this.shown = this.info;
+      this.yaw = 0;
+      return;
+    }
+    const dir = this.yaw < 0 ? -1 : 1;
+    this.yaw += dir * dt * 8;
+    if (Math.abs(this.yaw) >= Math.PI / 2) {
+      this.shown = this.info;
+      this.yaw -= dir * Math.PI;
+    }
+  }
+
+  // Whether a point lands on the take-up reel (or the pencil in it), which winds the tape; the rest
+  // of the shell turns the cassette over.
+  onReel(x: number, y: number) {
+    const r = this.canvas.getBoundingClientRect();
+    this.ray.setFromCamera(new THREE.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1), this.camera);
+    const local = this.ray.ray.clone().applyMatrix4(new THREE.Matrix4().copy(this.space.matrixWorld).invert());
+    const p = new THREE.Vector3();
+    return !!local.intersectPlane(this.face, p) && Math.hypot(p.x - HUB_X, p.y - HUB_Y) < PACK.max;
+  }
+
+  // How many screen pixels the cassette is wide, for turning it by hand.
+  widthPx() {
+    const at = (x: number) => new THREE.Vector3(x, 0, 0.3).applyMatrix4(this.space.matrixWorld).project(this.camera);
+    const a = at(-5), b = at(5);
+    return Math.max(1, Math.hypot(((b.x - a.x) / 2) * this.width, ((b.y - a.y) / 2) * this.height));
+  }
+
   start() {
     const loop = () => {
       this.frame();
@@ -268,9 +326,10 @@ export class CassetteScene {
     const target = this.dock ? 1 : 0;
     this.m += (target - this.m) * (1 - Math.exp(-dt * 5.5));
     if (Math.abs(target - this.m) < 0.0005) this.m = target;
-    const moving = this.m !== target || this.swapT0 >= 0 || (this.m < 1 && !this.still && !this.lowPower);
+    this.turnOver(dt);
+    const moving = this.m !== target || this.swapT0 >= 0 || this.yaw !== 0 || this.info.side !== this.shown.side || (this.m < 1 && !this.still && !this.lowPower);
     const d = this.dock;
-    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.count}|${this.info.current}|${this.fontsIn}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
+    const key = `${this.m}|${this.pencilAngle.toFixed(4)}|${this.hubAngleL.toFixed(3)}|${this.wound.toFixed(4)}|${this.info.side}|${this.yaw.toFixed(4)}|${this.info.count}|${this.info.current}|${this.fontsIn}|${this.look.name}|${d ? `${d.x},${d.y},${d.w}` : ''}|${this.width}x${this.height}`;
     if (!moving && key === this.renderKey) return;
     this.renderKey = key;
     const t0 = performance.now();
@@ -318,6 +377,14 @@ export class CassetteScene {
       }
     }
 
+    if (this.yaw !== 0) {
+      // Turned on its long axis, lifted off the desk as it goes up on edge.
+      const up = Math.abs(Math.sin(this.yaw));
+      this.rig.rotation.y += this.yaw;
+      this.rig.position.z += up * 2.2 * s;
+      this.rig.position.y += up * 0.5 * s;
+    }
+
     // Hubs turn about the cassette's own axis (glTF Y, inside the rotated model).
     if (this.hubL) this.hubL.rotation.y = this.hubAngleL;
     if (this.hubR) this.hubR.rotation.y = this.hubAngleR;
@@ -350,6 +417,10 @@ export class CassetteScene {
     const hub = new THREE.Vector3(HUB_X, HUB_Y, 0.6).applyMatrix4(this.space.matrixWorld).project(this.camera);
     const at = `${Math.round(((hub.x + 1) / 2) * this.width)},${Math.round(((1 - hub.y) / 2) * this.height)}`;
     if (this.canvas.dataset.hub !== at) this.canvas.dataset.hub = at;
+    // And a point on the shell away from the reels, where a hand turns it over.
+    const sh = new THREE.Vector3(-2.6, -2.5, 0.6).applyMatrix4(this.space.matrixWorld).project(this.camera);
+    const shell = `${Math.round(((sh.x + 1) / 2) * this.width)},${Math.round(((1 - sh.y) / 2) * this.height)}`;
+    if (this.canvas.dataset.shell !== shell) this.canvas.dataset.shell = shell;
     // Where the cassette's top and bottom edges are, for the hint that sits beside it (CSS).
     if (!this.dock) {
       const y = (v: number) => Math.round(((1 - new THREE.Vector3(0, v, 0.3).applyMatrix4(this.space.matrixWorld).project(this.camera).y) / 2) * this.height);
@@ -368,10 +439,10 @@ export class CassetteScene {
   private edges = '';
 
   private drawLabel() {
-    const { tracks, current, count } = this.info;
+    const { side, tracks, current, count, print } = this.shown;
     const L = this.look;
     const accent = L.stripe;
-    const key = `${tracks.join()}|${current}|${count}|${L.name}|${this.fontsIn}`;
+    const key = `${side}|${tracks.join()}|${current}|${count}|${print}|${L.name}|${this.fontsIn}`;
     if (key === this.labelKey) return;
     this.labelKey = key;
     const c = this.label.getContext('2d');
@@ -409,7 +480,7 @@ export class CassetteScene {
     c.fillStyle = L.ink;
     c.font = '700 92px "Courier Prime", monospace';
     c.textBaseline = 'alphabetic';
-    c.fillText('A', 56, 162);
+    c.fillText(side, 56, 162);
     // A ballpoint line is thin: go over it once more so it reads at the size the cassette is drawn.
     c.font = '400 92px "Reenie Beanie", cursive';
     c.strokeStyle = L.ink;
@@ -418,7 +489,7 @@ export class CassetteScene {
     c.fillText(`${L.name} — ${L.mood}`, 150, 138);
     c.globalAlpha = 0.65;
     c.font = '400 24px "Courier Prime", monospace';
-    c.fillText('marv1nnnnn · C-60 · NORMAL BIAS 120µs', 152, 176);
+    c.fillText(print, 152, 176);
     c.globalAlpha = 1;
     c.font = '700 40px "Courier Prime", monospace';
     c.textAlign = 'right';
@@ -433,7 +504,7 @@ export class CassetteScene {
       c.globalAlpha = 0.6;
       c.fillStyle = L.ink;
       c.font = '400 30px "Courier Prime", monospace';
-      c.fillText(String(i + 1).padStart(2, '0'), x, y - 44);
+      c.fillText(side === 'A' ? String(i + 1).padStart(2, '0') : `B${i + 1}`, x, y - 44);
       c.globalAlpha = i === current ? 1 : 0.75;
       c.font = '400 76px "Reenie Beanie", cursive';
       c.strokeStyle = L.ink;
