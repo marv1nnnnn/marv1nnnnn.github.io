@@ -206,8 +206,9 @@ body[data-wind='rew'] .deck-transport .deck-button[aria-label='Rewind'] { color:
 
 /* While the tape winds, the page drops away and the track under the head is called out.
    Opacity only: a filter or transform here would unpin the fixed layers inside the page. */
-#content { transition: opacity 160ms ease; }
-body[data-wind] #content { opacity: 0.12; }
+#content { transition: opacity 260ms ease; }
+/* Dimmed, not blacked out: a full-screen flash on every page change is hard on the eyes. */
+body[data-wind] #content { opacity: 0.35; }
 .deck-cue {
   position: fixed;
   left: 50%;
@@ -227,10 +228,8 @@ body[data-wind] #content { opacity: 0.12; }
   letter-spacing: var(--display-track);
   white-space: nowrap;
   pointer-events: none;
-  animation: cue-flicker 110ms steps(2) infinite;
 }
 .deck-cue-dir { color: var(--accent); font-size: 0.35em; letter-spacing: -0.1em; }
-@keyframes cue-flicker { 50% { opacity: 0.82; } }
 
 @media (max-width: 899px) {
   .top { flex-wrap: wrap; row-gap: 4px; }
@@ -404,8 +403,8 @@ html[data-tape='bent'] :is(.leaf-title, .essay-title, .cover-name) { text-shadow
 html[data-tape='bent'] .pg { background-blend-mode: normal, multiply, normal; }
 html[data-tape='bent'] .row, html[data-tape='bent'] .song { border-bottom-style: dashed; }
 /* The bent tape's lamp is on a bad wire. */
-html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; }
-@keyframes bad-wire { 0%, 61%, 64%, 88%, 100% { opacity: 1; } 62% { opacity: 0.55; } 63% { opacity: 0.85; } 89% { opacity: 0.7; } }
+@media (hover: hover) { html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; } }
+@keyframes bad-wire { 0%, 61%, 64%, 88%, 100% { opacity: 1; } 62% { opacity: 0.8; } 63% { opacity: 0.92; } 89% { opacity: 0.86; } }
 @media (prefers-reduced-motion: reduce) { html[data-tape='bent'] body::before { animation: none; } }
 
 /* The booklet (Pages.tsx): the insert that came with the tape, as pages that turn. Dark card,
@@ -431,6 +430,8 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
   align-items: flex-start;
   padding-top: var(--stage-top, 110px);
 }
+/* A big screen draws the same pages larger (Pages.tsx sets the scale). */
+.booklet-scale { transform-origin: top center; }
 .booklet-pages {
   position: relative;
   width: var(--pw);
@@ -463,6 +464,7 @@ html[data-tape='bent'] body::before { animation: bad-wire 7s steps(1) infinite; 
   pointer-events: none;
   background: linear-gradient(90deg, rgba(0, 0, 0, calc(var(--lift, 0) * 0.5)), rgba(var(--ink-rgb), calc(var(--lift, 0) * 0.07)) 55%, rgba(0, 0, 0, calc(var(--lift, 0) * 0.3)));
 }
+.is-spread .is-away { opacity: 0; pointer-events: none; }
 .is-single .leaf.is-turned { visibility: hidden; }
 /* On a phone the pages are a column: the finger moves them directly, and the browser snaps to
    each page (Pages.tsx adds .snap-pages to html). No 3D, no animation of our own. */
@@ -718,6 +720,7 @@ html.snap-pages .top { background: rgb(var(--bg-rgb)); }
 /* A detail page: the words. */
 .prose { font-family: var(--read); font-size: 17px; line-height: 1.6; color: rgba(var(--ink-rgb), 0.92); overflow-wrap: break-word; }
 .prose p { margin: 0 0 0.9em; }
+.prose a { text-decoration-color: rgba(var(--accent-rgb), 0.6); }
 .prose.first > p:first-child::first-letter { float: left; font-family: var(--display); font-weight: 400; font-size: 3.4em; line-height: 0.82; margin: 0.06em 0.1em 0 0; color: var(--accent); }
 .prose h1, .prose h2, .prose h3, .prose h4 { display: block; margin: 1.4em 0 0.8em; color: var(--accent); font-family: var(--mono); font-size: 10px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase; }
 .prose h1::before, .prose h2::before, .prose h3::before, .prose h4::before, .prose h1::after, .prose h2::after, .prose h3::after, .prose h4::after { content: none; }
@@ -734,7 +737,8 @@ html.snap-pages .top { background: rgb(var(--bg-rgb)); }
 .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 13px; margin: 0 0 0.9em; }
 .prose th, .prose td { border-bottom: 1px solid var(--line-p); padding: 5px 8px; text-align: left; }
 .back-line { margin: 22px 0 0; }
-.back { display: inline-block; padding: 8px 0; font-size: 11px; letter-spacing: 0.06em; }
+/* The link back (not the back of a leaf, .face.back, whose pages would take its size and spacing). */
+a.back { display: inline-block; padding: 8px 0; font-size: 11px; letter-spacing: 0.06em; }
 .colophon { margin-top: 26px; padding-top: 10px; border-top: 1px solid var(--line-p); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
 .colophon p { margin: 0 0 4px; }
 

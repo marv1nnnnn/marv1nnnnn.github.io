@@ -66,7 +66,7 @@ test.describe('sections', () => {
     await page.goto('/about');
     await expect(page.locator('.cover')).toBeVisible();
     await expect(page.locator('.cover-name')).toHaveText('marv1nnnnn');
-    await expect(page.getByText(/product manager/i).first()).toBeVisible();
+    await expect(page.getByText(/YouWare/).first()).toBeVisible();
     await expect(page.getByText('marvin1996325@gmail.com')).toBeVisible();
   });
 
