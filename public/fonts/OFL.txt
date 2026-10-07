@@ -5,6 +5,7 @@ Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructibl
 Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)
 Copyright 2010 j. 'mach' wust (UnifrakturMaguntia)
 Copyright 2011 JM Solé (Alfa Slab One)
+Copyright 2018 The LongCang Project Authors (https://github.com/googlefonts/longcang)
 
 These Font Softwares are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
