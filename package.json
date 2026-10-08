@@ -11,6 +11,7 @@
     "dev": "pnpm generate && next dev",
     "build": "pnpm generate && next build",
     "start": "next start",
+    "og": "node scripts/og-card.js",
     "lint": "next lint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

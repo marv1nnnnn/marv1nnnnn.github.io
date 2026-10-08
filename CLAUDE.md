@@ -11,6 +11,7 @@ pnpm generate     # Sync Clin when available, then generate signals + sitemap
 pnpm dev          # Generate and start Next.js
 pnpm build        # Generate and run the production build/typecheck
 pnpm start        # Serve the production build
+pnpm og           # After a build: shoot the share card (public/og/marv1nnnnn.jpg) from the home page
 pnpm lint         # ESLint
 ```
 
@@ -32,6 +33,7 @@ The site is one cassette on a desk. Its sections are the tracks on the tape; the
 - **Content export (`scripts/clin-content.js`)**: exports only positively allowlisted Clin notes tagged `site` into `content/` and `data/shows.json`.
 - **Signal build (`scripts/generate-signals.js`)**: compiles generated content into `lib/signals.json` and updates `public/sitemap.xml`.
 - **Types (`types/scanner.ts`)**: signal and page content types.
+- **The share card (`scripts/og-card.js`, `lib/share.ts`)**: what a link to the site unfolds into on X and elsewhere, for every page without a picture of its own (essays and makes with a cover use that). It is the home page itself, shot from the static export: the deck, the shelf and the intro taken away, the cassette moved right, and the name in ballpoint, three typed lines and the tracklist beside it, on the desk at 2am (its brightest), with WebGL told there is a GPU so the cassette is drawn in full. Run `pnpm og` after a build when the look of the home page changes, and commit the image under a new name if it must get past the caches of sites that already have the old one.
 
 ## Content workflow
 
