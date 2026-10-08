@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Article from '@/components/tape/Article';
 import { getEssay, getEssays } from '@/lib/tape';
+import { shareImage } from '@/lib/share';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const card = getEssay(id);
   if (!card) return { title: 'Not found' };
   const cover = card.markdown.match(/!\[([^\]]*)\]\(([^)\s]+)/);
-  const image = cover?.[2] ?? '/images/cursor_shenzhen.png';
+  const image = cover?.[2] ?? shareImage.url;
   return {
     title: card.title,
     description: card.summary,
