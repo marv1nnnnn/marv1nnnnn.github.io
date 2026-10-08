@@ -2,13 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import TapeProvider from "@/components/tape/TapeProvider";
 import { TopNav } from "@/components/tape/parts";
+import { shareImage } from "@/lib/share";
 
 const siteUrl = 'https://marv1nnnnn.github.io';
 const siteName = 'MARV1NNNNN';
 const siteTitle = 'Marvin Ma (MARV1NNNNN) · Product Manager';
 const siteDescription =
   'Marvin Ma is a product manager at YouWare and Cursor Ambassador. Formerly live coding and circuit bending in Beijing. Writing about agents, building small tools, and logging what he watches, reads and plays.';
-const defaultImage = '/images/cursor_shenzhen.png';
+const portrait = '/images/cursor_shenzhen.png';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -58,21 +59,14 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
     siteName,
-    images: [
-      {
-        url: defaultImage,
-        width: 1200,
-        height: 630,
-        alt: 'Marvin Ma speaking at a Cursor community event in Shenzhen',
-      }
-    ],
+    images: [shareImage],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteTitle,
     description: siteDescription,
     creator: '@marv1nnnnn1',
-    images: [defaultImage],
+    images: [shareImage],
   },
   robots: {
     index: true,
@@ -105,7 +99,7 @@ export default function RootLayout({
         name: 'Marvin Ma',
         alternateName: 'MARV1NNNNN',
         url: siteUrl,
-        image: `${siteUrl}${defaultImage}`,
+        image: `${siteUrl}${portrait}`,
         jobTitle: 'Product Manager',
         worksFor: { '@type': 'Organization', name: 'YouWare' },
         sameAs: [
