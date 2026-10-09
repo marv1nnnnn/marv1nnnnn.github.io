@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>复读 · marv1nnnnn</title>
+  <meta name="description" content="从小到大听歌用过的每一台机器，按真实大小摆在一张桌子上，后面堆着它装得下的每一首歌：步步高复读机、纽曼 MP3、清华紫光 MP4、飞利浦小方块、酷比魔方、闲鱼上的 iPod classic 和 Zune HD，最后是 Mixcloud。marv1nnnnn 的 B 面。">
+  <meta name="theme-color" content="#0b0a09">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/courier-prime.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/libre-caslon.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="repeat.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+  </script>
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <canvas class="stage" aria-hidden="true"></canvas>
+  <div class="labels" aria-hidden="true"></div>
+
+  <nav class="chrome" aria-label="repeat">
+    <a class="back" href="/?side=b">← B 面</a>
+    <span class="where">B2 · 复读</span>
+    <span class="loading" role="status">把机器摆上桌…</span>
+  </nav>
+
+  <main id="top">
+    <section class="stop intro" data-stop="0">
+      <div class="words">
+        <p class="kicker">marv1nnnnn · B 面 · 第二首</p>
+        <h1> <span class="zh">复读</span></h1>
+        <p class="said">从小到大，我拿来听歌的每一台机器，按来的先后，按真实的大小，摆在一张桌子上。每台后面那一堆，一粒是一首歌：它装得下多少，就堆多少。</p>
+        <p class="how">往下滚，一台一台拿起来。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="1" id="repeater">
+      <div class="words">
+        <p class="n">01</p>
+        <h2>步步高 变速王</h2>
+        <p class="said">最早我是听步步高复读机的英语听力，</p>
+        <p class="said later">后来用来听奥斯卡金曲磁带这些，</p>
+        <p class="cap">两盘磁带，二十来首 · <b data-weight>约 300 g</b>（不算电池）</p>
+        <p class="how">按放音。停止键再按一下开仓，换另一盘磁带；复读 A-B，变速 −/+。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="2" id="newsmy">
+      <div class="words">
+        <p class="n">02</p>
+        <h2>纽曼 M520</h2>
+        <p class="said">然后先买了一个纽曼的 MP3，长方形的，上面小屏幕，下面几个按键，</p>
+        <p class="cap">512MB，约 128 首 · <b data-weight>35 g</b></p>
+        <p class="how">上一首、下一首、播放，侧面还有 A-B 复读和 MENU。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="3" id="unis">
+      <div class="words">
+        <p class="n">03</p>
+        <h2>清华紫光 MQ-908</h2>
+        <p class="said">后面才买了第一个 MP4，一整块屏幕的那种，</p>
+        <p class="cap">2GB，约 512 首，还得给视频留地方 · <b data-weight>约 80 g</b></p>
+        <p class="how">屏幕下面那条是触摸键：◀◀ ▶▶ 选，M 进去。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="4" id="philips">
+      <div class="words">
+        <p class="n">04</p>
+        <h2>飞利浦 SA28</h2>
+        <p class="said">再后来买了飞利浦的一个方形小盒子 MP3，</p>
+        <p class="cap">2GB，约 512 首 · <b data-weight>26 g</b></p>
+        <p class="how">按镜面的四边：左右换歌，上下音量。顶上的 ⇄ 换播放模式：单曲循环，或者随机。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="5" id="cube">
+      <div class="words">
+        <p class="n">05</p>
+        <h2>酷比魔方 C30</h2>
+        <p class="said">再后来买了酷比魔方的一个长条 MP3，为了插 TF 卡。</p>
+        <p class="said">容量对我很重要：听歌量多了之后，就想把所有自己爱听的歌放进 MP3 里 shuffle。</p>
+        <p class="cap">4GB，再插一张 8GB 的 TF 卡，约 3,000 首 · <b data-weight>37 g</b></p>
+        <p class="how">点旁边那张 TF 卡，把它插进去。M 键切到随机：shuffle。</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="6" id="ipod">
+      <div class="words">
+        <p class="n">06</p>
+        <h2>iPod classic</h2>
+        <p class="said">那时候的梦想就是买 iPod Classic，</p>
+        <p class="said later">后来就买了 iPod Classic，闲鱼上的改装电池款。</p>
+        <p class="said later">有了闲鱼，很多复古设备被重新改装，用起来反而更好。</p>
+        <p class="cap">160GB，约 40,000 首 · <b data-weight>140 g</b></p>
+        <p class="how">转转盘，按中间选，MENU 返回。后壳能打开，里面是新换的电池。</p>
+        <div class="acts"><button type="button" class="act" data-act="open" aria-pressed="false">打开后壳</button></div>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="7" id="zune">
+      <div class="words">
+        <p class="n">07</p>
+        <h2>Zune HD</h2>
+        <p class="said">更后面买了 Zune 的 HD，这好像也是我最后用的一个 MP3，</p>
+        <p class="said">也是闲鱼上换过电池的。从 iPod 换到 Zune，很大原因是它更轻、更小。</p>
+        <p class="cap">32GB，约 8,000 首 · <b data-weight>74 g</b>，iPod 是 140 g</p>
+        <p class="how">在屏幕上划。旁边是 iPod，转到侧面比比厚薄。后盖也能打开。</p>
+        <div class="acts"><button type="button" class="act" data-act="profile" aria-pressed="false">侧面比一比</button><button type="button" class="act" data-act="open" aria-pressed="false">打开后盖</button></div>
+      </div>
+    </section>
+
+    <section class="stop cloud" data-stop="8" id="cloud">
+      <div class="words">
+        <p class="n">08</p>
+        <h2>Mixcloud</h2>
+        <p class="said">后面就开始在线听，Mixcloud 伴随了我很久。</p>
+        <p class="cap">不用再装了</p>
+        <div class="lately">
+          <p class="how">最近在听</p>
+          <ul>
+            <li><a href="https://www.nts.live/shows/sounds-on-screen/episodes/sounds-on-screen-hk-crime-movies-9th-april-2026" target="_blank" rel="noopener">Sounds on Screen: Hong Kong Crime Movies</a> <span>NTS</span></li>
+            <li><a href="https://www.nts.live/shows/panorama-yerevan/episodes/panorama-yerevan-25th-october-2025" target="_blank" rel="noopener">Armenian Cassette Special</a> <span>Panorama Yerevan</span></li>
+            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025" target="_blank" rel="noopener">Lychee Reggae Mix</a> <span>Wild Wata</span></li>
+            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-fiestas-del-alto-w-mama-tora-21st-september-2025" target="_blank" rel="noopener">fiestas del Alto</a> <span>mamá Tora</span></li>
+            <li><a href="https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025" target="_blank" rel="noopener">NTS Guide to: Hungarian Classical</a> <span>NTS</span></li>
+          </ul>
+        </div>
+        <p class="end"><a href="/?side=b">← 回 B 面</a> <a href="#top" class="again">再来一遍</a></p>
+      </div>
+    </section>
+  </main>
+
+  <noscript><p class="nogl">这一页的机器要用 JavaScript 和 WebGL 才能拿起来。</p></noscript>
+</body>
+</html>
