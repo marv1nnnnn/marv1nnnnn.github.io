@@ -16,7 +16,7 @@ export interface Work {
 
 export const SIDE_B: Work[] = [
   { id: 'cyberia', title: 'cyberia', note: 'a club in the wired, open all night', year: '2026' },
-  { id: 'repeat', title: '复读', note: '从小到大听歌用过的每一台机器，和它们装得下的每一首歌', year: '2026', path: '/repeat/' },
+  { id: 'fidelity', title: 'fidelity', note: 'a small museum of everything I listened to music on', year: '2026', path: '/fidelity/' },
 ];
 
 export const DOMAIN = 'marv1nnnnn.com';
