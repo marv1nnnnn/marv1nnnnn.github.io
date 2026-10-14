@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>fidelity · marv1nnnnn</title>
+  <meta name="description" content="A small museum of everything I listened to music on, in the order it came, at real size: a BBK cassette repeater and the MP3 players after it, an iPod classic and a Zune HD, the earphones and headphones between them, the speakers after, and an empty plinth for Mixcloud. Side B of marv1nnnnn.">
+  <meta name="theme-color" content="#0b0a09">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/courier-prime.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/libre-caslon.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="fidelity.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+  </script>
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <canvas class="stage" aria-hidden="true"></canvas>
+  <div class="labels" aria-hidden="true"></div>
+
+  <nav class="chrome" aria-label="fidelity">
+    <a class="back" href="/?side=b">← side B</a>
+    <span class="where">B2 · fidelity</span>
+    <span class="loading" role="status">installing…</span>
+    <div class="plan" role="group" aria-label="Gallery plan"></div>
+  </nav>
+
+  <main id="top">
+    <section class="stop intro" data-stop="0">
+      <div class="words">
+        <p class="kicker">marv1nnnnn · side B · track 2</p>
+        <h1>fidelity</h1>
+        <p class="sub">Listening devices, 2003 – now</p>
+        <p class="said">Everything I have listened to music on, in the order it came, at real size. Behind each player, one grain for every song it could hold.</p>
+        <p class="please">Please touch.</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="1" id="repeater">
+      <div class="words">
+        <p class="maker">BBK <span lang="zh-CN">步步高</span></p>
+        <h2>BK-898 language repeater</h2>
+        <p class="date">c. 2000</p>
+        <p class="medium">Plastic, LCD, cassette mechanism<br>13.7 × 11.6 × 3.0 cm, about 300 g<br>Two tapes, about 24 songs</p>
+        <p class="credit">English listening tapes, then Oscar hits</p>
+        <p class="acc">2003.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="2" id="newsmy">
+      <div class="words">
+        <p class="maker">Newsmy <span lang="zh-CN">纽曼</span></p>
+        <h2>M520 MP3 player</h2>
+        <p class="date">2005</p>
+        <p class="medium">Plastic, metal, 1.5-inch colour LCD<br>6.2 × 4.2 × 1.3 cm, 35 g<br>512 MB, about 128 songs</p>
+        <p class="credit">First MP3 player</p>
+        <p class="acc">2006.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="3" id="unis">
+      <div class="words">
+        <p class="maker">UNIS <span lang="zh-CN">清华紫光</span></p>
+        <h2>MQ-908 MP4 player</h2>
+        <p class="date">2008</p>
+        <p class="medium">Plastic, glass, brushed metal, 3-inch LCD<br>5.52 × 8.8 × 1.05 cm, about 80 g<br>2 GB, about 512 songs</p>
+        <p class="credit">First MP4 player</p>
+        <p class="acc">2008.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="4" id="sparkplug">
+      <div class="words">
+        <p class="maker">Koss</p>
+        <h2>Spark Plug in-ear earphones</h2>
+        <p class="date">c. 2005</p>
+        <p class="medium">Plastic, metal band, memory foam<br>Body 2.5 × 1.5 × 1.5 cm, 14 g, 1.2 m cord</p>
+        <p class="credit">First proper earphones</p>
+        <p class="acc">2010.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="5" id="philips">
+      <div class="words">
+        <p class="maker">Philips</p>
+        <h2>GoGear SA28 MP3 player</h2>
+        <p class="date">2008</p>
+        <p class="medium">Mirror-finish plastic, metal, OLED<br>4.0 × 4.0 × 1.5 cm, 26 g<br>2 GB, about 512 songs</p>
+        <p class="acc">2010.2</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="6" id="cube">
+      <div class="words">
+        <p class="maker">Cube <span lang="zh-CN">酷比魔方</span></p>
+        <h2>C30 MP3 player</h2>
+        <p class="date">2010</p>
+        <p class="medium">Zinc-magnesium alloy, mirror-finish plastic, OLED<br>7.5 × 2.7 × 1.5 cm, 37 g<br>4 GB and an 8 GB TF card, about 3,000 songs</p>
+        <p class="credit">Bought for its TF card slot</p>
+        <p class="acc">2011.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="7" id="gr4">
+      <div class="words">
+        <p class="maker">VSONIC <span lang="zh-CN">威索尼克</span></p>
+        <h2>GR04 in-ear earphones</h2>
+        <p class="date">c. 2011</p>
+        <p class="medium">Plastic, nickel-plated nozzle, silicone tips, copper cable<br>Housing about 1.55 × 1.55 × 0.75 cm (estimated), 1.3 m cable</p>
+        <p class="credit">From a time spent studying Chinese-made earphones</p>
+        <p class="acc">2012.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="8" id="ipod">
+      <div class="words">
+        <p class="maker">Apple</p>
+        <h2>iPod classic, 160 GB</h2>
+        <p class="date">2009</p>
+        <p class="medium">Anodised aluminium, stainless steel, 1.8-inch hard drive<br>10.35 × 6.18 × 1.05 cm, 140 g<br>160 GB, about 40,000 songs</p>
+        <p class="credit">Bought second-hand on Taobao when hacking old players came back; battery replaced</p>
+        <p class="acc">2013.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="9" id="m6">
+      <div class="words">
+        <p class="maker">MEElectronics</p>
+        <h2>M6 in-ear earphones</h2>
+        <p class="date">2009</p>
+        <p class="medium">Clear plastic, silicone tips, stainless-steel memory wire<br>Housing 1.65 × 1.9 × 2.54 cm, 1.4 m cable</p>
+        <p class="acc">2014.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="10" id="dt235">
+      <div class="words">
+        <p class="maker">beyerdynamic</p>
+        <h2>DT 235 closed headphones</h2>
+        <p class="date">2008</p>
+        <p class="medium">Plastic, rubber, velour<br>130 g without cable, 2.5 m cable</p>
+        <p class="acc">2015.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="11" id="zune">
+      <div class="words">
+        <p class="maker">Microsoft</p>
+        <h2>Zune HD</h2>
+        <p class="date">2009</p>
+        <p class="medium">Glass, metal, 3.3-inch OLED touchscreen<br>10.21 × 5.27 × 0.89 cm, 74 g<br>32 GB, about 8,000 songs</p>
+        <p class="credit">Also second-hand, from Xianyu, battery replaced. The last player</p>
+        <div class="acts"><button type="button" class="act" data-act="profile" aria-pressed="false">Side-on, with the iPod</button></div>
+        <p class="acc">2016.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="12" id="srh1540">
+      <div class="words">
+        <p class="maker">Shure</p>
+        <h2>SRH1540 closed-back headphones</h2>
+        <p class="date">2013</p>
+        <p class="medium">Aluminium alloy, carbon fibre, Alcantara, steel<br>286 g without cable, 1.83 m cable</p>
+        <p class="credit">Still in use</p>
+        <p class="acc">2017.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="13" id="erise5">
+      <div class="words">
+        <p class="maker">PreSonus</p>
+        <h2>Eris E5 studio monitors, a pair</h2>
+        <p class="date">2013</p>
+        <p class="medium">Vinyl-laminated MDF, woven Kevlar, silk dome, steel mesh<br>Each 26.0 × 17.8 × 19.5 cm, 4.63 kg</p>
+        <p class="credit">First speakers</p>
+        <p class="acc">2017.2</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="14" id="symfonisk">
+      <div class="words">
+        <p class="maker">IKEA × Sonos</p>
+        <h2>SYMFONISK WiFi bookshelf speaker</h2>
+        <p class="date">2019</p>
+        <p class="medium">Plastic, polyester fabric, rubber<br>31 × 10 × 15 cm, 2.08 kg</p>
+        <p class="acc">2019.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="15" id="move2">
+      <div class="words">
+        <p class="maker">Sonos</p>
+        <h2>Move 2 portable speaker</h2>
+        <p class="date">2023</p>
+        <p class="medium">Plastic, perforated grille, rubber<br>24.1 × 16.0 × 12.7 cm, 3.0 kg</p>
+        <p class="acc">2023.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="16" id="sony">
+      <div class="words">
+        <p class="maker">Sony</p>
+        <h2>SRS-XE200 and SRS-XB100 Bluetooth speakers</h2>
+        <p class="date">2022, 2023</p>
+        <p class="medium">Knitted fabric, rubber-coated plastic, steel grille, woven strap<br>20.8 × 9.0 × 9.4 cm, 800 g; 9.5 × 7.6 cm, 274 g</p>
+        <p class="acc">2024.1</p>
+      </div>
+    </section>
+
+    <section class="stop" data-stop="17" id="axon3">
+      <div class="words">
+        <p class="maker">NUX</p>
+        <h2>Axon 3 studio monitors, a pair</h2>
+        <p class="date">2025</p>
+        <p class="medium">ABS, silk dome, metal mesh grille, rubber footpads<br>Each 20.5 × 9.4 × 15.0 cm, 1.98 kg the pair</p>
+        <p class="credit">In use now</p>
+        <p class="acc">2025.1</p>
+      </div>
+    </section>
+
+    <section class="stop cloud" data-stop="18" id="cloud">
+      <div class="words">
+        <p class="maker">Mixcloud</p>
+        <h2>Radio shows and DJ mixes, streamed</h2>
+        <p class="date">2009 – </p>
+        <p class="medium">No object<br>Dimensions variable</p>
+        <p class="credit">Streaming was everywhere. Living alone, and after starting work too tired to look for songs, I let the shows choose: Mixcloud, then NTS.</p>
+        <p class="acc">2017.3</p>
+        <div class="lately">
+          <p class="how">Lately</p>
+          <ul>
+            <li><a href="https://www.nts.live/shows/sounds-on-screen/episodes/sounds-on-screen-hk-crime-movies-9th-april-2026" target="_blank" rel="noopener">Sounds on Screen: Hong Kong Crime Movies</a> <span>NTS</span></li>
+            <li><a href="https://www.nts.live/shows/panorama-yerevan/episodes/panorama-yerevan-25th-october-2025" target="_blank" rel="noopener">Armenian Cassette Special</a> <span>Panorama Yerevan</span></li>
+            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025" target="_blank" rel="noopener">Lychee Reggae Mix</a> <span>Wild Wata</span></li>
+            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-fiestas-del-alto-w-mama-tora-21st-september-2025" target="_blank" rel="noopener">fiestas del Alto</a> <span>mamá Tora</span></li>
+            <li><a href="https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025" target="_blank" rel="noopener">NTS Guide to: Hungarian Classical</a> <span>NTS</span></li>
+          </ul>
+        </div>
+        <p class="end"><a href="/?side=b">← side B</a> <a href="#top" class="again">From the top</a></p>
+      </div>
+    </section>
+  </main>
+
+  <noscript><p class="nogl">The players need JavaScript and WebGL to be picked up.</p></noscript>
+</body>
+</html>

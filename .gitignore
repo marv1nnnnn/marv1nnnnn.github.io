@@ -72,3 +72,5 @@ tools/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+# Blender scripts import their shared kit
+__pycache__/
