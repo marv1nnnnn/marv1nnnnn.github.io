@@ -1,6 +1,6 @@
-// The page: one stop per player down the scroll, the gallery drawn behind. The scroll sets which
-// player is in hand (stage.focus), the plinths carry numbers, the plan shows where you are, and
-// keys go to the player last touched.
+// The page: one stop per player down the scroll, the gallery drawn behind. The scroll walks the hall
+// and sets which player is in hand (stage.focus), the plan shows where you are, and keys go to the
+// player last touched.
 
 import { Stage } from './stage.js';
 import repeater from './devices/repeater.js';
@@ -39,9 +39,8 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.querySelector('canvas.stage');
 const loading = document.querySelector('.loading');
 const plan = document.querySelector('.plan');
-// On the plinths, and in the plan; the last plinth is empty.
+// In the plan; the last plinth is empty.
 const NAMES = [...players.map((p) => p.name), 'Mixcloud'];
-const YEARS = [...players.map((p) => String(p.got)), '2017 –'];
 
 let stage = null;
 try {
@@ -89,35 +88,14 @@ function read() {
   });
   if (stage) stage.focus = f;
   plan.querySelectorAll('button').forEach((b, k) => b.classList.toggle('is-here', k === Math.round(f) - 1));
-  // the shade under the words is for the players in hand, not the row seen whole
+  // the shade under the words is for the players in hand, not the hall at the door
   document.body.style.setProperty('--shade', String(Math.min(1, Math.max(0, f - 0.3) * 2)));
 }
 addEventListener('scroll', read, { passive: true });
 addEventListener('resize', read);
 read();
 
-// On each plinth its number and the year it came, as on a gallery floor; the names are on the labels.
-const box = document.querySelector('.labels');
-const tags = YEARS.map((year, i) => {
-  const el = document.createElement('div');
-  el.className = 'label';
-  el.innerHTML = `${String(i + 1).padStart(2, '0')}<small>${year}</small>`;
-  box.appendChild(el);
-  return el;
-});
-
-function place(el, p, on) {
-  if (!p || p.behind) { el.classList.remove('on'); return; }
-  el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, 0)`;
-  el.classList.toggle('on', on);
-}
-
 if (stage) {
-  stage.after = () => {
-    const f = stage.shown;
-    const over = f < 0.45;
-    tags.forEach((el, i) => place(el, stage.onScreen(i), over));
-  };
   window.__fidelity = stage; // for poking at from the console
   stage.start();
   stage.load().then(() => loading.classList.add('is-done'));
@@ -129,8 +107,8 @@ if (stage) {
     if (stage.slots[i].ctl?.key?.(e.key)) e.preventDefault();
   });
 
-  // The plan: a box a plinth, as wide as it is.
-  plan.innerHTML = [...stage.slots.map((t) => t.pw), (stage.rowW - stage.cloudX) * 2].map((w, i) => `<button type="button" style="flex-grow: ${w.toFixed(1)}" aria-label="${NAMES[i]}"></button>`).join('');
+  // The plan: a box a plinth.
+  plan.innerHTML = NAMES.map((name) => `<button type="button" aria-label="${name}"></button>`).join('');
   plan.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => go(i + 1)));
   read();
 

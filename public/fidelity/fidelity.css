@@ -92,6 +92,10 @@ h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1; letter-spacing: -0.02em;
 .sub { margin: 0; font-family: var(--read); font-style: italic; font-size: 17px; color: var(--muted); }
 .said { margin: 0; font-family: var(--read); font-size: 18px; line-height: 1.65; }
 .please { margin: 6px 0 0; font-size: 12px; color: var(--tape); letter-spacing: 0.08em; }
+.hint { margin: 0; font-size: 12px; color: var(--muted); }
+.hint .finger { display: none; }
+@media (pointer: coarse) { .hint .mouse { display: none; } .hint .finger { display: inline; } }
+html.no-gl .hint { display: none; }
 /* The wall label: maker, object, date; what it is made of, its size and what it held; how it came. */
 .stop:not(.intro) .words { gap: 0; padding-top: 22px; border-top: 1px solid rgba(236, 228, 214, 0.16); width: min(22rem, 32vw); }
 .maker { margin: 0 0 6px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
@@ -117,8 +121,6 @@ h2 { font-family: var(--read); font-size: 26px; line-height: 1.2; }
 .lately li span { color: var(--faint); font-family: var(--mono); font-size: 11px; margin-left: 6px; }
 .end { margin: 18px 0 0; display: flex; gap: 22px; font-size: 13px; }
 
-/* The names on the plinths, placed by main.js each frame. */
-.labels { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
 /* A shade down the left, under the words, so the players standing behind them stay out of the way. */
 body::after {
   content: '';
@@ -131,22 +133,6 @@ body::after {
   transition: opacity 0.6s;
 }
 html.no-gl body::after { display: none; }
-.label {
-  position: absolute;
-  left: 0;
-  top: 0;
-  white-space: nowrap;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-  transform: translate(-50%, 0);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.label.on { opacity: 0.9; }
-.label small { display: block; color: var(--muted); font-size: 10px; }
-
 
 .nogl { position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 4; color: var(--muted); }
 html.no-gl .words { opacity: 1 !important; }
@@ -178,5 +164,5 @@ html.no-gl canvas.stage { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .words, .label, .chrome .loading { transition: none; }
+  .words, .chrome .loading { transition: none; }
 }
