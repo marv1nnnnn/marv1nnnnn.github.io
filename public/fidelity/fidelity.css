@@ -105,20 +105,6 @@ h2 { font-family: var(--read); font-size: 26px; line-height: 1.2; }
 .medium, .credit { margin: 0; font-family: var(--read); font-size: 14px; line-height: 1.6; color: var(--muted); }
 .credit { margin-top: 10px; font-style: italic; }
 .acc { margin: 14px 0 0; font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
-.how { margin: 0; font-size: 12px; color: var(--faint); line-height: 1.6; }
-.acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.act {
-  border: 1px solid rgba(236, 228, 214, 0.25);
-  background: rgba(11, 10, 9, 0.5);
-  padding: 5px 12px;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 12px;
-}
-.act:hover, .act[aria-pressed='true'] { border-color: var(--tape); color: var(--tape); }
-.lately { margin-top: 18px; }
-.lately ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; font-family: var(--read); font-size: 14px; }
-.lately li span { color: var(--faint); font-family: var(--mono); font-size: 11px; margin-left: 6px; }
 .end { margin: 18px 0 0; display: flex; gap: 22px; font-size: 13px; }
 
 /* A shade down the left, under the words, so the players standing behind them stay out of the way. */

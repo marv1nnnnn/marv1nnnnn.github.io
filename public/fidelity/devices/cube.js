@@ -1,6 +1,6 @@
 // 酷比魔方 C30 (2010), metal grey, bought for its TF slot. Its three-line OLED shows through the
 // mirror only where it is lit. Before the card it holds 4 GB; put the card in (it lies beside the
-// player) and the block of songs behind it fills to 12 GB. M switches to shuffle, and the block
+// player) and the block of songs beside it fills to 12 GB. M switches to shuffle, and the block
 // deals itself out again.
 
 import * as THREE from 'three';
