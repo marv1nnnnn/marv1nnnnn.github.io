@@ -2,8 +2,8 @@
 // hand. The tape years come through as analog video (lines that wobble, colour bleeding sideways,
 // scanlines, grain), the first MP3 years as a few big pixels and a handful of colours, each year after
 // a little finer, until the hi-fi headphones and monitors draw clean; the Bluetooth speakers bring
-// the blocks back, as their codecs brought the loss back; the cloud at the end breaks into dots. Over the
-// whole row the history runs left to right across the one picture.
+// the blocks back, as their codecs brought the loss back; the cloud at the end breaks into dots. Walking
+// the hall, the picture goes from one era to the next.
 //
 // The scene is drawn to the screen as before, copied into a texture, and drawn again through one
 // shader, so the players' screens, tone mapping and antialiasing are untouched underneath.
@@ -24,16 +24,15 @@ export const ERAS = {
   slight: [0, 0.06, 0.14, 0],
   stream: [0, 0, 0, 1],
 };
-const SPAN = 256; // samples across the screen for the whole row
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
   void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 
 const fragmentShader = /* glsl */ `
-  uniform sampler2D tFrame, tEra, tSpan;
+  uniform sampler2D tFrame, tEra;
   uniform vec2 uRes;
-  uniform float uTime, uT, uOver, uN, uDpr;
+  uniform float uTime, uT, uN, uDpr;
   varying vec2 vUv;
   float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
   float bayer(vec2 p) {
@@ -46,9 +45,8 @@ const fragmentShader = /* glsl */ `
     return 0.0;
   }
   void main() {
-    // which era this pixel is in: the piece in hand, or across the row by where it stands
-    float t = mix(uT, texture2D(tSpan, vec2(vUv.x, 0.5)).r * (uN - 1.0), uOver);
-    vec4 e = texture2D(tEra, vec2((t + 0.5) / uN, 0.5));
+    // the era: the piece you are at, or between two on the way
+    vec4 e = texture2D(tEra, vec2((uT + 0.5) / uN, 0.5));
     float analog = e.r, bits = e.b, dots = e.a;
     float pix = (1.0 + e.g * 7.0) * uDpr;
     vec2 px = vUv * uRes;
@@ -112,8 +110,6 @@ export class Fidelity {
       t.needsUpdate = true;
       return t;
     };
-    this.span = new Uint8Array(SPAN * 4);
-    this.spanTex = tex(this.span, SPAN);
     this.frame = new THREE.FramebufferTexture(1, 1);
     this.mat = new THREE.ShaderMaterial({
       vertexShader,
@@ -124,11 +120,9 @@ export class Fidelity {
       uniforms: {
         tFrame: { value: this.frame },
         tEra: { value: tex(lut, this.n) },
-        tSpan: { value: this.spanTex },
         uRes: { value: new THREE.Vector2(1, 1) },
         uTime: { value: 0 },
         uT: { value: 0 },
-        uOver: { value: 0 },
         uN: { value: this.n },
         uDpr: { value: 1 },
       },
@@ -147,23 +141,11 @@ export class Fidelity {
     this.mat.uniforms.uDpr.value = this.renderer.getPixelRatio();
   }
 
-  // t: the stop in hand (0..n-1, eased); over: how much of the whole row is in view (0..1), with
-  // xs the screen x (0..1) of each stop's plinth from the first piece on, for the run across it.
-  set(t, over, time, xs) {
+  // t: where you are, a stop (0..n-1) or between two
+  set(t, time) {
     const u = this.mat.uniforms;
     u.uT.value = Math.min(this.n - 1, Math.max(1, t));
-    u.uOver.value = over;
     u.uTime.value = this.reduced ? 0 : time;
-    if (over <= 0) return;
-    for (let i = 0; i < SPAN; i++) {
-      const x = (i + 0.5) / SPAN;
-      let k = 1;
-      if (x <= xs[0]) k = 1;
-      else if (x >= xs[xs.length - 1]) k = xs.length;
-      else for (let j = 0; j < xs.length - 1; j++) if (x < xs[j + 1]) { k = 1 + j + (x - xs[j]) / (xs[j + 1] - xs[j] || 1); break; }
-      this.span[i * 4] = Math.round((k / (this.n - 1)) * 255);
-    }
-    this.spanTex.needsUpdate = true;
   }
 
   // Draw the scene, then draw it again through the era.
