@@ -13,7 +13,7 @@ const HUB_Y = 0.3;
 const PACK = { min: 0.8, max: 2.4 };
 const SPEEDS = [-2, -1, 0, 1, 2];
 const SIDE = 1800; // seconds of tape on a side
-const SONGS = 12; // grains per tape in the block behind it
+const SONGS = 12; // grains per tape in the block beside it
 
 const TAPES = [
   { name: '英语听力', paper: '#f1eee4', stripe: '#2756a8', ink: '#1d2a44', title: '英语听力', sub: 'ENGLISH LISTENING · 第三册', foot: 'Unit 1 — Unit 6 · 听力原文见课本', side: 'A' },

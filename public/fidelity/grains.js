@@ -1,5 +1,5 @@
 // What each player could hold, one grain a song (a song taken as 4 MB), stacked into a block on its
-// plinth behind it: 20 x 20 to a layer, so a block's height is how many songs. Together the blocks are
+// plinth beside it, on the right: 20 x 20 to a layer, so a block's height is how many songs. Together the blocks are
 // the row's other chart, the one that mattered: room enough to put every song you love on it and
 // shuffle. A block shuffles when touched (or from the player), and on the tapes a grain lights when
 // a stretch is being repeated.
@@ -9,7 +9,7 @@ import * as THREE from 'three';
 const PITCH = 0.27; // cm from grain to grain
 const SIZE = 0.21;
 const SIDE = 20; // grains along each side of a layer
-export const BEHIND = 3.2; // from a player's back to its block
+export const BESIDE = 3.2; // from a player's side to its block
 // How wide and deep a block of n songs stands.
 export const footOf = (n) => Math.min(SIDE, Math.ceil(Math.sqrt(n))) * PITCH;
 
@@ -42,7 +42,7 @@ export class Grains {
       const s = slots[i];
       const foot = footOf(n);
       const side = Math.max(1, Math.round(foot / PITCH)); // headphones and speakers hold none
-      const origin = new THREE.Vector3(s.x - foot / 2 + PITCH / 2, SIZE / 2, -(s.d / 2 + BEHIND + foot / 2) - foot / 2 + PITCH / 2);
+      const origin = new THREE.Vector3(s.x + s.w / 2 + BESIDE + PITCH / 2, SIZE / 2, -foot / 2 + PITCH / 2);
       const pal = (PALETTES[players[i].id] ?? ['#888']).map((c) => new THREE.Color(c));
       const b = { i, n, at, side, origin, order: new Int32Array(n), from: null, t0: 0, lit: -1, shown: n, fillFrom: n, fillT0: 0, height: Math.ceil(n / (side * side)) * PITCH };
       // colours run in albums: a family holds for a stretch, then the next

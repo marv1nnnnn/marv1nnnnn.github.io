@@ -1,7 +1,7 @@
-// The Zune HD, the last player: lighter and smaller than the iPod it
-// replaced, which is held up beside it at its stop. Its screen is the Zune's own: the menu in huge
-// lowercase words that slide under the finger, and now playing with the artist's name drifting
-// across the back, and a shuffle that deals the block of songs behind it out again.
+// The Zune HD, the last player: lighter and smaller than the iPod it replaced. Its screen is the
+// Zune's own: the menu in huge lowercase words that slide under the finger, and now playing with the
+// artist's name drifting across the back, and a shuffle that deals the block of songs beside it out
+// again.
 
 import { screen } from '../stage.js';
 
@@ -20,7 +20,6 @@ export default {
   grams: 74,
   songs: 8192,
   capacity: '32GB',
-  companion: 'ipod',
   async setup(model, { stage }) {
     const panel = model.getObjectByName('screen');
     const scr = screen(panel, W, H, { scale: 2 });

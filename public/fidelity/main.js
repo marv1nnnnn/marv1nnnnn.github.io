@@ -111,10 +111,4 @@ if (stage) {
   plan.innerHTML = NAMES.map((name) => `<button type="button" aria-label="${name}"></button>`).join('');
   plan.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => go(i + 1)));
   read();
-
-  // The button in the words.
-  document.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => {
-    const on = stage.act(b.dataset.act);
-    if (typeof on === 'boolean') b.setAttribute('aria-pressed', String(on));
-  }));
 }

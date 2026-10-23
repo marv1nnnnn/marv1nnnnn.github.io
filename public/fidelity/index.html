@@ -9,11 +9,27 @@
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/courier-prime.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/libre-caslon.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="fidelity.css">
+  <link rel="stylesheet" href="fidelity.css?v=2">
+  <!-- ?v= gets past the four hours browsers keep scripts here: bump it (all of them) when the code changes -->
   <script type="importmap">
-    { "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+    { "imports": {
+      "three": "./vendor/three/build/three.module.min.js",
+      "three/addons/": "./vendor/three/examples/jsm/",
+      "./stage.js": "./stage.js?v=2",
+      "./cloud.js": "./cloud.js?v=2",
+      "./grains.js": "./grains.js?v=2",
+      "./fidelity.js": "./fidelity.js?v=2",
+      "./devices/repeater.js": "./devices/repeater.js?v=2",
+      "./devices/newsmy.js": "./devices/newsmy.js?v=2",
+      "./devices/unis.js": "./devices/unis.js?v=2",
+      "./devices/philips.js": "./devices/philips.js?v=2",
+      "./devices/cube.js": "./devices/cube.js?v=2",
+      "./devices/ipod.js": "./devices/ipod.js?v=2",
+      "./devices/zune.js": "./devices/zune.js?v=2",
+      "./devices/exhibit.js": "./devices/exhibit.js?v=2"
+    } }
   </script>
-  <script type="module" src="main.js"></script>
+  <script type="module" src="main.js?v=2"></script>
 </head>
 <body>
   <canvas class="stage" aria-hidden="true"></canvas>
@@ -31,7 +47,7 @@
         <p class="kicker">marv1nnnnn · side B · track 2</p>
         <h1>fidelity</h1>
         <p class="sub">Listening devices, 2003 – now</p>
-        <p class="said">Everything I have listened to music on, in the order it came, at real size. Behind each player, one grain for every song it could hold.</p>
+        <p class="said">Everything I have listened to music on, in the order it came, at real size. Beside each player, one grain for every song it could hold.</p>
         <p class="please">Please touch.</p>
         <p class="hint"><span class="mouse">Scroll to walk, drag to look round, click a piece to go to it.</span><span class="finger">Swipe up to walk, drag sideways to look round, tap a piece to go to it.</span></p>
       </div>
@@ -151,7 +167,6 @@
         <p class="date">2009</p>
         <p class="medium">Glass, metal, 3.3-inch OLED touchscreen<br>10.21 × 5.27 × 0.89 cm, 74 g<br>32 GB, about 8,000 songs</p>
         <p class="credit">Also second-hand, from Xianyu, battery replaced. The last player</p>
-        <div class="acts"><button type="button" class="act" data-act="profile" aria-pressed="false">Side-on, with the iPod</button></div>
         <p class="acc">2016.1</p>
       </div>
     </section>
@@ -227,16 +242,6 @@
         <p class="medium">No object<br>Dimensions variable</p>
         <p class="credit">Streaming was everywhere. Living alone, and after starting work too tired to look for songs, I let the shows choose: Mixcloud, then NTS.</p>
         <p class="acc">2017.3</p>
-        <div class="lately">
-          <p class="how">Lately</p>
-          <ul>
-            <li><a href="https://www.nts.live/shows/sounds-on-screen/episodes/sounds-on-screen-hk-crime-movies-9th-april-2026" target="_blank" rel="noopener">Sounds on Screen: Hong Kong Crime Movies</a> <span>NTS</span></li>
-            <li><a href="https://www.nts.live/shows/panorama-yerevan/episodes/panorama-yerevan-25th-october-2025" target="_blank" rel="noopener">Armenian Cassette Special</a> <span>Panorama Yerevan</span></li>
-            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-lychee-reggae-mix-w-wild-wata-12th-october-2025" target="_blank" rel="noopener">Lychee Reggae Mix</a> <span>Wild Wata</span></li>
-            <li><a href="https://www.nts.live/shows/roots-2025/episodes/roots-2025-fiestas-del-alto-w-mama-tora-21st-september-2025" target="_blank" rel="noopener">fiestas del Alto</a> <span>mamá Tora</span></li>
-            <li><a href="https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-hungarian-classical-3rd-october-2025" target="_blank" rel="noopener">NTS Guide to: Hungarian Classical</a> <span>NTS</span></li>
-          </ul>
-        </div>
         <p class="end"><a href="/?side=b">← side B</a> <a href="#top" class="again">From the top</a></p>
       </div>
     </section>

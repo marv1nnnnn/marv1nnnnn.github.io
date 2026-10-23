@@ -1,7 +1,10 @@
-// The gallery: the players on plinths in the order they came, along one wall of a dark hall, each in
-// its own pool of light, and you walking past them at eye height as the page scrolls. Units are
-// centimetres, as in the models (scripts/blender/fidelity/): the players stand on the plinth tops
-// (y = 0, a metre off the floor) in a row along x, their fronts to +z, where the walk runs.
+// The gallery: a dark hall, everything on plinths along it in the order it came, the players on one
+// wall and the earphones, headphones and speakers on the other, each in its own pool of light, and
+// you walking down the middle at eye height as the page scrolls. Units are centimetres, as in the
+// models (scripts/blender/fidelity/). Time runs along x. The players' wall is the scene's own frame:
+// they stand on the plinth tops (y = 0, a metre off the floor), their fronts to +z, where the walk
+// runs. The wall across is the same turned round (across), and the cloud stands at the end of the
+// hall facing you (end); a slot's x and everything held are in its wall's frame (root).
 //
 // focus runs 0 (at the door) .. players.length + 1 (the cloud at the end); a whole number k >= 1 is
 // player k picked up off its plinth and held to you. main.js sets it from the scroll; a drag looks
@@ -11,10 +14,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Cloud } from './cloud.js';
-import { Grains, footOf, BEHIND } from './grains.js';
+import { Grains, footOf, BESIDE } from './grains.js';
 import { Fidelity, ERAS } from './fidelity.js';
 
-const STEP = 170; // from plinth to plinth
+const STEP = 120; // along the hall from one piece to the next, whichever wall it is on
 const PAD = 3; // plinth to spare round what stands on it
 const TOP = 36; // a plinth top at the least, square
 const PLINTH_H = 100;
@@ -24,8 +27,7 @@ const WALL = 45; // from the plinths' backs to the wall
 const PX = 4; // cm to a pixel, for the light on the floor and wall
 const KEY = 5200;
 const KEY_AT = new THREE.Vector3(-35, 55, 70); // the key light, from the camera's mark
-const CLOUD_W = 12; // the empty plinth at the end of the row
-const PAIR_GAP = 1.4; // between two players held up side by side
+const CLOUD_W = 12; // the empty plinth at the end of the hall
 const FOV = 30; // a piece in hand, as through a long lens
 const SEE = 52; // walking: the eyes' own
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -40,8 +42,6 @@ export class Stage {
     this.onPick = onPick;
     this.focus = 0;
     this.progress = []; // how far through each player's own stop the page is, 0..1 (main.js)
-    this.profile = 0; // the pair turned side-on, eased
-    this.profileOn = false;
     this.engaged = null; // the player last touched, which gets the keys
     this.shown = 0; // focus, eased
     this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -68,27 +68,41 @@ export class Stage {
     this.look = { yaw: 0, pitch: 0 }; // where the eyes have been dragged from the way ahead
     this.walking = 0; // how fast, eased: the step in the eyes
 
-    // Lay the row out from the sizes the players declare, so nothing moves as the models arrive: a
-    // plinth for each, a step apart, wide enough for the player and its block of songs, deep enough
-    // for the deepest block behind its player.
-    this.slots = players.map((p, index) => {
-      const pw = Math.max(TOP, Math.max(p.size[0], footOf(p.songs)) + 2 * PAD);
-      // up: how tall it stands in the hand; what lies flat (earphones) is tilted up to show its face
-      return { index, x: index * STEP, pw, w: p.size[0], h: p.size[1], d: p.size[2], up: p.flat ? p.size[2] : p.size[1] };
-    });
-    this.cloudX = players.length * STEP;
-    this.mid = this.cloudX / 2;
+    // Lay the hall out from the sizes the pieces declare, so nothing moves as the models arrive: a
+    // plinth for each, a step on from the one before. The players stand on their wall with their
+    // blocks of songs beside them, on the right; what holds no songs stands across.
     // the front edge: room for the repeater's spare tape, or the deepest thing standing there
     this.front = Math.max(11, ...players.map((p) => p.size[2] / 2 + PAD + 2));
-    this.rear = Math.min(this.front - TOP, -(Math.max(...players.map((p) => p.size[2] / 2 + BEHIND + footOf(p.songs))) + PAD));
+    this.rear = Math.min(this.front - TOP, -(Math.max(...players.map((p) => p.size[2] / 2)) + PAD));
     this.walkZ = this.front + WALK;
     this.wallZ = this.rear - WALL;
+    this.cloudX = (players.length + 1) * STEP;
+    this.mid = this.cloudX / 2;
+    // the camera faces each wall square on at yaw 0, -PI and -PI / 2 (the way down the hall)
+    const wall = (this.wall = Object.assign(new THREE.Group(), { yaw: 0 }));
+    const across = (this.across = Object.assign(new THREE.Group(), { yaw: -Math.PI }));
+    across.position.z = 2 * this.walkZ;
+    across.rotation.y = Math.PI;
+    const end = (this.end = Object.assign(new THREE.Group(), { yaw: -Math.PI / 2 }));
+    end.position.set(this.cloudX, 0, this.walkZ);
+    end.rotation.y = -Math.PI / 2;
+    scene.add(wall, across, end);
+    scene.updateMatrixWorld(true);
+    this.slots = players.map((p, index) => {
+      const at = index * STEP; // along the hall
+      const foot = p.songs ? BESIDE + footOf(p.songs) : 0; // the block of songs and the gap to it
+      const root = p.songs ? wall : across;
+      // x: the piece, cx: the plinth's middle, both in its wall's frame (across, x runs the other way)
+      const cx = root === wall ? at : -at;
+      // up: how tall it stands in the hand; what lies flat (earphones) is tilted up to show its face
+      return { index, at, root, foot, cx, x: cx - foot / 2, pw: Math.max(TOP, p.size[0] + foot + 2 * PAD), w: p.size[0], h: p.size[1], d: p.size[2], up: p.flat ? p.size[2] : p.size[1] };
+    });
 
     this.lamp();
     this.plinths();
     this.room();
-    this.cloud = new Cloud(this.cloudX);
-    scene.add(this.cloud.points);
+    this.cloud = new Cloud(0);
+    end.add(this.cloud.points);
     this.grains = new Grains(scene, this.slots, players, this.reduced);
 
     // one era per stop: the door, each piece, and the cloud
@@ -143,7 +157,7 @@ export class Stage {
     const side = new THREE.MeshStandardMaterial({ color: 0x6e6a64, roughness: 0.9, vertexColors: true, envMapIntensity: 0.2 });
     const lit = new THREE.MeshStandardMaterial({ color: 0x6e6a64, roughness: 0.9, map: poolTex, envMapIntensity: 0.2 });
     const mats = [side, side, lit, side, side, side]; // BoxGeometry's faces: +x -x +y -y +z -z
-    const plinth = (x, w) => {
+    const plinth = (x, w, root) => {
       const g = new THREE.BoxGeometry(w, PLINTH_H, this.front - this.rear, 1, 12, 1);
       const pos = g.attributes.position;
       const col = new Float32Array(pos.count * 3);
@@ -152,10 +166,10 @@ export class Stage {
       const m = new THREE.Mesh(g, mats);
       m.position.set(x, -PLINTH_H / 2, (this.rear + this.front) / 2);
       m.receiveShadow = true;
-      this.scene.add(m);
+      root.add(m);
     };
-    this.slots.forEach((t) => plinth(t.x, t.pw));
-    plinth(this.cloudX, Math.max(TOP, CLOUD_W + 2 * PAD));
+    this.slots.forEach((t) => plinth(t.cx, t.pw, t.root));
+    plinth(0, Math.max(TOP, CLOUD_W + 2 * PAD), this.end);
 
     const blob = document.createElement('canvas');
     blob.width = blob.height = 64;
@@ -170,15 +184,15 @@ export class Stage {
       t.blob = new THREE.Mesh(new THREE.PlaneGeometry(t.w + 2, t.d + 2), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
       t.blob.rotation.x = -Math.PI / 2;
       t.blob.position.set(t.x, 0.02, 0);
-      this.scene.add(t.blob);
+      t.root.add(t.blob);
     });
   }
 
-  // The hall: a floor with the light spilling off each plinth onto it, the wall behind washed above
-  // each, and on the wall over each its number and the year it came. Drawn once (no light of its
-  // own: a lamp a plinth is too many for a phone).
+  // The hall: a floor with the light spilling off each plinth onto it, the walls washed above each,
+  // and on the wall over each its number and the year it came. Drawn once (no light of its own: a
+  // lamp a plinth is too many for a phone).
   room() {
-    const x0 = -STEP * 2.5, x1 = this.cloudX + STEP * 2, xs = [...this.slots.map((t) => t.x), this.cloudX];
+    const x0 = -STEP * 3, x1 = this.cloudX + STEP * 2;
     const surface = (w, h, draw) => {
       const c = document.createElement('canvas');
       c.width = Math.ceil(w / PX);
@@ -202,27 +216,35 @@ export class Stage {
       g.fillRect(-rx, -rx, 2 * rx, 2 * rx);
       g.restore();
     };
-    // the floor, seen from above with the wall at the top of the picture
-    const fd = this.walkZ + 500 - this.wallZ;
+    // the floor from wall to wall, seen from above with the players' wall at the top of the picture
+    const fd = 2 * (this.walkZ - this.wallZ);
+    const spill = [...this.slots.map((t) => [t.root, t.cx]), [this.end, 0]].map(([root, x]) => root.localToWorld(new THREE.Vector3(x, 0, this.front + 30)));
     const floor = surface(x1 - x0, fd, (g) => {
       g.fillStyle = '#16140f';
       g.fillRect(0, 0, x1 - x0, fd);
-      xs.forEach((x) => glow(g, x - x0, this.front + 30 - this.wallZ, 120, 80, 0.13));
+      spill.forEach((p) => glow(g, p.x - x0, p.z - this.wallZ, 120, 80, 0.13));
     });
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set((x0 + x1) / 2, -PLINTH_H, this.wallZ + fd / 2);
+    floor.position.set((x0 + x1) / 2, -PLINTH_H, this.walkZ);
+    // each wall in its own frame, the hall's length running x0..x1 on the players' and the other
+    // way across
     const wh = 380;
-    const wall = surface(x1 - x0, wh, (g) => {
-      g.fillStyle = '#121010';
-      g.fillRect(0, 0, x1 - x0, wh);
-      xs.forEach((x) => glow(g, x - x0, wh - PLINTH_H - 60, 85, 170, 0.1));
-    });
-    wall.position.set((x0 + x1) / 2, wh / 2 - PLINTH_H, this.wallZ);
-    this.scene.add(floor, wall);
+    const walls = (root, lo, hi) => {
+      const xs = this.slots.filter((t) => t.root === root).map((t) => t.cx);
+      const w = surface(hi - lo, wh, (g) => {
+        g.fillStyle = '#121010';
+        g.fillRect(0, 0, hi - lo, wh);
+        xs.forEach((x) => glow(g, x - lo, wh - PLINTH_H - 60, 85, 170, 0.1));
+      });
+      w.position.set((lo + hi) / 2, wh / 2 - PLINTH_H, this.wallZ);
+      root.add(w);
+    };
+    walls(this.wall, x0, x1);
+    walls(this.across, -x1, -x0);
+    this.scene.add(floor);
 
     // the lettering, once the site's type is in
-    const years = [...this.players.map((p) => String(p.got)), '2017 –'];
-    const marks = xs.map((x, i) => {
+    const marks = this.slots.map((t, i) => {
       const c = document.createElement('canvas');
       c.width = 512;
       c.height = 256;
@@ -230,9 +252,9 @@ export class Stage {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = 8;
       const m = new THREE.Mesh(new THREE.PlaneGeometry(48, 24), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
-      m.position.set(x, 62, this.wallZ + 0.5);
-      this.scene.add(m);
-      return { c, tex, n: String(i + 1).padStart(2, '0'), year: years[i] };
+      m.position.set(t.cx, 62, this.wallZ + 0.5);
+      t.root.add(m);
+      return { c, tex, n: String(i + 1).padStart(2, '0'), year: String(this.players[i].got) };
     });
     const type = ['44px "Courier Prime"', '112px "Libre Caslon Text"'];
     Promise.all(type.map((f) => document.fonts.load(f))).catch(() => {}).then(() => marks.forEach(({ c, tex, n, year }) => {
@@ -257,7 +279,7 @@ export class Stage {
       holder.position.set(slot.x, 0, 0);
       pivot.position.y = slot.h / 2;
       holder.add(pivot);
-      this.scene.add(holder);
+      slot.root.add(holder);
       try {
         const gltf = await loader.loadAsync(p.file);
         const model = gltf.scene;
@@ -296,63 +318,53 @@ export class Stage {
   }
 
   // The camera's marks along the walk, every half stop (j = 2 × focus): at the door, a piece in hand
-  // and the cloud on the whole stops; on the halves, on the walk between two, eyes on the next.
+  // and the cloud on the whole stops; on the halves, on the walk down the middle between two, eyes
+  // on the next, on whichever wall it is.
   mark(j) {
     const n = this.players.length;
-    const at = (k) => (k <= 0 ? -STEP : k > n ? this.cloudX : this.slots[k - 1].x);
-    // a phone held upright sees a narrow slice: wider, and turned to the next piece
+    const at = (k) => (k <= 0 ? -STEP : k > n ? this.cloudX : this.slots[k - 1].at);
+    // a phone held upright sees a narrow slice: wider, and turned further to the next piece
     const see = this.wide ? SEE : 64;
-    if (j <= 0) return { pos: new THREE.Vector3(-STEP * 1.9, EYE, this.walkZ + 40), yaw: this.wide ? -1.0 : -0.85, pitch: -0.14, shift: 0, up: this.wide ? 0.08 : 0.2, d: 600, fov: see };
-    if (j % 2) return { pos: new THREE.Vector3((at((j - 1) / 2) + at((j + 1) / 2)) / 2, EYE, this.walkZ), yaw: this.wide ? -0.72 : -0.55, pitch: -0.2, shift: 0, up: this.wide ? 0 : 0.12, d: 500, fov: see };
-    const { target, d, elev, shift, up } = this.pose(j / 2);
-    return { pos: target.clone().add(new THREE.Vector3(0, Math.sin(elev) * d, Math.cos(elev) * d)), yaw: 0, pitch: -elev, shift, up, d, fov: FOV };
+    if (j <= 0) return { pos: new THREE.Vector3(-STEP * 2.4, EYE, this.walkZ), yaw: -Math.PI / 2, pitch: -0.12, shift: 0, up: this.wide ? 0.08 : 0.2, d: 600, fov: see };
+    if (j % 2) {
+      const next = this.slots[(j + 1) / 2 - 1];
+      const turn = Math.PI / 2 - (this.wide ? 0.72 : 0.5); // off the way ahead
+      const yaw = -Math.PI / 2 + (!next ? 0 : next.root === this.across ? -turn : turn);
+      return { pos: new THREE.Vector3((at((j - 1) / 2) + at((j + 1) / 2)) / 2, EYE, this.walkZ), yaw, pitch: -0.2, shift: 0, up: this.wide ? 0 : 0.12, d: 500, fov: see };
+    }
+    const k = j / 2, root = k > n ? this.end : this.slots[k - 1].root;
+    const { target, d, elev, shift, up } = this.pose(k);
+    return { pos: root.localToWorld(target.add(new THREE.Vector3(0, Math.sin(elev) * d, Math.cos(elev) * d))), yaw: root.yaw, pitch: -elev, shift, up, d, fov: FOV };
   }
 
-  // What the camera looks at for a stop, from how far and how high: a player held up (with the one
-  // it is compared with, if any), or the cloud.
+  // What the camera looks at for a stop, in the frame of its wall, from how far and how high: a
+  // player held up with its block of songs beside it, something else held up, or the cloud.
   pose(k) {
     const tan = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const aspect = this.camera.aspect;
     if (k > this.players.length) {
-      return { target: new THREE.Vector3(this.cloudX, 9, 4), d: Math.max(30 / (2 * tan), 16 / (2 * tan * aspect * (this.wide ? 0.55 : 1))), elev: 0.12, shift: 1, up: 0 };
+      return { target: new THREE.Vector3(0, 9, 4), d: Math.max(30 / (2 * tan), 16 / (2 * tan * aspect * (this.wide ? 0.55 : 1))), elev: 0.12, shift: 1, up: 0 };
     }
-    const j = k - 1, s = this.slots[j];
-    const c = this.companion(j);
+    const s = this.slots[k - 1];
+    const at = this.held(k - 1, 1);
     let w = s.w, h = s.up;
-    const at = this.held(j, 1);
-    if (c !== null) {
-      const cs = this.slots[c];
-      w = s.w + cs.w + PAIR_GAP;
-      h = Math.max(s.up, cs.up);
-      at.x -= (s.w / 2 + cs.w / 2 + PAIR_GAP) / 2;
+    if (s.foot) {
+      // down to the plinth top, where the block stands; one taller than the player goes out of the top
+      w += s.foot;
+      at.x += s.foot / 2;
+      h = at.y + s.up / 2;
+      at.y = h / 2;
     }
     const fitH = h / ((this.wide ? 0.62 : 0.4) * 2 * tan);
     const fitW = w / ((this.wide ? 0.5 : 0.8) * 2 * tan * aspect);
     return { target: at, d: Math.max(fitH, fitW, 14), elev: 0.1, shift: 1, up: 0 };
   }
 
-  // A player's middle when it is held up (amount 1) or standing on its plinth (0).
+  // A player's middle when it is held up (amount 1) or standing on its plinth (0), in its wall's frame.
   held(i, amount) {
     const s = this.slots[i];
     const lift = smooth(clamp(amount));
     return new THREE.Vector3(s.x, s.h / 2 + lift * (1.2 + s.up * 0.12 + (s.up - s.h) / 2), lift * (s.d + 9));
-  }
-
-  // The player another is held up beside (the Zune has the iPod it replaced next to it), or null.
-  companion(j) {
-    const id = this.players[j]?.companion;
-    if (!id) return null;
-    const c = this.players.findIndex((p) => p.id === id);
-    return c >= 0 ? c : null;
-  }
-
-  // Where player c is held, beside player j, as j's stop comes up (a).
-  beside(j, c, a) {
-    const s = this.slots[j], cs = this.slots[c];
-    const to = this.held(c, 1);
-    to.x = s.x - (s.w / 2 + cs.w / 2 + PAIR_GAP);
-    to.z = this.held(j, 1).z;
-    return this.held(c, 0).lerp(to, smooth(clamp(a)));
   }
 
   frame(t, dt) {
@@ -391,26 +403,11 @@ export class Stage {
     else cam.setViewOffset(this.w, this.h, 0, this.h * (0.25 * shift + up), this.w, this.h);
     cam.updateProjectionMatrix();
 
-    // Side-on for the comparison, only while its stop is in hand.
-    const here = Math.round(v) - 1;
-    if (this.companion(here) === null || Math.abs(v - (here + 1)) > 0.3) this.profileOn = false;
-    this.profile += ((this.profileOn ? 1 : 0) - this.profile) * (1 - Math.exp(-dt * 3));
-
     // Each player: lifted as the focus nears it, turned to the camera, swaying a little.
     this.slots.forEach((s, i) => {
       if (!s.holder) return;
-      let amount = clamp(1 - Math.abs(v - (i + 1)));
-      let p = this.held(i, amount);
-      let paired = this.companion(i) !== null && amount > 0;
-      this.players.forEach((q, j) => {
-        if (j === i || this.companion(j) !== i) return;
-        const aj = clamp(1 - Math.abs(v - (j + 1)));
-        if (aj > amount) {
-          amount = aj;
-          p = this.beside(j, i, aj);
-          paired = true;
-        }
-      });
+      const amount = clamp(1 - Math.abs(v - (i + 1)));
+      const p = this.held(i, amount);
       s.amount = amount;
       s.holder.position.set(p.x, p.y - s.h / 2, p.z);
       s.blob.material.opacity = 1 - smooth(amount);
@@ -428,9 +425,8 @@ export class Stage {
       const sway = this.reduced ? 0 : Math.sin(t * 0.5 + i) * 0.07 * amount;
       // On its plinth each stands a little askew; held, it faces you.
       const askew = [-0.16, 0.12, -0.22, 0.18, -0.1, 0.14, -0.12][i % 7];
-      const side = paired ? this.profile * (Math.PI / 2) : 0;
       const tilt = this.players[i].flat ? 1.25 : -0.08;
-      s.pivot.rotation.set(tilt * smooth(amount) + s.pitch, (1 - smooth(amount)) * askew + s.yaw + sway + side, 0);
+      s.pivot.rotation.set(tilt * smooth(amount) + s.pitch, (1 - smooth(amount)) * askew + s.yaw + sway, 0);
       // Pressed parts travel in and come back out.
       if (s.model) {
         for (const m of s.meshes) {
@@ -454,23 +450,13 @@ export class Stage {
     const held = Math.max(0, ...this.slots.map((s) => s.amount ?? 0));
     this.key.intensity = KEY * smooth(held);
     this.key.target.position.copy(target);
-    this.key.position.copy(target).add(KEY_AT);
+    this.key.position.copy(KEY_AT).applyAxisAngle(cam.up, yaw).add(target);
     // points are sized in the world: pixels per cm at a cm away
     this.cloud.mat.uniforms.scale.value = (this.h * this.renderer.getPixelRatio()) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
     this.cloud.frame(t, dt, clamp(1 - Math.abs(v - (this.players.length + 1))), this.reduced);
     // the picture in the medium of the piece you are at
     this.fidelity.set(v, t);
     this.grains.frame();
-  }
-
-  // The button in the words: turn the pair side-on.
-  act(name) {
-    if (!this.slots[Math.round(this.focus) - 1]) return undefined;
-    if (name === 'profile') {
-      this.profileOn = !this.profileOn;
-      return this.profileOn;
-    }
-    return undefined;
   }
 
   render() {
