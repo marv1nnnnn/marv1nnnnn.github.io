@@ -1,6 +1,5 @@
 // The iPod classic. Its screen is the 320 x 240 menu, run by the click wheel: turn round it to move,
-// the centre to choose, MENU to go back, the other three edges to skip and play. What is on it is
-// everything that came before, synced across.
+// the centre to choose, MENU to go back, the other three edges to skip and play. On it, post-punk.
 
 import { screen } from '../stage.js';
 
@@ -10,10 +9,11 @@ const TICK = (Math.PI * 2) / 20; // one step of the menu per twentieth of a turn
 const FONT = '"Helvetica Neue", Helvetica, Arial, "PingFang SC", "Noto Sans CJK SC", sans-serif';
 
 const ALBUMS = [
-  { title: '奥斯卡金曲', artist: 'Various Artists', art: 'oscar', songs: ['Auld Lang Syne', 'Scarborough Fair', 'Red River Valley', 'Canon in D'] },
-  { title: '英语听力', artist: '未知艺术家', art: 'english', songs: ['Unit 1 Listening', 'Unit 2 Listening', 'Unit 3 Listening', 'Unit 4 Listening'] },
-  { title: '新建文件夹 (2)', artist: 'Unknown Artist', art: 'folder', songs: ['Track 01', 'Track 02', 'Track 03', 'Track 04', 'Track 05', 'Track 06', 'Track 07'] },
-  { title: 'Unknown Album', artist: 'Unknown Artist', art: 'none', songs: ['01.mp3', '02.mp3', '03.mp3', '下载 (1).mp3', 'AMV_0042'] },
+  { title: 'Unknown Pleasures', artist: 'Joy Division', art: 'pleasures', songs: ['Disorder', 'Day of the Lords', 'Candidate', 'Insight', 'New Dawn Fades', "She's Lost Control", 'Shadowplay', 'Wilderness', 'Interzone', 'I Remember Nothing'] },
+  { title: 'Entertainment!', artist: 'Gang of Four', art: 'entertainment', songs: ['Ether', "Natural's Not in It", 'Not Great Men', 'Damaged Goods', 'Return the Gift', 'Guns Before Butter', 'I Found That Essence Rare', 'Glass', 'Contract', "At Home He's a Tourist", '5.45', 'Anthrax'] },
+  { title: 'Pink Flag', artist: 'Wire', art: 'pinkflag', songs: ['Reuters', 'Field Day for the Sundays', 'Three Girl Rhumba', 'Ex Lion Tamer', 'Lowdown', 'Start to Move', 'Brazil', "It's So Obvious"] },
+  { title: 'Seventeen Seconds', artist: 'The Cure', art: 'seventeen', songs: ['A Reflection', 'Play for Today', 'Secrets', 'In Your House', 'Three', 'The Final Sound', 'A Forest', 'M', 'At Night', 'Seventeen Seconds'] },
+  { title: 'Этажи', artist: 'Molchat Doma', art: 'etazhi', songs: ['Тоска', 'Судно (Борис Рыжий)', 'Клетка'] },
 ];
 const SONGS = ALBUMS.flatMap((a) => a.songs.map((title) => ({ title, album: a })));
 const length = (s) => 150 + ((s.title.length * 37 + s.album.title.length * 11) % 140);
@@ -29,80 +29,82 @@ const MENUS = {
   Extras: ['Clock', 'Games', 'Contacts', 'Calendar', 'Notes', 'Stopwatch'],
 };
 
-// Album art, drawn once: a cover for each album that came over from something older.
+// Album art, drawn once, after the covers rather than copies of them.
 function art(kind) {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const g = c.getContext('2d');
-  if (kind === 'oscar') {
-    const grd = g.createLinearGradient(0, 0, 0, 256);
-    grd.addColorStop(0, '#5e0b12');
-    grd.addColorStop(1, '#250307');
-    g.fillStyle = grd;
+  if (kind === 'pleasures') {
+    // a pulsar's successive pulses, stacked, each hiding the ones behind
+    g.fillStyle = '#000';
     g.fillRect(0, 0, 256, 256);
-    for (let x = 0; x < 256; x += 18) {
-      g.fillStyle = `rgba(0,0,0,${0.18 + 0.12 * Math.sin(x)})`;
-      g.fillRect(x, 0, 9, 256);
+    let seed = 3;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    g.strokeStyle = '#f2f2f2';
+    g.lineWidth = 1.3;
+    for (let r = 0; r < 40; r++) {
+      // each pulse its own height, with a second peak beside the first, and noise mostly in the middle
+      const y0 = 50 + r * 4.4, pts = [], a = 10 + 30 * rnd(), a2 = 14 * rnd(), c2 = (rnd() - 0.5) * 1.4;
+      for (let x = 58; x <= 198; x += 2) {
+        const u = (x - 128) / 26;
+        const peak = a * Math.exp(-u * u) + a2 * Math.exp(-((u - c2) ** 2) * 4) + (rnd() - 0.5) * (0.8 + 4 * Math.exp(-u * u * 0.6));
+        pts.push([x, y0 - Math.max(0, peak)]);
+      }
+      const line = () => { g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); };
+      line();
+      g.lineTo(198, 256);
+      g.lineTo(58, 256);
+      g.fill();
+      line();
+      g.stroke();
     }
-    g.fillStyle = '#d8b25a';
-    g.font = `700 50px ${FONT}`;
-    g.textAlign = 'center';
-    g.fillText('奥斯卡', 128, 112);
-    g.fillText('金曲', 128, 168);
-    g.font = `600 15px ${FONT}`;
-    g.fillText('OSCAR GOLDEN HITS', 128, 206);
-    g.strokeStyle = '#d8b25a';
-    g.lineWidth = 2;
-    g.strokeRect(16, 16, 224, 224);
-  } else if (kind === 'english') {
-    g.fillStyle = '#e9eef2';
+  } else if (kind === 'entertainment') {
+    g.fillStyle = '#c51f24';
     g.fillRect(0, 0, 256, 256);
-    g.fillStyle = '#1d58a8';
-    g.fillRect(0, 0, 256, 92);
-    g.fillStyle = '#fff';
-    g.font = `700 34px ${FONT}`;
-    g.fillText('ENGLISH', 20, 58);
-    g.fillStyle = '#1d58a8';
-    g.font = `700 44px ${FONT}`;
-    g.fillText('英语听力', 20, 160);
-    g.font = `500 18px ${FONT}`;
-    g.fillText('Listening · 磁带同步', 22, 196);
-    g.fillStyle = '#e7a21c';
+    g.fillStyle = '#111';
+    g.font = `900 23px ${FONT}`;
+    g.fillText('GANG OF FOUR', 22, 46);
+    g.font = `900 40px ${FONT}`;
+    g.fillText('ENTER-', 22, 166);
+    g.fillText('TAINMENT!', 22, 206);
+    g.fillStyle = '#f4ecdc';
+    g.fillRect(150, 60, 70, 70);
+    g.fillStyle = '#c51f24';
     g.beginPath();
-    g.arc(214, 214, 26, 0, Math.PI * 2);
+    g.arc(185, 95, 22, 0, Math.PI * 2);
     g.fill();
-  } else if (kind === 'folder') {
-    g.fillStyle = '#d4d0c8';
-    g.fillRect(0, 0, 256, 256);
-    g.fillStyle = '#e8b730';
-    g.fillRect(48, 70, 70, 28);
-    g.fillStyle = '#f6cd4d';
-    g.fillRect(48, 88, 160, 110);
-    g.fillStyle = 'rgba(0,0,0,0.15)';
-    g.fillRect(48, 190, 160, 8);
-    g.fillStyle = '#222';
-    g.font = `500 17px ${FONT}`;
-    g.textAlign = 'center';
-    g.fillText('新建文件夹 (2)', 128, 230);
-  } else {
-    const grd = g.createLinearGradient(0, 0, 256, 256);
-    grd.addColorStop(0, '#f2f2f2');
-    grd.addColorStop(1, '#c9c9c9');
+  } else if (kind === 'pinkflag') {
+    const grd = g.createLinearGradient(0, 0, 0, 256);
+    grd.addColorStop(0, '#d98ca2');
+    grd.addColorStop(1, '#f4d3dc');
     g.fillStyle = grd;
     g.fillRect(0, 0, 256, 256);
-    g.fillStyle = '#a9a9a9';
-    g.beginPath();
-    g.ellipse(102, 176, 26, 19, -0.4, 0, Math.PI * 2);
-    g.ellipse(176, 158, 26, 19, -0.4, 0, Math.PI * 2);
-    g.fill();
-    g.fillRect(118, 62, 10, 112);
-    g.fillRect(192, 46, 10, 112);
-    g.beginPath();
-    g.moveTo(118, 62);
-    g.lineTo(202, 40);
-    g.lineTo(202, 66);
-    g.lineTo(118, 88);
-    g.fill();
+    g.fillStyle = '#7e7a76';
+    g.fillRect(0, 214, 256, 42);
+    g.fillStyle = '#f7f3ee';
+    g.fillRect(150, 58, 3, 160);
+    g.fillStyle = '#e36a8a';
+    g.fillRect(153, 58, 40, 24);
+  } else if (kind === 'seventeen') {
+    g.fillStyle = '#b8bcb6';
+    g.fillRect(0, 0, 256, 256);
+    g.filter = 'blur(5px)';
+    for (let k = 0; k < 14; k++) {
+      g.fillStyle = `rgba(${40 + k * 4}, ${48 + k * 4}, ${44 + k * 3}, 0.75)`;
+      g.fillRect(10 + k * 18 + (k % 3) * 5, 30 + (k % 4) * 12, 6 + (k % 2) * 5, 230);
+    }
+    g.filter = 'none';
+    g.fillStyle = '#2b2d2b';
+    g.font = `500 15px ${FONT}`;
+    g.fillText('THE CURE', 18, 238);
+  } else {
+    // a block of flats against a grey sky
+    g.fillStyle = '#9aa2a7';
+    g.fillRect(0, 0, 256, 256);
+    g.fillStyle = '#4a5054';
+    g.fillRect(40, 70, 176, 186);
+    g.fillStyle = '#c9cfd2';
+    for (let y = 82; y < 250; y += 16) for (let x = 50; x < 206; x += 14) g.fillRect(x, y, 8, 9);
   }
   return c;
 }
@@ -235,7 +237,7 @@ export default {
       g.clip();
       const z = 1.25 + 0.08 * Math.sin(t * 0.2);
       const s = (H - 21) * z;
-      g.drawImage(cover(a.art), half - 20 + Math.sin(t * 0.13) * 14, 21 - (s - (H - 21)) / 2, s, s);
+      g.drawImage(cover(a.art), half - (s - (W - half)) / 2 + Math.sin(t * 0.13) * 14, 21 - (s - (H - 21)) / 2, s, s);
       g.fillStyle = 'rgba(0,0,0,0.04)';
       g.fillRect(half, 21, 2, H);
       g.restore();
