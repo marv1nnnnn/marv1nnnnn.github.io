@@ -12,6 +12,7 @@
     "build": "pnpm generate && next build",
     "start": "next start",
     "og": "node scripts/og-card.js",
+    "og:woji": "node scripts/woji-og.js",
     "lint": "next lint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

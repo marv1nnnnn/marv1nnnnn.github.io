@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>沃集鲜研发部 · 新品随机生成器</title>
+  <meta name="description" content="天麻炖鸽子味薯片、苦瓜风味火腿肠之后，研发部的下一个新品是什么？点一下，替他们抽一个。非官方恶搞。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="沃集鲜研发部 · 新品随机生成器">
+  <meta property="og:description" content="天麻炖鸽子味薯片、苦瓜风味火腿肠之后，研发部的下一个新品是什么？点一下，替他们抽一个。">
+  <meta property="og:url" content="https://marv1nnnnn.com/woji/">
+  <meta property="og:image" content="https://marv1nnnnn.com/woji/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f3f1ea">
+  <link rel="canonical" href="https://marv1nnnnn.com/woji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='14' width='56' height='36' rx='4' fill='%23ffd23f'/%3E%3Ctext x='32' y='42' font-size='22' font-weight='800' text-anchor='middle' fill='%23d7261e' font-family='sans-serif'%3E%C2%A5%3C/text%3E%3C/svg%3E">
+  <style>
+    /* A shelf in a supermarket under strip lights, and on it one price tag: the R&D department's
+       latest. Everything on the tag is drawn out of the word lists below. */
+    :root {
+      --bg: #f3f1ea;
+      --bg-2: #e6e3d8;
+      --ink: #1b1a17;
+      --muted: #6d6a62;
+      --rail: #b9bcc1;
+      --rail-hi: #e9ebee;
+      --rail-lo: #8d9197;
+      --tag: #fffdf6;
+      --band: #ffd23f;
+      --red: #d7261e;
+      --line: #d9d4c4;
+      --note: #fff3a8;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      --num: "DIN Alternate", "DIN Condensed", Bahnschrift, "Roboto Condensed", "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+      --hand: "Kaiti SC", "STKaiti", KaiTi, "BiauKai", serif;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* the store after closing: the tag is still a tag */
+        --bg: #17181b;
+        --bg-2: #0f1012;
+        --ink: #ecebe6;
+        --muted: #9a978e;
+        --rail: #565a61;
+        --rail-hi: #7a7f87;
+        --rail-lo: #33363b;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100svh;
+      background: radial-gradient(120% 70% at 50% -10%, var(--bg) 40%, var(--bg-2));
+      color: var(--ink);
+      font-family: var(--sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+      -webkit-tap-highlight-color: transparent;
+    }
+    a { color: inherit; }
+    .top {
+      width: min(100%, 640px);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .top a { text-decoration: none; }
+    .top a:hover { text-decoration: underline; }
+    header {
+      width: min(100%, 640px);
+      margin: 28px 0 22px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 6vw, 38px);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    h1 small {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 0.42em;
+      font-weight: 600;
+      vertical-align: middle;
+      padding: 2px 7px;
+      border: 1.5px solid currentColor;
+      border-radius: 4px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    header p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* the shelf edge, with the tag clipped to it */
+    .shelf {
+      width: min(100%, 640px);
+      position: relative;
+      padding-top: 18px;
+    }
+    .shelf::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      right: -12px;
+      top: 0;
+      height: 22px;
+      border-radius: 3px;
+      background: linear-gradient(var(--rail-hi), var(--rail) 45%, var(--rail-lo));
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+    .tag {
+      position: relative;
+      background: var(--tag);
+      color: #1b1a17;
+      border-radius: 4px 4px 6px 6px;
+      box-shadow: 0 1px 0 #fff inset, 0 14px 30px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      transform-origin: 50% 0;
+    }
+    .tag.swing { animation: swing 520ms cubic-bezier(.2, .9, .3, 1.2); }
+    @keyframes swing {
+      0% { transform: rotateX(-70deg); opacity: 0; }
+      60% { transform: rotateX(8deg); opacity: 1; }
+      100% { transform: rotateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tag.swing { animation: none; }
+    }
+    .band {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--band);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .badge {
+      background: var(--red);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.1em;
+    }
+    .band .no {
+      margin-left: auto;
+      font-family: var(--num);
+      font-weight: 600;
+      opacity: 0.75;
+    }
+    .body {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0 18px;
+      padding: 14px 16px 12px;
+    }
+    .name {
+      grid-column: 1 / -1;
+      margin: 0 0 10px;
+      font-size: clamp(24px, 6.4vw, 36px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      word-break: break-all;
+    }
+    .name .label, .fields .label, .ingredients .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8a8577;
+      margin-right: 6px;
+      letter-spacing: 0.1em;
+    }
+    .name .label { display: block; margin-bottom: 4px; }
+    .fields {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      padding: 8px 0;
+      border-top: 1px dashed var(--line);
+      border-bottom: 1px dashed var(--line);
+      font-size: 14px;
+    }
+    .ingredients {
+      grid-column: 1 / -1;
+      margin: 10px 0 0;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #4a463d;
+    }
+    .pitch {
+      align-self: end;
+      margin: 12px 0 0;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .pitch::before { content: "「"; }
+    .pitch::after { content: "」"; }
+    .price {
+      align-self: end;
+      text-align: right;
+      color: var(--red);
+      margin-top: 10px;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .price .label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      margin-bottom: 4px;
+    }
+    .price .amount {
+      font-family: var(--num);
+      font-size: clamp(44px, 12vw, 64px);
+      font-weight: 700;
+      line-height: 0.95;
+      font-variant-numeric: tabular-nums;
+    }
+    .price .yen { font-size: 0.45em; margin-right: 2px; }
+    .price .unit { font-size: 13px; font-weight: 600; }
+    .foot {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px 12px;
+      font-size: 11.5px;
+      color: #8a8577;
+    }
+    .barcode { display: block; height: 34px; width: 118px; }
+    .foot .digits { font-family: var(--num); letter-spacing: 0.12em; margin-top: 2px; }
+    .foot .staff { text-align: right; line-height: 1.6; }
+
+    /* the tasting stand's note, taped on below the tag */
+    .note {
+      position: relative;
+      width: fit-content;
+      max-width: 88%;
+      margin: 12px 4px 0 auto;
+      transform: rotate(-1.6deg);
+      background: var(--note);
+      color: #3b3420;
+      padding: 12px 14px 10px;
+      font-family: var(--hand);
+      font-size: 17px;
+      line-height: 1.5;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+    }
+    .note::before {
+      content: "";
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      width: 64px;
+      height: 18px;
+      margin-left: -32px;
+      background: rgba(255, 255, 255, 0.55);
+      transform: rotate(3deg);
+    }
+    .note b { display: block; font-family: var(--sans); font-size: 11px; letter-spacing: 0.2em; opacity: 0.6; }
+
+    .actions {
+      width: min(100%, 640px);
+      display: flex;
+      gap: 10px;
+      margin-top: 26px;
+    }
+    button {
+      font: inherit;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      min-height: 48px;
+      padding: 0 18px;
+    }
+    .go {
+      flex: 1;
+      background: var(--red);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      box-shadow: 0 3px 0 #9d1912;
+    }
+    .go:active { transform: translateY(2px); box-shadow: 0 1px 0 #9d1912; }
+    .copy {
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--rail);
+      font-weight: 600;
+    }
+    button:focus-visible { outline: 3px solid var(--band); outline-offset: 2px; }
+    .hint { width: min(100%, 640px); margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+
+    .history {
+      width: min(100%, 640px);
+      margin-top: 30px;
+    }
+    .history h2 { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.15em; margin: 0 0 10px; }
+    .history ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .history a {
+      display: block;
+      text-decoration: none;
+      background: var(--tag);
+      color: #1b1a17;
+      border-top: 4px solid var(--band);
+      border-radius: 3px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .history a:hover { border-top-color: var(--red); }
+
+    footer {
+      width: min(100%, 640px);
+      margin-top: auto;
+      padding-top: 40px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    footer p { margin: 0 0 6px; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translate(-50%, 20px);
+      background: #1b1a17;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms, transform 180ms;
+    }
+    .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 420px) {
+      .body { grid-template-columns: 1fr; }
+      .price { text-align: left; }
+      .fields { gap: 4px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top" aria-label="woji">
+    <a href="/?side=b">← side B</a>
+    <span>B3 · woji</span>
+  </nav>
+
+  <header>
+    <h1>沃集鲜研发部<small>非官方</small></h1>
+    <p>天麻炖鸽子味薯片、苦瓜风味火腿肠都真的上架了。下一个新品是什么？替研发部抽一个。</p>
+  </header>
+
+  <main class="shelf">
+    <article class="tag" id="tag" aria-live="polite">
+      <div class="band">
+        <span class="badge" id="badge">新品</span>
+        <span>沃集鲜研发部 · 新品价签</span>
+        <span class="no" id="no"></span>
+      </div>
+      <div class="body">
+        <h2 class="name"><span class="label">品 名</span><span id="name"></span></h2>
+        <div class="fields">
+          <span><span class="label">规格</span><span id="spec"></span></span>
+          <span><span class="label">单位</span><span id="unit"></span></span>
+          <span><span class="label">产地</span><span id="origin"></span></span>
+          <span><span class="label">等级</span><span id="grade"></span></span>
+        </div>
+        <p class="ingredients"><span class="label">配料</span><span id="ingredients"></span></p>
+        <p class="pitch" id="pitch"></p>
+        <div class="price">
+          <span class="label">零售价</span>
+          <span class="amount"><span class="yen">¥</span><span id="price"></span></span>
+          <span class="unit" id="per"></span>
+        </div>
+      </div>
+      <div class="foot">
+        <div>
+          <svg class="barcode" id="barcode" viewBox="0 0 118 34" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div class="digits" id="digits"></div>
+        </div>
+        <div class="staff">
+          <div>物价员：<span id="staff"></span></div>
+          <div>上架日期：<span id="date"></span></div>
+        </div>
+      </div>
+    </article>
+    <aside class="note" aria-label="试吃反馈"><b>试吃区反馈</b><span id="review"></span></aside>
+  </main>
+
+  <div class="actions">
+    <button class="go" id="go" type="button">研发部，再来一个</button>
+    <button class="copy" id="copy" type="button">复制链接</button>
+  </div>
+  <p class="hint">空格键也行。每个新品都有自己的链接，发给朋友，他看到的就是这一个。</p>
+
+  <section class="history" id="history" hidden>
+    <h2>今天上过货架的</h2>
+    <ol id="shelf"></ol>
+  </section>
+
+  <footer>
+    <p>真实上架过的：天麻炖鸽子味薯片、苦瓜风味火腿肠、川味葡萄凉面、人参黄精吐司、生牛乳茯苓薏仁奶。</p>
+    <p>非官方恶搞，与沃尔玛及沃集鲜无关。这里的商品全是随机抽出来的，并不存在；如有雷同，说明研发部真的做出来了。</p>
+    <p><a href="/">marv1nnnnn</a></p>
+  </footer>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    // ---- the word lists: what the R&D department draws from ----
+
+    // 药食同源: what goes in the slow cooker at grandma's, now in snacks
+    const HERBS = ['人参', '黄精', '天麻', '枸杞', '茯苓', '薏仁', '山药', '红枣', '当归', '黄芪', '党参', '陈皮',
+      '罗汉果', '板蓝根', '金银花', '菊花', '酸枣仁', '葛根', '五指毛桃', '灵芝', '石斛', '胖大海', '决明子',
+      '蒲公英', '阿胶', '桂圆', '百合', '莲子', '芡实', '山楂', '乌梅', '甘草', '艾草', '紫苏', '玉竹', '麦冬',
+      '杜仲', '西洋参'];
+    // what the herbs are stewed with
+    const STEW = ['鸽子', '老母鸡', '乌鸡', '猪蹄', '排骨', '羊肉', '鲫鱼', '甲鱼', '牛腩', '老鸭', '猪肚', '花胶'];
+    const METHODS = ['炖', '炖', '煲', '焖', '煨', '蒸'];
+    // vegetables and fruit that have no business being there
+    const ODD = ['苦瓜', '菠萝', '葡萄', '西瓜', '榴莲', '香菜', '折耳根', '鱼腥草', '秋葵', '芹菜', '茄子', '番茄',
+      '柚子', '黄瓜', '青提', '杨梅', '百香果', '牛油果', '火龙果', '荔枝', '大蒜', '洋葱', '韭菜', '山竹', '芒果',
+      '草莓', '酸角', '青柠', '生姜'];
+    const VEG = ['苦瓜', '香菜', '折耳根', '鱼腥草', '秋葵', '芹菜', '茄子', '大蒜', '洋葱', '韭菜', '生姜', '黄瓜', '番茄',
+      '豆角', '莴笋', '青椒'];
+    const FRUIT = ['葡萄', '西瓜', '草莓', '菠萝', '芒果', '荔枝', '青提', '杨梅', '榴莲', '牛油果', '百香果', '山竹',
+      '火龙果', '蓝莓', '樱桃', '水蜜桃'];
+    const REGION = ['川味', '麻辣', '藤椒', '酸汤', '东北', '潮汕', '新疆', '云南', '泰式', '韩式', '蒜香', '黑椒',
+      '孜然', '糖醋', '十三香', '椒盐', '剁椒', '怪味', '鱼香', '宫保'];
+    const DISH = ['酸菜鱼', '螺蛳粉', '毛血旺', '小龙虾', '佛跳墙', '臭豆腐', '麻辣烫', '卤大肠', '羊肉串',
+      '煎饼果子', '肉夹馍', '红烧肉', '回锅肉', '皮蛋瘦肉粥', '东北乱炖', '宫保鸡丁', '鱼香肉丝', '腌笃鲜',
+      '猪脚饭', '黄焖鸡', '酸辣粉', '烤冷面'];
+    // a season of its own: 抹茶季 happened, 香菜 had a series
+    const SEASONS = ['抹茶', '香菜', '榴莲', '折耳根', '桂花', '柚子', '黑芝麻', '咸蛋黄', '老陈醋', '藤椒', '紫苏', '酸梅'];
+
+    // what ends up on the shelf: names, how it is sold, and where these things are usually made
+    const CATS = {
+      chips: { names: ['薯片', '虾条', '锅巴', '米饼', '海苔脆'], unit: '袋', spec: ['70g', '105g', '160g 家庭装'], price: [6.9, 14.9],
+        from: ['福建·晋江', '广东·汕头', '江苏·苏州'], base: ['马铃薯', '植物油'], mods: ['厚切', '波纹', '爆脆'] },
+      sausage: { names: ['火腿肠', '烤肠', '午餐肉', '鱼豆腐', '鸡胸肉肠'], unit: '袋', spec: ['30g×10根', '240g', '6根装'], price: [9.9, 19.9],
+        from: ['河南·漯河', '山东·临沂', '河南·郑州'], base: ['鸡肉', '猪肉', '玉米淀粉'], mods: ['爆汁', '脆皮', '0淀粉'] },
+      noodle: { names: ['挂面', '凉面', '拌面', '冷面', '方便面'], unit: '袋', spec: ['400g', '5连包', '2人份'], price: [7.9, 16.9],
+        from: ['四川·成都', '陕西·西安', '河南·郑州'], base: ['小麦粉', '饮用水'], mods: ['低GI', '手擀', '劲道'] },
+      bread: { names: ['吐司', '欧包', '贝果', '餐包', '手撕面包'], unit: '袋', spec: ['350g', '4个装', '8片'], price: [9.9, 22.9],
+        from: ['上海·奉贤', '江苏·苏州', '广东·广州'], base: ['小麦粉', '鸡蛋', '黄油'], mods: ['0蔗糖', '全麦', '爆浆'] },
+      pastry: { names: ['馅饼', '月饼', '蛋黄酥', '青团', '麻薯', '蛋挞', '瑞士卷'], unit: '盒', spec: ['6枚装', '4个装', '280g'], price: [12.9, 39.9],
+        from: ['广东·广州', '浙江·湖州', '福建·泉州'], base: ['小麦粉', '红豆沙', '麦芽糖浆'], mods: ['流心', '爆浆', '冰皮'] },
+      frozen: { names: ['冰淇淋', '雪糕', '冰棍', '冰沙杯'], unit: '支', spec: ['75g', '4支装', '90g'], price: [4.9, 15.9],
+        from: ['内蒙古·呼和浩特', '天津', '广东·佛山'], base: ['生牛乳', '稀奶油', '白砂糖'], mods: ['厚乳', '爆浆', '冻干'] },
+      drink: { names: ['奶', '酸奶', '气泡水', '果汁', '奶茶', '茶饮'], unit: '瓶', spec: ['450ml', '1L', '250ml×6'], price: [5.9, 18.9],
+        from: ['黑龙江·齐齐哈尔', '广东·佛山', '浙江·杭州'], base: ['生牛乳'], mods: ['0糖', '厚乳', '冷萃'] },
+      candy: { names: ['软糖', '牛轧糖', '巧克力', '棒棒糖', '果冻'], unit: '袋', spec: ['120g', '18粒', '8杯装'], price: [8.9, 24.9],
+        from: ['福建·晋江', '广东·潮州', '上海·金山'], base: ['白砂糖', '葡萄糖浆', '明胶'], mods: ['夹心', '爆浆', '冻干'] },
+      deli: { names: [], unit: '盒', spec: ['400g', '2人份', '门店现做'], price: [19.9, 49.9],
+        from: ['门店现做'], base: ['门店现做'], mods: [] },
+    };
+
+    const BADGES = ['新品', '新品', '新品', '限定', '研发部推荐', '爆款预定', '勇者专供'];
+    const GRADES = ['合格品', '一级', '一级', '研发部特供级', '勇士级', '养生级'];
+    const PITCHES = ['养生和放纵，一口全都要', '脆皮年轻人的续命新主食', '药食同源，零食也要进补', '研发部连夜开会定的口味',
+      '一口吃出奶奶家厨房的味道', '早八人的电子进补', '熬夜修复，从嘴开始', '好不好吃，买了才知道', '限定新品，卖完看缘分',
+      '试吃区阿姨都说好', '比你想象的正常一点', '你没见过，因为我们也是第一次做', '挑战味蕾，也挑战胆量',
+      '爸妈放心买，年轻人放心晒', '传统滋补，现代零食', '晒朋友圈，点赞翻三倍', '每一口都是研发部的心血',
+      '灵感来自一次团建', '这次真的不是愚人节', '建议配一杯热水'];
+    const REVIEWS = ['第一口：？？ 第二口：……有点东西', '吃完感觉自己补过头了', '我妈说这个养生，我信了',
+      '研发部你们开会是抽签吗', '离谱，但我回购了', '味道很难形容，像小时候生病那天', '同事吃完沉默了三秒',
+      '口味很勇敢', '说不上好吃，但是忘不掉', '配料表比我简历还丰富', '买来整蛊室友，结果自己吃完了',
+      '建议改名：勇者的试炼', '不难吃，就是不知道为什么要这样', '很适合发朋友圈，不太适合吃',
+      '吃完养生了，心态没了', '一星给味道，五星给勇气', '打工人吃了能多加两小时班', '已推荐给最讨厌的人',
+      '吃之前笑了，吃之后哭了', '居然……还行？'];
+    const SURNAMES = ['王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴'];
+
+    // ---- one product per seed: the same seed always draws the same product ----
+
+    function rng(seed) {
+      // mulberry32 over a hash of the seed string
+      let h = 1779033703 ^ seed.length;
+      for (let i = 0; i < seed.length; i++) { h = Math.imul(h ^ seed.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+      let a = h >>> 0;
+      return () => {
+        a |= 0; a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function draw(seed) {
+      const r = rng(seed);
+      const pick = (list) => list[Math.floor(r() * list.length)];
+      const two = (list) => { const a = pick(list); let b = pick(list); while (b === a) b = pick(list); return [a, b]; };
+      const chance = (p) => r() < p;
+      const tiny = () => `${(0.01 + r() * 0.08).toFixed(2)}%`;
+
+      // each recipe is one of the ways the real ones were named
+      const RECIPES = [
+        [2, () => { // 天麻炖鸽子味薯片
+          const herb = pick(HERBS), meat = pick(STEW), cat = pick(['chips', 'chips', 'noodle', 'candy', 'frozen', 'sausage']);
+          return { cat, name: `${herb}${pick(METHODS)}${meat}味${pick(CATS[cat].names)}`, adds: [`${herb}粉(${tiny()})`, `${meat}风味调味料(≥2%)`] };
+        }],
+        [2, () => { // 苦瓜风味火腿肠
+          const cat = pick(['sausage', 'sausage', 'bread', 'frozen', 'drink', 'chips']);
+          const odd = pick(cat === 'sausage' || cat === 'chips' ? ODD : VEG);
+          return { cat, name: `${odd}风味${pick(CATS[cat].names)}`, adds: [`${odd}汁(≥5%)`] };
+        }],
+        [1.5, () => { // 坚果四脆川味葡萄凉面
+          const region = pick(REGION), fruit = pick(FRUIT);
+          const prefix = chance(0.3) ? pick(['坚果四脆', '五谷', '冰镇', '爆汁']) : '';
+          return { cat: 'noodle', name: `${prefix}${region}${fruit}${pick(['凉面', '挂面', '拌面', '冷面'])}`, adds: [`${fruit}果肉(≥8%)`, `${region}调味料`], plain: !!prefix };
+        }],
+        [1.5, () => { // 人参黄精吐司
+          const [a, b] = two(HERBS), cat = pick(['bread', 'bread', 'pastry']);
+          return { cat, name: `${a}${b}${pick(CATS[cat].names)}`, adds: [`${a}粉(${tiny()})`, `${b}提取物(${tiny()})`] };
+        }],
+        [1, () => { // 生牛乳茯苓薏仁奶
+          const [a, b] = two(HERBS);
+          return { cat: 'drink', name: `生牛乳${a}${b}${pick(['奶', '奶', '酸奶'])}`, adds: [`${a}(${tiny()})`, `${b}(${tiny()})`] };
+        }],
+        [1, () => { // 板蓝根馅饼
+          const herb = pick(HERBS);
+          return { cat: 'pastry', name: `${herb}馅${pick(['饼', '月饼', '包', '汤圆', '饺子', '青团'])}`, adds: [`${herb}馅(≥20%)`] };
+        }],
+        [2, () => { // a famous dish, in a dessert
+          const dish = pick(DISH), cat = pick(['frozen', 'frozen', 'candy', 'drink', 'pastry', 'chips']);
+          return { cat, name: `${dish}味${pick(CATS[cat].names)}`, adds: [`${dish}风味酱(≥3%)`] };
+        }],
+        [1.5, () => { // a season of its own
+          const flavour = pick(SEASONS);
+          if (chance(0.45)) {
+            const dish = pick(DISH);
+            return { cat: 'deli', name: `${flavour}${dish}`, adds: [`${flavour}(≥1%)`, `${dish}`], badge: `${flavour}季限定` };
+          }
+          const cat = pick(['frozen', 'bread', 'pastry', 'drink', 'candy', 'sausage']);
+          return { cat, name: `${flavour}${pick(CATS[cat].names)}`, adds: [`${flavour}(≥3%)`], badge: `${flavour}季限定` };
+        }],
+      ];
+      let total = RECIPES.reduce((s, [w]) => s + w, 0), at = r() * total, recipe = RECIPES[0][1];
+      for (const [w, f] of RECIPES) { if ((at -= w) < 0) { recipe = f; break; } }
+      const made = recipe();
+      const cat = CATS[made.cat];
+      let name = made.name;
+      // a selling word in front, now and then, on a name that has room for one
+      if (cat.mods.length && !made.plain && name.length < 9 && chance(0.25)) name = pick(cat.mods) + name;
+
+      const [lo, hi] = cat.price;
+      const price = (Math.floor(lo + r() * (hi - lo)) + (chance(0.7) ? 0.9 : 0.8)).toFixed(1);
+      const base = made.cat === 'drink' && !/奶/.test(name) ? ['饮用水'] : cat.base;
+      const ingredients = [...base, ...made.adds, '白砂糖', '食用盐'];
+      if (chance(0.18)) ingredients.push('研发部的勇气');
+      const digits = barcodeDigits(r);
+
+      return {
+        name,
+        badge: made.badge ?? pick(BADGES),
+        spec: pick(cat.spec),
+        unit: cat.unit,
+        origin: chance(0.08) ? '研发部会议室' : pick(cat.from),
+        grade: pick(GRADES),
+        ingredients: [...new Set(ingredients)].join('、'),
+        pitch: pick(PITCHES),
+        price,
+        per: `/ ${cat.unit}`,
+        review: pick(REVIEWS),
+        no: `No.${String(Math.floor(r() * 9000) + 1000)}`,
+        staff: `${pick(SURNAMES)}（研发部）`,
+        digits,
+      };
+    }
+
+    // EAN-13 digits under China's 690-699 prefix, with a real check digit
+    function barcodeDigits(r) {
+      const d = [6, 9, Math.floor(r() * 10)];
+      while (d.length < 12) d.push(Math.floor(r() * 10));
+      const sum = d.reduce((s, x, i) => s + x * (i % 2 ? 3 : 1), 0);
+      d.push((10 - (sum % 10)) % 10);
+      return d.join('');
+    }
+
+    // EAN-13's own bars, so it looks like one (it scans to nothing on any till)
+    function barcodeSvg(digits) {
+      const L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011'];
+      const G = L.map((c) => c.split('').reverse().map((b) => (b === '1' ? '0' : '1')).join(''));
+      const R = L.map((c) => c.split('').map((b) => (b === '1' ? '0' : '1')).join(''));
+      const PARITY = ['LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG', 'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL'];
+      const n = digits.split('').map(Number);
+      let bits = '101';
+      for (let i = 1; i <= 6; i++) bits += (PARITY[n[0]][i - 1] === 'L' ? L : G)[n[i]];
+      bits += '01010';
+      for (let i = 7; i <= 12; i++) bits += R[n[i]];
+      bits += '101';
+      const w = 118 / bits.length;
+      let rects = '';
+      for (let i = 0; i < bits.length; i++) if (bits[i] === '1') rects += `<rect x="${(i * w).toFixed(2)}" y="0" width="${w.toFixed(2)}" height="34"/>`;
+      return `<g fill="#1b1a17">${rects}</g>`;
+    }
+
+    // ---- the page ----
+
+    const $ = (id) => document.getElementById(id);
+    const today = (() => { const d = new Date(); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; })();
+    const newSeed = () => Math.floor(Math.random() * 36 ** 6).toString(36).padStart(6, '0');
+    const seedFromHash = () => { const s = location.hash.slice(1).toLowerCase(); return /^[a-z0-9]{1,12}$/.test(s) ? s : null; };
+
+    let seen = [];
+    try { seen = JSON.parse(localStorage.getItem('woji-shelf') || '[]').filter((x) => x && /^[a-z0-9]{1,12}$/.test(x.seed)).slice(0, 12); } catch { seen = []; }
+
+    function render(seed) {
+      const p = draw(seed);
+      for (const k of ['name', 'badge', 'spec', 'unit', 'origin', 'grade', 'ingredients', 'pitch', 'price', 'per', 'review', 'no', 'staff']) $(k).textContent = p[k];
+      $('digits').textContent = p.digits;
+      $('barcode').innerHTML = barcodeSvg(p.digits);
+      $('date').textContent = today;
+      document.title = `${p.name} · 沃集鲜研发部`;
+      const tag = $('tag');
+      tag.classList.remove('swing');
+      void tag.offsetWidth;
+      tag.classList.add('swing');
+      remember(seed, p.name);
+    }
+
+    function remember(seed, name) {
+      seen = [{ seed, name }, ...seen.filter((x) => x.seed !== seed)].slice(0, 12);
+      try { localStorage.setItem('woji-shelf', JSON.stringify(seen)); } catch { /* no storage */ }
+      const rest = seen.slice(1);
+      $('history').hidden = rest.length === 0;
+      $('shelf').replaceChildren(...rest.map((x) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${x.seed}`;
+        a.textContent = x.name;
+        li.append(a);
+        return li;
+      }));
+    }
+
+    function next() { location.hash = newSeed(); }
+
+    let toastTimer = 0;
+    function toast(text) {
+      const t = $('toast');
+      t.textContent = text;
+      t.classList.add('on');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('on'), 1600);
+    }
+
+    async function copyLink() {
+      const url = location.href;
+      try { await navigator.clipboard.writeText(url); toast('链接已复制，发给朋友吧'); }
+      catch { prompt('复制这个链接：', url); }
+    }
+
+    $('go').addEventListener('click', next);
+    $('copy').addEventListener('click', copyLink);
+    addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !e.repeat && !(e.target instanceof HTMLButtonElement) && !(e.target instanceof HTMLAnchorElement)) { e.preventDefault(); next(); }
+    });
+    addEventListener('hashchange', () => { const s = seedFromHash(); if (s) render(s); });
+
+    const first = seedFromHash();
+    if (first) render(first);
+    else history.replaceState(null, '', `#${newSeed()}`), render(seedFromHash());
+  </script>
+</body>
+</html>
