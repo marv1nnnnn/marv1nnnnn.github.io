@@ -903,5 +903,26 @@
     "type": "video",
     "date": "2026-10-31",
     "url": "https://movie.douban.com/subject/37446297/"
+  },
+  {
+    "title": "Possible Love",
+    "creator": "Lee Chang-dong",
+    "type": "video",
+    "date": "2026-11-11",
+    "url": "https://www.netflix.com/title/82106490"
+  },
+  {
+    "title": "Virtue and a Sledgehammer",
+    "creator": "Deconstructeam & Selkie Harbour",
+    "type": "game",
+    "date": "2026-11-11",
+    "url": "https://store.steampowered.com/app/3743260/"
+  },
+  {
+    "title": "Psycho-Sleuth",
+    "creator": "PHOSEPO",
+    "type": "game",
+    "date": "2026-11-11",
+    "url": "https://store.steampowered.com/app/3432860/"
   }
 ]
