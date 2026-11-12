@@ -8,7 +8,8 @@ on:
 
 jobs:
   playwright:
-    runs-on: ubuntu-latest
+    # ubuntu-latest became 26.04, where Playwright 1.59 cannot install Chromium's dependencies
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
